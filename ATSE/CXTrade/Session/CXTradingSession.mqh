@@ -317,12 +317,12 @@ private:
 
         //-- 3. 활성 파이프라인 (Monitoring & TS)
         CXCompositeStep* activeStep = new CXCompositeStep("Step_ActiveComposite");
-        activeStep.AddTask(new CXTaskComm_V_Status())
+        activeStep.AddTask(new CXTaskIntentWatch()) //-- [v11.7] Prioritize intent check
+                  .AddTask(new CXTaskComm_V_Status())
                   .AddTask(new CXTaskSync_V_Stale())
                   .AddTask(new CXTaskActive_V_Terminal())
                   .AddTask(new CXTaskActive_P_Align())
                   .AddTask(new CXTaskActive_L_Status())
-                  .AddTask(new CXTaskIntentWatch())
                   .AddTask(new CXTaskAlphaCalc())
                   .AddTask(new CXTaskAlphaApply());
 
