@@ -6,140 +6,22 @@ using NLog;
 using XTA.Core;
 using XTA.Interfaces;
 using XTA.Models;
-using XTA.XData.Models;
 using XTA.Validation;
 using FluentValidation.Results;
-using FluentSeq;
 
 namespace XTA.Services
 {
     /// <summary>
     /// 신호의 생명주기 관리, 식별자(SID/GID) 생성 및 최종 검증을 담당하는 서비스
     /// [v9.9] FluentSeq를 도입하여 Enrichment 5단계 (ID 생성, 패치, 중복 검사, 검증) 명확화
+    /// [Partial] Core: 필드, 생성자, 그룹화 및 기본 검증 로직
     /// </summary>
-    public class XSignalService : IXSignalService
+    public partial class XSignalService : IXSignalService
     {
         private static readonly Logger nlog = LogManager.GetCurrentClassLogger();
         private readonly XSignalValidator _validator = new();
 
         private record EnrichContext(XDataObject Xdo, Models.XSignal CurrentSignal, bool IsDropped = false);
-
-        public async Task<List<Models.XSignal>> PrepareSignalsAsync(XDataObject xdo)
-        {
-            var globalCtx = XContext.Instance;
-            if (globalCtx.Policy == null) 
-            {
-                nlog.Error("[SIGNAL:ERROR] Policy service is not initialized.");
-                return new List<Models.XSignal>();
-            }
-
-            // 1. 정책 서비스 적용 (내부적으로 FluentSeq 구동)
-            var enriched = await globalCtx.Policy.ApplyPolicyAsync(xdo);
-            if (enriched == null || enriched.Count == 0) return new List<Models.XSignal>();
-
-            var finalResults = new List<Models.XSignal>();
-
-            // 2. 신호 단위로 Enrichment 시퀀스 구동
-            foreach (var s in enriched)
-            {
-                var ctx = new EnrichContext(xdo, s);
-                ISequence<string> seq = null!;
-
-                seq = new FluentSeq<string>().Create("Idle")
-                    .ActivateDebugLogging(nlog)
-                    .ConfigureState("GenerateIDs")
-                        .OnEntry(() => {
-                            var sig = ctx.CurrentSignal;
-                            if (string.IsNullOrEmpty(sig.sid))
-                                sig.sid = XIdManager.Instance.GenerateSid(sig.cno, DateTime.Now, sig.sno, sig.gno, sig.dir, sig.type);
-                            if (string.IsNullOrEmpty(sig.gid))
-                                sig.gid = XIdManager.Instance.GenerateGid(sig.cno, DateTime.Now, sig.sno, sig.gno);
-                            seq.SetState("PatchMetadata");
-                        })
-                    .ConfigureState("PatchMetadata")
-                        .OnEntry(() => {
-                            var sig = ctx.CurrentSignal;
-                            sig.updated = DateTime.Now;
-                            if (sig.xe_status == 0) sig.SetXeStatus((int)XCode.EaStatus.Ready);
-
-                            // [v9.0] 모든 주입 신호의 심볼은 GOLD#으로 통일
-                            sig.symbol = "GOLD#";
-
-                            // 수동 주입 보정
-                            if (ctx.Xdo.CMD == "DM_INJECTION")
-                            {
-                                nlog.Debug($"[Signal:ENRICH:DM] Patching manual signal metadata for CNO:{sig.cno}");
-                                if (sig.xa_exit == 0 && sig.xa_entry == 0) sig.xa_entry = 1;
-                                if (sig.xa_entry > 0 && sig.price_signal <= 0) sig.price_signal = 1.0;
-                            }
-                            seq.SetState("CheckDuplicates");
-                        })
-                    .ConfigureState("CheckDuplicates")
-                        .OnEntry(async () => {
-                            nlog.Debug($"[Signal:ENRICH] SID:{ctx.CurrentSignal.sid} GID:{ctx.CurrentSignal.gid} CNO:{ctx.CurrentSignal.cno} Dir:{ctx.CurrentSignal.dir} Type:{ctx.CurrentSignal.type}");
-
-                            // [v9.0] 수동 주입(DM_INJECTION)일 경우 중복 체크 생략하여 SID 갱신 허용
-                            if (ctx.Xdo.CMD != "DM_INJECTION" && globalCtx.SignalRepo != null)
-                            {
-                                var existing = await globalCtx.SignalRepo.GetSignalBySidAsync(ctx.CurrentSignal.sid);
-                                if (existing != null)
-                                {
-                                    nlog.Warn($"[Signal:DROP] Duplicate SID detected. Injection aborted for SID:{ctx.CurrentSignal.sid}");
-                                    ctx = ctx with { IsDropped = true };
-                                    seq.SetState("End");
-                                    return;
-                                }
-                            }
-                            seq.SetState("Validate");
-                        })
-                    .ConfigureState("Validate")
-                        .OnEntry(async () => {
-                            if (ctx.IsDropped) { seq.SetState("End"); return; }
-                            var valResult = _validator.Validate(ctx.CurrentSignal);
-                            if (valResult.IsValid)
-                            {
-                                finalResults.Add(ctx.CurrentSignal);
-                            }
-                            else
-                            {
-                                string errors = string.Join(", ", valResult.Errors.Select(e => e.ErrorMessage));
-                                string errorMsg = $"[VAL-99] Validation Failed: {errors}";
-                                nlog.Warn($"[Signal:VALIDATE-FAIL] SID:{ctx.CurrentSignal.sid} | {errorMsg}");
-                                
-                                ctx.CurrentSignal.xe_status = 99;
-                                ctx.CurrentSignal.xe_status_msg = errorMsg;
-                                ctx.CurrentSignal.comment = errors;
-
-                                // [v9.0] 검증 실패 시 즉시 DB에 에러 상태 기록 (Worker 모니터링 대상)
-                                if (globalCtx.SignalRepo != null)
-                                {
-                                    await globalCtx.SignalRepo.SaveSignalImmediateAsync(ctx.CurrentSignal, true);
-                                }
-                            }
-                            seq.SetState("End");
-                        })
-                    .ConfigureState("End")
-                    .Builder().DisableValidation().Build();
-
-                // [v9.0] 빌드 후 명시적 상태 전이 (생성자 내 자동 전이 시 seq가 null인 문제 해결)
-                seq.SetState("GenerateIDs");
-
-                try
-                {
-                    int safety = 0;
-                    while (!seq.IsInState("End") && safety++ < 10)
-                    {
-                        await seq.RunAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    nlog.Error(ex, $"[Signal:PREPARE-ERROR] Error preparing signal for CNO:{ctx.CurrentSignal.cno}");
-                }
-            }
-
-            return finalResults;
-        }
 
         public List<XSignalGroup> GroupSignals(List<Models.XSignal> signals)
         {
