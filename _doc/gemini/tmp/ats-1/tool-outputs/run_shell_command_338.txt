@@ -1,3 +1,0 @@
-Output: >          DatabaseColumnText(req,    GetColumnIndex(req, "symbol"),       sig.symbol);??           DatabaseColumnInteger(req, GetColumnIndex(req, "dir"),          sig.dir);??           DatabaseCol
-umnInteger(req, GetColumnIndex(req, "type"),         sig.type);
-Process Group PGID: 18700

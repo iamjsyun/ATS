@@ -1,4 +1,0 @@
-Current topic: "Enhancing Trade Command Tracing"
-Topic summary: The user requested that every call to `m_trade` functions (OrderOpen, OrderModify, PositionModify, etc.) include all passed parameters in the logs. I will modify `CXOrderManager.mqh` and `CXPositionManager.mqh` to implement 'Call-Site Tracing', ensuring that Symbol, Type, Lot, Price, SL, TP, and other arguments are explicitly logged just before or during the execution of broker commands. This provides a complete audit trail for every physical trade request.
-
-Strategic Intent: Enhance trade execution logs with exhaustive parameter details.

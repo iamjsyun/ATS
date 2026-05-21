@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 1 match for pattern \"enum\\s+ENUM_XE_STATUS\" in the workspace directory:\n---\nFile: ATSE\\CXTrade\\Interfaces\\CXDefine.mqh\nL1- #ifndef CX_DEFINE_MQH\nL2- #define CX_DEFINE_MQH\nL3- \nL4- /**\nL5-  * @file CXDefine.mqh\nL6-  
-... [TRUNCATED] ...
-EVENT_TRANSACTION   = 1,\nL93-     EVENT_TIMER         = 2,\nL94-     EVENT_START         = 100,\nL95-     EVENT_INJECT        = 101\nL96- };\nL97- \nL98- //--- Step 실행 공통 결과 (Generic Step Results)\nL99- #define STATE_UNCHANGED     -1\nL100- \n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\grep_search_grep_search_1779234348975_3_ulsoqq.txt
-</tool_output_masked>

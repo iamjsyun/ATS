@@ -1,3 +1,0 @@
-{
-  "output": "Found 4 matches for pattern \"#include \".*CXServiceFactory\\.mqh\"\" in the workspace directory (filter: \"ATSE/**/*.mqh\"):\n---\nFile: ATSE\\CXTrade\\App\\CXAppService.mqh\nL19: #include \"CXServiceFactory.mqh\"\n---\nFile: ATSE\\CXTrade\\App\\CXServiceFactory.mqh\nL4: #include \"..\\Interfaces\\ICXServiceFactory.mqh\"\n---\nFile: ATSE\\CXTrade\\Interfaces\\ICXTradingSessionPool.mqh\nL8: #include \"ICXServiceFactory.mqh\"\n---\nFile: ATSE\\CXTrade\\Session\\CXTradingSession.mqh\nL17: #include \"..\\Interfaces\\ICXServiceFactory.mqh\"\n---"
-}

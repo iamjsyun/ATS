@@ -1,3 +1,0 @@
-{
-  "output": "#ifndef ICXPARAM_MQH\n#define ICXPARAM_MQH\n\n#include <Object.mqh>\n#include \"ICXSignal.mqh\"\n#include \"CXDefine.mqh\"\n\nclass ICXContext;\n\nclass ICXParam : public CObject {\npublic:\n    virtual ~ICXParam() {}\n    virtual ICXSignal* GetSignal() = 0;\n    virtual ENUM_CX_EVENT GetEvent() const = 0;\n    virtual void SetEvent(ENUM_CX_EVENT event) = 0;\n    virtual string GetString() const = 0;\n    virtual void SetString(string val) = 0;\n    virtual ICXContext* GetContext() = 0;\n    \n    virtual double GetDouble() const = 0;\n    virtual void   SetDouble(double val) = 0;\n\n    virtual int    GetInt() const = 0;\n    virtual void   SetInt(int val) = 0;\n};\n\n#endif\n"
-}

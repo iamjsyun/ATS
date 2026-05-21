@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Module\\Steps\\Watcher\\CXStepValidation.mqh (1 replacements). Here is the updated code:\n#ifndef CXSTEPVALIDATION_MQH\n#define CXSTEPVALIDATION_MQH\n\n#include \"..\\..\\..
-... [TRUNCATED] ...
-ingFormat(\"[WATCHER-VALIDATION] All %d signals failed validation.\", total));\n        return WATCHER_DISCOVERY;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779159345296_0_h062dq.txt
-</tool_output_masked>

@@ -1,4 +1,0 @@
-Current topic: "Debugging WatcherSeq & Adaptive Logging"
-Topic summary: User reported a critical error 'Illegal Transition Blocked (0 -> 1)' in WatcherSeq and requested to adjust the log output interval (2 immediate bursts, then 1, 2, 3... up to 10 minutes). I will research CXSignalWatcher.mqh and related sequence logic to find the cause of the transition error and implement the adaptive interval logic.
-
-Strategic Intent: Investigate illegal transition in WatcherSeq and implement adaptive log interval.

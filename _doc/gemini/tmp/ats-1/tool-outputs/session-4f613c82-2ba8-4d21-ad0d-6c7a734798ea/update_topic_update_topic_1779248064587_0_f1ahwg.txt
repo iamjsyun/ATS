@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"로깅 표준 강화 - TE 변환 상세 정보 추가\"\nTopic summary: Trading Logging Standard v10.0을 보완하여, 대기 오더(Trailing Entry) 진입 시 TE 옵션(포인트)이 실제 실행 가격(execPrice)으로 어떻게 변환되었는지에 대한 상세 계산 로그를 추가합니다. 이는 v10.15 Market-Price 기반 계산 로직의 투명성을 확보하기 위함입니다. CXOrderManager의 ExecuteEntry 로깅을 업데이트합니다.\n\nStrategic Intent: 대기 오더(Trailing Entry) 로그에 TE 포인트-가격 변환 정보 추가."
-}

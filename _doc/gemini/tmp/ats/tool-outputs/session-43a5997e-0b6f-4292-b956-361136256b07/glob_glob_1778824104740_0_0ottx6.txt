@@ -1,3 +1,0 @@
-{
-  "output": "Found 1 file(s) matching \"**/SequenceBuilderExtensions.cs\" across 2 workspace directories, sorted by modification time (newest first):\nC:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\FluentSeq\\Extensions\\SequenceBuilderExtensions.cs"
-}

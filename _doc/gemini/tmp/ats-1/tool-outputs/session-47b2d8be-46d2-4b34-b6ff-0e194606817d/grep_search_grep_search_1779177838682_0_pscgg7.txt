@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"CreateTable\" across 2 workspace directories (filter: \"*Service.cs\")."
-}

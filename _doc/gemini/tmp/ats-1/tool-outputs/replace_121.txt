@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskGuard_V_Spread.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_GUARD_V_SPREAD_MQH\n#define CX_TASK_GUARD_V_SPREAD_MQH\n\n#inclu
-... [TRUNCATED] ...
-[GUARD-V-SPREAD] YIELD: High Spread Detected (%d > %d). Retrying...\", spread, maxSpread));\n            return TASK_YIELD;\n        }\n\n        XP_LOG_DEBUG(xp, \"[GUARD-V-SPREAD] PASSED.\");\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238937094_0_s3u0fj.txt
-</tool_output_masked>

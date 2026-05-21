@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA:\n[DIR] bin\n[DIR] Channels\n[DIR] Core\n[DIR] Extensions\n[DIR] Infrastructure\n[DIR] Interfaces\n[DIR] Models\n[DIR] obj\n[DIR] Services\n[DIR] Validation\nAssemblyInfo.cs (730 bytes)\nXTA.csproj (1662 bytes)\nXTA.slnx (58 bytes)\nXTAHostBuilder.cs (2458 bytes)\nXTAStartupV2.cs (3446 bytes)"
-}

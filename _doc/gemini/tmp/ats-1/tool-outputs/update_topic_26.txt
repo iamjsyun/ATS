@@ -1,4 +1,0 @@
-Current topic: "Refining Pending Order Price Logic"
-Topic summary: The user clarified that pending orders (Type 1) should be calculated based on the signal's price +/- `te_limit`, not the current Ask/Bid price. My previous fix applied market price correction to all orders if the price was <= 1.0. I need to distinguish between Market orders and Pending orders more carefully. I will modify `CXOrderManager` to calculate the Limit/Pending order price as `PriceSignal ± te_limit` (if provided) and keep the market order price logic isolated. This ensures pending orders are placed exactly where the strategy requires.
-
-Strategic Intent: Fix pending order price calculation logic for Type 1 (Limit Trailing).

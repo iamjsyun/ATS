@@ -1,3 +1,0 @@
-{
-  "output": "Output: �\n 移\n   :1 臾몄\n+ ... vice.cs | foreach { $i++; if($i -ge 60 -and $i -le 70) { \"$i: $_\" } }\n+                                                               ~~~\n蹂�몄“媛 �삳�듬��. ':' �ㅼ�瑜� 蹂�\n                                   臾몄 ��듬��. ${}瑜� �ъ⑺� �\n                                                             �\n                                                               援щ�\n                                                                   ���.\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\n    + FullyQualifiedErrorId : InvalidVariableReferenceWithDrive\nExit Code: 1\nProcess Group PGID: 22948"
-}

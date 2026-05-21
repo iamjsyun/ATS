@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 140-180 of 206 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-dManager.Instance.GenerateGid(finalSignal.cno, DateTime.Now, finalSignal.sno, 0);\n            finalSignal.symbol = \"GOLD#\";\n            finalSignal.lot = 0.0;\n            finalSignal.msg_id = msgId;\n            finalSignal.cmd = XCode.CLOSE;"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779154195155_0_e028ig.txt
-</tool_output_masked>

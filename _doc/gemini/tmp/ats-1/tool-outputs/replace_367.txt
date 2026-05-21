@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Interfaces\\ICXConfig.mqh (1 replacements). Here is the updated code:\n#ifndef ICXCONFIG_MQH\n#define ICXCONFIG_MQH\n\n#include <Object.mqh>\n\nclass ICXConfig : public CObj
-... [TRUNCATED] ...
- = 0;\n    virtual bool   IsWatcherRemoteLogEnabled() const = 0;\n    virtual bool   IsSystemLogEnabled() const = 0;\n    virtual bool   IsSequenceLogEnabled(long cno) const = 0;\n    virtual ENUM_LOG_LEVEL GetLogLevel() const = 0;\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779159786777_0_dcecqn.txt
-</tool_output_masked>

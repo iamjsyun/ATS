@@ -1,4 +1,0 @@
-Current topic: "Unmasking the Real Error & Log Fix"
-Topic summary: The `[ERR-000] Critical internal system error` is masking the true error. When `CXOrderManager` fails, it writes the specific error to the signal, but `CXTradingSession` immediately overwrites it with the generic `[ERR-000]` message when handling the `SESSION_ERROR` state. I will fix `CXTradingSession.mqh` to preserve the original error message. Second, I will check where `SignalWatcher` logs are defined to understand the log creation discrepancy. MQL5 does support `FolderCreate`, but not `FolderIsExist`, so I will use `FolderCreate` safely. I will ensure all logs are stored neatly in `Common/Files` as requested.
-
-Strategic Intent: Fix hidden error message and correct log file creation.

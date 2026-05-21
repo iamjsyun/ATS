@@ -1,8 +1,0 @@
-Output: 
-Name
-----
-ActiveTasks.mqh 
-EntryTasks.mqh  
-ExitTasks.mqh   
-PendingTasks.mqh
-Process Group PGID: 23296

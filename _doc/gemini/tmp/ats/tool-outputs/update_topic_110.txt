@@ -1,4 +1,0 @@
-Current topic: "Interface Unification for Repository Access"
-Topic summary: I have identified that CXStepDiscovery is bypassing the IRepository interface and directly using the concrete CXSignalRepository class to access the LoadActiveSignals method. This violates the interface-first mandate and contributes to cluster coupling. I will now update the IRepository interface to include LoadActiveSignals and refactor CXStepDiscovery to use the interface, further decoupling the infra and module layers.
-
-Strategic Intent: Enforcing interface-centric repository access and fixing layer violations in the Watcher module.

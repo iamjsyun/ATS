@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CX_TASK_ENTRY_L_VALIDATE_MQH\n#define CX_TASK_ENTRY_L_VALIDATE_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXGuard.mqh\"\n\n/**\n
-... [TRUNCATED] ...
-uard.ValidateLot(sig.GetSymbol(), sig.GetLot())) {\n                XP_LOG_WARN(xp, \"[ENTRY-L] Lot/Margin Validation Failed.\");\n                return TASK_BREAK;\n            }\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779235392384_0_r09wce.txt
-</tool_output_masked>

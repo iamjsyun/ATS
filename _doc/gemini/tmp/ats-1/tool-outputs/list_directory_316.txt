@@ -1,6 +1,0 @@
-Directory listing for D:\Projects\ats\ATSE\CXTrade\Session\Steps\Exit:
-CXStepExit.mqh (2415 bytes)
-CXStepExitSweep.mqh (1341 bytes)
-CXStepExitTicket.mqh (1337 bytes)
-CXStepExitTrailing.mqh (3613 bytes)
-CXStepExitVerify.mqh (2088 bytes)

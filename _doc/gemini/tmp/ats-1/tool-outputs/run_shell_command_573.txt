@@ -1,7 +1,0 @@
-Output: 臾몄댁
-寃곗 ��듬��.
-    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
-    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString
- 
-Exit Code: 1
-Process Group PGID: 9872

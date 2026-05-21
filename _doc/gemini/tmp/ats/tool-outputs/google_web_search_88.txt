@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Web search results for \"caveman tool installation software development\":\n\n**Caveman**은 최근 소프트웨어 개발 분야(특히 AI 코딩 에이전트 활용 시)에서 큰 인기를 끌고 있는 **AI 에이전트용 토큰 최적화 스킬/플러그인**입니다.[1]\n\n이 도구는 AI 에이전트(Claude Code, Cursor, Windsurf, Gemini CLI 등
-... [TRUNCATED] ...
-6YPryj_9wWeIT_mq93n)\n[8] youtube.com (https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFTbIs3BwSuJfH-elY_gUeX01Y7Dexa4OuH8R3NB0NAxxoifkeE-bu1pMzRgDK__lbla3tDeMpxFnWw-ZJIDluOo0771CVtHtqhOrvjeMjui44M2mcwkTlejlECEbO9tXVWQQ0foh8=)"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\google_web_search_google_web_search_1778720974104_1_yxmx3.txt
-</tool_output_masked>

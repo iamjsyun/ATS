@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "using System;\nusing System.Threading.Tasks;\nusing Microsoft.Extensions.Hosting;\nusing Microsoft.Extensions.Logging;\nusing System.Linq;\nusing XTA.Core;\nusing XTA.Models;\nusing XTA.XData.Models;\nusing XTA.Infrastructure.Data;\nus
-... [TRUNCATED] ...
-[Transfer] Data Transfer Protocol cycle completed.\");\n            }\n            catch (Exception ex)\n            {\n                nlog.Error(ex, $\"[Transfer:ERROR] Data transfer failed: {ex.Message}\");\n            }\n        }\n    }\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151116760_1_0e8yka.txt
-</tool_output_masked>

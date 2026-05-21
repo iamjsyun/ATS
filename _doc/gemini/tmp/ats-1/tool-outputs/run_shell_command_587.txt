@@ -1,4 +1,0 @@
-Output:       //-- 1. ?紐諭� 筌�Ŋ�ｌ
-                            ��
-      if(m_hActiveSignals == INVALID_HANDLE) {
-Process Group PGID: 24608

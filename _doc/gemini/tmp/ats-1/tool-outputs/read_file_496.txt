@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXCONFIG_MQH\n#define CXCONFIG_MQH\n\n#include \"..\\Interfaces\\ICXConfig.mqh\"\n#include <Arrays\\ArrayLong.mqh>\n\nclass CXConfig : public ICXConfig {\nprivate:\n    string         m_targetMagics;\n    CArrayLong     m_magic
-... [TRUNCATED] ...
-nabled(long cno) const override {\n        if(m_seqLogCnos == \"*\") return true;\n        for(int i=0; i<m_seqCnoList.Total(); i++) {\n            if(m_seqCnoList.At(i) == cno) return true;\n        }\n        return false;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156988202_0_gytxxl.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Output: 105                     .ConfigureState(\"End\")\n106                     .Builder().DisableValidation().Build();       \n107\n108                 try\n109                 {\n110                     int safety = 0;\n111                     while (!seq.IsInState(\"End\") && safety++ < 10)\n112                     {\n113                         await seq.RunAsync();\n114                     }\n115                 }\nProcess Group PGID: 15256"
-}

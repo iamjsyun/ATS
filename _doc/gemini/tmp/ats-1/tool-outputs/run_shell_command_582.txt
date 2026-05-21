@@ -1,3 +1,0 @@
-Output: 1
-32
-Process Group PGID: 15944

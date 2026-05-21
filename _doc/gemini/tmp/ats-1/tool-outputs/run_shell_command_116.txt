@@ -1,7 +1,0 @@
-Output:              .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)??             .Timeout(72000); // 20??? ??? ??? ?????  ??          //-- 3. ??? ????????(Liquidation Pipeline)??  
-        XP_LOG_TRACE(GetPointer(xp), " -> Added: Liquidation Pipeline (Ticket -> Sweep -> Verify)");??          seq.From(SESSION_LIQUIDATING).Execute(new CXStepExitTicket())?
-?             .OnSuccess(STATE_EXIT_SWEEP)??             .Timeout(60)??             .Retries(3);??  ??          seq.From(STATE_EXIT_SWEEP).Execute(new CXStepExitSweep())??   
-          .OnSuccess(STATE_EXIT_VERIFY)??             .Timeout(60);??  ??          seq.From(STATE_EXIT_VERIFY).Execute(new CXStepExitVerify())??             .OnSuccess(SESSIO
-N_CLOSED)??             .OnFail(SESSION_LIQUIDATING)??             .Timeout(120)??             .Retries(5);                 ??          ??>         seq.Build();??          XP
-_LOG_INFO(GetPointer(xp), "Sequence Assembly Complete.");??      }??  };??  ??  #endif
-Process Group PGID: 34320

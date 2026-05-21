@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Implementing Entry TTS Notifications\"\nTopic summary: The user wants TTS notifications when a new signal is injected or when `xa_entry` transitions from 0 to 1. I will identify the entry injection points in `XGatewayService.cs` and `DataManagerViewModel.cs` and insert calls to `ISoundService` with appropriate commands (e.g., 'SIGNAL_RECEIVED' or 'ORDER_PLACED') to provide audible feedback for new entries.\n\nStrategic Intent: Implement TTS for new signal injection (xa_entry 0->1)."
-}

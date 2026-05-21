@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "# XTX Project Memory Index\n\n## 1. Core Specifications\n- **[LATEST] [XTX_CORE_SPEC_LATEST.md](XTX_CORE_SPEC_LATEST.md)**: 진입/청산 로직, 우선순위, 정합성 가드 등 통합 설계 사양서. (2026-05-06 기준)\n\n## 2. Core Constraints\n- **Single Source of Truth**: XT
-... [TRUNCATED] ...
-를 접두어로 포함하여, WPF(ATSA) 앱에서 상태별 UI 렌더링 및 아이콘 표시를 위한 파싱이 가능하도록 설계해야 합니다.\n--- End of Context from: c:/users/hijsyun/appdata/roaming/metaquotes/terminal/540829ad6be27960e4557e2cfd5c69e0/mql5/experts/ats/atse/gemini.md ---\n--- End Project Context ---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720322629_2_maexcb.txt
-</tool_output_masked>

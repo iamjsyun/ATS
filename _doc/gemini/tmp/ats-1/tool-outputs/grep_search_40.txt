@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 7 matches for pattern \"SaveSignalImmediateAsync\" across 2 workspace directories:\n---\nFile: ats\\ATSA\\ATSA\\UI\\DataManager\\DataManagerViewModel.cs\nL398:                     await repo.SaveSignalImmediateAsync(final);\n---\
-... [TRUNCATED] ...
-es\\IRepositories.cs\nL13:         Task SaveSignalImmediateAsync(XSignal signal);\n---\nFile: ats\\ATSA\\XTA\\Infrastructure\\Data\\XpoSqliteService.cs\nL146:         public async Task SaveSignalImmediateAsync(XTA.XData.Models.XSignal signal)\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\grep_search_grep_search_1779153930586_0_wikh7f.txt
-</tool_output_masked>

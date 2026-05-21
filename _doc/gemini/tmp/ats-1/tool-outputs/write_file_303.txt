@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskEntry_L_Validate.mqh. Here is the updated code:\n#ifndef CX_TASK_ENTRY_L_VALIDATE_MQH\r\n#define CX_TASK_ENTRY_L_VALIDATE_MQH\r\
-... [TRUNCATED] ...
-etSymbol(), sig.GetLot())) {\r\n                XP_LOG_WARN(xp, \"[ENTRY-L] Lot/Margin Validation Failed.\");\r\n                return TASK_BREAK;\r\n            }\r\n        }\r\n\r\n        return TASK_CONTINUE;\r\n    }\r\n};\r\n\r\n#endif\r\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779234579482_0_j7i73.txt
-</tool_output_masked>

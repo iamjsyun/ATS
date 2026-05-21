@@ -1,6 +1,0 @@
-Output: > 11:25:42.4178 | INFO | [XTA.Models.XParameter] [DM:SAVE] SaveChanges Command Triggered.??  11:25:42.4334 | INFO | [XTA.Models.XObject] [SIGNAL:DEBUG:PARSE] CleanText: ???????????????????  ???????
-????????????  ----------------------------??  ??????: 1?????  ???: GOLD#
-> 11:25:42.5020 | INFO | [XTA.Models.XParameter] [DM:SAVE] New Signal 1001-26051911-01-00-1-1 injected (EN=1, EX=0, ST=0, Force=True).??  11:25:42.5020 | INFO | [XTA.Models.XParameter] [DM:LOAD] Lo
-adSignals Command Triggered.??  11:25:50.0375 | INFO | [XTA.Models.XObject] State changed from Idle to Prepare??  11:25:50.0375 | INFO | [XTA.Models.XObject] State changed from Prepare to Query??  
-11:25:50.0375 | INFO | [XTA.Models.XObject] State changed from Query to Idle??  11:26:00.0376 | INFO | [XTA.Models.XObject] State changed from Idle to Prepare
-Process Group PGID: 27460

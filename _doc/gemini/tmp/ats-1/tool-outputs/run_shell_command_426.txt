@@ -1,5 +1,0 @@
-Output:               XP_LOG_SEQ_INFO(m_ctx.GetParam(), StringFormat("[SEQ:%s] Sequence Started at State: %d", m_name, m_current_state));??          }??>         TriggerOnEnter(m_current_state);??      }??
-
-          m_current_state = next;??          m_state_entered = TimeCurrent();??>         TriggerOnEnter(m_current_state);??      }??
->     void TriggerOnEnter(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);
-Process Group PGID: 24004

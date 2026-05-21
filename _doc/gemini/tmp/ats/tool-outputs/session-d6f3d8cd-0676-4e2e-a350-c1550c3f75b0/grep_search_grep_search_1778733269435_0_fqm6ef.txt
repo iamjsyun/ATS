@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"schema\" across 2 workspace directories (filter: \"*.md\")."
-}

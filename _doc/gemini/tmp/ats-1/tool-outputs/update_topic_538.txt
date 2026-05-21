@@ -1,4 +1,0 @@
-Current topic: "Investigating Validation & Guard Logic"
-Topic summary: I was investigating why signal ID 104 is not being detected. The repository query seems correct, so I'm shifting focus to the validation step in CXStepValidation. I'll examine CXGuard.mqh to see if the signal is being filtered out due to validation rules (Magic, SID, Lot, or Price). I'll also check the logging mechanism to see where these failure messages might be appearing.
-
-Strategic Intent: Investigate CXGuard validation logic and possible reasons for signal detection failure.

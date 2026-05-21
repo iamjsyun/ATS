@@ -1,3 +1,0 @@
-{
-  "output": "No files found matching pattern \"**/XTAStartup.cs\" within 2 workspace directories"
-}

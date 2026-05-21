@@ -1,5 +1,0 @@
-Output: >                 string sigInfo = StringFormat("SID:%s, P:%.5f, L:%.2f, TE:%.0f, TS:%d, SL:%.0f, TP:%.0f, EN:%d, EX:%d, ST:%d",??                      sig.GetSid(), sig.GetPriceSignal(), sig.GetLo
-t(), sig.GetTEStart(), sig.GetTSStart(), sig.GetSL(), sig.GetTP(),??                      sig.GetXAEntry(), sig.GetXAExit(), sig.GetStatus());
->                         string err = StringFormat("[WATCHER-VALIDATION] FAILED [%s] - %s", sigInfo, guard.GetLastError());??                          log.Error(xp, err);??                      }
->                     if(IS_VALID(log)) log.Debug(xp, StringFormat("[WATCHER-VALIDATION] PASSED [%s]", sigInfo));??                  }??              }
-Process Group PGID: 29360

@@ -1,3 +1,0 @@
-{
-  "error": "Error listing directory: ENOENT: no such file or directory, stat 'C:\\Users\\hijsyun\\.gemini\\tmp\\ats-1\\memory'"
-}

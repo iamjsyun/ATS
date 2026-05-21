@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\_doc\\_Report:\nATS_Atomized_Task_Strategy_Report_v1.0.md (2408 bytes)\nATS_Hyper_Atomized_Architecture_Review_v1.0.md (2912 bytes)\nATS_Micro_Granular_Strategy_Report_v1.0.md (4525 bytes)\nATS_Partial_Class_Strategy_Report_v1.0.md (2093 bytes)\nATSE_Enhancement_Strategy_Workplan_v1.0.md (3081 bytes)"
-}

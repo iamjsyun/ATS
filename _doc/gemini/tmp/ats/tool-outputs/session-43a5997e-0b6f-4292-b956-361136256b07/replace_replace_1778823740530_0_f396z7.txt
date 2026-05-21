@@ -1,3 +1,0 @@
-{
-  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Models\\XTgMessage.cs (1 replacements). Here is the updated code:\nusing System;\n\nnamespace XTA.Models\n{\n    /// <summary>\n    /// 텔레그램 메시지 모델 (Pure POCO 버전)\n    /// </summary>\n    public class XTgMessage\n    {\n        public int Oid { get; set; }\n        public long CID { get; set; }\n        public DateTime Time { get; set; }\n        public int CNO { get; set; }\n        public string Text { get; set; } = string.Empty;\n        public int Status { get; set; }\n        public int RetryCount { get; set; }\n        public DateTime CreatedAt { get; set; }\n    }\n}\n"
-}

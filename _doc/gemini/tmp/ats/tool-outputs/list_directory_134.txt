@@ -1,6 +1,0 @@
-Directory listing for C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69E0\MQL5\Experts\ATS\ATSE\CXTrade\Session\Steps\Exit:
-CXStepExit.mqh (2405 bytes)
-CXStepExitSweep.mqh (1328 bytes)
-CXStepExitTicket.mqh (1324 bytes)
-CXStepExitTrailing.mqh (3188 bytes)
-CXStepExitVerify.mqh (1775 bytes)

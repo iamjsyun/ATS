@@ -1,4 +1,0 @@
-Current topic: "Optimizing Boot Logging"
-Topic summary: I'm changing the log level of boot-phase tasks (service registration, object creation, etc.) to TRACE as requested. I'll also ensure `InpBootLogEnabled` is set to `false` by default in `ATS.mq5`. This reduces log noise during system startup while allowing for detailed tracing when needed. I'll search for 'Assembling Sequence Architecture' and related log messages to update their levels.
-
-Strategic Intent: Change boot-time logging level to TRACE and disable by default.

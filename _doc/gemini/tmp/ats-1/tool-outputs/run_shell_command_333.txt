@@ -1,3 +1,0 @@
-Output: >          DatabaseColumnText(req,    GetColumnIndex(req, "comment"),      sig.comment);??           DatabaseColumnText(req,    GetColumnIndex(req, "tag"),          sig.tag);??           ??        
-   string created_str;??           if(DatabaseColumnText(req, GetColumnIndex(req, "created"), created_str))??              sig.created = StringToTime(created_str);
-Process Group PGID: 2988

@@ -1,3 +1,0 @@
-{
-  "output": "namespace FluentSeq.Builder;\n\n/// <summary>\n/// Can configure a state\n/// </summary>\n/// <typeparam name=\"TState\">The type of the state</typeparam>\npublic interface ICanConfigureState<TState> where TState : notnull\n{\n    /// <summary>\n    /// Creates a new State\n    /// </summary>\n    /// <param name=\"state\">The name of the state</param>\n    /// <param name=\"description\">Optional description of the state</param>\n    /// <returns>A StateBuilder</returns>\n    IStateBuilder<TState> ConfigureState(TState state, string description = \"\");\n}"
-}

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 1 match for pattern \"record PolicyContext\" across 2 workspace directories:\n---\nFile: ats\\ATSA\\XTA\\Services\\XTradePolicyService.cs\nL1- using System;\nL2- using System.Collections.Generic;\nL3- using System.Linq;\nL4- usin
-... [TRUNCATED] ...
-                  var profiles = profileRepo != null ? await profileRepo.GetGridProfilesAsync(ctx.MasterSignal.cno, ctx.MasterSignal.dir) : new List<XGridProfile>();\nL72-                         ctx = ctx with { Profiles = profiles };\nL73- \n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\grep_search_grep_search_1779151137774_0_9f5dsw.txt
-</tool_output_masked>

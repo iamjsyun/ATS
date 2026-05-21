@@ -1,3 +1,0 @@
-Output: >         m_ctx.Register("order_mgr", m_orderMgr);??          m_ctx.Register("pos_mgr", m_posMgr);     ??          m_ctx.Register("exit_mgr", m_exitMgr);??          m_ctx.Reg
-ister("price_tracker", m_priceTracker);??  ??          m_sequence = factory.CreateSequence(m_ctx, "SessionSeq");
-Process Group PGID: 24300

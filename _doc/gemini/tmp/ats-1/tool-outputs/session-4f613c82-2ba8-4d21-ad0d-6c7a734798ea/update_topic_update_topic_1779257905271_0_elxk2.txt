@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"에러 메시지 고도화 - Circuit Breaker 명시\"\nTopic summary: 시스템의 치명적 에러 발생 시 출력되는 메시지를 고도화합니다. 단순히 에러 내용만 나열하는 대신, 시스템 안전을 위해 'Circuit Breaker(회로 차단기)'가 작동하여 세션을 강제 차단했음을 로그와 DB에 명시합니다. 이를 통해 운영자가 해당 에러가 시스템 보호를 위한 선제적 조치였음을 즉시 인지할 수 있도록 개선합니다. CXTradingSession의 에러 핸들링 로직을 최종 업데이트합니다.\n\nStrategic Intent: 치명적 에러 메시지에 Circuit Breaker(회로 차단기) 개념 명시."
-}

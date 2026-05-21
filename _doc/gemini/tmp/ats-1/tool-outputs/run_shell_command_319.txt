@@ -1,3 +1,0 @@
-Output: >     virtual bool ValidateSID(string sid) {??          if(StringLen(sid) != SID_MAX_LENGTH) return SetError("Invalid SID length: " + sid);??          return true;
->         if(!ValidateSID(sig.GetSid())) return false;??          ??          return true;
-Process Group PGID: 21684

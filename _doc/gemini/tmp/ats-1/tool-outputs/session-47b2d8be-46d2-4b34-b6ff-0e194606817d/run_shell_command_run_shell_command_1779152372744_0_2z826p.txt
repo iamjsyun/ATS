@@ -1,3 +1,0 @@
-{
-  "output": "Output:                     })\nProcess Group PGID: 3416"
-}

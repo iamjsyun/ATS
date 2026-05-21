@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 230-260 of 588 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-gnal == null) return;\n            try\n            {\n                var merged = _param.GetMergedConfig(SelectedSignal.cno);\n                var policy = (SelectedSignal.dir == XCode.BUY) ? merged.TradingOption.Buy : merged.TradingOption.Sell;"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779155199313_1_t10r48.txt
-</tool_output_masked>

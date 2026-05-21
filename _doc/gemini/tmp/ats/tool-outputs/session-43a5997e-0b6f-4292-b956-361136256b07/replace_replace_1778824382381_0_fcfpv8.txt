@@ -1,3 +1,0 @@
-{
-  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Infrastructure\\Audio\\XSoundState.cs (1 replacements). Here is the updated code:\nnamespace XTA.Infrastructure.Audio\n{\n    /// <summary>\n    /// 사운드 서비스의 처리 단계 정의\n    /// </summary>\n    public enum XSoundState\n    {\n        Idle,           // 대기\n        RequestReceived, // 요청 수신\n        Validated,      // 유효성 및 스팸 검사 통과\n        Composed,       // 메시지 조립 완료\n        Completed,      // 발화 명령 전달 완료\n        Suppressed      // 차단됨 (스팸, 설정 등)\n    }\n}\n"
-}

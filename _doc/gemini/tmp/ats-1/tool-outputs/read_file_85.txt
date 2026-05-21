@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 60-130 of 149 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
-... [TRUNCATED] ...
-tinue;\n\n                        XInterpreterBase? interpreter = null;\n                        \n                        // 명시적 해석기 매핑 (v9.6)\n                        if (ch.Interpreter.Equals(\"GlobalGold\", StringComparison.OrdinalIgnoreCase))"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153029520_1_3qfc1m.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Models:\nHubState.cs (567 bytes)\nXChannelInfo.cs (5359 bytes)\nXChannelObject.cs (865 bytes)\nXChannelOption.cs (1029 bytes)\nXConfig.cs (1366 bytes)\nXDataObject.cs (797 bytes)\nXExitSignal.cs (2237 bytes)\nXObject.cs (763 bytes)\nXParameter.cs (4419 bytes)\nXSignal.cs (2614 bytes)\nXSignalExtensions.cs (3817 bytes)\nXSignalGroup.cs (1342 bytes)\nXTgMessage.cs (1218 bytes)"
-}

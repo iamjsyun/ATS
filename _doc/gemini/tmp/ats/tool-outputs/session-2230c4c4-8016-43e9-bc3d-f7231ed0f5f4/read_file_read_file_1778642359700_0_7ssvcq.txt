@@ -1,3 +1,0 @@
-{
-  "error": "Path not in workspace: Attempted path \"D:\\downloads\\2.png\" resolves outside the allowed workspace directories: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS, D:\\Projects\\XTA.App\\_spec or the project temp directory: C:\\Users\\hijsyun\\.gemini\\tmp\\ats"
-}

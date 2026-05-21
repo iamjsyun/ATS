@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXSTEPEXITTICKET_MQH\n#define CXSTEPEXITTICKET_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXExitManager.mqh\"\n#include \"..\\..\\..\\Infra\\CXMessageProvider.mqh\"\n\n/**\n * @cl
-... [TRUNCATED] ...
-WEEP;\n            }\n        }\n        return -1;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override { XP_LOG_DEBUG(NULL, \"[EXIT-L1] Attempting Ticket Close\"); }\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720420729_1_hfd8bs.txt
-</tool_output_masked>

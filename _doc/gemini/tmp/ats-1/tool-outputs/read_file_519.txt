@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXLOGDISPATCHER_MQH\n#define CXLOGDISPATCHER_MQH\n\n#include \"..\\Interfaces\\ICXLogger.mqh\"\n#include <Arrays\\ArrayObj.mqh>\n\n/**\n * @class CXLogDispatcher\n * @brief 세션별 4대 채널(File, Tab, UI, Remote) 로그 통합 관리 및 배분\n */\nc
-... [TRUNCATED] ...
-S_VALID(m_file))   m_file.SetEnabled(useFile);\n        if(IS_VALID(m_tab))    m_tab.SetEnabled(useTab);\n        if(IS_VALID(m_ui))     m_ui.SetEnabled(useUI);\n        if(IS_VALID(m_remote)) m_remote.SetEnabled(useRemote);\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156810937_0_rvo13h.txt
-</tool_output_masked>

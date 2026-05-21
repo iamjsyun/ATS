@@ -1,5 +1,0 @@
-Output: >     virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }??  ??      /**??       * @brief ??? ??? ??? (xa_entry ???)??       */??      virtua
-l bool ExecuteEntry(ICXParam* xp) override {
->         m_trade.SetExpertMagicNumber((ulong)sig.GetMagic());??  ??          XP_LOG_INFO(xp, StringFormat("[EXEC-ENTRY] SID:%s, Dir:%d, Type:%d, Lot:%.2f, Price:%.5f", ??   
-          m_sid, sig.GetDir(), sig.GetType(), sig.GetLot(), sig.GetPriceSignal()));??  ??          //--- ??? ????????? ??? (DIP/Unified)
-Process Group PGID: 25772

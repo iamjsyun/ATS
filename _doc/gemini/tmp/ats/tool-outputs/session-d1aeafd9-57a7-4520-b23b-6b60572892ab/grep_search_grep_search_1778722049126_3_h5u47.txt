@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"SetStatusMsg\\s*\\(\\s*\"\" across 2 workspace directories (filter: \"ATSE/CXTrade/**/*.mqh\")."
-}

@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"매니저 인터페이스 고도화 - 에러 전파 체계 구축\"\nTopic summary: IXOrderManager, IXPositionManager, IXExitManager 인터페이스의 모든 메서드에 ICXParam* xp 매개변수를 추가하여, 트레이딩 작업 중 발생하는 상세 에러를 세션 레벨로 일관되게 전달할 수 있는 체계를 구축합니다. 이를 통해 'Sequence Logic Interruption' 대신 구체적인 실패 원인을 DB와 로그에 기록할 수 있게 됩니다. 인터페이스 변경에 따른 모든 구현체 동기화 작업을 수행합니다.\n\nStrategic Intent: 트레이딩 매니저 인터페이스 고도화 및 에러 전파 체계 구축."
-}

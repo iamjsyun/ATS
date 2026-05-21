@@ -1,4 +1,0 @@
-Directory listing for D:\projects\ats\ATSA\ATSA\UI\DataManager:
-DataManagerView.xaml (27652 bytes)
-DataManagerView.xaml.cs (324 bytes)
-DataManagerViewModel.cs (24426 bytes)

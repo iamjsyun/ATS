@@ -1,3 +1,0 @@
-{
-  "output": "Output: On branch main\nYour branch and 'origin/main' have diverged,\nand have 1 and 2 different commits each, respectively.\n  (use \"git pull\" if you want to integrate the remote branch with yours)\n\nAll conflicts fixed but you are still merging.\n  (use \"git commit\" to conclude merge)\n\nChanges to be committed:\n        modified:   ATSA/ATSA/UI/Dashboard/DashboardView.xaml\n        modified:   ATSA/ATSA/UI/Dashboard/DashboardViewModel.cs\n        modified:   ATSA/ATSA/UI/UCtrls/TGMsg/UCXTGMsgView.xaml\n        modified:   ATSA/ATSA/UI/UCtrls/UCXTGMsgView.xaml\n        modified:   ATSA/ATSA/UI/UCtrls/UCXTGMsgViewModel.cs\n        modified:   ATSA/XTA.XData/Models/Mappers.cs\nProcess Group PGID: 24212"
-}

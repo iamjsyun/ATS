@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\ATS.mq5. Here is the updated code:\n//+------------------------------------------------------------------+\n//|                                                          ATS
-... [TRUNCATED] ...
-Watcher_UseRemote, InpWatcher_InitStart,\n                            InpSystem_UseFile, InpSystem_UseRemote, InpSystem_InitStart,\n                            InpSession_UseFile, InpSession_UseRemote, InpSession_UseUI, InpSession_InitStart);\n..."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779242211104_0_orwtb.txt
-</tool_output_masked>

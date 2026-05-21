@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"\\.GetOffset\\(|\\.GetStep\\(|SetOffset\\(|SetStep\\(\" in path \"D:\\projects\\ats\\ATSE\\CXTrade\"."
-}

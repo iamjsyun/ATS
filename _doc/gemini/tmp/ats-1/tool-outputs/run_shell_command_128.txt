@@ -1,5 +1,0 @@
-Output: 
-Lines Words Characters Property
------ ----- ---------- --------
-   39
-Process Group PGID: 24940

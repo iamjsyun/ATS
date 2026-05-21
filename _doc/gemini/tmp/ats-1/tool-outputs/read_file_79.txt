@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXPOSITIONMANAGER_MQH\n#define CXPOSITIONMANAGER_MQH\n\n#include \"..\\..\\Interfaces\\IXPositionManager.mqh\"\n#include \"..\\..\\Interfaces\\ICXContext.mqh\"\n#include \"..\\..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\..\\
-... [TRUNCATED] ...
-  }\n        }\n        \n        XP_LOG_ERROR(NULL, StringFormat(\"[POS-MANAGER] Failed to confirm PositionModify for ticket:%lld\", ticket));\n        return false;\n    }\n\n    void Reset() {\n        m_ticket = 0;\n    }\n};\n\n#endif\n\n\n\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779239796818_1_1edomh.txt
-</tool_output_masked>

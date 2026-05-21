@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\_Test:\n[DIR] Core\n[DIR] Data\n[DIR] Mocks\n[DIR] Suites\n_TestRunner.mq5 (2585 bytes)\n\n(1 ignored)"
-}

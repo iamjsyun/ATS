@@ -1,4 +1,0 @@
-Output: >                 session.Start(GetPointer(sp));??  ??                  if(IS_VALID(log)) log.Ok(xp, StringFormat("[WATCHER-BINDING] SUCCESS: SID:%s bound to session.", sid))
-;??                  success++;??              } else {??                  if(IS_VALID(log)) log.Error(xp, StringFormat("[WATCHER-BINDING] FAILED: No idle session for SID:%s"
-, sid));
-Process Group PGID: 9392

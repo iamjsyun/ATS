@@ -1,3 +1,0 @@
-{
-  "output": "namespace XTA.Models\n{\n    /// <summary>\n    /// Gateway 허브 내 신호 처리 파이프라인 상태 정의\n    /// </summary>\n    public enum XHubState\n    {\n        Received,       // 메시지 수신됨\n        Validated,      // 채널 유효성 검사 완료\n        Interpreted,    // 해석기로 라우팅 완료\n        ProfileApplied, // 그리드/옵션 적용 완료\n        Dispatched,     // 최종 발송 완료\n        Failed,         // 조건 미달로 처리 중단\n        Liquidation     // 청산 특수 처리 상태\n    }\n}\n"
-}

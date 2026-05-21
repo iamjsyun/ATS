@@ -1,3 +1,0 @@
-{
-  "output": "<Project Sdk=\"Microsoft.NET.Sdk\">\n\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n    <AssemblyName>XTA.XData</AssemblyName>\n    <RootNamespace>XTA.XData</RootNamespace>\n  </PropertyGroup>\n\n  <ItemGroup>\n    <PackageReference Include=\"DevExpress.Xpo\" Version=\"24.1.6\" />\n    <PackageReference Include=\"NLog\" Version=\"6.1.2\" />\n    <PackageReference Include=\"Microsoft.Data.Sqlite\" Version=\"9.0.2\" />\n  </ItemGroup>\n\n</Project>\n"
-}

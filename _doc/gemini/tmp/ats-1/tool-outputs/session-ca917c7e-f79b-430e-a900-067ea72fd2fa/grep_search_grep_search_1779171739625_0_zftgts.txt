@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"(GetType|GetDir)\\(\\) ==\\s*\\d+\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\"."
-}

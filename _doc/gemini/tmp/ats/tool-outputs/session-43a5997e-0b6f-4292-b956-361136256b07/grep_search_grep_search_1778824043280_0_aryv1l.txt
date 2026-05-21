@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"public class FluentSeq[^<]\" across 2 workspace directories."
-}

@@ -1,3 +1,0 @@
-{
-  "output": "Found 2 file(s) matching \"**/*spec*\" across 2 workspace directories (4 additional files were ignored), sorted by modification time (newest first):\nC:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\spec.md\nC:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSE\\_MEM\\XTX_CORE_SPEC_LATEST.md"
-}

@@ -1,3 +1,0 @@
-{
-  "output": "Found 8 matches for pattern \"CXStepValidation\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Module\\CXSignalWatcher.mqh\nL17: #include \"Steps\\Watcher\\CXStepValidation.mqh\"\nL102:         seq.From(WATCHER_VALIDATION).Execute(new CXStepValidation()).OnSuccess(WATCHER_BINDING).OnFail(WATCHER_DISCOVERY);\n---\nFile: Module\\Steps\\Watcher\\CXStepValidation.mqh\nL1: #ifndef CXSTEPVALIDATION_MQH\nL2: #define CXSTEPVALIDATION_MQH\nL10:  * @class CXStepValidation\nL13: class CXStepValidation : public IXStep {\nL15:     CXStepValidation() {}\nL16:     virtual ~CXStepValidation() {}\n---"
-}

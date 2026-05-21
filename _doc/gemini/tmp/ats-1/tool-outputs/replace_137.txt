@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Interfaces\\ICXParam.mqh (1 replacements). Here is the updated code:\n#ifndef ICXPARAM_MQH\n#define ICXPARAM_MQH\n\n#include <Object.mqh>\n#include \"ICXSignal.mqh\"\n#inclu
-... [TRUNCATED] ...
-val) = 0;\n    virtual ICXContext* GetContext() = 0;\n    \n    virtual double GetDouble() const = 0;\n    virtual void   SetDouble(double val) = 0;\n\n    virtual int    GetInt() const = 0;\n    virtual void   SetInt(int val) = 0;\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238459413_0_q1qekh.txt
-</tool_output_masked>

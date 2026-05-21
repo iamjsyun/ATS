@@ -1,3 +1,0 @@
-{
-  "output": "Output: \n\n    ���\n       곕━: G:\\�� ��\\_Memory\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\n------        2026-05-19   ��\n                              9:21           7337 spec.md\nProcess Group PGID: 16596"
-}

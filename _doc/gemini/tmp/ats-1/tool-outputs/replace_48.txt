@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Models\\CXSignal.mqh (1 replacements). Here is the updated code:\n#ifndef CXSIGNAL_MQH\n#define CXSIGNAL_MQH\n\n#include \"..\\Interfaces\\ICXSignal.mqh\"\n#include \"..\\In
-... [TRUNCATED] ...
- }\n    virtual datetime  GetUpdated() const override { return updated; }\n    virtual double    GetLimitOffset() const override { return limit_offset; }\n    virtual double    GetStopOffset() const override { return stop_offset; }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779171865087_0_scponp.txt
-</tool_output_masked>

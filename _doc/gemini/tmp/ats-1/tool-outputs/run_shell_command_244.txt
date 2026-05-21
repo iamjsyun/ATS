@@ -1,2 +1,0 @@
-Output: >     virtual double PointsToPrice(string symbol, double points) const {??          double pt = SymbolInfoDouble(symbol, SYMBOL_POINT);??          return points * pt;
-Process Group PGID: 31104

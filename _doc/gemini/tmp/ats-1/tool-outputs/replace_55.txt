@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Infrastructure\\Audio\\XSoundService.cs (1 replacements). Here is the updated code:\nusing NLog;\nusing System;\nusing System.IO;\nusing XTA.Models;\nusing XTA.XData.Models;\nus
-... [TRUNCATED] ...
-\n            return result.Trim();\n        }\n\n        private bool IsTargetChannel(int cno)\n        {\n            var channel = param.GetChannelByCno(cno);\n            return channel != null && channel.IsSoundEnabled;\n        }\n    }\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779153514269_0_aafgvm.txt
-</tool_output_masked>

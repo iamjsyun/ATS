@@ -1,3 +1,0 @@
-{
-  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Interfaces\\ISoundService.cs. Here is the updated code:\nusing XTA.Models;\r\n\r\nnamespace XTA.Interfaces\r\n{\r\n    /// <summary>\r\n    /// 사운드 및 알림 서비스 인터페이스\r\n    /// </summary>\r\n    public interface ISoundService\r\n    {\r\n        /// <summary>\r\n        /// 사운드 재생 요청 (구 messenger.SendSound 대체)\r\n        /// </summary>\r\n        void PlaySound(XSignal? sig, string cmd, string text = \"\");\r\n    }\r\n}\r\n"
-}

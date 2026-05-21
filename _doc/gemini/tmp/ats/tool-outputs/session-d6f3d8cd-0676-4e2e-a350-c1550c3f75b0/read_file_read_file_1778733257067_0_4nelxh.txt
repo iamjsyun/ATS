@@ -1,3 +1,0 @@
-{
-  "output": "# XTX Core Design Specification\n\n**SSOT NOTICE**: 본 문서의 최신 버전은 프로젝트 루트의 [spec.md](../spec.md)로 통합되었습니다. 모든 설계 사양 및 규격은 [spec.md](../spec.md)를 참조하십시오.\n\n---\n*Last modified in this file: 2026-05-06 (v5.31)*\n*Updated to v6.00 in spec.md: 2026-05-09*\n"
-}

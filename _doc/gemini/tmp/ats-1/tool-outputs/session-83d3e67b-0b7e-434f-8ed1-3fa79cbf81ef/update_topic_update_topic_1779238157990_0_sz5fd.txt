@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Debugging Signal Discovery Failure\"\nTopic summary: The user reported that Watcher fails to find an active signal (xe_status=0, xa_entry=1) that exists in the DB. I will analyze CXStepDiscovery.mqh and CXSignalRepository::LoadActiveSignals to identify the specific SQL filters or logic preventing the signal from being detected. I'll check for magic number mismatches, status filter rigidity, or entry flag requirements.\n\nStrategic Intent: Investigate why Watcher-Discovery fails to find active signals."
-}

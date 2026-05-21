@@ -1,3 +1,0 @@
-{
-  "output": "Output: � ъ�\n  ������\n     곕━ � ��) ��듬��.\nProcess Group PGID: 26476"
-}

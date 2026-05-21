@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\CXTradingSession.mqh. Here is the updated code:\n...\n        SAFE_DELETE(m_entryMgr); SAFE_DELETE(m_orderMgr);\n        SAFE_DELETE(m_posMgr);   SAFE_DELETE(m_exi
-... [TRUNCATED] ...
-ELETE(m_signal); //-- [v10.7 Fix] Clear ownership\n        if(IS_VALID(m_sequence)) m_sequence.ForceState(SESSION_READY);\n    }\n\n    bool IsActive() const { return m_isActive; }\n    virtual string GetSid() const override { return m_sid; }\n..."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779239632951_1_rqm73.txt
-</tool_output_masked>

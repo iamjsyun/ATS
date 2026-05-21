@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"에러 컨텍스트 전파 고도화 - 상세 원인 추적 로직 보강\"\nTopic summary: DB에 기록된 'Sequence Logic Interruption' 메시지는 태스크에서 구체적인 에러 사유를 xp.SetString()으로 전달하지 않았을 때 발생합니다. 특히 EXEC-ENTRY-FAIL 발생 시 해당 에러 내용이 세션 종료 메시지로 전파되도록 각 원자적 태스크(Task)의 에러 핸들링 로직을 보강하겠습니다. 실패 시 xp.SetString()을 강제하여 에러 발생 원인이 DB와 로그에 명확히 남도록 개선합니다.\n\nStrategic Intent: Sequence Logic Interruption의 구체적 원인 추적 및 XP_LOG 연동."
-}

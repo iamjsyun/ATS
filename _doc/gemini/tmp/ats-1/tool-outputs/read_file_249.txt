@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 80-120 of 591 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
-... [TRUNCATED] ...
-n                        else if (policy.LotStrategy.Type == \"Rate\")\n                        {\n                            SelectedSignal.SelectedLotType = \"2:배수 로트\";\n                            SelectedSignal.lot = policy.LotStrategy.Rate;"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779161279299_0_9r0ry7.txt
-</tool_output_masked>

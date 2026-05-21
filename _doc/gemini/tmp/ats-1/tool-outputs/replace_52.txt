@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Infra\\CXDatabase.mqh (1 replacements). Here is the updated code:\n﻿#ifndef CXDATABASE_MQH\n#define CXDATABASE_MQH\n\n#include \"..\\Interfaces\\IDatabase.mqh\"\n#include \"
-... [TRUNCATED] ...
-\n        }\n    }\n\n    virtual bool Execute(string sql) override {\n        if(m_db == INVALID_HANDLE) return false;\n        return DatabaseExecute(m_db, sql);\n    }\n\n    virtual int GetHandle() override { return m_db; }\n};\n\n#endif\n\n\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779242250558_0_dw2kyb.txt
-</tool_output_masked>

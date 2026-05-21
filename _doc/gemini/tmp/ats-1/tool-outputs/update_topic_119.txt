@@ -1,4 +1,0 @@
-Current topic: "Analyzing Immediate Session Failure"
-Topic summary: The signal status is instantly changing from 0 (READY) to 99 (CRITICAL ERROR) as soon as the EA starts. This indicates that the failure is occurring during the initial bootstrap or the first `Pulse()` of the trading session, not during actual execution of entry tasks. I suspect a missing dependency (e.g., config, database handle, or symbol data) or a violation of the SANDBOX guard in `CXTradingSession`. I will trace the `Start()` and `Pulse()` lifecycle in `CXTradingSession.mqh` to pinpoint the initialization blocker.
-
-Strategic Intent: Analyze immediate session failure (99) upon EA execution.

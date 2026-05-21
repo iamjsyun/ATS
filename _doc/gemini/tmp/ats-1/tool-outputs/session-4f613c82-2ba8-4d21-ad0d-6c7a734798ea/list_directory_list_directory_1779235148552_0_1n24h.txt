@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\projects\\ats\\ATSA\\ATSA\\UI\\Models:\nBindableSignalGroup.cs (2073 bytes)\nBindableXSignal.cs (9149 bytes)\nBindableXTgMessage.cs (1661 bytes)\nXChannelStatus.cs (1109 bytes)"
-}

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXFileLogger.mqh (1 replacements). Here is the updated code:\n﻿#ifndef CXFILELOGGER_MQH\n#define CXFILELOGGER_MQH\n\n#include \"..\\Interfaces\\ICXLogger.mqh\"\n\n/**
-... [TRUNCATED] ...
-const override { return m_enabled; }\n\n    void Close() {\n        if(m_handle != INVALID_HANDLE) {\n            FileClose(m_handle);\n            m_handle = INVALID_HANDLE;\n        }\n    }\n};\n\n#endif\n\n\n Applied fuzzy match at line 10-43."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779157600163_0_w775nk.txt
-</tool_output_masked>

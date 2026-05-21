@@ -1,1 +1,0 @@
-No matches found for pattern "UpdateStatus\([^,]+,\s*[^,]+,\s*"" across 2 workspace directories (filter: "ATSE/CXTrade/**/*.mqh").

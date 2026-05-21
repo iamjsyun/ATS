@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 15-40 of 109 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example,
-... [TRUNCATED] ...
-----------------------------------------------------------+\nint OnInit() {\n    //--- Chart GUI Clean-up\n    ChartSetInteger(0, CHART_SHOW_GRID, false);\n    ChartSetInteger(0, CHART_SHOW_OBJECT_DESCR, false);\n    \n    //--- Show Version Label"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779158597582_0_6q3kjq.txt
-</tool_output_masked>

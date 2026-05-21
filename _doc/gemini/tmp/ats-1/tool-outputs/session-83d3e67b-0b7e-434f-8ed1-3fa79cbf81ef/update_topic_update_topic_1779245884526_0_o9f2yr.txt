@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Formalizing Market-Price Calculation Standards\"\nTopic summary: I am formalizing the 'Market-Price Priority' calculation rules in the project's core documentation. This involves adding section 3.4 to `spec.md` to define how Pending, SL/TP, and Trailing prices are derived from real-time Ask/Bid. I will also append this rule as a foundational mandate to `GEMINI.md`, ensuring all future code changes maintain strict adherence to real-time market conditions over stale signal data.\n\nStrategic Intent: Document real-time market-price calculation standards."
-}

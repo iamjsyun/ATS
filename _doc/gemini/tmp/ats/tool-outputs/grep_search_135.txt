@@ -1,1 +1,0 @@
-No matches found for pattern "#include ".*CX[A-Z][a-z]+Manager\.mqh"" in the workspace directory (filter: "ATSE/CXTrade/Session/Steps/**/*.mqh").

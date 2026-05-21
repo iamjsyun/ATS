@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Active\\CXTaskComm_V_Status.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_COMM_V_STATUS_MQH\n#define CX_TASK_COMM_V_STATUS_MQH\n\n#include
-... [TRUNCATED] ...
-M-V-STATUS] WARNING: Global Logger is unavailable. System running in silent mode.\");\n        } else {\n            XP_LOG_DEBUG(xp, \"[COMM-V-STATUS] OK: Logger is connected.\");\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239771117_0_vgjzur.txt
-</tool_output_masked>

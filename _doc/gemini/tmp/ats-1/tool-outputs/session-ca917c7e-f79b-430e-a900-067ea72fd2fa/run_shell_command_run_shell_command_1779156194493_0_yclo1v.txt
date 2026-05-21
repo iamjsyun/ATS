@@ -1,3 +1,0 @@
-{
-  "output": "Output: //|                                                      ProjectName |\n//|                                      Copyright 2020, CompanyName |\n//|                                       http://www.companyname.net |\n//+------------------------------------------------------------------+\n#ifndef CXSIGNALREPOSITORY_MQH\n#define CXSIGNALREPOSITORY_MQH\n\n#include <Arrays\\ArrayObj.mqh>\n#include \"..\\Interfaces\\IRepository.mqh\"\n#include \"..\\Interfaces\\IDatabase.mqh\"\nProcess Group PGID: 11704"
-}

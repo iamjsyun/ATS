@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\ATSA\\UI\\DataManager\\DataManagerViewModel.cs (1 replacements). Here is the updated code:\nusing DevExpress.Mvvm;\nusing DevExpress.Mvvm.DataAnnotations;\nusing System;\nusing Syste
-... [TRUNCATED] ...
-0]);\n            sig.xa_exit = int.Parse(sig.SelectedXAExit.Split(':')[0]);\n            sig.xe_status = int.Parse(sig.SelectedXEStatus.Split(':')[0]);\n            sig.updated = DateTime.Now;\n            sig.RefreshAll();\n        }\n    }\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779153474656_0_be6r1.txt
-</tool_output_masked>

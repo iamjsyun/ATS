@@ -1,4 +1,0 @@
-Current topic: "Implementing Log Deduplication"
-Topic summary: The user requested that redundant log messages in `CXSignalWatcher::Pulse` be suppressed. I will modify `CXLogDispatcher.mqh` to implement a generic `m_last_msg` cache, ensuring that identical consecutive log entries are ignored. This provides a cleaner log stream while maintaining 0.5s operational frequency. I will then verify the implementation with a full build.
-
-Strategic Intent: Implement message-based log deduplication in CXSignalWatcher.

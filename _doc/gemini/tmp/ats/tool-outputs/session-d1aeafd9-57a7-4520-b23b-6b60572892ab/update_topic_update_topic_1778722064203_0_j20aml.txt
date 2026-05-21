@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Checking Logging Standard Violations\"\nTopic summary: I am running an additional grep search to find violations of the logging standard, specifically looking for instances where `logger.Log` or `m_logger.Log` is called manually instead of using the mandatory `XP_LOG_*` macros.\n\nStrategic Intent: Checking for logging macro violations."
-}

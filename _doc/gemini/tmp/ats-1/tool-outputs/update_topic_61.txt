@@ -1,4 +1,0 @@
-Current topic: "Fixing SL/TP Logic & Detail Logging"
-Topic summary: The user's logs revealed an 'invalid stops' error because point offsets (700, 1500) were being used as absolute prices in `OrderOpen`. I will modify `CXOrderManager` to calculate absolute SL/TP prices from point offsets when necessary. I will also enhance the validation logs to provide exhaustive details on price, lot, and stop levels, and fix a similar bug in `CXTaskPending_R_Apply` where raw points were passed to `ModifyOrder`.
-
-Strategic Intent: Fix SL/TP logic errors and enhance validation logs in CXOrderManager.

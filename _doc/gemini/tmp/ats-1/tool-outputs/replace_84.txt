@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Exit\\CXTaskExit_V_Error.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_EXIT_V_ERROR_MQH\n#define CX_TASK_EXIT_V_ERROR_MQH\n\n#include \"..
-... [TRUNCATED] ...
-ng to XE_ERROR.\");\n                CXMessageProvider::UpdateStatus(sig, XE_ERROR, \"Liquidation Failed after 10 retries.\");\n                return SESSION_ERROR;\n            }\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239755972_0_dpimul.txt
-</tool_output_masked>

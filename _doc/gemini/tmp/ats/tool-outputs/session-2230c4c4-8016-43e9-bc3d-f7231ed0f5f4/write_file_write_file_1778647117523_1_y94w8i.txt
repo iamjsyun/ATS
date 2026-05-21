@@ -1,3 +1,0 @@
-{
-  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Interfaces\\IDatabase.mqh. Here is the updated code:\n#ifndef IDATABASE_MQH\r\n#define IDATABASE_MQH\r\n\r\n/**\r\n * @interface IDatabase\r\n * @brief 저수준 데이터베이스 엔진 인터페이스\r\n */\r\ninterface IDatabase {\r\n    virtual ~IDatabase() {}\r\n    virtual bool Open() = 0;\r\n    virtual void Close() = 0;\r\n    virtual bool Execute(string sql) = 0;\r\n    virtual int  GetHandle() = 0;\r\n};\r\n\r\n#endif\r\n"
-}

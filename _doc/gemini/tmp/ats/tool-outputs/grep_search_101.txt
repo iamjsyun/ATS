@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 7 matches for pattern \"dynamic_cast<CX[A-Z][a-z]+[^I][A-Za-z]*\\*>\" in the workspace directory (filter: \"ATSE/**/*.mqh\"):\n---\nFile: ATSE\\CXTrade\\Module\\CXSignalWatcher.mqh\nL81:         CXFluentSequence* seq = dynamic_ca
-... [TRUNCATED] ...
-gnal*>(xp.GetSignal());\n---\nFile: ATSE\\CXTrade\\Session\\Steps\\Alpha\\CXStepExitTrailingCalc.mqh\nL17:         CXSignal* sig = dynamic_cast<CXSignal*>(xp.GetSignal());\nL22:         CXSignal* sig = dynamic_cast<CXSignal*>(xp.GetSignal());\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\grep_search_grep_search_1778720549997_0_us1nqh.txt
-</tool_output_masked>

@@ -1,4 +1,0 @@
-Current topic: "Finalizing Signal Detection Fixes"
-Topic summary: I have fixed the stale query handle in the Signal Repository and corrected the logging macros in the Watcher steps. I am now updating the CXSignalWatcher constructor to ensure a valid CXParam is present in the context during sequence initialization, which will enable sequence-level logging. These changes combined will allow ATSE to detect new signals from ATSA and provide clear logs if any step in the process fails. I'll also perform a final review of the system initialization to ensure no other blockers exist.
-
-Strategic Intent: Complete the fix for signal detection and logging visibility.

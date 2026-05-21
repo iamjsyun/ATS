@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"virtual ICXSignal\\* GetSignalBySid(const string sid) = 0;\" across 2 workspace directories (filter: \"ATSE/CXTrade/Interfaces/IRepository.mqh\")."
-}

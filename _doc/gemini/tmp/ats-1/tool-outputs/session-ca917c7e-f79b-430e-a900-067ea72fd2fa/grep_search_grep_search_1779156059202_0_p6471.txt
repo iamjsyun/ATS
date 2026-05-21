@@ -1,3 +1,0 @@
-{
-  "output": "Found 8 matches for pattern \"CXStepBinding\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Module\\CXSignalWatcher.mqh\nL18: #include \"Steps\\Watcher\\CXStepBinding.mqh\"\nL103:         seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);\n---\nFile: Module\\Steps\\Watcher\\CXStepBinding.mqh\nL1: #ifndef CXSTEPBINDING_MQH\nL2: #define CXSTEPBINDING_MQH\nL13:  * @class CXStepBinding\nL16: class CXStepBinding : public IXStep {\nL18:     CXStepBinding() {}\nL19:     virtual ~CXStepBinding() {}\n---"
-}

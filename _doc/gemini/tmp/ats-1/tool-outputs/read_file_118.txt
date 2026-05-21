@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "namespace FluentSeq.Builder;\n\n/// <summary>\n/// Provides methods to enhance a state builder with actions\n/// </summary>\n/// <typeparam name=\"TState\">The type of the state</typeparam>\npublic interface ICanConfigureActions<TState
-... [TRUNCATED] ...
-is state.\n    /// Multiple actions can be chained and will be executed in the order they are defined.\n    /// </summary>\n    /// <param name=\"action\">The action to be executed</param>\n    IStateBuilder<TState> WhileInState(Action action);\n}"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152534914_0_0v8pbj.txt
-</tool_output_masked>

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Models\\CXParam.mqh (1 replacements). Here is the updated code:\n#ifndef CXPARAM_MQH\n#define CXPARAM_MQH\n\n#include \"..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\Interf
-... [TRUNCATED] ...
- override { m_sig = sig; }\n    void SetContext(ICXContext* ctx) { m_ctx = ctx; }\n\n    void SetTransaction(const MqlTradeTransaction& trans) { m_trans = trans; }\n    MqlTradeTransaction GetTransaction() const { return m_trans; }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238464024_0_g1j1p.txt
-</tool_output_masked>

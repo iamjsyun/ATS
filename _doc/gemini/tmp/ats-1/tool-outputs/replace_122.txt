@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskEntry_L_Validate.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_ENTRY_L_VALIDATE_MQH\n#define CX_TASK_ENTRY_L_VALIDATE_MQH\n\n
-... [TRUNCATED] ...
-n for %s Lot:%.2f\", sig.GetSymbol(), sig.GetLot()));\n                return TASK_BREAK;\n            }\n            XP_LOG_DEBUG(xp, \"[ENTRY-L] Lot/Margin Validation Passed.\");\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238929458_1_471jzw.txt
-</tool_output_masked>

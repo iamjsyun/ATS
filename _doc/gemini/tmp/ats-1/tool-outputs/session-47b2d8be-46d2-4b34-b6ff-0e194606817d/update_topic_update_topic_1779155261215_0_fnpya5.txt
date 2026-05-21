@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Full Method Structural Restoration\"\nTopic summary: Multiple failed `replace` attempts and duplicated code fragments have corrupted the structure of `DataManagerViewModel.cs`. I am performing a complete, verified rewrite of the `UpdateSignalStatus` method. I will read the entire method block first to ensure I have clear boundaries, then replace it with a syntactically perfect implementation that includes the requested TTS triggers and Debug logging.\n\nStrategic Intent: Complete rewrite of UpdateSignalStatus to fix structure."
-}

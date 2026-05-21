@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 220-270 of 592 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-          SelectedSignal.te_start = policy.Entry.TeStart;\n                    SelectedSignal.te_step = policy.Entry.TeStep;\n                    SelectedSignal.limit_offset = policy.Entry.TeLimit;\n                    SelectedSignal.RefreshAll();"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779155185197_1_5xp5ac.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Output: [main 6720d70] Merge branch 'origin/main' into main and resolve refactoring conflicts\nEnumerating objects: 169, done.\nCounting objects: 100% (138/138), done. \nDelta compression using up to 12 threads\nCompressing objects: 100% (85/85), done.\nWriting objects: 100% (89/89), 50.97 KiB | 4.63 MiB/s, done.   \nTotal 89 (delta 32), reused 0 (delta 0), pack-reused 0 (from 0)\nremote: Resolving deltas: 100% (32/32), completed with 25 local objects.\nTo https://github.com/iamjsyun/ATS.git\n   b5802f4..6720d70  main -> main\nProcess Group PGID: 27308"
-}

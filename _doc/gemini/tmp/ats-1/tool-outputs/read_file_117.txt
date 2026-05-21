@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "namespace FluentSeq.Builder;\n\nusing Core;\n\n/// <summary>\n/// Provides methods for further describing a state\n/// </summary>\n/// <typeparam name=\"TState\">The type of the state</typeparam>\npublic class StateBuilder<TState> : IS
-... [TRUNCATED] ...
-ic ISequenceBuilder<TState> Builder() =>\n        RootSequenceBuilder;\n\n    /// <inheritdoc />\n    public IStateBuilder<TState> ConfigureState(TState state, string description = \"\") =>\n        Builder().ConfigureState(state, description);\n}"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152540202_0_sxnmx2.txt
-</tool_output_masked>

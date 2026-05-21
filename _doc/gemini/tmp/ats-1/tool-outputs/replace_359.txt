@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXFluentSequence.mqh (1 replacements). Here is the updated code:\n#ifndef CXFLUENTSEQUENCE_MQH\n#define CXFLUENTSEQUENCE_MQH\n\n#include \"..\\Interfaces\\ICXFluentSe
-... [TRUNCATED] ...
-state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);\n    }\n\n    void TriggerOnExit(int state) {\n        CXStepNode* node = NULL;\n        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnExit(m_ctx);\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779160065591_1_hlvcwi.txt
-</tool_output_masked>

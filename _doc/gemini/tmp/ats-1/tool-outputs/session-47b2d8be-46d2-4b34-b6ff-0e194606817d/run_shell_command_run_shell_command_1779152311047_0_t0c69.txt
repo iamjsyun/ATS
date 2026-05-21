@@ -1,3 +1,0 @@
-{
-  "output": "Output: Select-String : 'Pattern' 留ㅺ� 蹂� 鍮 臾몄댁濡 �� �대� 留ㅺ� 蹂��⑺� ��듬��.\n�\n 移\n   :1 臾몄\n+ ... Services\\XTradePolicyService.cs | Select-String -Context 0 \"\" | Selec ...\n+                                                                ~~\n    + CategoryInfo          : InvalidData: (:) [Select-String], ParameterBindingValidationException\n    + FullyQualifiedErrorId : ParameterArgumentValidationErrorEmptyStringNotAllowed,Microsoft.PowerShell.Commands.SelectStringCommand\n \nExit Code: 1\nProcess Group PGID: 15320"
-}

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\ATS.mq5 (1 replacements). Here is the updated code:\n//+------------------------------------------------------------------+\n//|                                             
-... [TRUNCATED] ...
-ransaction& trans,\n                        const MqlTradeRequest& request,\n                        const MqlTradeResult& result) {\n    //-- 트랜잭션 이벤트는 시스템 정합성을 위해 유지\n    if(IS_VALID(g_app)) g_app.OnTradeTransaction(trans, request, result);\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238047138_1_zu5z84.txt
-</tool_output_masked>

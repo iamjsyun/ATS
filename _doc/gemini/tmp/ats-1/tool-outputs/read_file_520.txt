@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CX_MACROS_MQH\n#define CX_MACROS_MQH\n\n#include \"CXMessageDictionary.mqh\"\n#include \"ICXParam.mqh\"\n#include \"ICXContext.mqh\"\n#include \"ICXLogger.mqh\"\n\n/**\n * @file CXMacros.mqh\n * @brief XTA 시스템 전역 매크로 정의 (Functi
-... [TRUNCATED] ...
-ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  true); if(IS_VALID(_log)) _log.Warn(xp, msg); }\n#define XP_LOG_SEQ_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, true); if(IS_VALID(_log)) _log.Error(xp, msg); }\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156805325_0_txebg7.txt
-</tool_output_masked>

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 68 matches for pattern \"#include\" in the workspace directory (filter: \"ATSE/CXTrade/Session/**/*.mqh\"):\n---\nFile: ATSE\\CXTrade\\Session\\Execution\\CXEntryManager.mqh\nL4: #include \"..\\..\\Interfaces\\IXEntryManager.mqh\
-... [TRUNCATED] ...
-itVerify.mqh\nL4: #include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\nL5: #include \"..\\..\\..\\Interfaces\\IXExitManager.mqh\"\nL6: #include \"..\\..\\..\\Interfaces\\IRepository.mqh\"\nL7: #include \"..\\..\\..\\Infra\\CXMessageProvider.mqh\"\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\grep_search_grep_search_1778720326822_0_1ufgv.txt
-</tool_output_masked>

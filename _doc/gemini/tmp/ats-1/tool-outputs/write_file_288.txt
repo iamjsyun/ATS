@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Active\\CXTaskAlphaCalc.mqh. Here is the updated code:\n#ifndef CX_TASK_ALPHA_CALC_MQH\r\n#define CX_TASK_ALPHA_CALC_MQH\r\n\r\n#include \"..
-... [TRUNCATED] ...
-ger(sig.GetSymbol(), SYMBOL_DIGITS));\r\n                xp.SetDouble(newSL);\r\n                return TASK_CONTINUE;\r\n            }\r\n        }\r\n\r\n        xp.SetDouble(0); \r\n        return TASK_CONTINUE;\r\n    }\r\n};\r\n\r\n#endif\r\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779234615029_4_1bbau.txt
-</tool_output_masked>

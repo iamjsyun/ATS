@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 1-115 of 162 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example,
-... [TRUNCATED] ...
-  _sequence.Run();\n            }\n        }\n\n        public override void Start() => nlog.Trace(\"[SoundService] Service Started (Interface Enabled).\");\n        public override void Stop() => nlog.Trace(\"[SoundService] Service Stopped.\");\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153442719_0_w0j76k.txt
-</tool_output_masked>

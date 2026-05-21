@@ -1,8 +1,0 @@
-Output: >     virtual bool ValidateLot(string symbol, double lot) {??          if(symbol == "" || symbol == "NULL") return SetError("Symbol is empty");??          ??          double min_v = SymbolInfoDoubl
-e(symbol, SYMBOL_VOLUME_MIN);??          double max_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);??          ??          //-- [Fix] SYMBOL_VOLUME_MAX?? 0????? (??? ???????? ??? ???????
-if(max_v <= 0) {??              if(!SymbolSelect(symbol, true)) return SetError("Symbol " + symbol + " not found in Market Watch");??              min_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN
-);??              max_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);??              if(max_v <= 0) return SetError(StringFormat("Symbol property error (%s). Max lot is 0.00", symbol));??
- }??  ??          if(lot < min_v) return SetError(StringFormat("Lot(%.2f) below minimum(%.2f) for %s", lot, min_v, symbol));??          if(lot > max_v) return SetError(StringFormat("Lot(%.2f) above
- maximum(%.2f) for %s", lot, max_v, symbol));??          return true;??      }??  ??      virtual bool ValidateSlippage(int slippage) {??          if(slippage < 0 || slippage > MAX_SLIPPAGE) return
- SetError("Slippage out of range");
-Process Group PGID: 8732

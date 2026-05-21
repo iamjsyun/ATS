@@ -1,5 +1,0 @@
-Directory listing for D:\Projects\ATS\ATSE\CXTrade\Session:
-[DIR] Execution
-[DIR] Steps
-[DIR] Tasks
-CXTradingSession.mqh (9862 bytes)

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXFILELOGGER_MQH\n#define CXFILELOGGER_MQH\n\n#include \"..\\Interfaces\\ICXLogger.mqh\"\n\n/**\n * @class CXFileLogger\n * @brief 세션별 독립 로그 파일 생성 및 기록 담당\n */\nclass CXFileLogger : public ICXLogger {\nprivate:\n    int    m_ha
-... [TRUNCATED] ...
-abled; }\n    virtual bool IsEnabled() const override { return m_enabled; }\n\n    void Close() {\n        if(m_handle != INVALID_HANDLE) {\n            FileClose(m_handle);\n            m_handle = INVALID_HANDLE;\n        }\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779235808663_1_q4dvhe.txt
-</tool_output_masked>

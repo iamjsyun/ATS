@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXSTEPEXITTRAILINGCALC_MQH\n#define CXSTEPEXITTRAILINGCALC_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Models\\CXSignal.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXPriceTracker.mqh\"\n\n/**\n 
-... [TRUNCATED] ...
-BOL_DIGITS)));\n                return 1; // MODIFIED\n            }\n        }\n\n        return 0; // NO_CHANGE\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720423700_1_oru3o7.txt
-</tool_output_masked>

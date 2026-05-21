@@ -1,3 +1,0 @@
-{
-  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSE\\CXTrade\\Interfaces\\IXPositionManager.mqh (1 replacements). Here is the updated code:\n#ifndef IXPOSITIONMANAGER_MQH\n#define IXPOSITIONMANAGER_MQH\n\n#include <Object.mqh>\n#include \"ICXParam.mqh\"\n\n/**\n * @class IXPositionManager\n * @brief 오픈된 포지션의 모니터링 및 관리를 위한 인터페이스\n */\nclass IXPositionManager : public CObject {\npublic:\n    virtual void Pulse(ICXParam* xp) = 0;\n    virtual bool ModifyPosition(ulong ticket, double sl, double tp) = 0;\n};\n\n#endif\n"
-}

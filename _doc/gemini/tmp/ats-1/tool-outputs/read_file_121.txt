@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "namespace FluentSeq;\n\nusing Builder;\n\n/// <summary>\n/// This is the root element for FluentSeq\n/// </summary>\n/// <typeparam name=\"TState\">The type of the state</typeparam>\npublic class FluentSeq<TState> where TState : notnul
-... [TRUNCATED] ...
-te> Configure(TState initialState, Action<ISequenceBuilder<TState>> configurationActions)\n    {\n        var sequenceBuilder = Create(initialState);\n        configurationActions.Invoke(sequenceBuilder);\n        return sequenceBuilder;\n    }\n}"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152528391_1_lhcvir.txt
-</tool_output_masked>

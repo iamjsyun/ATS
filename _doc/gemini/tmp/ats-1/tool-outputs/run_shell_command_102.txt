@@ -1,7 +1,0 @@
-Output: >     virtual bool ExecuteEntry(ICXParam* xp) override {??          if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;??  ??          ICXSignal* sig = xp.GetSignal();??
- if(IS_INVALID(sig)) return false;??  ??          //--- [Point 4] ??? ?????????????(CXGuard) ?????          IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);??          i
-f(IS_VALID(guard)) {??              if(!guard.ValidateMagic(sig.GetMagic()) || ??                 !guard.ValidateSID(sig.GetSid()) || ??                 !guard.ValidateLot(si
-g.GetSymbol(), sig.GetLot()) ||??                 !guard.ValidatePrice(sig.GetSymbol(), sig.GetPriceSignal())) {??                  ??                  string err = CXMessage
-Provider::Format(MSG_ERR_GUARD_DENIED, guard.GetLastError());??                  XP_LOG_ERROR(xp, err);??                  CXMessageProvider::UpdateStatus(sig, XE_ERROR, err)
-;??                  return false;??              }??          }??
-Process Group PGID: 29776

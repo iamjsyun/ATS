@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 40-120 of 169 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
-... [TRUNCATED] ...
-ety = 0;\n                    while (!seq.IsInState(\"End\") && safety++ < 10)\n                    {\n                        await seq.RunAsync();\n                    }\n                }\n                catch (Exception ex)\n                {"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779154814324_0_z4yyu.txt
-</tool_output_masked>
