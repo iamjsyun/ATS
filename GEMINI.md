@@ -8,6 +8,15 @@
 - **Project Memory Redirection (Fallback)**: If Admin rights are unavailable, all **Private Project Memory (Tier 3)** MUST be manually saved in `_doc/gemini/memory/ats/` (Cloud Linked) to ensure cross-PC consistency.
 - **Custom Commands**: Project-wide CLI shortcuts are stored in `_doc/gemini/commands/`.
 
+## Design Documentation Standard (v1.0)
+- **PDCA/Design Storage**: 모든 설계 문서(.md)는 `_doc/` 폴더 최상위 또는 주제별 서브폴더에 저장하여 전 프로젝트가 공유한다.
+- **Version Control**: 문서 파일명에는 반드시 `v1.x` 형태의 버전을 포함한다.
+
+## Simulator Shared Memory
+- **Simulator Target**: ATSE의 하이퍼-원자적 태스크 무결성 검증.
+- **Core Principle**: Step-Lock 기반 Virtual Clock 시스템 (결정성 보장).
+- **Data Source**: SQLite 역주입 및 CSV 시나리오 연동.
+
 ## Trading Logging Standard (v10.4 - Mandatory)
 모든 트레이딩 함수 호출 시 다음의 로깅 프리픽스와 형식을 엄격히 준수해야 한다. 모든 로그는 시스템 로그(Experts/Global)와 개별 세션 로그(File/Remote)에 동시에 기록되어야 한다.
 
