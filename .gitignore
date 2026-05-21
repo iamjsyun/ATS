@@ -49,4 +49,6 @@ _temp/
 Thumbs.db
 
 build_log.txt
-_Doc\gemini\tmp
+
+_doc/gemini/tmp/
+_doc/gemini/history/
