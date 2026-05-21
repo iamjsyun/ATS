@@ -39,9 +39,14 @@ public:
                 continue;
             }
 
+            // [v11.4] Distinguish Entry and Exit intents in logs
+            string mode = "UNKNOWN";
+            if(sig.GetXAEntry() == XA_ACTIVE) mode = "ENTRY";
+            else if(sig.GetXAExit() == XA_ACTIVE) mode = "EXIT";
+
             // [v11.0 Rule 1 & 3] 상세 로그 생성 및 중복 방지
-            string sigInfo = StringFormat("SID:%s, Sym:%s, P:%.5f, L:%.2f, Typ:%d, TE:%d, TS:%d, SL:%d, TP:%d, EN:%d, EX:%d, ST:%d",
-                sig.GetSid(), sig.GetSymbol(), sig.GetPriceSignal(), sig.GetLot(), sig.GetType(), 
+            string sigInfo = StringFormat("[%s] SID:%s, Sym:%s, P:%.5f, L:%.2f, Typ:%d, TE:%d, TS:%d, SL:%d, TP:%d, EN:%d, EX:%d, ST:%d",
+                mode, sig.GetSid(), sig.GetSymbol(), sig.GetPriceSignal(), sig.GetLot(), sig.GetType(), 
                 (int)sig.GetTEStart(), (int)sig.GetTSStart(), (int)sig.GetSL(), (int)sig.GetTP(),
                 sig.GetXAEntry(), sig.GetXAExit(), sig.GetStatus());
 

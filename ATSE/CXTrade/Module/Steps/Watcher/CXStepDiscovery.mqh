@@ -40,7 +40,16 @@ public:
         
         int found = repo.LoadActiveSignals(activeList);
         if(found > 0) {
-            if(IS_VALID(log)) log.Info(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals in DB.", found));
+            int entryCount = 0;
+            int exitCount = 0;
+            for(int i = 0; i < activeList.Total(); i++) {
+                ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
+                if(IS_VALID(sig)) {
+                    if(sig.GetXAEntry() == XA_ACTIVE) entryCount++;
+                    if(sig.GetXAExit() == XA_ACTIVE)  exitCount++;
+                }
+            }
+            if(IS_VALID(log)) log.Info(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals (Entry:%d, Exit:%d).", found, entryCount, exitCount));
             ctx.Set("active_signals", activeList);
             return WATCHER_VALIDATION;
         }
