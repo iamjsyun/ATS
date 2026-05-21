@@ -6,6 +6,7 @@ using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
 using XTA.Infrastructure.Data;
 using XTA.XData.Models;
+using XTA.Models;
 using FluentSeq;
 
 namespace XTA.Services

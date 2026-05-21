@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using XTA.Infrastructure.Data;
 using XTA.Core;
+using XTA.Models;
+using XTA.XData.Models;
 using FluentSeq;
 
 namespace XTA.Services

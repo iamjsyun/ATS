@@ -6,6 +6,7 @@ using NLog;
 using XTA.Core;
 using XTA.Interfaces;
 using XTA.Models;
+using XTA.XData.Models;
 using XTA.Validation;
 using FluentValidation.Results;
 

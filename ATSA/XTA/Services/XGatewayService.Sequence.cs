@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using XTA.XData.Models;
 using XTA.Models;
+using XTA.Channels;
 using XTA.Core;
 using FluentSeq;
 
