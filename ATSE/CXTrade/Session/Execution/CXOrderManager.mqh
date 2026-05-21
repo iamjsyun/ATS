@@ -105,12 +105,13 @@ public:
 
         //--- [v10.10 Enhancement] Pre-flight StopLevel Validation
         if(IS_VALID(guard)) {
-            if(!guard.ValidateStopLevel(sig.GetSymbol(), marketPrice, finalSL) || !guard.ValidateStopLevel(sig.GetSymbol(), marketPrice, finalTP)) {
-                string err = StringFormat("[EXEC-ENTRY] INVALID STOPS (Market-Based). Req:[Mkt:%.5f, SL:%.5f, TP:%.5f], Sym:%s", 
-                                          marketPrice, finalSL, finalTP, sig.GetSymbol());
-                XP_LOG_ERROR(xp, err);
-                CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
-                return false;
+            if(!guard.ValidateStopLevel(symbol, basePrice, finalSL)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0 to avoid 10016.", basePrice, finalSL));
+                finalSL = 0;
+            }
+            if(!guard.ValidateStopLevel(symbol, basePrice, finalTP)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0 to avoid 10016.", basePrice, finalTP));
+                finalTP = 0;
             }
         }
 
@@ -202,6 +203,24 @@ public:
     virtual bool ModifyOrder(ICXParam* xp, ulong ticket, double price, double sl, double tp) override {
         if(ticket == 0) return false;
         
+        //--- [v11.2 Enhancement] Pre-flight StopLevel Validation for Modification
+        string symbol = "";
+        if(OrderSelect(ticket)) symbol = OrderGetString(ORDER_SYMBOL);
+        
+        if(symbol != "") {
+            IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+            if(IS_VALID(guard)) {
+                if(!guard.ValidateStopLevel(symbol, price, sl)) {
+                    XP_LOG_WARN(xp, StringFormat("[ORDER-MODIFY] SL too close (P:%.5f, SL:%.5f). Resetting SL to 0.", price, sl));
+                    sl = 0;
+                }
+                if(!guard.ValidateStopLevel(symbol, price, tp)) {
+                    XP_LOG_WARN(xp, StringFormat("[ORDER-MODIFY] TP too close (P:%.5f, TP:%.5f). Resetting TP to 0.", price, tp));
+                    tp = 0;
+                }
+            }
+        }
+
         XP_LOG_INFO(xp, StringFormat("[ORDER-MODIFY] Sending Request: [Ticket:%I64u, Price:%.5f, SL:%.5f, TP:%.5f]", 
                                         ticket, price, sl, tp));
 
