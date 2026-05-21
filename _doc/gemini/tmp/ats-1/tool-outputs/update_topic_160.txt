@@ -1,0 +1,4 @@
+Current topic: "Debugging System Log Creation"
+Topic summary: The user reports an error when `InpSystemLogEnabled = true` is set, likely due to a file path issue or missing directory in the MQL5 `Common/Files` folder. I'll investigate how `CXAppService` initializes the system logger and check if the `ATSE` subdirectory or parent directory is correctly created before opening the log file. I will add defensive logging to `CXFileLogger` to pinpoint if the error is due to `FileOpen` failing, directory access issues, or invalid path construction.
+
+Strategic Intent: Investigate and resolve System Log file creation errors.

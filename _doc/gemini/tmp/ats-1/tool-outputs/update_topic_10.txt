@@ -1,0 +1,4 @@
+Current topic: "Optimizing Signal Discovery Query"
+Topic summary: I am removing the `xa_exit > 0` condition from the Watcher's discovery query. As the user noted, ATSA handles record cleanup, so EA only needs to focus on signals with active or error statuses. This refinement prevents redundant discovery of closed or archived signals and simplifies the execution flow. I will update `CXSignalRepository.mqh` and verify with a build.
+
+Strategic Intent: Refine SQL discovery query by removing xa_exit condition.

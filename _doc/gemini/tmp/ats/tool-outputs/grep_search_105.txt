@@ -1,0 +1,1 @@
+No matches found for pattern "CX_GET_OBJ\(.*,.*, CX[A-Z][a-z]+[A-Za-z]*\)" in the workspace directory (filter: "ATSE/**/*.mqh").

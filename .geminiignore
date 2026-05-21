@@ -1,0 +1,37 @@
+# MQL5 컴파일된 바이너리 및 로그 제외
+*.ex5
+*.ex4
+/Logs/
+*.log
+
+# C# 및 Visual Studio 임시/빌드 파일 제외
+.vs/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.pdb
+
+# 기타 대형 데이터 및 환경변수 보호
+*.env
+*.csv
+*.json
+!settings.json
+
+# Git internal data (Speed up search)
+.git/
+
+# Caveman compression backups
+*.original.md
+
+# MQL5 Editor backups
+*.bak
+
+# C# / .NET build artifacts
+TestResults/
+packages/
+_ReSharper*/
+
+# OS noise
+.DS_Store
+Thumbs.db

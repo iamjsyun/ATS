@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using System;\nusing Microsoft.Extensions.Configuration;\nusing Microsoft.Extensions.DependencyInjection;\nusing Microsoft.Extensions.Hosting;\nusing Microsoft.Extensions.Logging;\nusing NLog.Extensions.Logging;\nusing XTA.Core;\nusing
+... [TRUNCATED] ...
+              nlog.Trace($\"[XTA:BOOT] Interpreter for {ch.Name} ({ch.Interpreter}) registered.\");\n                        }\n                    }\n                })\n                .Build();\n\n            return host;\n        }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151116752_0_6uxwvo.txt
+</tool_output_masked>

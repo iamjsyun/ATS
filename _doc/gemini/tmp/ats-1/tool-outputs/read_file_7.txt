@@ -1,0 +1,202 @@
+#ifndef CXORDERMANAGER_MQH
+#define CXORDERMANAGER_MQH
+
+#include "..\..\Interfaces\IXOrderManager.mqh"
+#include "..\..\Interfaces\ICXContext.mqh"
+#include "..\..\Interfaces\ICXParam.mqh"
+#include "..\..\Interfaces\CXDefine.mqh"
+#include "..\..\Interfaces\CXMacros.mqh"
+#include "..\..\Interfaces\IXGuard.mqh"
+#include "..\..\Infra\CXMessageProvider.mqh"
+#include <Trade\Trade.mqh>
+
+/**
+ * @class CXOrderManager
+ * @brief 샌드박스 세션 내의 주문 실행 및 관리 담당
+ */
+class CXOrderManager : public IXOrderManager {
+private:
+    ulong           m_ticket;
+    string          m_sid;
+    CTrade          m_trade;
+    ICXContext*     m_ctx;
+
+public:
+    CXOrderManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0), m_sid("") {}
+    virtual ~CXOrderManager() override {}
+
+    virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
+
+    /**
+     * @brief 진입 주문 실행 (xa_entry 기반)
+     */
+    virtual bool ExecuteEntry(ICXParam* xp) override {
+        if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;
+
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) {
+            XP_LOG_ERROR(xp, "[EXEC-ENTRY] FAILED: Signal object is NULL.");
+            return false;
+        }
+
+        //--- [v10.7 Enhancement] Exhaustive Validation Logging
+        IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+        if(IS_VALID(guard)) {
+            bool vMagic = guard.ValidateMagic(sig.GetMagic());
+            bool vSid   = guard.ValidateSID(sig.GetSid());
+            bool vLot   = guard.ValidateLot(sig.GetSymbol(), sig.GetLot());
+            bool vPrice = guard.ValidatePrice(sig.GetSymbol(), sig.GetPriceSignal());
+
+            if(!vMagic || !vSid || !vLot || !vPrice) {
+                string reason = StringFormat("Magic:%s, SID:%s, Lot:%s, Price:%s", 
+                                             vMagic?"OK":"FAIL", vSid?"OK":"FAIL", vLot?"OK":"FAIL", vPrice?"OK":"FAIL");
+                
+                string err = StringFormat("[EXEC-ENTRY] GUARD DENIED (%s). Symbol:%s, Lot:%.2f, Price:%.5f, Magic:%I64u", 
+                                          reason, sig.GetSymbol(), sig.GetLot(), sig.GetPriceSignal(), sig.GetMagic());
+                
+                XP_LOG_ERROR(xp, err);
+                CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
+                return false;
+            }
+        }
+
+        m_sid = sig.GetSid();
+        m_trade.SetExpertMagicNumber((ulong)sig.GetMagic());
+
+        //--- 주문 타입 및 방향 결정
+        ENUM_ORDER_TYPE order_type;
+        if(sig.GetType() == ORDER_MARKET) {
+            order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
+        } else {
+            order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;
+        }
+
+        //--- [v10.15 Fix] Market-Price Based Calculation (Ignore Signal Price)
+        double currentAsk = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_ASK);
+        double currentBid = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_BID);
+        double marketPrice = (sig.GetDir() == CX_DIR_BUY) ? currentAsk : currentBid;
+
+        //--- 1. Execution Price Calculation (For Pending Orders)
+        double execPrice = 0;
+        if(sig.GetType() != ORDER_MARKET) {
+            double limitOffset = sig.GetLimitOffset(); // 포인트 단위 오프셋 가정
+            double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+            double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
+            
+            // 지정가는 시장가 대비 offset만큼 떨어진 곳에 배치
+            execPrice = NormalizeDouble(marketPrice - (limitOffset * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+            XP_LOG_TRACE(xp, StringFormat("[v10.15-PRICE] Limit Price Cal: Market:%.5f, Offset:%.0f -> Exec:%.5f", marketPrice, limitOffset, execPrice));
+        }
+
+        //--- 2. SL/TP Point-to-Price Calculation based on Market Price
+        double finalSL = sig.GetPriceSL();
+        double finalTP = sig.GetPriceTP();
+        double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
+
+        if(finalSL <= 0 && sig.GetSL() > 0) {
+            finalSL = NormalizeDouble(marketPrice - (sig.GetSL() * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+            XP_LOG_TRACE(xp, StringFormat("[v10.15-CALC] SL Cal (Market): Market:%.5f - (Offset:%.0f * Pt:%.5f) = %.5f", marketPrice, sig.GetSL(), point, finalSL));
+        }
+        if(finalTP <= 0 && sig.GetTP() > 0) {
+            finalTP = NormalizeDouble(marketPrice + (sig.GetTP() * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+            XP_LOG_TRACE(xp, StringFormat("[v10.15-CALC] TP Cal (Market): Market:%.5f + (Offset:%.0f * Pt:%.5f) = %.5f", marketPrice, sig.GetTP(), point, finalTP));
+        }
+
+        //--- [v10.10 Enhancement] Pre-flight StopLevel Validation
+        if(IS_VALID(guard)) {
+            if(!guard.ValidateStopLevel(sig.GetSymbol(), marketPrice, finalSL) || !guard.ValidateStopLevel(sig.GetSymbol(), marketPrice, finalTP)) {
+                string err = StringFormat("[EXEC-ENTRY] INVALID STOPS (Market-Based). Req:[Mkt:%.5f, SL:%.5f, TP:%.5f], Sym:%s", 
+                                          marketPrice, finalSL, finalTP, sig.GetSymbol());
+                XP_LOG_ERROR(xp, err);
+                CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
+                return false;
+            }
+        }
+
+        //-- [v10.8] Exhaustive Parameter Logging
+        XP_LOG_TRACE(xp, StringFormat("[EXEC-ENTRY] Sending Order: [Sym:%s, Type:%s, Lot:%.2f, Price:%.5f, SL:%.5f, TP:%.5f, SID:%s]", 
+           sig.GetSymbol(), EnumToString(order_type), sig.GetLot(), execPrice, finalSL, finalTP, m_sid));
+
+        if(!m_trade.OrderOpen(sig.GetSymbol(), order_type, sig.GetLot(), 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, m_sid)) {
+            string retMsg = m_trade.ResultRetcodeDescription();
+            uint retCode = m_trade.ResultRetcode();
+            int sysErr = GetLastError();
+            string err_msg = StringFormat("[EXEC-ENTRY] TRADE FAILED: %s (BrokerCode:%u, SystemErr:%d). Req:[Sym:%s, Lot:%.2f, P:%.5f, SL:%.5f, TP:%.5f]", 
+                                          retMsg, retCode, sysErr, sig.GetSymbol(), sig.GetLot(), execPrice, finalSL, finalTP);
+            
+            XP_LOG_ERROR(xp, err_msg);
+            CXMessageProvider::UpdateStatus(sig, XE_ERROR, err_msg);
+            ResetLastError();
+            return false;
+        }
+
+        m_ticket = m_trade.ResultOrder();
+        
+        if(OrderSelect(m_ticket)) {
+            sig.SetTicket((long)m_ticket);
+            int next_status = (sig.GetType() == ORDER_MARKET) ? XE_EXECUTED : XE_PENDING_PLACED;
+            string status_msg = (sig.GetType() == ORDER_MARKET) ? MSG_ENTRY_MARKET_SUCCESS : MSG_ENTRY_LIMIT_PLACED;
+
+            CXMessageProvider::UpdateStatus(sig, next_status, status_msg);
+            XP_LOG_OK(xp, StringFormat("%s (Ticket:%I64u)", status_msg, m_ticket));
+            return true;
+        } else {
+            string vErr = StringFormat("[EXEC-ENTRY] VERIFY FAILED: Ticket %I64u not found in terminal after OrderOpen.", m_ticket);
+            XP_LOG_ERROR(xp, vErr);
+            CXMessageProvider::UpdateStatus(sig, XE_ERROR, vErr);
+            return false;
+        }
+    }
+
+    /**
+     * @brief 주문 수정 (진트레)
+     */
+    virtual bool ModifyOrder(ulong ticket, double price, double sl, double tp) override {
+        if(ticket == 0) return false;
+        
+        XP_LOG_TRACE(NULL, StringFormat("[ORDER-MODIFY] Sending Request: [Ticket:%I64u, Price:%.5f, SL:%.5f, TP:%.5f]", 
+                                        ticket, price, sl, tp));
+
+        if(m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0)) {
+            XP_LOG_OK(NULL, StringFormat("[ORDER-MODIFY] SUCCESS: Ticket %I64u Modified.", ticket));
+            return true;
+        }
+
+        string retMsg = m_trade.ResultRetcodeDescription();
+        uint retCode = m_trade.ResultRetcode();
+        int sysErr = GetLastError();
+        XP_LOG_ERROR(NULL, StringFormat("[ORDER-MODIFY] FAILED: %s (BrokerCode:%u, SystemErr:%d). Req:[Ticket:%I64u, Price:%.5f, SL:%.5f, TP:%.5f]", 
+                                        retMsg, retCode, sysErr, ticket, price, sl, tp));
+        ResetLastError();
+        return false;
+    }
+
+    virtual bool DeleteOrder(ulong ticket) override {
+        if(ticket == 0) return false;
+        
+        XP_LOG_TRACE(NULL, StringFormat("[ORDER-DELETE] Sending Request: [Ticket:%I64u]", ticket));
+
+        // 1. 삭제 시도
+        if(!m_trade.OrderDelete(ticket)) {
+            string retMsg = m_trade.ResultRetcodeDescription();
+            uint retCode = m_trade.ResultRetcode();
+            int sysErr = GetLastError();
+            XP_LOG_ERROR(NULL, StringFormat("[ORDER-DELETE] FAILED: %s (BrokerCode:%u, SystemErr:%d). Ticket:%I64u", 
+                                            retMsg, retCode, sysErr, ticket));
+            ResetLastError();
+            return false;
+        }
+        
+        // 2. 삭제 확인
+        if(OrderSelect(ticket)) {
+            XP_LOG_ERROR(NULL, StringFormat("[ORDER-DELETE] VERIFY FAILED: Ticket:%I64u still exists after deletion.", ticket));
+            return false;
+        }
+        
+        XP_LOG_OK(NULL, StringFormat("[ORDER-DELETE] SUCCESS: Ticket %I64u Deleted.", ticket));
+        return true;
+    }
+};
+
+#endif

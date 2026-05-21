@@ -1,0 +1,15 @@
+namespace XTA.Infrastructure.Audio
+{
+    /// <summary>
+    /// 사운드 서비스의 처리 단계 정의
+    /// </summary>
+    public enum XSoundState
+    {
+        Idle,           // 대기
+        RequestReceived, // 요청 수신
+        Validated,      // 유효성 및 스팸 검사 통과
+        Composed,       // 메시지 조립 완료
+        Completed,      // 발화 명령 전달 완료
+        Suppressed      // 차단됨 (스팸, 설정 등)
+    }
+}

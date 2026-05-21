@@ -1,0 +1,4 @@
+Current topic: "Analyzing Critical System Error (Status 99)"
+Topic summary: The signal ID 111 is marked with `xe_status=99` (`[ERR-000] Critical internal system error`), which explains why it's failing. This status is set in the session manager when a sequence reaches a terminal fail state or an unexpected error. I'll investigate where `xe_status = 99` is assigned and how the sequence engine transitions to `SESSION_ERROR` state. This is likely an exception occurring within the `Entry` or `Watcher` pipeline that was not properly caught, causing a circuit breaker. I will trace the `MSG_ERR_INTERNAL` constant to pinpoint the failing module.
+
+Strategic Intent: Analyze the xe_status=99 (Critical internal system error) for ID 111.

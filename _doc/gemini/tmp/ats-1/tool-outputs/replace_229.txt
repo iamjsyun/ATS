@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\CXTradingSession.mqh (1 replacements). Here is the updated code:\n#ifndef CXTRADINGSESSION_MQH\n#define CXTRADINGSESSION_MQH\n\n#include \"..\\Interfaces\\IReposito
+... [TRUNCATED] ...
+         .OnSuccess(SESSION_CLOSED)\n           .OnFail(SESSION_ERROR)\n           .Timeout(300)\n           .Retries(3);\n        \n        seq.Build();\n        XP_LOG_INFO(GetPointer(xp), \"Sequence Assembly Complete.\");\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779235407894_0_9ftfco.txt
+</tool_output_masked>

@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\Sync:\nCXReverseInjector.mqh (2961 bytes)\nCXTerminalScanner.mqh (1810 bytes)"
+}

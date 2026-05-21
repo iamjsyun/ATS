@@ -1,0 +1,4 @@
+Current topic: "Debugging Log Truncation Logic"
+Topic summary: I am investigating why the 'Clear Log on Start' feature is failing even when set to true. I suspect that the use of 'FILE_READ|FILE_WRITE' prevents file truncation in MQL5, and 'FILE_REWRITE' might be an invalid or incorrectly used flag. I will verify the standard MQL5 FileOpen behavior and adjust the logic in CXFileLogger.mqh to correctly truncate the file when initialization is requested.
+
+Strategic Intent: Analyze and fix the 'Clear Log on Start' failure.

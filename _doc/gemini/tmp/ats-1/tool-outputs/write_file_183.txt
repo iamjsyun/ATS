@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Models\\CXConfig.mqh. Here is the updated code:\n...\n    bool           m_system_useFile;\n    bool           m_system_useRemote;\n    bool           m_session_useFile;\n 
+... [TRUNCATED] ...
+erride { return m_log_initOnStart; }\n\n    // Granular Control\n    virtual bool IsFileLogEnabled(string cat) const override {\n        if(cat == \"Watcher\") return m_watcher_useFile;\n        if(cat == \"System\")  return m_system_useFile;\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779237241635_0_qh37lh.txt
+</tool_output_masked>

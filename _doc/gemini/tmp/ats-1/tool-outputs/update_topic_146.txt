@@ -1,0 +1,4 @@
+Current topic: "Diagnosing Database Mismatch"
+Topic summary: I will add diagnostic logging to CXSignalRepository::LoadActiveSignals to report the total number of rows in the 'signals' table, helping to confirm if the EA is accessing the correct database file. I will also make GetColumnIndex case-insensitive to handle potential schema variations and add error reporting for query results to identify why the expected record is missing from the discovery step.
+
+Strategic Intent: Diagnose database mismatch and schema issues in CXSignalRepository.mqh.

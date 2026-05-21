@@ -1,0 +1,37 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 40-70 of 173 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 71.
+
+--- FILE CONTENT (truncated) ---
+                .ConfigureState(XSoundState.Idle)
+
+                // 2. 요청 수신 상태
+                .ConfigureState(XSoundState.RequestReceived)
+
+                // 3. 억제 상태 (필터링 우선 순위: Spam/Channel/Status 체크)
+                .ConfigureState(XSoundState.Suppressed)
+                    .TriggeredBy(() => _currentXdo?.Signal != null && IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD))
+                        .WhenInState(XSoundState.RequestReceived)
+                    .TriggeredBy(() => _currentXdo?.Signal != null && !IsTargetChannel(_currentXdo.Signal.cno))
+                        .WhenInState(XSoundState.RequestReceived)
+                    .TriggeredBy(() => _currentXdo?.Signal?.xe_status == (int)XCode.EaStatus.ExecutingMarket)
+                        .WhenInState(XSoundState.RequestReceived)
+                    .OnEntry(() => {
+                        if (_currentXdo?.Signal != null) {
+                            if (IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD))
+                                nlog.Debug($"[Sound:SUPPRESSED] Anti-Spam blocked SID:{_currentXdo.Signal.sid} Cmd:{_currentXdo.CMD}");
+                            else if (!IsTargetChannel(_currentXdo.Signal.cno))
+                                nlog.Debug($"[Sound:SUPPRESSED] Channel {_currentXdo.Signal.cno} has Sound Disabled or not registered.");
+                            else if (_currentXdo.Signal.xe_status == (int)XCode.EaStatus.ExecutingMarket)
+                                nlog.Debug($"[Sound:SUPPRESSED] Execution in progress for SID:{_currentXdo.Signal.sid}");
+                        }
+                    })
+
+                // 4. 완료 상태 (직접 텍스트 요청 처리)
+                .ConfigureState(XSoundState.Completed)
+                    .TriggeredBy(() => _currentXdo != null && !string.IsNullOrEmpty(_currentXdo.Text))
+                        .WhenInState(XSoundState.RequestReceived)
+                    .TriggeredBy(() => !string.IsNullOrEmpty(_currentTtsMsg))
+                        .WhenInState(XSoundState.Composed)
+                    .OnEntry(() => {

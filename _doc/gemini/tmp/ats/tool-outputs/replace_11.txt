@@ -1,0 +1,133 @@
+Successfully modified file: C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69E0\MQL5\Experts\ATS\ATSE\CXTrade\Infra\CXSignalRepository.mqh (1 replacements). Here is the updated code:
+//+------------------------------------------------------------------+
+//|                                                      ProjectName |
+//|                                      Copyright 2020, CompanyName |
+//|                                       http://www.companyname.net |
+//+------------------------------------------------------------------+
+#ifndef CXSIGNALREPOSITORY_MQH
+#define CXSIGNALREPOSITORY_MQH
+
+#include <Arrays\ArrayObj.mqh>
+#include "..\Interfaces\IRepository.mqh"
+#include "..\Interfaces\IDatabase.mqh"
+#include "..\Models\CXSignal.mqh"
+
+class CXSignalRepository : public IRepository {
+private:
+   IDatabase* m_db;
+
+   int GetColumnIndex(int req, string name) {
+      int count = DatabaseColumnsCount(req);
+      for(int i = 0; i < count; i++) {
+         string col_name;
+         if(DatabaseColumnName(req, i, col_name) && col_name == name)
+            return i;
+      }
+      Print("Column " + name + " not found!");
+      return -1;
+   }
+
+public:
+   CXSignalRepository(IDatabase* db) : m_db(db) {}
+   virtual ~CXSignalRepository() {}
+
+   virtual void SaveSignal(ICXSignal* signal) override {
+      if(IS_INVALID(signal) || IS_INVALID(m_db)) return;
+
+      string sql = StringFormat(
+                      "INSERT OR REPLACE INTO signals (sid, gid, symbol, dir, type, lot, xa_entry, xa_exit, xe_status, updated) "
+                      "VALUES ('%s', '%s', '%s', %d, %d, %.2f, %d, %d, %d, datetime('now','localtime'))",
+                      signal.GetSid(), "G1", signal.GetSymbol(), signal.GetDir(), signal.GetType(), signal.GetLot(), 
+                      signal.GetXAEntry(), signal.GetXAExit(), signal.GetStatus()
+                   );
+      m_db.Execute(sql);
+   }
+
+   virtual void LoadParam(ICXParam* param) override {
+      // Implementation for loading dynamic parameters
+   }
+
+   virtual int GetStatusBySid(const string sid) override {
+      if(IS_INVALID(m_db) || sid == "") return -1;
+      string sql = StringFormat("SELECT xe_status FROM signals WHERE sid='%s'", sid);
+      int handle = m_db.GetHandle();
+      int req = DatabasePrepare(handle, sql);
+      int status = -1;
+      if(req != INVALID_HANDLE) {
+         if(DatabaseRead(req)) DatabaseColumnInteger(req, 0, status);
+         DatabaseFinalize(req);
+      }
+      return status;
+   }
+
+   virtual bool UpdateStatus(ICXSignal* signal) override {
+      if(IS_INVALID(m_db) || IS_INVALID(signal)) return false;
+      string sql = StringFormat(
+                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', updated=datetime('now','localtime') WHERE sid='%s'",
+                      signal.GetStatus(), signal.GetStatusMsg(), signal.GetSid()
+                   );
+      return m_db.Execute(sql);
+   }
+
+   virtual int LoadActiveSignals(CArrayObj* list) override {
+      // 1. 가드 클로즈: 유효성 검사 (Early Return)
+      if (IS_INVALID(m_db) || IS_INVALID(list)) return 0;
+
+      // 2. SQL 쿼리 작성 (SELECT * 적용)
+      string sql = "SELECT * FROM signals WHERE (xa_entry > 0 OR xa_exit > 0) AND xa_status != 6";
+      return LoadBySql(sql, list);
+   }
+
+   virtual ICXSignal* GetSignalBySid(const string sid) override {
+      if (IS_INVALID(m_db) || sid == "") return NULL;
+      string sql = StringFormat("SELECT * FROM signals WHERE sid='%s'", sid);
+      CArrayObj list;
+      if (LoadBySql(sql, GetPointer(list)) > 0) {
+         return CX_CAST(ICXSignal, list.Detach(0));
+      }
+      return NULL;
+   }
+
+private:
+   int LoadBySql(string sql, CArrayObj* list) {
+      int handle = m_db.GetHandle();
+      int req = DatabasePrepare(handle, sql);
+
+      if (req == INVALID_HANDLE) {
+         PrintFormat("DatabasePrepare failed: %d", GetLastError());
+         return 0;
+      }
+
+      int count = 0;
+      while (DatabaseRead(req)) {
+         CXSignal* sig = new CXSignal();
+
+         // 3. 컬럼 명칭을 인덱스로 변환하여 대입 (프로젝트 표준: 시각적 가독성 및 스키마 변경 대응)
+         DatabaseColumnInteger(req, GetColumnIndex(req, "id"),           sig.id);
+         DatabaseColumnText(req,    GetColumnIndex(req, "sid"),          sig.sid);
+         DatabaseColumnText(req,    GetColumnIndex(req, "gid"),          sig.gid);
+         DatabaseColumnText(req,    GetColumnIndex(req, "symbol"),       sig.symbol);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "dir"),          sig.dir);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "type"),         sig.type);
+         DatabaseColumnDouble(req,  GetColumnIndex(req, "lot"),          sig.lot);
+         DatabaseColumnDouble(req,  GetColumnIndex(req, "price_signal"), sig.price_signal);
+         DatabaseColumnDouble(req,  GetColumnIndex(req, "tp"),           sig.tp);
+         DatabaseColumnDouble(req,  GetColumnIndex(req, "sl"),           sig.sl);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "te_start"),     sig.te_start);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "te_step"),      sig.te_step);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "ts_start"),     sig.ts_start);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "ts_step"),      sig.ts_step);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "xa_entry"),     sig.xa_entry);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "xa_exit"),      sig.xa_exit);
+         DatabaseColumnInteger(req, GetColumnIndex(req, "xe_status"),    sig.xe_status);
+
+         list.Add(sig);
+         count++;
+      }
+
+      DatabaseFinalize(req);
+      return count;
+   }
+};
+
+#endif

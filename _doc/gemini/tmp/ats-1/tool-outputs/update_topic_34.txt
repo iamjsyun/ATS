@@ -1,0 +1,4 @@
+Current topic: "Fixing Market Order Execution via Buy/Sell Helpers"
+Topic summary: I'm refactoring `CXOrderManager::ExecuteEntry` to use explicit `m_trade.Buy()` and `m_trade.Sell()` methods for market orders. The generic `m_trade.OrderOpen()` method is causing `Retcode 10013` because it likely expects strict parameter alignment that doesn't match the current invocation for market orders. Using the library-provided `Buy`/`Sell` helper methods is the standard MQL5 practice to ensure correct parameter filling and broker compatibility. I will also keep the `OrderOpen` fallback for limit/stop orders.
+
+Strategic Intent: Replace generic OrderOpen with explicit CTrade::Buy/Sell for market orders to resolve Retcode 10013.

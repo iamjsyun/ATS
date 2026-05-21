@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "# ATS Hyper-Atomized Architecture Review v1.0\n\n## 1. 설계 철학 (Design Philosophy)\n본 고도화 안은 MQL5 환경에서 시스템의 **결합도(Coupling)**를 최소화하고, 외부 환경(Broker, SQLite)의 불안정성에 대해 **격리된 실패 지점(Isolated Failure Domains)**을 구축하는 것을 목표로 함.\n\n## 2. 핵심 아키텍
+... [TRUNCATED] ...
+r`에서 불필요한 중복 쓰기 방지 로직 필요.\n\n## 5. 결론 및 제언\n본 Hyper-Atomized 구조는 초기 개발 공수는 증가하나, 실물 매매 환경에서 가장 빈번하게 발생하는 **\"알 수 없는 지연\"**에 대해 시스템이 명확한 인과관계를 가지고 대응할 수 있게 함. \n\n---\n**Last Modified**: 2026-05-19\n**Reporter**: Gemini-3.1-Flash-Lite (cli-agent)\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779234342067_1_br3hl3.txt
+</tool_output_masked>

@@ -1,0 +1,4 @@
+Current topic: "Diagnosing Signal Discovery Failure"
+Topic summary: Despite a signal existing in the DB (ID 13), the Watcher reports 'No active signals found'. I suspect a DB path mismatch (Common vs. Instance) or a schema mismatch causing FetchSignals to fail. I will enhance `CXSignalRepository.mqh` by adding `XP_LOG_WARN` diagnostics directly into `LoadActiveSignals` to track constructed SQL, total row count, and any column-missing errors, ensuring these insights appear in the user's main log stream.
+
+Strategic Intent: Diagnose signal discovery failure using deep repository tracing.

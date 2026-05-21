@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"컴파일 에러 수정 - 파라미터 개수 불일치 해결\"\nTopic summary: IXExitManager 등 매니저 인터페이스에 ICXParam* xp 매개변수가 추가됨에 따라, 이를 호출하는 CXStepExitTicket, CXStepExitSweep 등 시퀀스 스텝 파일들에서 발생하는 'wrong parameters count' 컴파일 에러를 수정합니다. 모든 호출부에 xp 인자를 전달하도록 업데이트하여 시스템 무결성을 확보합니다.\n\nStrategic Intent: 매니저 인터페이스 변경에 따른 호출부 파라미터 불일치 수정."
+}

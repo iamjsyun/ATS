@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Services\\XSyncWorker.cs (1 replacements). Here is the updated code:\nusing DevExpress.Data.Filtering;\nusing DevExpress.Xpo;\nusing System;\nusing System.Collections.Generic;\n
+... [TRUNCATED] ...
+ass SyncContext { \n            public XpoSqliteService? DbService { get; set; } \n            public List<int> TradeCnos { get; set; } = new(); \n            public List<XpoTgMessage> PendingMessages { get; set; } = new(); \n        }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779154182624_1_heayse.txt
+</tool_output_masked>

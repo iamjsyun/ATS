@@ -1,0 +1,12 @@
+Output: Get-Content : 'D:\Projects\ATS\ATSA\ATSA\bin\Debug\net10.0-windows\ATSA.json' 寃쎈�� 議댁 ��쇰�濡 李얠
+                                                                                                       ��듬��.
+�
+ 移
+   :1 臾몄
++ ... ing]::UTF8; Get-Content "D:\Projects\ATS\ATSA\ATSA\bin\Debug\net10.0- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (D:\Projects\ATS...ndows\ATSA.json:String) [Get-Content], ItemNotFoundException
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+Exit Code: 1
+Process Group PGID: 5604

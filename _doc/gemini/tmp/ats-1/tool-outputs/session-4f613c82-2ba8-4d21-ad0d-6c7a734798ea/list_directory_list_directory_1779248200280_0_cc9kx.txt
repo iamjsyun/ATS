@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Infra:\n[DIR] Sync\nCXDatabase.mqh (2800 bytes)\nCXDbDispatcher.mqh (2188 bytes)\nCXFileLogger.mqh (3293 bytes)\nCXFluentSequence.mqh (11119 bytes)\nCXGuard.mqh (4747 bytes)\nCXMessageProvider.mqh (1385 bytes)\nCXRemoteLogger.mqh (3973 bytes)\nCXSignalRepository.mqh (12706 bytes)\nCXTabLogger.mqh (675 bytes)"
+}

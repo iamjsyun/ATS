@@ -1,0 +1,3 @@
+{
+  "output": "#ifndef IXORDERMANAGER_MQH\n#define IXORDERMANAGER_MQH\n\n#include <Object.mqh>\n#include \"ICXParam.mqh\"\n\n/**\n * @class IXOrderManager\n * @brief 주문 실행 및 수정을 위한 추상 인터페이스\n */\nclass IXOrderManager : public CObject {\npublic:\n    virtual void SetMagic(ulong magic) = 0;\n    virtual void ExecuteEntry(ICXParam* xp) = 0;\n    virtual bool ModifyOrder(ulong ticket, double price, double sl, double tp) = 0;\n    virtual bool DeleteOrder(ulong ticket) = 0;\n};\n\n#endif\n"
+}

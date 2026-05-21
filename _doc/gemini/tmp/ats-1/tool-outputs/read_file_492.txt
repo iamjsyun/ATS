@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXPARAM_MQH\n#define CXPARAM_MQH\n\n#include \"..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\Interfaces\\ICXContext.mqh\"\n\n/**\n * @class CXParam\n * @brief 트레이딩 이벤트 및 데이터를 전달하는 기본 DTO 클래스\n */\nclass CXParam : public ICXPar
+... [TRUNCATED] ...
+nal* sig) { m_sig = sig; }\n    void SetContext(ICXContext* ctx) { m_ctx = ctx; }\n\n    void SetTransaction(const MqlTradeTransaction& trans) { m_trans = trans; }\n    MqlTradeTransaction GetTransaction() const { return m_trans; }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779157015105_0_swxgzd.txt
+</tool_output_masked>

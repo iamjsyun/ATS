@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: [LOG_LVL_INFO] [07:47:05] [RemoteLog] Connected successfully to 127.0.0.1:878 (Socket:1)
+[LOG_LVL_INFO] [07:47:05] [SEQ:WatcherSeq] Sequence Started at State: 0
+[LOG_LVL_INFO] [07:47:05] >>> Signal Watcher Started <<<
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] No active signals found in DB.
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] No active signals found in DB.
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:47:06] [WATCHER-DISCOVERY] No active signals found in DB.
+[LOG_LVL_INFO] [07:49:43] [RemoteLog] Connected successfully to 127.0.0.1:878 (Socket:1)
+
+... [9 lines omitted] ...
+
+[LOG_LVL_DEBUG] [07:50:03] [WATCHER-VALIDATION] PASSED [SID:1001-26051913-01-00-1-1, Sym:GOLD#, P:1.00000, L:0.01, TE:500, TS:500, SL:700, TP:1500, EN:1, EX:0, ST:0]
+[LOG_LVL_INFO] [07:50:03] [WATCHER-VALIDATION] Passed: 1, Failed: 0
+[LOG_LVL_OK] [07:50:04] [WATCHER-BINDING] SUCCESS: SID:1001-26051913-01-00-1-1 bound to session.
+[LOG_LVL_INFO] [07:50:04] [WATCHER-BINDING] Complete. Success: 1, Skipped: 0, Failed: 0
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] No active signals found in DB.
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] No active signals found in DB.
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] Pulsing...
+[LOG_LVL_TRACE] [07:50:04] [WATCHER-DISCOVERY] No active signals found in DB.
+Process Group PGID: 30276
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779166300766_0_dm8sne.txt
+</tool_output_masked>

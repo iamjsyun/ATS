@@ -1,0 +1,14 @@
+Found 8 matches for pattern "CXStepBinding" in path "D:\Projects\ATS\ATSE\CXTrade":
+---
+File: Module\CXSignalWatcher.mqh
+L18: #include "Steps\Watcher\CXStepBinding.mqh"
+L103:         seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);
+---
+File: Module\Steps\Watcher\CXStepBinding.mqh
+L1: #ifndef CXSTEPBINDING_MQH
+L2: #define CXSTEPBINDING_MQH
+L13:  * @class CXStepBinding
+L16: class CXStepBinding : public IXStep {
+L18:     CXStepBinding() {}
+L19:     virtual ~CXStepBinding() {}
+---

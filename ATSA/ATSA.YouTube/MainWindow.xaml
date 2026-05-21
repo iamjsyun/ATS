@@ -1,0 +1,80 @@
+<Window x:Class="ATSA.YouTube.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:uc="clr-namespace:ATSA.YouTube.UI.UCtrls.UCWebView"
+        xmlns:vm="clr-namespace:ATSA.YouTube.UI.ViewModels"
+        xmlns:vmuc="clr-namespace:ATSA.YouTube.UI.UCtrls.UCWebView.ViewModels"
+        mc:Ignorable="d"
+        Title="ATSA YouTube Monitor (ay)" Height="800" Width="1200" WindowStartupLocation="CenterScreen"
+        Background="#F4F7F9">
+    
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- Dynamic View Switching Mapping -->
+        <DataTemplate DataType="{x:Type vmuc:UCWebViewModel}">
+            <uc:UCWebView/>
+        </DataTemplate>
+
+        <Style x:Key="ChannelButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#E9ECEF"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#444444"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Top Menu -->
+            <RowDefinition Height="*"/>    <!-- Main Content Area -->
+        </Grid.RowDefinitions>
+
+        <!-- Top Channel Navigation Menu (ATSA Design Concept) -->
+        <Border Grid.Row="0" Background="#1A1C2E" Padding="10,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="AY MONITOR" Foreground="#FFEC8B" VerticalAlignment="Center" FontWeight="Bold" FontSize="18" Margin="10,0,30,0"/>
+                
+                <ItemsControl ItemsSource="{Binding Channels}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding ChannelName}" 
+                                    Command="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource ChannelButtonStyle}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <!-- Dynamic Content Area -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}"/>
+    </Grid>
+</Window>

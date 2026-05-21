@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Infrastructure\\Data\\XpoSqliteService.cs (1 replacements). Here is the updated code:\nusing DevExpress.Data.Filtering;\nusing DevExpress.Xpo;\nusing DevExpress.Xpo.DB;\nusing N
+... [TRUNCATED] ...
+var s in targets) { var h = new XpoSignalHistory(uow); s.ToHistoryModel(h); s.Delete(); } if (targets.Count > 0) await uow.CommitChangesAsync(); } catch (Exception ex) { nlog.Error(ex, \"[DB:ARCHIVE] Archiving Protocol Failure.\"); } }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779153940641_0_u2czc.txt
+</tool_output_masked>

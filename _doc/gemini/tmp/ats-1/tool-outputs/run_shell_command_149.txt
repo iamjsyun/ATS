@@ -1,0 +1,4 @@
+Output: >     void SetFileLogger(ICXLogger* logger)   { SAFE_DELETE(m_file);   m_file = logger; }??      void SetTabLogger(ICXLogger* logger)    { SAFE_DELETE(m_tab);    m_tab = logger; }??      void SetUI
+Logger(ICXLogger* logger)     { SAFE_DELETE(m_ui);     m_ui = logger; }??      void SetRemoteLogger(ICXLogger* logger) { SAFE_DELETE(m_remote); m_remote = logger; }??  ??      ICXLogger* GetFileLog
+ger() const { return m_file; }
+Process Group PGID: 34192

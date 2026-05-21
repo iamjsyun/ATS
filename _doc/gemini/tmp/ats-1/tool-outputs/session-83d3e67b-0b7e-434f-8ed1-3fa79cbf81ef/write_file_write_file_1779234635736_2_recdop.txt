@@ -1,0 +1,3 @@
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\ActiveTasks.mqh. Here is the updated code:\n#ifndef ACTIVETASKS_MQH\n#define ACTIVETASKS_MQH\n\n#include \"Active\\CXTaskActive_V_Terminal.mqh\"\n#include \"Active\\CXTaskActive_P_Align.mqh\"\n#include \"Active\\CXTaskActive_L_Status.mqh\"\n#include \"Active\\CXTaskIntentWatch.mqh\"\n#include \"Active\\CXTaskAlphaCalc.mqh\"\n#include \"Active\\CXTaskAlphaApply.mqh\"\n\n#endif\n"
+}

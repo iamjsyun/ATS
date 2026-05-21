@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Module\\Steps\\Watcher\\CXStepDiscovery.mqh. Here is the updated code:\n...\n\n#include <Arrays\\ArrayObj.mqh>\n\n/**\n * @class CXStepDiscovery\n * @brief DB에서 신규 활성 신호를 검
+... [TRUNCATED] ...
+      } else {\n            if(IS_VALID(log) && shouldLog) {\n                log.Trace(xp, \"[WATCHER-DISCOVERY] No active signals found in DB.\");\n            }\n            m_noSignalCount++;\n        }\n\n        SAFE_DELETE(activeList);\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\write_file_write_file_1779161036102_1_3xzvn.txt
+</tool_output_masked>

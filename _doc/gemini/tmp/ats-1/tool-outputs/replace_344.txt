@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXGuard.mqh (1 replacements). Here is the updated code:\n#ifndef CXGUARD_MQH\n#define CXGUARD_MQH\n\n#include \"..\\Interfaces\\IXGuard.mqh\"\n#include \"..\\Interfac
+... [TRUNCATED] ...
+ignal* sig = xp.GetSignal();\n        if(IS_INVALID(sig)) return true;\n        \n        if(!ValidateMagic(sig.GetMagic())) return false;\n        if(!ValidateSID(sig.GetSid())) return false;\n        \n        return true;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779160584314_0_o8a0w4.txt
+</tool_output_masked>

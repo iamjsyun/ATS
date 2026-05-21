@@ -1,0 +1,3 @@
+{
+  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Infra\\CXFluentSequence.mqh. Here is the updated code:\n#ifndef CXFLUENTSEQUENCE_MQH\r\n#define CXFLUENTSEQUENCE_MQH\r\n\r\n#include \"..\\Interfaces\\ICXFluentSequence.mqh\"\r\n\r\nclass CXFluentSequence : public ICXFluentSequence {\r\npublic:\r\n    CXFluentSequence() {}\r\n    ~CXFluentSequence() {}\r\n};\r\n\r\n#endif\r\n"
+}

@@ -1,0 +1,15 @@
+Output:         }
+        }
+
+        //--- [Fix] SL/TP ??? ????????)??? ??? ????Absolute Price)??? ????(IXGuard ???)
+        double sl_price = 0.0;
+        double tp_price = 0.0;
+        IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+
+        if(IS_VALID(guard)) {
+            if(sig.GetSL() > 0) {
+                double sl_dist = guard.PointsToPrice(sym, sig.GetSL());
+                sl_price = (sig.GetDir() == CX_DIR_BUY) ? (price - sl_dist) : (price + sl_dist);
+                sl_price = guard.NormalizePrice(sym, sl_price);
+            }
+Process Group PGID: 8180

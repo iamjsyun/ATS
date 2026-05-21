@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: >     int                         m_current_state;??      datetime                    m_state_entered;??      CHashMap<int, CXStepNode*>  m_map;??      string                      m_name;??      ??
+      // Builder State??      int                         m_tmp_from;??      IXStep*                     m_tmp_step;??      IXGuard*                    m_tmp_guard;??      int
+   m_tmp_success;??      int                         m_tmp_fail;??      int                         m_tmp_timeout;??      int                         m_tmp_retries;??      CHashMap<int, int>*      
+   m_tmp_branches;??  ??  public:??      CXFluentSequence(ICXContext* ctx, string name)
+>         : m_ctx(ctx), m_name(name), m_current_state(-1), m_tmp_from(-1),??            m_tmp_step(NULL), m_tmp_guard(NULL), m_tmp_success(-1), m_tmp_fail(-1),??            m_tmp_timeout(0), m_tmp_
+retries(0) {??          m_tmp_branches = new CHashMap<int, int>();??          if(IS_VALID(m_tmp_branches)) {??              m_state_entered = TimeCurrent();??          }??      }??      ??      ~CX
+FluentSequence() {??          int keys[];??          CXStepNode* values[];??          m_map.CopyTo(keys, values);??          for(int i = 0; i < ArraySize(values); i++) if(IS_VALID(values[i])) SAFE_
+DELETE(values[i]);??          m_map.Clear();??          SAFE_DELETE(m_tmp_branches);??      }??  ??      //-- Fluent API??      CXFluentSequence* From(int state) { CommitCurrent(); m_tmp_from = sta
+te; return GetPointer(this); }??      CXFluentSequence* Execute(IXStep* step) { m_tmp_step = step; return GetPointer(this); }
+>         if(m_current_state == -1) {
+
+... [19 lines omitted] ...
+
+    if(m_tmp_from == -1 || IS_INVALID(m_tmp_step)) return;??          CXStepNode* node = new CXStepNode(m_tmp_step, m_tmp_success, m_tmp_fail, m_tmp_timeout, m_tmp_retries, m_tmp_guard);??
+ if(IS_INVALID(node)) return;??          ??          int b_keys[]; int b_values[];??          m_tmp_branches.CopyTo(b_keys, b_values);??          for(int i = 0; i < ArraySize(b_keys); i++) node.bra
+nches.Add(b_keys[i], b_values[i]);??          m_tmp_branches.Clear();??  ??          m_map.Add(m_tmp_from, node);??          m_tmp_from = -1; m_tmp_step = NULL; m_tmp_guard = NULL; m_tmp_success = 
+-1; m_tmp_fail = -1;??      }??  ??      void UpdateState(int next) {
+>         if(m_current_state == next) return;
+>         TriggerOnExit(m_current_state);
+>         m_current_state = next;??          m_state_entered = TimeCurrent();
+>         TriggerOnEnter(m_current_state);??      }??  ??      void TriggerOnEnter(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) n
+ode.step.OnEnter(m_ctx);??      }??  ??      void TriggerOnExit(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnExit(m_c
+tx);??      }??  };??  ??  #endif
+Process Group PGID: 15432
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779158013599_0_j5fv6.txt
+</tool_output_masked>

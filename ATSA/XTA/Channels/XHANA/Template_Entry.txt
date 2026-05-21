@@ -1,0 +1,12 @@
+🚀 XHANA TRADING SIGNAL
+━━━━━━━━━━━━━━
+📌 Entry Detected
+━━━━━━━━━━━━━━
+
+📌 Symbol : {SYMBOL}
+📌 Direction : {DIR}
+📌 Lot : {LOT}
+📌 Price : {PRICE}
+📌 SNO : {SNO}회차
+
+Good luck!

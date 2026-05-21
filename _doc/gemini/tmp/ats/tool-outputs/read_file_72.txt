@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 50-56 of 69 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, 
+... [TRUNCATED] ...
+.GetTP())) {\n                    sig.SetSL(newSL);\n                    sig.SetStatusMsg(MSG_EXIT_TS_MODIFIED);\n                    XP_LOG_INFO(xp, StringFormat(\"[TS-MODIFY] Ticket:%lld, SL:%.5f -> %.5f\", sig.GetTicket(), sig.GetSL(), newSL));"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778721378721_0_ekkk24.txt
+</tool_output_masked>

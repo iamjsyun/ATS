@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Exit\\CXTaskExit_V_Terminal.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_EXIT_V_TERMINAL_MQH\n#define CX_TASK_EXIT_V_TERMINAL_MQH\n\n#inc
+... [TRUNCATED] ...
+minal. Waiting...\", ticket));\n            return TASK_YIELD;\n        }\n\n        XP_LOG_OK(xp, StringFormat(\"[EXIT-V-TERMINAL] SUCCESS: Physical Asset(%I64u) Absence Verified.\", ticket));\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239005043_0_poyst.txt
+</tool_output_masked>

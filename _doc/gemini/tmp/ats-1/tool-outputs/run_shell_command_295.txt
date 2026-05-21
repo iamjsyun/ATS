@@ -1,0 +1,2 @@
+Output: >     virtual bool ValidateComment(string comment) {??          if(StringLen(comment) > COMMENT_MAX_LENGTH) return SetError("Comment too long");??          return true;
+Process Group PGID: 31488

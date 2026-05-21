@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Pending\\CXTaskPending_V_Sync.mqh. Here is the updated code:\n#ifndef CX_TASK_PENDING_V_SYNC_MQH\r\n#define CX_TASK_PENDING_V_SYNC_MQH\r\n\r\
+... [TRUNCATED] ...
+         return SESSION_LIQUIDATING;\r\n        }\r\n\r\n        if(sig.GetStatus() >= XE_EXECUTED) return SESSION_ACTIVE;\r\n        if(sig.GetTicket() <= 0) return TASK_BREAK;\r\n\r\n        return TASK_CONTINUE;\r\n    }\r\n};\r\n\r\n#endif\r\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779234622585_0_8dpe3.txt
+</tool_output_masked>

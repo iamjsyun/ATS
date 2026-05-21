@@ -1,0 +1,19 @@
+#ifndef IXORDERMANAGER_MQH
+#define IXORDERMANAGER_MQH
+
+#include <Object.mqh>
+#include "ICXParam.mqh"
+
+/**
+ * @class IXOrderManager
+ * @brief 주문 실행 및 수정을 위한 추상 인터페이스
+ */
+class IXOrderManager : public CObject {
+public:
+    virtual void SetMagic(ulong magic) = 0;
+    virtual bool ExecuteEntry(ICXParam* xp) = 0;
+    virtual bool ModifyOrder(ICXParam* xp, ulong ticket, double price, double sl, double tp) = 0;
+    virtual bool DeleteOrder(ICXParam* xp, ulong ticket) = 0;
+};
+
+#endif

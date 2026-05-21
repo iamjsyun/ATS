@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef ICXLOGGER_MQH\n#define ICXLOGGER_MQH\n\n#include <Object.mqh>\n#include \"CXDefine.mqh\"\n#include \"ICXParam.mqh\"\n\n/**\n * @class ICXLogger\n * @brief 멀티 채널 로깅을 위한 공용 인터페이스 및 베이스 클래스\n */\nclass ICXLogger : public CObject {
+... [TRUNCATED] ...
+ sig = xp.GetSignal();\n            if(CheckPointer(sig) != POINTER_INVALID) sid_str = sig.GetSid();\n        }\n        string prefix = (sid_str != \"\") ? \"[\" + sid_str + \"] \" : \"\";\n        Log(level, prefix + msg);\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156814093_0_2p2w2f.txt
+</tool_output_masked>

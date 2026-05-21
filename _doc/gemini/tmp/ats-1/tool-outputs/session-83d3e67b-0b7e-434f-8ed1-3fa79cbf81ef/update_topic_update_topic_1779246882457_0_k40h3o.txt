@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Analyzing Type 1 Execution Path\"\nTopic summary: I am analyzing why a `type=1` (Trailing Entry) signal, which should ideally be a pending order with a `te_limit` offset, might be executing as a Market order or entering a position immediately. I will examine `CXOrderManager.mqh` to see how it handles `te_limit` and whether it inadvertently triggers `m_trade.Buy/Sell` (Market) instead of `m_trade.OrderOpen` (Pending) when certain offsets are small or logic is misaligned. I will then provide a detailed logic report.\n\nStrategic Intent: Analyze type=1 signal execution path (Pending vs Market)."
+}

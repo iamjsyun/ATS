@@ -1,0 +1,11 @@
+Output: 
+
+    ���
+       곕━: D:\Projects\ATS\ATSA\XTA\Models
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2026-05-18   ��
+                              9:12           2614 XSignal.cs
+Process Group PGID: 30772

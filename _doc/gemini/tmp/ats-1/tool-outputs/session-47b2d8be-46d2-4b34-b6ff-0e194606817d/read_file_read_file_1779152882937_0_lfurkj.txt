@@ -1,0 +1,3 @@
+{
+  "output": "namespace XTA.Infrastructure.Audio\n{\n    /// <summary>\n    /// 사운드 서비스의 처리 단계 정의\n    /// </summary>\n    public enum XSoundState\n    {\n        Idle,           // 대기\n        RequestReceived, // 요청 수신\n        Validated,      // 유효성 및 스팸 검사 통과\n        Composed,       // 메시지 조립 완료\n        Completed,      // 발화 명령 전달 완료\n        Suppressed      // 차단됨 (스팸, 설정 등)\n    }\n}\n"
+}

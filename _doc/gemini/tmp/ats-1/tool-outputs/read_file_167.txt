@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using System;\nusing System.Collections.Generic;\n\nnamespace XTA.XData.Models\n{\n    public class XSignal\n    {\n        public string sid { get; set; } = string.Empty;\n        public string gid { get; set; } = string.Empty;\n     
+... [TRUNCATED] ...
+d { get; set; }\n        public long CID { get; set; }\n        public DateTime Time { get; set; }\n        public int CNO { get; set; }\n        public string Text { get; set; } = string.Empty;\n        public int Status { get; set; }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779164946569_0_genid.txt
+</tool_output_masked>

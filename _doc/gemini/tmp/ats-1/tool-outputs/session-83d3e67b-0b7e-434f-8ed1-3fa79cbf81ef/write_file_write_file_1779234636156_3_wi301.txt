@@ -1,0 +1,3 @@
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\PendingTasks.mqh. Here is the updated code:\n#ifndef PENDINGTASKS_MQH\n#define PENDINGTASKS_MQH\n\n#include \"Pending\\CXTaskPending_V_Sync.mqh\"\n#include \"Pending\\CXTaskPending_L_Rebound.mqh\"\n#include \"Pending\\CXTaskPending_L_Improve.mqh\"\n#include \"Pending\\CXTaskPending_R_Apply.mqh\"\n\n#endif\n"
+}

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Active\\CXTaskActive_V_Terminal.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_ACTIVE_V_TERMINAL_MQH\n#define CX_TASK_ACTIVE_V_TERMINAL_MQH
+... [TRUNCATED] ...
+ists = PositionSelectByTicket(ticket);\n\n        XP_LOG_TRACE(xp, StringFormat(\"[ACTIVE-V-TERMINAL] Checking Position:%I64u, Found:%d\", ticket, exists));\n        xp.SetInt(exists ? 1 : 0); \n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239668467_0_auiyd.txt
+</tool_output_masked>

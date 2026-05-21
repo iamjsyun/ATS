@@ -1,0 +1,4 @@
+Output: >     virtual bool ValidateMagic(long magic) {??          ICXConfig* config = CX_GET_OBJ(m_ctx, "config", ICXConfig);??          if(IS_INVALID(config)) return SetError("Config not found for Magic v
+alidation");
+>         if(!ValidateMagic(sig.GetMagic())) return false;??          if(!ValidateSID(sig.GetSid())) return false;??
+Process Group PGID: 25960

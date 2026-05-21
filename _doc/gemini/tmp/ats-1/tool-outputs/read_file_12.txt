@@ -1,0 +1,47 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 70-110 of 173 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 111.
+
+--- FILE CONTENT (truncated) ---
+                    .OnEntry(() => {
+                        string msgToSpeak = string.IsNullOrEmpty(_currentTtsMsg) ? (_currentXdo?.Text ?? "") : _currentTtsMsg;
+                        if (!string.IsNullOrEmpty(msgToSpeak))
+                        {
+                            nlog.Debug($"[Sound:EXECUTE] TTS Output: {msgToSpeak}");
+                            XContext.Instance.GetService<ITtsService>()?.Speak(msgToSpeak);
+                        }
+                    })
+
+                // 5. 메시지 조립 상태 (v9.7 SRP 리팩토링)
+                .ConfigureState(XSoundState.Composed)
+                    .TriggeredBy(() => _currentXdo?.Signal != null && !string.IsNullOrEmpty(_currentXdo.CMD))
+                        .WhenInState(XSoundState.RequestReceived)
+                    .OnEntry(() => {
+                        if (string.IsNullOrEmpty(_currentXdo!.Text))
+                        {
+                            _currentTtsMsg = GetTtsMessage(_currentXdo.Signal!, _currentXdo.CMD!);
+                            nlog.Debug($"[Sound:COMPOSE] Generated Msg: {_currentTtsMsg} (SID:{_currentXdo.Signal!.sid})");
+                        }
+                        else
+                        {
+                            _currentTtsMsg = _currentXdo.Text;
+                        }
+                        
+                        UpdateSpamInfo(_currentXdo.Signal!.sid, _currentXdo.CMD!);
+                    })
+
+                .Builder()
+                .DisableValidation()
+                .Build();
+        }
+
+        public void PlaySound(XSignal? sig, string cmd, string text = "")
+        {
+            // [v9.0] 스레드 안전성 보장
+            lock (_seqLock)
+            {
+                nlog.Debug($"[Sound:REQUEST] SID:{sig?.sid ?? "N/A"} Cmd:{cmd}");
+                _currentXdo = new XDataObject { Signal = sig, CMD = cmd, Text = text };
+                _currentTtsMsg = string.Empty;
+                _sequence.SetState(XSoundState.RequestReceived);

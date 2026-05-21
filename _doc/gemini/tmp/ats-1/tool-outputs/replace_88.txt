@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Pending\\CXTaskPending_L_Rebound.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_PENDING_L_REBOUND_MQH\n#define CX_TASK_PENDING_L_REBOUND_MQ
+... [TRUNCATED] ...
+ounded) {\n            XP_LOG_INFO(xp, \"[PENDING-L-REBOUND] OK: Market Fallback Triggered due to price rebound.\");\n            xp.SetInt(10); \n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n Applied fuzzy match at line 14-29."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239722867_0_xvx0zq.txt
+</tool_output_masked>

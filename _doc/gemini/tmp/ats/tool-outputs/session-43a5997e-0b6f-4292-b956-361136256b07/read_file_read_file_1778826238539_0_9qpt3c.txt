@@ -1,0 +1,3 @@
+{
+  "output": "<Project Sdk=\"Microsoft.NET.Sdk\">\n\n  <PropertyGroup>\n    <OutputType>WinExe</OutputType>\n    <TargetFramework>net10.0-windows</TargetFramework>\n    <Nullable>enable</Nullable>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <UseWPF>true</UseWPF>\n  </PropertyGroup>\n\n  <ItemGroup>\n    <ProjectReference Include=\"..\\FluentSeq\\FluentSeq.csproj\" />\n    <ProjectReference Include=\"..\\XTA.XData\\XTA.XData.csproj\" />\n    <ProjectReference Include=\"..\\XTA\\XTA.csproj\" />\n  </ItemGroup>\n\n  <ItemGroup>\n    <None Update=\"NLog.config\">\n      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>\n    </None>\n  </ItemGroup>\n\n</Project>\n"
+}

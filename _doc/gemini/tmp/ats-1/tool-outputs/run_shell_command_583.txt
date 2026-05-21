@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: 41
+119
+32 
+32 
+32 
+32 
+32 
+32 
+32 
+32 
+
+... [143 lines omitted] ...
+
+116
+32
+62
+32
+37
+100
+41
+34
+44
+32
+Process Group PGID: 15428
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779156320325_0_0xra6o.txt
+</tool_output_masked>

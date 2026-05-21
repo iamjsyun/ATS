@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Services\\XSignalService.cs (1 replacements). Here is the updated code:\nusing System;\nusing System.Collections.Generic;\nusing System.Linq;\nusing System.Threading.Tasks;\nusi
+... [TRUNCATED] ...
+n                    group.HedgeSignals.Add(s);\n                }\n            }\n\n            return groups.Values.ToList();\n        }\n\n        public ValidationResult Validate(Models.XSignal signal) => _validator.Validate(signal);\n    }\n}"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779152761799_0_n68xs.txt
+</tool_output_masked>

@@ -1,0 +1,8 @@
+Output:           CommitCurrent();??          if(m_current_state == -1) {??              m_current_state = m_tmp_from;??              XP_LOG_SEQ_INFO(m_ctx.GetParam(), StringFormat("[SEQ:%s] Sequence Start
+ed at State: %d", m_name, m_current_state));??          }??>         TriggerOnEnter(m_current_state);??      }??  ??      virtual void Pulse(ICXParam* xp) override {??          CXStepNode* node = N
+ULL;??          if(!m_map.TryGetValue(m_current_state, node) || IS_INVALID(node)) return;
+      void UpdateState(int next) {??          if(m_current_state == next) return;??          TriggerOnExit(m_current_state);??          m_current_state = next;??          m_state_entered = TimeCurr
+ent();??>         TriggerOnEnter(m_current_state);??      }??
+>     void TriggerOnEnter(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);??      }??  ??      void Trigger
+OnExit(int state) {
+Process Group PGID: 23860

@@ -1,0 +1,13 @@
+Output: �
+ 移
+   :1 臾몄
++ ... -Skip 38 -First 10; $lines[7] -match "m_ctx.Set\(\"repo\", m_repo\);"
++                                                        ~~~~~~~~~~~~~~~~~~
+� 臾몄
+       �湲곗�� 'repo\", m_repo\);"' ���곗
+���.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+ 
+Exit Code: 1
+Process Group PGID: 21836

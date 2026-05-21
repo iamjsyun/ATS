@@ -1,0 +1,125 @@
+//+------------------------------------------------------------------+
+//|                                                          ATS.mq5 |
+//|                                  Copyright 2026, Gemini CLI      |
+//| [v10.27] Main ATS Expert Advisor Entry Point (Unified)           |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2026, Gemini CLI"
+#property link      "https://github.com/google-gemini/gemini-cli"
+#property version   "10.27"
+#property strict
+
+//--- Include core service
+#include "App\CXAppService.mqh"
+#include "Models\CXConfig.mqh"
+
+//--- [Group: Basic Configuration]
+input string         InpTargetMagics    = "1001,1002,3001,3002"; // Target Magic Numbers (CSV)
+input double         InpTimerInterval   = 0.5;                 // Timer Interval (Seconds)
+input string         InpRemoteAddr      = "127.0.0.1:878";     // Remote Log Address (IP:Port)
+input string         InpDatabaseName    = "ATS.db";            // DB: Database Filename
+input bool           InpUseCommonPath   = true;                // DB: Use Terminal Common Path
+
+//--- [Group: Global Log Options]
+input bool           InpLog_UseUI       = true;                // UI: Dashboard Log Enabled
+input bool           InpLog_UseRemote   = true;                // Remote: Global Remote Toggle
+input string         InpLog_FilterCnos  = "*";                 // Filter: Target CNO List (CSV / *:All)
+input ENUM_LOG_LEVEL InpLog_Level       = LOG_LVL_INFO;        // Log Level
+
+//--- [Group: Signal Watcher Log]
+input bool           InpWatcher_UseFile   = true;              // Watcher: File Log Enabled
+input bool           InpWatcher_UseRemote = true;              // Watcher: Remote Log Enabled
+input bool           InpWatcher_InitStart = true;              // Watcher: Clear Log on Start
+
+//--- [Group: System Infra Log]
+input bool           InpSystem_UseFile    = true;              // System: File Log Enabled
+input bool           InpSystem_UseRemote  = false;             // System: Remote Log Enabled
+input bool           InpSystem_InitStart  = true;              // System: Clear Log on Start
+
+//--- [Group: Trading Session Log]
+input bool           InpSession_UseFile   = true;              // Session: File Log Enabled
+input bool           InpSession_UseRemote = true;              // Session: Remote Log Enabled
+input bool           InpSession_UseUI     = true;              // Session: UI Log Enabled
+input bool           InpSession_InitStart = true;              // Session: Clear Log on Start
+
+//--- Global Instance
+CXAppService* g_app = NULL;
+CXConfig*     g_config = NULL;
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit() {
+    //--- Chart GUI Clean-up
+    ChartSetInteger(0, CHART_SHOW_GRID, false);
+    ChartSetInteger(0, CHART_SHOW_OBJECT_DESCR, false);
+    
+    //--- [v10.4] Testing Mode: Timer-only execution (0.5s)
+    EventSetMillisecondTimer(500);
+    
+    //--- Show Version Label
+    string ver_name = "ATSE_Version_Label";
+    ObjectDelete(0, ver_name);
+    if(ObjectCreate(0, ver_name, OBJ_LABEL, 0, 0, 0)) {
+        ObjectSetInteger(0, ver_name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+        ObjectSetInteger(0, ver_name, OBJPROP_XDISTANCE, 20);
+        ObjectSetInteger(0, ver_name, OBJPROP_YDISTANCE, 40);
+        ObjectSetInteger(0, ver_name, OBJPROP_COLOR, clrWhite);
+        ObjectSetInteger(0, ver_name, OBJPROP_FONTSIZE, 10);
+        ObjectSetString(0, ver_name, OBJPROP_TEXT, "ATSE Core v10.27 (STABLE)");
+    }
+
+    // 1. Configuration 객체 생성 (v10.27)
+    g_config = new CXConfig(InpTargetMagics, InpTimerInterval, InpRemoteAddr, 
+                            InpLog_UseUI, InpLog_UseRemote, InpLog_FilterCnos, InpLog_Level,
+                            InpWatcher_UseFile, InpWatcher_UseRemote, InpWatcher_InitStart,
+                            InpSystem_UseFile, InpSystem_UseRemote, InpSystem_InitStart,
+                            InpSession_UseFile, InpSession_UseRemote, InpSession_UseUI, InpSession_InitStart,
+                            InpDatabaseName, InpUseCommonPath);
+    
+    if(IS_INVALID(g_config)) return INIT_FAILED;
+
+    // 2. 앱 서비스 초기화 및 기동
+    g_app = new CXAppService(g_config);
+    if(IS_INVALID(g_app) || !g_app.Initialize(50)) {
+        Print("App Service initialization failed.");
+        return INIT_FAILED;
+    }
+
+    
+    return INIT_SUCCEEDED;
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason) {
+    EventKillTimer();
+    SAFE_DELETE(g_app);
+    SAFE_DELETE(g_config);
+    ObjectsDeleteAll(0, "ATSE_");
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick() {
+    //-- [v10.4] Disabled for Testing (Use Timer Only)
+    // if(IS_VALID(g_app)) g_app.Pulse(EVENT_TICK);
+}
+
+//+------------------------------------------------------------------+
+//| Expert timer function                                            |
+//+------------------------------------------------------------------+
+void OnTimer() {
+    if(IS_VALID(g_app)) g_app.Pulse(EVENT_TIMER);
+}
+
+//+------------------------------------------------------------------+
+//| TradeTransaction function                                        |
+//+------------------------------------------------------------------+
+void OnTradeTransaction(const MqlTradeTransaction& trans,
+                        const MqlTradeRequest& request,
+                        const MqlTradeResult& result) {
+    //-- 트랜잭션 이벤트는 시스템 정합성을 위해 유지
+    if(IS_VALID(g_app)) g_app.OnTradeTransaction(trans, request, result);
+}

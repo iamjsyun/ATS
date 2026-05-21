@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 3 matches for pattern \"MSG_ERR_INTERNAL\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Interfaces\\CXMessageDictionary.mqh\nL14- #define MSG_ENTRY_EXECUTED          \"[SYS-110] Order fully executed.\"\nL15- \nL16- /
+... [TRUNCATED] ...
+ive = true;\nL108-         m_sid = (IS_VALID(xp) && IS_VALID(xp.GetSignal())) ? xp.GetSignal().GetSid() : \"\";\nL109-         InitLogger(m_sid, factory);\nL110-         xp.SetEvent(EVENT_START);\nL111-         Pulse(xp);\nL112-     }\nL113- \n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779167239075_0_qzp6cd.txt
+</tool_output_masked>

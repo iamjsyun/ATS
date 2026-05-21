@@ -1,0 +1,9 @@
+🎯 XHANA POSITION CLOSED
+━━━━━━━━━━━━━━
+📌 Exit Detected
+━━━━━━━━━━━━━━
+
+📌 Symbol : {SYMBOL}
+📌 SNO : {SNO}회차 정리
+
+Checking results...

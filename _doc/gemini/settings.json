@@ -1,0 +1,33 @@
+{
+  "general": {
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    },
+    "preferredEditor": "vscode"
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "ide": {
+    "hasSeenNudge": true
+  },
+  "ui": {
+    "footer": {
+      "items": [
+        "workspace",
+        "git-branch",
+        "sandbox",
+        "model-name",
+        "quota",
+        "memory-usage",
+        "context-used",
+        "token-count",
+        "code-changes"
+      ]
+    }
+  }
+}

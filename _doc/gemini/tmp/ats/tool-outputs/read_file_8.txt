@@ -1,0 +1,50 @@
+#ifndef CXPARAM_MQH
+#define CXPARAM_MQH
+
+#include "..\Interfaces\ICXParam.mqh"
+#include "..\Interfaces\ICXContext.mqh"
+
+/**
+ * @class CXParam
+ * @brief 트레이딩 이벤트 및 데이터를 전달하는 기본 DTO 클래스
+ */
+class CXParam : public ICXParam {
+protected:
+    ICXSignal*           m_sig;
+    int                  m_val;
+    string               m_str;
+    ICXContext*          m_ctx;
+    ENUM_CX_EVENT        m_event;
+    MqlTradeTransaction  m_trans;
+
+public:
+    CXParam() : m_sig(NULL), m_val(0), m_str(""), m_ctx(NULL), m_event(EVENT_TICK) {
+        ZeroMemory(m_trans);
+    }
+    virtual ~CXParam() {
+        // NOTE: m_sig 및 m_ctx는 DI를 통해 전달된 것이므로 여기서 해제하지 않음
+    }
+
+    //-- Interface Implementation
+    virtual ICXSignal* GetSignal() override { return m_sig; }
+    virtual ICXContext* GetContext() override { return m_ctx; }
+    
+    virtual ENUM_CX_EVENT GetEvent() const override { return m_event; }
+    virtual void SetEvent(ENUM_CX_EVENT event) override { m_event = event; }
+
+    virtual string GetString() const override { return m_str; }
+    virtual void   SetString(string val) override { m_str = val; }
+    
+    //-- Getters & Setters
+    void SetSignal(ICXSignal* sig) { m_sig = sig; }
+    
+    int  GetInt() const { return m_val; }
+    void SetInt(int val) { m_val = val; }
+    
+    void SetContext(ICXContext* ctx) { m_ctx = ctx; }
+
+    void SetTransaction(const MqlTradeTransaction& trans) { m_trans = trans; }
+    MqlTradeTransaction GetTransaction() const { return m_trans; }
+};
+
+#endif

@@ -1,0 +1,22 @@
+Successfully overwrote file: D:\Projects\ATS\ATSE\CXTrade\Infra\CXFileLogger.mqh. Here is the updated code:
+#ifndef CXFILELOGGER_MQH
+#define CXFILELOGGER_MQH
+
+#include "..\Interfaces\ICXLogger.mqh"
+
+/**
+ * @class CXFileLogger
+ * @brief 세션별 독립 로그 파일 생성 및 기록 담당
+ */
+class CXFileLogger : public ICXLogger {
+private:
+    int    m_handle;
+    string m_filename;
+    string m_sid;
+    int    m_lastHour;
+...
+        }
+    }
+};
+
+#endif

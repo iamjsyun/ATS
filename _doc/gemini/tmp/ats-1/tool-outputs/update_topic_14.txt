@@ -1,0 +1,4 @@
+Current topic: "Limiting Consecutive Log Repeats"
+Topic summary: The user noticed that identical log messages are still repeating. I will modify `CXLogDispatcher.mqh` to implement a strict counter that only allows a message to be logged up to 2 times consecutively if it is identical to the previous one. Any subsequent identical messages will be suppressed until a different message occurs or an error level log is triggered, ensuring an even cleaner and more focused log stream.
+
+Strategic Intent: Implement consecutive log message count control (max 2 repeats).

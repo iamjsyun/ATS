@@ -1,0 +1,13 @@
+#ifndef ACTIVETASKS_MQH
+#define ACTIVETASKS_MQH
+
+#include "Active\CXTaskComm_V_Status.mqh"
+#include "Active\CXTaskSync_V_Stale.mqh"
+#include "Active\CXTaskActive_V_Terminal.mqh"
+#include "Active\CXTaskActive_P_Align.mqh"
+#include "Active\CXTaskActive_L_Status.mqh"
+#include "Active\CXTaskIntentWatch.mqh"
+#include "Active\CXTaskAlphaCalc.mqh"
+#include "Active\CXTaskAlphaApply.mqh"
+
+#endif

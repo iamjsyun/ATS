@@ -1,0 +1,4 @@
+Current topic: "Switching to Timer-Only Execution"
+Topic summary: The user requested to disable the OnTick event and use only a 0.5-second timer interval for execution during the testing phase. I will modify ATS.mq5 to comment out or remove the logic inside OnTick and ensure EventSetTimer(0.5) is correctly configured in OnInit. This reduces execution overhead and ensures a predictable 0.5s pulse for system tasks.
+
+Strategic Intent: Disable OnTick and switch to 0.5s timer-only execution for testing.

@@ -1,0 +1,3 @@
+{
+  "output": "Output: 由ъ\n\n    ���\n       곕━: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Models\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\n-a----      2026-05-15   �\n                           2:52            568 XHubState.cs\nProcess Group PGID: 6216"
+}

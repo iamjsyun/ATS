@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef PENDINGTASKS_MQH\n#define PENDINGTASKS_MQH\n\n#include \"..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\Interfaces\\IXPriceTracker.mqh\"\n#include \"..\\..\\Interfaces\\IXOrd
+... [TRUNCATED] ...
+n                if(IS_VALID(repo)) repo.UpdateStatus(sig);\n                XP_LOG_INFO(xp, StringFormat(\"[PENDING-R] Order Modified. New Price:%.5f\", newPrice));\n            }\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779234352998_3_44p86n.txt
+</tool_output_masked>

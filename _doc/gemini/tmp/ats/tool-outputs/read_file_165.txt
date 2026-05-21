@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "## Engineering Standards\n\n### 1. Type Safety, Casting & Pointer Ownership\n- **묵시적 타입 캐스팅 금지**: 모든 타입 변환은 명시적(Explicit)으로 수행해야 함.\n- **CXParam 중심의 타입 관리**: `CObject*`나 `void*` 등을 통한 불분명한 타입 전달을 지양하고, 반드시 `CXParam` 내부에 명시적인 참조 변수(예: `
+... [TRUNCATED] ...
+를 접두어로 포함하여, WPF(ATSA) 앱에서 상태별 UI 렌더링 및 아이콘 표시를 위한 파싱이 가능하도록 설계해야 합니다.\n--- End of Context from: c:/users/hijsyun/appdata/roaming/metaquotes/terminal/540829ad6be27960e4557e2cfd5c69e0/mql5/experts/ats/atse/gemini.md ---\n--- End Project Context ---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720322388_1_miufvj.txt
+</tool_output_masked>

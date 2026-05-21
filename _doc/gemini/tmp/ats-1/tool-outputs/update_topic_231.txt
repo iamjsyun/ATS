@@ -1,0 +1,4 @@
+Current topic: "Early TTS for Exit Signals"
+Topic summary: The user requested that the TTS notification for an exit signal (청산 신호 발생) be played immediately after the signal is generated and identified as a close command, before it reaches the validation or skipping logic in XLiquidationService. I will locate the parsing or early enrichment phase (likely in the channel interpreter or the early stages of XGatewayService/XSignalService) and insert the TTS trigger there.
+
+Strategic Intent: Trigger TTS earlier for exit signals, right after parsing.

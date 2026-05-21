@@ -1,0 +1,4 @@
+Current topic: "Detailed Signal Logging & Suppression"
+Topic summary: I'm refining the Watcher's logging behavior to meet specific user requirements. First, I'm ensuring TRACE heartbeats are strictly limited to 3 consecutive occurrences to prevent log flooding. Second, I'm updating `CXStepValidation` and `CXStepDiscovery` to include a full "Signal Snapshot" (SID, Price, Lot, TE, TS, SL, TP, XA:EN, XA:EX, Status) whenever a signal is processed. This provides immediate, comprehensive visibility into the signal data that failed or passed validation, making it much easier to diagnose issues like the Lot validation error.
+
+Strategic Intent: Implement advanced log suppression and detailed signal logging in Watcher.

@@ -1,0 +1,3 @@
+{
+  "output": "Output: mkdir : 吏�� �\n              (C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\_doc)��ぉ��듬��.\n�\n 移\n   :1 臾몄\n+ ... sole]::OutputEncoding = [System.Text.Encoding]::UTF8; mkdir -p \"_doc\"\n+                                                           ~~~~~~~~~~~~~~~\n    + CategoryInfo          : ResourceExists: (C:\\Users\\hijsyu...xperts\\ATS\\_doc:String) [New-Item], IOException\n    + FullyQualifiedErrorId : DirectoryExist,Microsoft.PowerShell.Commands.NewItemCommand\n \nExit Code: 1\nProcess Group PGID: 26148"
+}

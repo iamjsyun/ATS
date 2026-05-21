@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXFluentSequence.mqh. Here is the updated code:\n...\n    int                         m_tmp_retries;\n    CHashMap<int, int>*         m_tmp_branches;\n\npublic:\n   
+... [TRUNCATED] ...
+) {\n            m_current_state = m_first_state;\n            XP_LOG_SEQ_INFO(m_ctx.GetParam(), StringFormat(\"[SEQ:%s] Sequence Started at State: %d\", m_name, m_current_state));\n        }\n        TriggerOnEnter(m_current_state);\n    }\n\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\write_file_write_file_1779158253963_0_tvivr.txt
+</tool_output_masked>

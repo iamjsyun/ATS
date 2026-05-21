@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"te_limit|te_step|ts_step\" across 2 workspace directories (filter: \"*.mqh,*.mq5\")."
+}

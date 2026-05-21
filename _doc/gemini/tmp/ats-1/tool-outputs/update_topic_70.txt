@@ -1,0 +1,4 @@
+Current topic: "Investigating DM Liquidation TTS Error"
+Topic summary: User reports TTS error when using DM button for sequential liquidation. I will find the DM button command logic in DataManager components, trace the liquidation flow, and analyze why TTS might be failing (e.g., anti-spam interference or state transition race conditions).
+
+Strategic Intent: Investigate DM button liquidation TTS error.

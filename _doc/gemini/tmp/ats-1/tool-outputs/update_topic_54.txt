@@ -1,0 +1,4 @@
+Current topic: "Root Cause Analysis & PDCA Report"
+Topic summary: I am conducting a deep-dive analysis into the persistent `Retcode 10016` and log file creation failures. The `OrderOpen` failure is due to type mismatches (Market Order treated as Limit) and incorrect price/SL/TP calculation logic in `CXOrderManager`. The log creation issue stems from the MQL5 Sandbox environment constraints. I will analyze the structural violations (redundant validations, scattered logic) and quantify the risks. Finally, I will generate a formal PDCA report in Korean, covering the root causes, corrective actions, architectural violations, and risks, and save it to `G:\공용 문서` as requested.
+
+Strategic Intent: Perform root cause analysis and generate a comprehensive failure report (PDCA).

@@ -1,0 +1,12 @@
+🛸 XDUNA QUANT SIGNAL
+━━━━━━━━━━━━━━
+📌 Market Entry
+━━━━━━━━━━━━━━
+
+📌 Asset : {SYMBOL}
+📌 Action : {DIR}
+📌 Volume : {LOT}
+📌 Target : {PRICE}
+📌 Phase : {SNO}
+
+Powered by XDUNA.

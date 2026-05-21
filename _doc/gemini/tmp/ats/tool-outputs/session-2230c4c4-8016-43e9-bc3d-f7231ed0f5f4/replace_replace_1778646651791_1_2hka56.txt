@@ -1,0 +1,3 @@
+{
+  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Interfaces\\ICXSignal.mqh (1 replacements). Here is the updated code:\n#ifndef ICXSIGNAL_MQH\n#define ICXSIGNAL_MQH\n\ninterface ICXSignal {\n    virtual ~ICXSignal() {}\n};\n\n#endif\n"
+}

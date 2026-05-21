@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Watcher 필터링 강화 - Repository 수정\"\nTopic summary: CXSignalRepository의 LoadActiveSignals 메서드에서 xe_status=XE_ERROR(99)인 신호를 검색 대상에서 제외하도록 SQL 쿼리를 수정합니다. 현재 쿼리는 에러 상태의 신호도 활성 신호로 간주하여 로드하고 있으며, 이로 인해 Watcher가 세션을 시작하려는 시도가 발생하고 있습니다. 99 상태를 명시적으로 제외하여 좀비 세션 생성을 원천 차단합니다.\n\nStrategic Intent: XE_ERROR(99) 신호의 세션 생성 방지 (Repository 쿼리 수정)."
+}

@@ -1,0 +1,3 @@
+{
+  "error": "Path not in workspace: Attempted path \"G:\\공용 문서\\XTA_Signal_Detection_Error_Report_v1.0.md\" resolves outside the allowed workspace directories: D:\\Projects\\ATS, C:\\Users\\hijsyun\\.gemini\\extensions\\caveman\\skills\\caveman or the project temp directory: C:\\Users\\hijsyun\\.gemini\\tmp\\ats-1"
+}

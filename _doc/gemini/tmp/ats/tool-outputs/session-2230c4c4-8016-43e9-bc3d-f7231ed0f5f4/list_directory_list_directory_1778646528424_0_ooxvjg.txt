@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS:\n[DIR] _doc\n[DIR] _log\n[DIR] _MEM\n[DIR] .gemini\n[DIR] CXTrade\n.gitattributes (505 bytes)\n.gitignore (528 bytes)\nGEMINI.md (6355 bytes)\nREADME.md (9 bytes)\nspec.md (4588 bytes)\n\n(2 ignored)"
+}

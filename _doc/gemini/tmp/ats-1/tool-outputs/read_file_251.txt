@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXFLUENTSEQUENCE_MQH\n#define CXFLUENTSEQUENCE_MQH\n\n#include \"..\\Interfaces\\ICXFluentSequence.mqh\"\n#include \"..\\Interfaces\\IXStep.mqh\"\n#include \"..\\Interfaces\\IXGuard.mqh\"\n#include \"..\\Interfaces\\CXDefine.mq
+... [TRUNCATED] ...
+state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);\n    }\n\n    void TriggerOnExit(int state) {\n        CXStepNode* node = NULL;\n        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnExit(m_ctx);\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779235022771_0_93go4p.txt
+</tool_output_masked>

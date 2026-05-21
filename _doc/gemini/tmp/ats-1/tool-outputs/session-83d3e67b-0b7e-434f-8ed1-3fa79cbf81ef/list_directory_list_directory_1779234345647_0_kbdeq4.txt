@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Module\\Steps:\n[DIR] Watcher"
+}

@@ -1,0 +1,229 @@
+<UserControl x:Class="ATSA.UI.Dashboard.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:ATSA.UI.UCtrls"
+             xmlns:dashboard="clr-namespace:ATSA.UI.Dashboard"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=dashboard:DashboardViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="800" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <!-- [v9.6] Telegram Log Header Style -->
+        <Style x:Key="Style.LogHeader" TargetType="Border">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Color.Border}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="3,3,0,0"/>
+            <Setter Property="Margin" Value="-12,-12,-12,8"/> <!-- Negative margin to flush with card edges -->
+        </Style>
+        <Style x:Key="Style.LogHeader.Text" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid Background="{StaticResource Color.Background}">
+        <Grid.RowDefinitions>
+            <!-- 1. Dashboard Controls Bar -->
+            <RowDefinition Height="48"/>
+            <!-- 2. Main Dashboard Content Area -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 1. Dashboard Controls Bar -->
+        <Border Grid.Row="0" Background="{StaticResource Color.Surface}" BorderBrush="{StaticResource Color.Border}" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="24,0">
+                <CheckBox IsChecked="{Binding IsAutoRefresh}" Content="Auto Sync" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                
+                <TextBlock Text="Interval (ms):" VerticalAlignment="Center" FontSize="12" Margin="0,0,8,0"/>
+                <TextBox Text="{Binding RefreshInterval, UpdateSourceTrigger=PropertyChanged}" Width="50" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                
+                <Button Command="{Binding ManualRefreshCommand}" Padding="12,4" Margin="0,0,16,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Manual Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,8,16,8"/>
+                
+                <Button Command="{Binding StartServiceCommand}" Padding="12,4" Margin="0,0,8,0" Background="#E8F5E9" BorderBrush="#C8E6C9">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xF5B0;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#4CAF50"/>
+                        <TextBlock Text="Start Service" VerticalAlignment="Center" Foreground="#2E7D32"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button Command="{Binding StopServiceCommand}" Padding="12,4" Margin="0,0,16,0" Background="#FFEBEE" BorderBrush="#FFCDD2">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE71A;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#F44336"/>
+                        <TextBlock Text="Stop Service" VerticalAlignment="Center" Foreground="#C62828"/>
+                    </StackPanel>
+                </Button>
+                
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,8,16,8"/>
+                
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="DB Path:" Foreground="Gray" FontSize="11" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding DbPath}" Foreground="#444" FontSize="11" FontWeight="SemiBold"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- 2. Main Content Area -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="{StaticResource Grid.Medium}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Top Section: Summary & Signals -->
+                    <RowDefinition Height="*"/>    <!-- Bottom Section: Logs -->
+                </Grid.RowDefinitions>
+
+                <!-- Upper Section -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left Side: Summary / Status Card -->
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Height="350">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource Text.Header}" Text="Engine Summary" Margin="0,0,0,16"/>
+                            <ListView ItemsSource="{Binding EngineSummary}" 
+                                      Background="Transparent" BorderThickness="0"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <uc:UCXChannelStatusView DataContext="{Binding}"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListViewItem">
+                                                    <ContentPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            </ListView>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Right Side: Signal Grid Card -->
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Height="350">
+                        <DockPanel>
+                            
+                            <TabControl BorderThickness="0" Background="Transparent">
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE950;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#2196F3"/>
+                                            <TextBlock Text="CNO 1001" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <uc:UCXSignalView DataContext="{Binding Channel1001}"/>
+                                </TabItem>
+                                
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xEA1F;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#4CAF50"/>
+                                            <TextBlock Text="CNO 1002" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <uc:UCXSignalView DataContext="{Binding Channel1002}"/>
+                                </TabItem>
+                                
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xEC42;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#FF9800"/>
+                                            <TextBlock Text="CNO 3001" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <uc:UCXSignalView DataContext="{Binding Channel3001}"/>
+                                </TabItem>
+                                
+                                <TabItem>
+                                    <TabItem.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xEC42;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#F44336"/>
+                                            <TextBlock Text="CNO 3002" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </TabItem.Header>
+                                    <uc:UCXSignalView DataContext="{Binding Channel3002}"/>
+                                </TabItem>
+                            </TabControl>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Lower Section: Real-time Radar (Message Logs) -->
+                <Grid Grid.Row="1" Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <UniformGrid Grid.Row="1" Columns="4">
+                        <Border Style="{StaticResource CardStyle}" Height="350">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Style="{StaticResource Style.LogHeader}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE950;" FontFamily="Segoe MDL2 Assets" Foreground="#2196F3" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="1001: GlobalGold" Style="{StaticResource Style.LogHeader.Text}"/>
+                                    </StackPanel>
+                                </Border>
+                                <uc:UCXTGMsgView DataContext="{Binding MsgLog1001}"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Style="{StaticResource CardStyle}" Height="350">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Style="{StaticResource Style.LogHeader}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xEA1F;" FontFamily="Segoe MDL2 Assets" Foreground="#4CAF50" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="1002: GMK" Style="{StaticResource Style.LogHeader.Text}"/>
+                                    </StackPanel>
+                                </Border>
+                                <uc:UCXTGMsgView DataContext="{Binding MsgLog1002}"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Style="{StaticResource CardStyle}" Height="350">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Style="{StaticResource Style.LogHeader}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xEC42;" FontFamily="Segoe MDL2 Assets" Foreground="#FF9800" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="3001: XHANA" Style="{StaticResource Style.LogHeader.Text}"/>
+                                    </StackPanel>
+                                </Border>
+                                <uc:UCXTGMsgView DataContext="{Binding MsgLog3001}"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Style="{StaticResource CardStyle}" Height="350">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top" Style="{StaticResource Style.LogHeader}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xEC42;" FontFamily="Segoe MDL2 Assets" Foreground="#F44336" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="3002: XDUNA" Style="{StaticResource Style.LogHeader.Text}"/>
+                                    </StackPanel>
+                                </Border>
+                                <uc:UCXTGMsgView DataContext="{Binding MsgLog3002}"/>
+                            </DockPanel>
+                        </Border>
+                    </UniformGrid>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

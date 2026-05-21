@@ -1,0 +1,3 @@
+{
+  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskGuard_V_Volatility.mqh. Here is the updated code:\n#ifndef CX_TASK_GUARD_V_VOLATILITY_MQH\r\n#define CX_TASK_GUARD_V_VOLATILITY_MQH\r\n\r\n#include \"..\\..\\..\\Interfaces\\IXTask.mqh\"\r\n#include \"..\\..\\..\\Interfaces\\CXMacros.mqh\"\r\n\r\n/**\r\n * @class CXTaskGuard_V_Volatility\r\n * @brief [Guard] 급격한 변동성 구간 진입 억제\r\n */\r\nclass CXTaskGuard_V_Volatility : public IXTask {\r\npublic:\r\n    virtual string Name() override { return \"Guard_V_Volatility\"; }\r\n    virtual int Execute(ICXParam* xp, ICXContext* ctx) override {\r\n        // 간단한 틱 간 변동성 체크 로직 (Placeholder)\r\n        return TASK_CONTINUE;\r\n    }\r\n};\r\n\r\n#endif\r\n"
+}

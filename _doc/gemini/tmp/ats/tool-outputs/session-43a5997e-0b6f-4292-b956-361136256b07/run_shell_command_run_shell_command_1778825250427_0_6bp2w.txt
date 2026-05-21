@@ -1,0 +1,3 @@
+{
+  "output": "Output: M  ATSA/ATSA/UI/Dashboard/DashboardView.xaml   \nM  ATSA/ATSA/UI/Dashboard/DashboardViewModel.cs\nM  ATSA/ATSA/UI/UCtrls/TGMsg/UCXTGMsgView.xaml \nM  ATSA/ATSA/UI/UCtrls/UCXTGMsgView.xaml       \nM  ATSA/ATSA/UI/UCtrls/UCXTGMsgViewModel.cs    \nM  ATSA/XTA.XData/Models/Mappers.cs\nProcess Group PGID: 25692"
+}

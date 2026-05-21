@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 100 matches for pattern \"xa_entry|xe_status|Signal\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\" (results limited to 100 matches for performance):\n---\nFile: App\\CXAppService.mqh\nL8: #include \"..\\Interfaces\\ICXSignalWatch
+... [TRUNCATED] ...
+nal* sig) { m_sig = sig; }\n---\nFile: Models\\CXPayloader.mqh\nL16:     CXPayloader* WithSignal(ICXSignal* sig) { SetSignal(sig); return GetPointer(this); }\n---\nFile: Models\\CXSignal.mqh\nL1: #ifndef CXSIGNAL_MQH\nL2: #define CXSIGNAL_MQH\n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779156003573_0_i15o7.txt
+</tool_output_masked>

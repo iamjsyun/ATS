@@ -1,0 +1,38 @@
+Memo0 : m0-S1LUqwMk3b3lTNULOSyVxo5z5q7iGefKTJMCltWz
+
+dm 시퀀스 설계
+
+# dm view onLoad ,onShow
+- db 신호 읽어 gridview에 뿌려준다.
+- 입력필드 초기화
+
+# new signal button click
+- cno 콤보박스 변경시 - cno 채널 정보 te,ts ,sl ,tp 채널 설정 정보 입력필드에 뿌려준다.
+- 템플릿을 선택해 tg msg 생성 -> 신호 추출 -> 검증
+
+# save changes buttin
+- xa_entry = 1 , xa_exit = 0 , xa_status = 0
+- 생성된 신호가 query롤 신호 존재 여부 확인 없으면 주입 있으면 오류 메세지 박스
+- 중비 성공하면 그리뷰 동기화 갱신
+
+# 청산 요청 신호 발생
+- 그리뷰 클릭으로 신호 선택
+- exit(close) 버튼 클릭 - xa_entry = 기놉갑 유지 , xa_exit = 1 , xa_status = 기존값 유지
+
+# 청산 완료 신호 버튼 
+- 그리뷰 클릭으로 신호 선택
+- exit(close) 버튼 클릭 - xa_entry = 기놉갑 유지 , xa_exit = 2 , xa_status >= 20 (xa_status 청산 코드중 1개)
+
+# 이관 대기 버튼
+- 그리뷰 클릭으로 신호 선택
+- exit(close) 버튼 클릭 - xa_entry = 기놉갑 유지 , xa_exit = 3 , xa_status = 기존 값 유지
+
+# delete signal button
+- 그리뷰 클릭으로 신호 선택
+- delete row and gridview 갱신
+
+# delete all signal button
+- 그리뷰 클릭으로 신호 선택
+- delete row and gridview 갱신
+
+신호 주입,수정, 삭제시 db 다시 읽어서 테이블에 데이터 처리 결과를 확인  

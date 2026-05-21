@@ -1,0 +1,14 @@
+Successfully overwrote file: C:\Users\hijsyun\.gemini\tmp\ats-1\memory\MEMORY.md. Here is the updated code:
+# Memory Index
+
+- Global Settings:
+  - Git Path: D:\Program Files\Git\cmd\git.exe
+  - MetaEditor64 Path: D:\Program Files\XM Global MT5\MetaEditor64.exe
+
+- Project ATS:
+  - Path: D:\Projects\ATS\
+  - Shared Folder Alias: G: (G:\공용 문서)
+
+- Log Rotation:
+  - System Log: ATSE_{yyMMdd-HH0000}.log
+  - Session Log: {sid}-{yyMMdd-HH0000}.log

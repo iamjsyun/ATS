@@ -1,0 +1,4 @@
+Current topic: "Optimizing Sequence Logging Level"
+Topic summary: I'm updating the log levels for sequence-related events to DEBUG as requested. This includes state transitions, branch matches, and step failures/retries in `CXFluentSequence.mqh`. By moving these to DEBUG, users can easily monitor the internal flow of the trading engine without being overwhelmed by TRACE-level noise, while still maintaining better visibility than the basic INFO level. This aligns with the newly implemented log filtering system.
+
+Strategic Intent: Change sequence transition and step logs to DEBUG level.

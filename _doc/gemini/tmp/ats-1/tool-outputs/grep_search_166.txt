@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 1 match for pattern \"FILE_REWRITE\" in the workspace directory:\n---\nFile: ATSE\\CXTrade\\Infra\\CXFileLogger.mqh\nL18- \nL19- public:\nL20-     CXFileLogger() : m_handle(INVALID_HANDLE), m_lastHour(-1), m_enabled(true), m_init
+... [TRUNCATED] ...
+n m_enabled; }\nL90- \nL91-     void Close() {\nL92-         if(m_handle != INVALID_HANDLE) {\nL93-             FileClose(m_handle);\nL94-             m_handle = INVALID_HANDLE;\nL95-         }\nL96-     }\nL97- };\nL98- \nL99- #endif\nL100- \n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\grep_search_grep_search_1779237876583_1_s5okp1.txt
+</tool_output_masked>

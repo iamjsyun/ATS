@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXGUARD_MQH\n#define CXGUARD_MQH\n\n#include \"..\\Interfaces\\IXGuard.mqh\"\n#include \"..\\Interfaces\\ICXConfig.mqh\"\n#include \"..\\Interfaces\\ICXContext.mqh\"\n#include \"..\\Interfaces\\CXDefine.mqh\"\n\nclass CXGuard :
+... [TRUNCATED] ...
+ignal* sig = xp.GetSignal();\n        if(IS_INVALID(sig)) return true;\n        \n        if(!ValidateMagic(sig.GetMagic())) return false;\n        if(!ValidateSID(sig.GetSid())) return false;\n        \n        return true;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779160253121_1_z3x3q.txt
+</tool_output_masked>

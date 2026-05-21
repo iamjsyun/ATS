@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Models:\nCXConfig.mqh (3519 bytes)\nCXContext.mqh (953 bytes)\nCXParam.mqh (1895 bytes)\nCXPayloader.mqh (723 bytes)\nCXSignal.mqh (5919 bytes)"
+}

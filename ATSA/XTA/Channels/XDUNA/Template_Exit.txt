@@ -1,0 +1,9 @@
+🛸 XDUNA QUANT SETTLED
+━━━━━━━━━━━━━━
+📌 Market Exit
+━━━━━━━━━━━━━━
+
+📌 Asset : {SYMBOL}
+📌 Phase : {SNO} Complete
+
+XDUNA System Update.

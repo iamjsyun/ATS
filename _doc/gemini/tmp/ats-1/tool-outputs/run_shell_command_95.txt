@@ -1,0 +1,18 @@
+Output: >             if(m_sequence.State() == SESSION_ERROR) {??                  XP_LOG_ERROR(xp, MSG_ERR_INTERNAL + " (Circuit Breaker/Sequence Error)");??                  if(IS_
+VALID(sig)) {??                      CXMessageProvider::UpdateStatus(sig, XE_ERROR, MSG_ERR_INTERNAL);??                      if(IS_VALID(m_repo)) m_repo.UpdateStatus(sig);??
+                  }??                  m_isActive = false; // ??? ??? ?????? (???????)??              }??          }??      }??  ??      void Start(ICXParam* xp, ICXServiceFa
+ctory* factory) {??          m_isActive = true;??          m_sid = (IS_VALID(xp) && IS_VALID(xp.GetSignal())) ? xp.GetSignal().GetSid() : "";??          InitLogger(m_sid, fac
+tory);??          xp.SetEvent(EVENT_START);??          Pulse(xp);??      }??  ??      void Start(ICXParam* xp) {??          // Fallback for existing calls without factory (th
+ough ideally should always pass it or store it)
+>            .OnFail(SESSION_ERROR)??             .Case(SESSION_ACTIVE, SESSION_ACTIVE)??             .Timeout(300);??  ??          CXCompositeStep* pendingStep = new CXCompo
+siteStep("Step_PendingComposite");??          pendingStep.AddTask(new CXTaskPendingSync())??                     .AddTask(new CXTaskTrailingCalc())??                     .Add
+Task(new CXTaskTrailingApply());??          XP_LOG_TRACE(GetPointer(xp), " -> Added: Pending Pipeline (Sync -> Calc -> Apply)");??  ??          seq.From(STATE_ENTRY_TRAILING)
+.Execute(pendingStep)??             .OnSuccess(SESSION_ACTIVE)
+>            .OnFail(SESSION_ERROR)??             .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)??             .Timeout(3600);??  ??          //-- 2. ??? ????????(Monitoring
+ & TS)??          CXCompositeStep* activeStep = new CXCompositeStep("Step_ActiveComposite");??          activeStep.AddTask(new CXTaskPosSync())??                    .AddTask(
+new CXTaskIntentWatch())??                    .AddTask(new CXTaskAlphaCalc())??                    .AddTask(new CXTaskAlphaApply());??          XP_LOG_TRACE(GetPointer(xp), "
+ -> Added: Active Pipeline (PosSync -> IntentWatch -> AlphaCalc -> AlphaApply)");??  ??          seq.From(SESSION_ACTIVE).Execute(activeStep)??             .Case(SESSION_LIQU
+IDATING, SESSION_LIQUIDATING)??             .Timeout(72000); // 20??? ??? ??? ?????  ??          //-- 3. ??? ????????(Liquidation Pipeline)??          XP_LOG_TRACE(GetPointer
+(xp), " -> Added: Liquidation Pipeline (Ticket -> Sweep -> Verify)");??          seq.From(SESSION_LIQUIDATING).Execute(new CXStepExitTicket())??             .OnSuccess(STATE_
+EXIT_SWEEP)??             .Timeout(60)
+Process Group PGID: 28496

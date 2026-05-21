@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXSTEPENTRYTRAILING_MQH\n#define CXSTEPENTRYTRAILING_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXPriceTracker.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXOrderManager.mqh\"\n#inc
+... [TRUNCATED] ...
+tual void OnEnter(ICXContext* ctx) override { XP_LOG_DEBUG(NULL, \"[STEP-TE] Starting Entry Trailing Loop\"); }\n    virtual void OnExit(ICXContext* ctx) override { XP_LOG_DEBUG(NULL, \"[STEP-TE] Exiting Entry Trailing Loop\"); }\n};\n\n#endif\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720472833_0_y8p2er.txt
+</tool_output_masked>

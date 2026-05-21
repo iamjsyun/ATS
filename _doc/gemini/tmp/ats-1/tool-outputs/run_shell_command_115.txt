@@ -1,0 +1,11 @@
+Output: >         TriggerOnEnter(m_current_state);??      }??  ??      virtual void Pulse(ICXParam* xp) override {??          CXStepNode* node = NULL;??          if(!m_map.TryGetValu
+e(m_current_state, node) || IS_INVALID(node)) return;??  ??          if(IS_VALID(node.guard) && !node.guard.Check(xp, m_ctx)) return;??  ??          if(node.timeout_sec > 0 &
+& (TimeCurrent() - m_state_entered > node.timeout_sec)) {??              int next = (node.if_false != -1) ? node.if_false : SESSION_ERROR;??              XP_LOG_SEQ_WARN(xp, 
+StringFormat("[SEQ:%s] State %d Timeout (%d sec). Moving to %d", m_name, m_current_state, node.timeout_sec, next));??              UpdateState(next);??              return;??
+          }??  ??          if(node.step.OnCondition(xp, m_ctx, m_current_state)) {??              int next_state = node.step.OnProcess(xp, m_ctx);??              ??
+    //-- [???] Retries & OnFail ??? ?????              if(next_state == m_current_state || next_state == -1) {
+>         TriggerOnEnter(m_current_state);??      }??
+>     void TriggerOnEnter(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);??      }?
+?  ??      void TriggerOnExit(int state) {??          CXStepNode* node = NULL;??          if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnExit(m_ctx);??     
+ }??  };??  ??  #endif
+Process Group PGID: 7852

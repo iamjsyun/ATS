@@ -1,0 +1,3 @@
+{
+  "output": "Output: \n\n    ���\n       곕━: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\nd-----      2026-05-20   ��\n                            8:49                Entry\nd-----      2026-05-20   ��\n                            8:49                Exit\nd-----      2026-05-20   ��\n                            8:49                Active\nd-----      2026-05-20   ��\n                            8:49                Pending\nProcess Group PGID: 21468"
+}

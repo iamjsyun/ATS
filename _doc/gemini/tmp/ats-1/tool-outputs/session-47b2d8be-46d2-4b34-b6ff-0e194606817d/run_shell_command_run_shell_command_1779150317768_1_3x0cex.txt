@@ -1,0 +1,3 @@
+{
+  "output": "Output: \n\n    ���\n       곕━: D:\\projects\\ats\\ATSE\\_MEM\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\n-a----        2026-05-18   �\n                             4:17           1254 MEMORY.md\nProcess Group PGID: 13328"
+}

@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"CXStepDiscovery\\|CXStepValidation\\|CXStepBinding\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\"."
+}

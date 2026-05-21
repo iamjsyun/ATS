@@ -1,0 +1,17 @@
+Category	Pattern
+Entry	BUY
+Entry	SELL
+Entry	SIGNAL
+Entry	ENTRY
+Exit	CLOSE
+Exit	EXIT
+Exit	TP
+Exit	SL
+Buy	BUY
+Buy	LONG
+Sell	SELL
+Sell	SHORT
+Price	(?:PRICE|ENTRY|AT|@)[:\s]*([\d.]+)
+Lot	(?:LOT|VOL|QTY|WEIGHT)[:\s]*([\d.]+)
+Sno	(?:SNO|ID|REV)[:\s]*(\d+)
+Sno	(\d+)(?:차|회차|회)

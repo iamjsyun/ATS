@@ -1,0 +1,3 @@
+{
+  "output": "Output: \n        public async Task<List<Models.XSignal>> ApplyPolicyAsync(XDataObject xdo)\n        {\n            if (xdo.Signal == null) return new List<Models.XSignal>();\n\n            var ctx = new PolicyContext(xdo, xdo.Signal, ResultSignals: new List<Models.XSignal>());\n            ISequence<string> seq = null!;\n\n            seq = new FluentSeq<string>().Create(\"ResolveConfig\")\n                //.ActivateDebugLogging(nlog) // ?遺얠쒔域�??袁⑹ ??雅�깃� ?���\nProcess Group PGID: 24884"
+}

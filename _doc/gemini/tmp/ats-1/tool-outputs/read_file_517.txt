@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXCONTEXT_MQH\n#define CXCONTEXT_MQH\n\n#include \"..\\Interfaces\\ICXContext.mqh\"\n#include <Generic\\HashMap.mqh>\n\nclass CXContext : public ICXContext {\nprivate:\n    ICXParam*                   m_param;\n    CHashMap<str
+... [TRUNCATED] ...
+gister(string key, CObject* obj) override {\n        Set(key, obj);\n    }\n\n    virtual CObject* Get(string key) override {\n        CObject* obj = NULL;\n        m_resources.TryGetValue(key, obj);\n        return obj;\n    }\n};\n\n#endif\n\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156820044_0_4p8641.txt
+</tool_output_masked>

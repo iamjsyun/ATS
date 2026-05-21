@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+
+        <LangVersion>latestmajor</LangVersion>
+        <NeutralLanguage>en</NeutralLanguage>
+
+        <RepositoryType>git</RepositoryType>
+        <UserSecretsId>940bf605-ef83-43f5-9f75-715291de7535</UserSecretsId>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+        <PackageId>FluentSeq</PackageId>
+        <Title>FluentSeq</Title>
+        <Version>2.1.0</Version>
+        <PackageReleaseNotes>Migrate from xUnit v2.9.x to v3.2.x</PackageReleaseNotes>
+
+        <Company>ieg Systems</Company>
+        <Authors>Ing. Ernst Greiner</Authors>
+        <Copyright>(c) 2026 ieg Systems - Ing. Ernst Greiner</Copyright>
+
+        <Description>
+            FluentSeq provides a fluent interface for creating easy-to-read sequences, eliminating the need for lengthy if-else statements.  
+            Successor of IegTools.Sequencer  
+            - new architecture, state-based instead of transaction-based  
+        </Description>
+
+        <PackageTags>sequence, sequencer, state-machine, state-engine, finite-state-machine, fsm, finite-state-automation, fsa</PackageTags>
+
+        <RepositoryUrl>https://github.com/egreiner/FluentSeq</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/egreiner/FluentSeq</PackageProjectUrl>
+        <PackageReadme>https://github.com/egreiner/FluentSeq/blob/main/README.md</PackageReadme>
+        <PackageReadmeFile>docs\README.md</PackageReadmeFile>
+        <PackageLicenseFile>docs\LICENSE.txt</PackageLicenseFile>
+        <PackageIcon>docs\icon2.png</PackageIcon>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IegTools.Extensions" Version="0.2.0" />
+      <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+      <PackageReference Include="NLog" Version="6.1.2" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <LegacyFrameworks>netstandard2.0;netstandard2.1;net48;net6.0;net7.0</LegacyFrameworks>
+        <LatestFrameworks>net8.0;net9.0;net10.0</LatestFrameworks>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0'">
+        <PackageReference Include="FluentValidation" Version="11.11.0" />
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0' OR '$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
+    </ItemGroup>
+    
+    <ItemGroup>
+    </ItemGroup>
+</Project>

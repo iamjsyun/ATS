@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: {
+  "System": {
+    "Version": "v9.0.0",
+    "DatabaseFullPath": "C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\Common\\Files\\ATS.db",
+    "LoggingLevel": "Info",
+    "RefreshIntervalMs": 1000
+  },
+  "ChannelDefault": {
+    "Enabled": true,
+    "CNO": 0,
+
+... [350 lines omitted] ...
+
+        "Sell": {
+          "Enabled": null,
+          "LotStrategy": null,
+          "Entry": null,
+          "Exit": null
+        }
+      }
+    }
+  ]
+}
+Process Group PGID: 22644
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779156659480_0_ar46xj.txt
+</tool_output_masked>

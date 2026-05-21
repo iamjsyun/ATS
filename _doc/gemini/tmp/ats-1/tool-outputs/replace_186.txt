@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Infra\\CXFileLogger.mqh (1 replacements). Here is the updated code:\n#ifndef CXFILELOGGER_MQH\n#define CXFILELOGGER_MQH\n\n#include \"..\\Interfaces\\ICXLogger.mqh\"\n\n/**\
+... [TRUNCATED] ...
+abled; }\n    virtual bool IsEnabled() const override { return m_enabled; }\n\n    void Close() {\n        if(m_handle != INVALID_HANDLE) {\n            FileClose(m_handle);\n            m_handle = INVALID_HANDLE;\n        }\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779237218701_0_zon6b.txt
+</tool_output_masked>

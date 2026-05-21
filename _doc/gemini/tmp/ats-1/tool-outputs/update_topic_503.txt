@@ -1,0 +1,4 @@
+Current topic: "Fixing Watcher Logging"
+Topic summary: I've identified that the logging macros in the Watcher steps (Discovery, Validation, Binding) are being called with NULL for the XP parameter, which silences all logs. I'm fixing this to use the passed XP parameter. This will allow me to see if signals are being found in the database and where they might be failing validation. I also noticed potential caching issues with prepared statements in the repository which I will investigate if logging doesn't reveal the cause.
+
+Strategic Intent: Fix logging macros in Watcher steps to enable visibility into signal detection.

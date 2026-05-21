@@ -1,0 +1,3 @@
+{
+  "output": "Output: Get-Content : 留ㅺ� 蹂�\n                        'Skip'怨�(�) � 留ㅺ� 蹂�� 李얠\n                                                       ��듬��.\n�\n 移\n   :1 臾몄\n+ ... ts\\ATS\\ATSE\\CXTrade\\Infra\\CXSignalRepository_clean.mqh\" -Skip 100 -To ...\n+                                                             ~~~~~\n    + CategoryInfo          : InvalidArgument: (:) [Get-Content], ParameterBindingException\n    + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.GetContentCommand\n \nExit Code: 1\nProcess Group PGID: 21652"
+}

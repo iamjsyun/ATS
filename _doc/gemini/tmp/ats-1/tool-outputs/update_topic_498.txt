@@ -1,0 +1,4 @@
+Current topic: "Fixing Repository Polling Bug"
+Topic summary: I've discovered a critical bug in the Signal Repository: the LoadActiveSignals method caches the prepared statement handle and only calls DatabaseReset on subsequent calls. In MQL5 SQLite, DatabaseReset only resets the cursor and does not re-execute the query, meaning new signals injected by ATSA are never seen by ATSE. I am modifying the repository to ensure the query is re-prepared or properly re-executed to fetch fresh data on every poll. I am also ensuring the logging fix is applied.
+
+Strategic Intent: Fix stale database query caching in Signal Repository to enable detection of new signals.

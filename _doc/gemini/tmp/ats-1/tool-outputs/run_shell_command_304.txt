@@ -1,0 +1,17 @@
+Output: 
+
+    ���
+       곕━: D:\Projects\ats\ATSE\CXTrade\Session\Tasks
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----      2026-05-20   ��
+                            8:49                Entry
+d-----      2026-05-20   ��
+                            8:49                Exit
+d-----      2026-05-20   ��
+                            8:49                Active
+d-----      2026-05-20   ��
+                            8:49                Pending
+Process Group PGID: 21468

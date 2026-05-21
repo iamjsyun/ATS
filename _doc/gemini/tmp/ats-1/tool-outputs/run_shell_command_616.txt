@@ -1,0 +1,11 @@
+Output:       
+      CArrayObj list;
+      if (FetchSignals(m_hSignalBySid, GetPointer(list)) > 0) {
+         return CX_CAST(ICXSignal, list.Detach(0));
+      }
+      return NULL;
+   }
+
+private:
+   int FetchSignals(int req, CArrayObj* list) {
+Process Group PGID: 16448

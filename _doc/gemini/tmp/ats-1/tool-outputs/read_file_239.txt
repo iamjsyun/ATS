@@ -1,0 +1,67 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 400-460 of 591 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 461.
+
+--- FILE CONTENT (truncated) ---
+                    final.xa_exit = 0;
+                    final.xe_status = 0;
+                    
+                    await repo.SaveSignalImmediateAsync(final, IsForceInject);
+                    _param.nlog.Info($"[DM:SAVE] New Signal {final.sid} injected (EN=1, EX=0, ST=0, Force={IsForceInject}).");
+
+                    // [v9.0] 신규 주입 시 즉시 TTS 출력 (xa_entry 0->1 전이 효과)
+                    XContext.Instance.Sound?.PlaySound(final, "SIGNAL_RECEIVED");
+                }
+
+                // [Verification] DB 재로드
+                await LoadSignals();
+            }
+            catch (Exception ex)
+            {
+                _param.nlog.Error(ex, "[DM:SAVE] Failed to save/inject signal.");
+                _dialogService.ShowError($"주입 실패: {ex.Message}", "에러");
+            }
+        }
+
+        [Command]
+        public void AddNewEntrySignal()
+        {
+            var draft = CreateDraft();
+            draft.xa_exit = XCode.XA_RAW;
+            draft.SelectedXAExit = "0:READY";
+            draft.xe_status_msg = "New Entry Draft";
+            SelectedSignal = draft;
+            GenerateCurrentMessage();
+        }
+
+        [Command]
+        public void AddNewExitSignal()
+        {
+            var draft = CreateDraft();
+            draft.xa_exit = 1; // [v9.8.9] 1: ACTIVE (청산 접수)
+            draft.SelectedXAExit = "1:ACTIVE";
+            draft.xe_status = 20; // [v9.8.9] 20: CLOSED_SIG (강제 종료)
+            draft.SelectedXEStatus = "20:CLOSED_SIG";
+            draft.xe_status_msg = "Manual Exit Injection";
+            SelectedSignal = draft;
+            GenerateCurrentMessage();
+        }
+
+        private BindableXSignal CreateDraft()
+        {
+            var current = SelectedSignal;
+            DateTime now = DateTime.Now;
+            string yy = now.ToString("yyMMddHH");
+            var draft = new BindableXSignal();
+
+            if (current != null)
+            {
+                draft.cno = current.cno;
+                draft.sno = current.sno;
+                draft.gno = current.gno;
+                draft.symbol = current.symbol;
+                draft.dir = current.dir;
+                draft.type = current.type;
+                draft.lot = current.lot;
+                draft.price_signal = current.price_signal;

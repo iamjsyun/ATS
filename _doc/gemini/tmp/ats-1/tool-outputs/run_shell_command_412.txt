@@ -1,0 +1,12 @@
+Output: >     // Builder State??      int                         m_tmp_from;??      IXStep*                     m_tmp_step;??      IXGuard*                    m_tmp_guard;??      int
+   m_tmp_success;??      int                         m_tmp_fail;??      int                         m_tmp_timeout;??      int                         m_tmp_retries;??      CHashMap<int, int>*      
+   m_tmp_branches;??  ??  public:??      CXFluentSequence(ICXContext* ctx, string name) ??          : m_ctx(ctx), m_name(name), m_current_state(-1), m_tmp_from(-1),??            m_tmp_step(NULL), m
+_tmp_guard(NULL), m_tmp_success(-1), m_tmp_fail(-1),??            m_tmp_timeout(0), m_tmp_retries(0) {??          m_tmp_branches = new CHashMap<int, int>();??          if(IS_VALID(m_tmp_branches)) 
+{??              m_state_entered = TimeCurrent();??          }??      }??
+>     virtual void Build() override {??          CommitCurrent();??          if(m_current_state == -1) {??              m_current_state = m_tmp_from;??              XP_LOG_SEQ_INFO(m_ctx.GetParam()
+, StringFormat("[SEQ:%s] Sequence Started at State: %d", m_name, m_current_state));??          }??          TriggerOnEnter(m_current_state);??      }??  ??      virtual void Pulse(ICXParam* xp) ove
+rride {??          CXStepNode* node = NULL;??          if(!m_map.TryGetValue(m_current_state, node) || IS_INVALID(node)) return;??  ??          if(IS_VALID(node.guard) && !node.guard.Check(xp, m_ct
+x)) return;??  ??          if(node.timeout_sec > 0 && (TimeCurrent() - m_state_entered > node.timeout_sec)) {??              int next = (node.if_false != -1) ? node.if_false : SESSION_ERROR;??     
+         XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] State %d Timeout (%d sec). Moving to %d", m_name, m_current_state, node.timeout_sec, next));??              UpdateState(next);??              ret
+urn;??          }
+Process Group PGID: 24120

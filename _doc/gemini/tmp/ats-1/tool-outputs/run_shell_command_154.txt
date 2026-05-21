@@ -1,0 +1,11 @@
+Output:                             return;
+                        }
+
+                        ctx = ctx with { MergedConfig = merged, Policy = policy };
+                        seq.SetState("CheckEnablement");
+                    })
+                .ConfigureState("CheckEnablement")
+                    .OnEntry(() => {
+                        bool isManual = ctx.Xdo.CMD == "DM_INJECTION" || ctx.Xdo.CMD == "TEST_INJECTION";
+                        if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))
+Process Group PGID: 24280

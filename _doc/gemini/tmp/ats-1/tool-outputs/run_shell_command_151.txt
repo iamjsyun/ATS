@@ -1,0 +1,12 @@
+Output: Get-Content : 'D:\Projects\ATS\ATSE\CXTrade\App\CXLogDispatcher.mqh' 寃쎈�� 議댁 ��쇰�濡 李얠
+                                                                                              ��듬��.
+�
+ 移
+   :1 臾몄
++ ... ing]::UTF8; Get-Content "D:\Projects\ATS\ATSE\CXTrade\App\CXLogDispat ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (D:\Projects\ATS...gDispatcher.mqh:String) [Get-Content], ItemNotFoundException
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+Exit Code: 1
+Process Group PGID: 34708

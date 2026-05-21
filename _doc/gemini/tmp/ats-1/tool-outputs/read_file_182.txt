@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<nlog xmlns=\"http://www.nlog-project.org/schemas/NLog.xsd\"\n      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n      autoReload=\"true\"      \n      >\n\n  <extensions>\n    <
+... [TRUNCATED] ...
+- **XDUNA**: `-1003697953708` (CNO 3002)\r\n- **Zero Matching**: Fuzzy CID matching and CID-to-CNO mapping are deprecated. 1:1 ID-to-CNO mapping is enforced.\n--- End of Context from: d:/projects/ats/atsa/gemini.md ---\n--- End Project Context ---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151109416_2_k362jr.txt
+</tool_output_masked>

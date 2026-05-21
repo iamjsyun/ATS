@@ -1,0 +1,3 @@
+{
+  "output": "#ifndef IXPOSITIONMANAGER_MQH\n#define IXPOSITIONMANAGER_MQH\n\n#include <Object.mqh>\n#include \"ICXParam.mqh\"\n\n/**\n * @class IXPositionManager\n * @brief 오픈된 포지션의 모니터링 및 관리를 위한 인터페이스\n */\nclass IXPositionManager : public CObject {\npublic:\n    virtual void Pulse(ICXParam* xp) = 0;\n    virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) = 0;\n};\n\n#endif\n"
+}

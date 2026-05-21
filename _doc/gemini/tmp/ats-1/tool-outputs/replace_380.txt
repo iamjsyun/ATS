@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Module\\CXSignalWatcher.mqh (1 replacements). Here is the updated code:\n#ifndef CXSIGNALWATCHER_MQH\n#define CXSIGNALWATCHER_MQH\n\n#include \"..\\Interfaces\\IRepository.m
+... [TRUNCATED] ...
+epValidation()).OnSuccess(WATCHER_BINDING).OnFail(WATCHER_DISCOVERY);\n        seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);\n\n        seq.Build();\n    }\n};\n\n#endif\n\n Applied fuzzy match at line 34-48."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779159207608_1_2vkefi.txt
+</tool_output_masked>

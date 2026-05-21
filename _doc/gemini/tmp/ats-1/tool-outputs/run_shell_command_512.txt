@@ -1,0 +1,11 @@
+Output: 
+
+    ���
+       곕━: C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\Common\Files
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2026-05-18  ��
+                             10:42           4096 ATS.db
+Process Group PGID: 6648

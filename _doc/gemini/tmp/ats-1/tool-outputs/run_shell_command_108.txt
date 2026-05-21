@@ -1,0 +1,5 @@
+Output:       virtual int Execute(ICXParam* xp, ICXContext* ctx) override {??          IXOrderManager* orderMgr = CX_GET_OBJ(ctx, "order_mgr", IXOrderManager);??          if(IS_INVAL
+ID(orderMgr)) return TASK_BREAK;??  ??          XP_LOG_INFO(xp, "[TASK-ENTRY] Executing Market/Trailing Entry...");??>         if(orderMgr.ExecuteEntry(xp)) {??
+ICXSignal* sig = xp.GetSignal();??              if(IS_VALID(sig) && sig.GetType() == ORDER_MARKET) {??                  return SESSION_ACTIVE; // ????? ?????              }??
+              return STATE_ENTRY_TRAILING; // ??????? ???
+Process Group PGID: 7588

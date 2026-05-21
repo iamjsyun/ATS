@@ -1,0 +1,17 @@
+namespace XTA.Models
+{
+    /// <summary>
+    /// Gateway 허브 내 신호 처리 파이프라인 상태 정의
+    /// </summary>
+    public enum XHubState
+    {
+        Idle,           // 초기 대기 상태 (안전한 초기화용)
+        Received,       // 메시지 수신됨
+        Validated,      // 채널 유효성 검사 완료
+        Interpreted,    // 해석기로 라우팅 완료
+        ProfileApplied, // 그리드/옵션 적용 완료
+        Dispatched,     // 최종 발송 완료
+        Failed,         // 조건 미달로 처리 중단
+        Liquidation     // 청산 특수 처리 상태
+    }
+}

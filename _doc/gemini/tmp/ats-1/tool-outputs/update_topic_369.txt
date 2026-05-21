@@ -1,0 +1,4 @@
+Current topic: "Optimizing Log Level Filtering"
+Topic summary: I'm adding a `InpLogLevel` input parameter to `ATS.mq5` to allow users to filter logs by level (TRACE, DEBUG, INFO, WARN, ERROR). I'll update `ICXConfig` and `CXConfig` to store and expose this setting. Finally, I'll modify the `GetLoggerSafe` macro in `CXMacros.mqh` to implement the filtering logic, ensuring only logs at or above the selected level are processed. This gives users fine-grained control over log verbosity.
+
+Strategic Intent: Add configurable log level filtering to ATS.mq5 and ICXConfig.

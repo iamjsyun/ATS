@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="ATSA.YouTube/ATSA.YouTube.csproj" Id="57dbeb68-ab94-4669-ad90-b13dd53cd9e7" />
+  <Project Path="ATSA/ATSA.csproj" />
+  <Project Path="FluentSeq/FluentSeq.csproj" />
+  <Project Path="XTA.Test/XTA.Test.csproj" />
+  <Project Path="XTA.XData/XTA.XData.csproj" />
+  <Project Path="XTA/XTA.csproj" />
+</Solution>

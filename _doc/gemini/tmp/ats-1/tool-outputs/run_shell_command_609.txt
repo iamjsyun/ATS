@@ -1,0 +1,21 @@
+Output:       int handle = m_db.GetHandle();
+      int req = DatabasePrepare(handle, sql);
+      int status = -1;
+      if(req != INVALID_HANDLE) {
+         if(DatabaseRead(req)) DatabaseColumnInteger(req, 0, status);
+         DatabaseFinalize(req);
+      }
+      return status;
+   }
+
+   virtual bool UpdateStatus(ICXSignal* signal) override {
+      if(IS_INVALID(m_db) || IS_INVALID(signal)) return false;
+      string sql = StringFormat(
+                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', updated=datetime('now','localtime') WHERE sid='%s'",
+                      signal.GetStatus(), signal.GetStatusMsg(), signal.GetSid()
+                   );
+      return m_db.Execute(sql);
+   }
+
+   virtual int LoadActiveSignals(CArrayObj* list) override {
+Process Group PGID: 26764

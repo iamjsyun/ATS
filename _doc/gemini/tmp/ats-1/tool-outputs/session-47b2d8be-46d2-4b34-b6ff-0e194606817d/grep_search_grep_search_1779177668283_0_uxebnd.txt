@@ -1,0 +1,3 @@
+{
+  "output": "Found 6 matches for pattern \"\\.[Oo]ffset\\s*=|\\.[Ss]tep\\s*=\" across 2 workspace directories (filter: \"*.cs\"):\n---\nFile: ats\\ATSA\\XTA.XData\\Models\\Mappers.cs\nL78:             xpo.offset = domain.offset;\nL79:             xpo.step = domain.step;\nL188:             xpo.offset = domain.offset;\nL217:             target.offset = source.offset;\nL218:             target.step = source.step;\n---\nFile: ats\\ATSA\\XTA\\Services\\XTradePolicyService.cs\nL114:                             s.offset = profile.offset;\n---"
+}

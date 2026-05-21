@@ -1,0 +1,3 @@
+{
+  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Module\\CXSignalWatcher.mqh. Here is the updated code:\n#ifndef CXSIGNALWATCHER_MQH\r\n#define CXSIGNALWATCHER_MQH\r\n\r\n#include \"..\\Interfaces\\IRepository.mqh\"\r\n#include \"..\\Interfaces\\ICXConfig.mqh\"\r\n\r\nclass CXSignalWatcher {\r\nprivate:\r\n    IRepository* m_repo;\r\n    ICXConfig*   m_config;\r\npublic:\r\n    CXSignalWatcher(IRepository* repo, ICXConfig* config) : m_repo(repo), m_config(config) {}\r\n    ~CXSignalWatcher() {}\r\n};\r\n\r\n#endif\r\n"
+}

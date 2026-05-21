@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 185-206 of 206 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
+... [TRUNCATED] ...
+ount}건)\");\n            }\n            \n            // [v9.8.6] 청산 신호 접수 시 즉시 TTS 출력 복구\n            string soundCmd = (signal.sno == 0) ? \"GROUP_CLOSE\" : \"SID_CLOSE\";\n            ctx.Sound?.PlaySound(signal, soundCmd);\n        }\n    }\n}"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779154206992_0_w4u08c.txt
+</tool_output_masked>

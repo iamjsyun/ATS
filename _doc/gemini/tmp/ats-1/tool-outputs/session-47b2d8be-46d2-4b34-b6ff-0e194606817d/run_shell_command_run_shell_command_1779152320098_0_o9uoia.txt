@@ -1,0 +1,3 @@
+{
+  "output": "Output:                             return;\n                        }\n\n                        ctx = ctx with { MergedConfig = merged, Policy = policy };\n                        seq.SetState(\"CheckEnablement\");\n                    })\n                .ConfigureState(\"CheckEnablement\")\n                    .OnEntry(() => {\n                        bool isManual = ctx.Xdo.CMD == \"DM_INJECTION\" || ctx.Xdo.CMD == \"TEST_INJECTION\";\n                        if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))\nProcess Group PGID: 24280"
+}

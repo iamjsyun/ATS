@@ -1,0 +1,11 @@
+Output: >         // 2. ???????? ??? ?????(SID: System)??          if(m_config.IsBootLogEnabled()) {
+>             m_logger = m_factory.CreateLogger("System", m_config);??              if(IS_VALID(m_logger)) {??                  m_globalContext.Register("logger", m_logger);
+>                 m_logger.Log(LOG_LVL_INFO, ">>> ATSE Framework Initializing (System SID) <<<");??              }??          }??          ??          CXParam xp;??          xp.SetContext(m_globalC
+ontext);??  ??          // 3. ????????????
+>         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Initializing Guard System...");??          m_guard = new CXGuard(m_globalContext);??          if(IS_INVALID(m_guard)) return
+ false;??          m_globalContext.Register("guard", m_guard);??  ??          // 4. ??????????(DB)??          if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 2/6] Connecting to Database &
+ Repository...");??          m_db = new CXDatabase();??          if(IS_INVALID(m_db)) return false;??          if(!m_db.Open()) {??              if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_ERROR, "
+Database open failed.");??              return false;??          }??          ??          m_repo = new CXSignalRepository(m_db);??          if(IS_INVALID(m_repo)) return false;??          m_globalC
+ontext.Register("repo", m_repo);??  ??          // 5. ??? ?? (Session Pool)??          if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, StringFormat("[STEP 3/6] Initializing Session Pool (Size: %
+d)...", poolSize));??          m_sessionPool = new CXTradingSessionPool(poolSize);
+Process Group PGID: 12456

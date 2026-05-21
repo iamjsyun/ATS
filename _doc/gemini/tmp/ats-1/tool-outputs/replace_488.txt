@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Models\\CXContext.mqh (1 replacements). Here is the updated code:\n﻿#ifndef CXCONTEXT_MQH\n#define CXCONTEXT_MQH\n\n#include \"..\\Interfaces\\ICXContext.mqh\"\n#include <Ge
+... [TRUNCATED] ...
+gister(string key, CObject* obj) override {\n        Set(key, obj);\n    }\n\n    virtual CObject* Get(string key) override {\n        CObject* obj = NULL;\n        m_resources.TryGetValue(key, obj);\n        return obj;\n    }\n};\n\n#endif\n\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779157033161_0_dfbotl.txt
+</tool_output_masked>

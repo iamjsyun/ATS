@@ -1,0 +1,134 @@
+Successfully overwrote file: D:\Projects\ATS\ATSE\CXTrade\Session\Execution\CXOrderManager.mqh. Here is the updated code:
+...
+#include "..\..\Infra\CXMessageProvider.mqh"
+#include <Trade\Trade.mqh>
+
+/**
+ * @class CXOrderManager
+ * @brief 샌드박스 세션 내의 주문 실행 및 관리 담당
+ */
+class CXOrderManager : public IXOrderManager {
+private:
+    ulong           m_ticket;
+    string          m_sid;
+...
+    virtual ~CXOrderManager() override {}
+
+    virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
+
+    /**
+     * @brief 진입 주문 실행 (xa_entry 기반)
+     */
+    virtual bool ExecuteEntry(ICXParam* xp) override {
+        if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;
+
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) return false;
+
+        m_sid = sig.GetSid();
+        m_trade.SetExpertMagicNumber((ulong)sig.GetMagic());
+
+        XP_LOG_INFO(xp, StringFormat("[EXEC-ENTRY] SID:%s, Dir:%d, Type:%d, Lot:%.2f, Price:%.5f", 
+           m_sid, sig.GetDir(), sig.GetType(), sig.GetLot(), sig.GetPriceSignal()));
+
+        //--- 주문 타입 및 방향 결정
+        ENUM_ORDER_TYPE order_type;
+        bool isMarket = sig.IsMarketOrder();
+        
+        if(isMarket) {
+            order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
+        } else {
+            order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;
+        }
+
+        //--- 단일 OrderSend로 통합 실행
+        string sym = sig.GetSymbol();
+        if(!SymbolSelect(sym, true)) {
+            string err_msg = StringFormat("SymbolSelect failed for %s. Cannot trade.", sym);
+            XP_LOG_ERROR(xp, err_msg);
+            CXMessageProvider::UpdateStatus(sig, XE_ERROR, err_msg);
+            return false;
+        }
+
+        double price = sig.GetPriceSignal();
+        if(isMarket) {
+            price = (sig.GetDir() == CX_DIR_BUY) ? SymbolInfoDouble(sym, SYMBOL_ASK) : SymbolInfoDouble(sym, SYMBOL_BID);
+        } else {
+            if(sig.GetTELimit() > 0) {
+                IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+                if(IS_VALID(guard)) {
+                    double limit_dist = guard.PointsToPrice(sym, sig.GetTELimit());
+                    price = (sig.GetDir() == CX_DIR_BUY) ? (price - limit_dist) : (price + limit_dist);
+                    price = guard.NormalizePrice(sym, price);
+                }
+            }
+        }
+
+        //--- SL/TP 계산
+        double sl_price = 0.0;
+        double tp_price = 0.0;
+        IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+
+        if(IS_VALID(guard)) {
+...
+                double tp_dist = guard.PointsToPrice(sym, sig.GetTP());
+                tp_price = (sig.GetDir() == CX_DIR_BUY) ? (price + tp_dist) : (price - tp_dist);
+                tp_price = guard.NormalizePrice(sym, tp_price);
+            }
+
+            if(sl_price > 0 && !guard.ValidateStopLevel(sym, price, sl_price)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] SL too close, resetting SL to 0.0. SID:%s", m_sid));
+                sl_price = 0.0;
+            }
+            if(tp_price > 0 && !guard.ValidateStopLevel(sym, price, tp_price)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] TP too close, resetting TP to 0.0. SID:%s", m_sid));
+                tp_price = 0.0;
+            }
+        }
+        
+        XP_LOG_DEBUG(xp, StringFormat("[EXEC-DEBUG] OrderOpen -> Sym:%s, Type:%d, Lot:%.2f, Price:%.5f, SL:%.5f, TP:%.5f", 
+            sym, order_type, sig.GetLot(), price, sl_price, tp_price));
+
+        bool res = false;
+        if(isMarket) {
+            if(sig.GetDir() == CX_DIR_BUY) 
+                res = m_trade.Buy(sig.GetLot(), sym, price, sl_price, tp_price, m_sid);
+            else 
+...
+            CXMessageProvider::UpdateStatus(sig, XE_ERROR, err_msg);
+            return false;
+        }
+        else {
+            m_ticket = m_trade.ResultOrder();
+            if(PositionSelectByTicket(m_ticket)) {
+                sig.SetTicket((long)m_ticket);
+                int next_status = (sig.GetType() == ORDER_MARKET) ? XE_EXECUTED : XE_PENDING_PLACED;
+                string status_msg = (sig.GetType() == ORDER_MARKET) ? MSG_ENTRY_MARKET_SUCCESS : MSG_ENTRY_LIMIT_PLACED;
+                CXMessageProvider::UpdateStatus(sig, next_status, status_msg);
+                XP_LOG_OK(xp, status_msg);
+                return true;
+            } else {
+                XP_LOG_ERROR(xp, StringFormat("[ORDER-MANAGER] Failed to confirm PositionSelectByTicket for ticket:%lld", m_ticket));
+...
+                return false;
+            }
+        }
+    }
+
+    virtual bool ModifyOrder(ulong ticket, double price, double sl, double tp) override {
+        if(ticket == 0) return false;
+        return m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0);
+    }
+
+    virtual bool DeleteOrder(ulong ticket) override {
+        if(ticket == 0) return false;
+        if(!m_trade.OrderDelete(ticket)) return false;
+        if(OrderSelect(ticket)) {
+            XP_LOG_ERROR(NULL, StringFormat("[ORDER-MANAGER] Failed to confirm deletion for ticket:%lld", ticket));
+            return false;
+        }
+        return true;
+    }
+};
+
+#endif

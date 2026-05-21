@@ -1,0 +1,15 @@
+Output:       ~CXFluentSequence() {??          int keys[];??          CXStepNode* values[];??          m_map.CopyTo(keys, values);??          for(int i = 0; i < ArraySize(values); i++) if(IS_VALID(values[i
+])) SAFE_DELETE(values[i]);??          m_map.Clear();??          SAFE_DELETE(m_tmp_branches);??      }??  ??      //-- Fluent API??>     CXFluentSequence* From(int state) { CommitCurrent(); m_tmp_f
+rom = state; return GetPointer(this); }??      CXFluentSequence* Execute(IXStep* step) { m_tmp_step = step; return GetPointer(this); }??      CXFluentSequence* Guard(IXGuard* guard) { m_tmp_guard =
+ guard; return GetPointer(this); }??      CXFluentSequence* OnSuccess(int next) { m_tmp_success = next; return GetPointer(this); }??      CXFluentSequence* OnFail(int next) { m_tmp_fail = next; ret
+urn GetPointer(this); }??      CXFluentSequence* Timeout(int sec) { m_tmp_timeout = sec; return GetPointer(this); }??      CXFluentSequence* Retries(int count) { m_tmp_retries = count; return GetPo
+inter(this); }??      CXFluentSequence* Case(int code, int state) { m_tmp_branches.Add(code, state); return GetPointer(this); }??  ??      virtual void Build() override {??          CommitCurrent()
+;
+      virtual void AddStep(int state_id, IXStep* step) override {??          CXStepNode* node = new CXStepNode(step, -1, -1);??          if(IS_VALID(node)) m_map.Add(state_id, node);??      }??  ??
+      virtual int State() const override { return m_current_state; }??      virtual void ForceState(int state) override { UpdateState(state); }??  ??  private:??      void CommitCurrent() {??>     
+    if(m_tmp_from == -1 || IS_INVALID(m_tmp_step)) return;??          CXStepNode* node = new CXStepNode(m_tmp_step, m_tmp_success, m_tmp_fail, m_tmp_timeout, m_tmp_retries, m_tmp_guard);??
+ if(IS_INVALID(node)) return;??          ??          int b_keys[]; int b_values[];??          m_tmp_branches.CopyTo(b_keys, b_values);??          for(int i = 0; i < ArraySize(b_keys); i++) node.bra
+nches.Add(b_keys[i], b_values[i]);??          m_tmp_branches.Clear();??  ??          m_map.Add(m_tmp_from, node);
+>         m_tmp_from = -1; m_tmp_step = NULL; m_tmp_guard = NULL; m_tmp_success = -1; m_tmp_fail = -1;??      }??  ??      void UpdateState(int next) {??          if(m_current_state == next) return
+;??          TriggerOnExit(m_current_state);??          m_current_state = next;??          m_state_entered = TimeCurrent();??          TriggerOnEnter(m_current_state);??      }??
+Process Group PGID: 23388

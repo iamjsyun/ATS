@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry:\nCXTaskEntry_L_Validate.mqh (2761 bytes)\nCXTaskEntry_P_Finalize.mqh (1579 bytes)\nCXTaskEntry_P_Lock.mqh (1419 bytes)\nCXTaskEntry_R_Order.mqh (1471 bytes)\nCXTaskEntry_V_Error.mqh (1256 bytes)\nCXTaskEntry_V_Real.mqh (1580 bytes)\nCXTaskEntry_V_Ticket.mqh (1389 bytes)\nCXTaskFinalize_V_DoubleCheck.mqh (1300 bytes)\nCXTaskGuard_V_Spread.mqh (1210 bytes)\nCXTaskGuard_V_Volatility.mqh (593 bytes)"
+}

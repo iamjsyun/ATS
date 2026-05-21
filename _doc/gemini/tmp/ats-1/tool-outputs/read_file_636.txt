@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXREVERSEINJECTOR_MQH\n#define CXREVERSEINJECTOR_MQH\n\n#include \"..\\..\\Interfaces\\ICXContext.mqh\"\n#include \"..\\..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\..\\Interfaces\\IRepository.mqh\"\n#include \"..\\..\\Interf
+... [TRUNCATED] ...
+CXSignal, sig));\n            } else {\n                XP_LOG_ERROR(xp, StringFormat(\"[REVERSE-INJECT] Failed to borrow session for recovery of SID: %s\", sid));\n                SAFE_DELETE(sig);\n            }\n        }\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156048797_0_pajwc5.txt
+</tool_output_masked>

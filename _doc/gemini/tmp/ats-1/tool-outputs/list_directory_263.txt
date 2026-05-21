@@ -1,0 +1,5 @@
+Directory listing for C:\Users\hijsyun\.gemini\tmp\ats-1:
+[DIR] chats
+[DIR] tool-outputs
+.project_root (15 bytes)
+logs.json (17264 bytes)

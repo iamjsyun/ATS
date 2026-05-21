@@ -1,0 +1,4 @@
+Current topic: "Refining Assembly Logs & Log Persistence Control"
+Topic summary: I will enhance the sequence assembly report to include state names (e.g., 0:READY) by mapping ENUM_SESSION_STATE and ENUM_WATCHER_STATE codes to their string equivalents. Additionally, I will add an 'InpLog_InitOnStart' Input parameter to ATS.mq5, allowing users to toggle whether existing log files are cleared upon EA startup. This improves both the readability of system structure logs and control over log history persistence.
+
+Strategic Intent: Enhance sequence reporting with state names and add log initialization toggle.

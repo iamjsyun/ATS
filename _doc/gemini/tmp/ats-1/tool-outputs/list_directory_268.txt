@@ -1,0 +1,8 @@
+Directory listing for D:\Projects\ATS\ATSA\XTA\Services:
+[DIR] TelegramService
+XDataService.cs (4479 bytes)
+XGatewayService.cs (14405 bytes)
+XLiquidationService.cs (9088 bytes)
+XSignalService.cs (7735 bytes)
+XSyncWorker.cs (9755 bytes)
+XTradePolicyService.cs (8661 bytes)

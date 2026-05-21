@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 35-120 of 203 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
+... [TRUNCATED] ...
+           var ctx = XContext.Instance;\n            var gateway = ctx.Gateway as XGatewayService;\n            var dbService = ctx.Parameter.GetService<XpoSqliteService>();\n\n            // 메모리 검색\n            if (gateway != null)\n            {"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152862681_1_ycw343.txt
+</tool_output_masked>

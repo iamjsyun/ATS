@@ -1,0 +1,5 @@
+Output: >                 XP_LOG_ERROR(xp, MSG_ERR_INTERNAL + " (Circuit Breaker/Sequence Error)");??                  if(IS_VALID(sig)) {
+>                     CXMessageProvider::UpdateStatus(sig, XE_ERROR, MSG_ERR_INTERNAL);??                      if(IS_VALID(m_repo)) m_repo.UpdateStatus(sig);??
+   }??                  m_isActive = false; // ??? ??? ?????? (???????)??              }??          }??      }??  ??      void Start(ICXParam* xp, ICXServiceFactory* factory)
+ {??          m_isActive = true;??          m_sid = (IS_VALID(xp) && IS_VALID(xp.GetSignal())) ? xp.GetSignal().GetSid() : "";
+Process Group PGID: 14300

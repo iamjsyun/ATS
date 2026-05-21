@@ -1,0 +1,14 @@
+Output: 
+
+    ���
+       곕━: C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\Common\Files\ATSE
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2026-05-18   �
+                             6:45          23804 System-260518-124545.log
+
+-a----        2026-05-18   �
+                             6:45            148 SignalWatcher-260518-124545.log
+Process Group PGID: 5356

@@ -1,0 +1,11 @@
+Category	Pattern
+Entry	GOLD 포지션 진입
+Entry	진입 신호 공유
+Exit	포지션 정리
+Exit	청산 신호 공유
+Buy	BUY
+Sell	SELL
+Price	(?:참고가격|진입가|청산가|Price|가격)[:\s]*([\d.]+)
+Lot	(?:랏수|수량|비중|포지션|계약)[:\s]*(?:BUY|SELL|LONG|SHORT)?\s*([\d,.]+)\s*(?:랏|LOT|계약)?
+Sno	([\d,\s]+)(?:회차|차)
+Sno	(?:회차|차)[:\s]*(\d+)

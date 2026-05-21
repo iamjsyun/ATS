@@ -1,0 +1,12 @@
+Output: Get-Content : 'C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\Common\Files\ATSE\ATSE_260519-070000.log' 寃쎈�� 議댁 ��쇰�濡 李얠
+                                                                                                                                       ��듬��.
+�
+ 移
+   :1 臾몄
++ ... ing]::UTF8; Get-Content "C:\Users\hijsyun\AppData\Roaming\MetaQuotes\ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\hijsyu...0519-070000.log:String) [Get-Content], ItemNotFoundException
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+Exit Code: 1
+Process Group PGID: 21500

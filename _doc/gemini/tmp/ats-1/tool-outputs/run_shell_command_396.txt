@@ -1,0 +1,11 @@
+Output: 
+
+    ���
+       곕━: G:\
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        2026-05-19   ��
+                              9:16                �� ��
+Process Group PGID: 15176

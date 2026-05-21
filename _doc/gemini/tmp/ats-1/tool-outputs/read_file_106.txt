@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXTRADINGSESSIONPOOL_MQH\n#define CXTRADINGSESSIONPOOL_MQH\n\n#include <Arrays\\ArrayObj.mqh>\n#include \"..\\Session\\CXTradingSession.mqh\"\n#include \"..\\Interfaces\\ICXTradingSessionPool.mqh\"\n\n/**\n * @class CXTradingSe
+... [TRUNCATED] ...
+= 0; i--) {\n            ICXTradingSession* session = CX_CAST(ICXTradingSession, m_active.At(i));\n            if(IS_VALID(session) && !session.IsActive()) {\n                ReturnSession(session);\n            }\n        }\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779239041799_1_ockfyj.txt
+</tool_output_masked>

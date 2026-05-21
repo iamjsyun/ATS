@@ -1,0 +1,4 @@
+Current topic: "Finding Exit Keywords for CNO 1001"
+Topic summary: I am searching for the specific keywords used by the CNO 1001 interpreter to identify exit signals. I will start by locating the interpreter class for CNO 1001 and then analyze its `Interpret` logic or associated configuration files to provide the list of exit keywords.
+
+Strategic Intent: Read the CNO 1001 interpreter configuration to find exit keywords.

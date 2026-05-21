@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Investigating 'caveman' Installation\"\nTopic summary: The user requested the installation of 'caveman'. I am currently searching the codebase and project documentation to identify what 'caveman' refers to in this specific environment (e.g., a testing framework, a library, or an external tool) before proceeding with the installation or providing guidance.\n\nStrategic Intent: Investigating 'caveman' to understand the user's installation request in the context of the MQL5 project."
+}

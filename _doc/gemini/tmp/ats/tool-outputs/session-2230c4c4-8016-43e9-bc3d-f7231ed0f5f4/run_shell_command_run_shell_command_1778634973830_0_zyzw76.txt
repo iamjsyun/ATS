@@ -1,0 +1,3 @@
+{
+  "output": "Output: error: pathspec 'Infra/Sync/CXStateReconciler.mqh' did not match any file(s) known to git\nExit Code: 1\nProcess Group PGID: 22612"
+}
