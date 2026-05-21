@@ -16,6 +16,9 @@
 #include "..\Interfaces\IXExitManager.mqh"
 #include "..\Interfaces\IXPriceTracker.mqh"
 #include "..\Interfaces\ICXPriceManager.mqh"
+#include "..\Interfaces\ICXRiskManager.mqh"
+#include "..\Interfaces\ICXSymbolManager.mqh"
+#include "..\Interfaces\ICXInventoryManager.mqh"
 #include "..\Interfaces\ICXServiceFactory.mqh"
 
 #include "Steps\CXCompositeStep.mqh"
@@ -51,6 +54,9 @@ private:
     IXExitManager*     m_exitMgr;
     IXPriceTracker*    m_priceTracker;
     ICXPriceManager*   m_priceManager;
+    ICXRiskManager*    m_riskManager;
+    ICXSymbolManager*  m_symbolManager;
+    ICXInventoryManager* m_inventoryManager;
 
 public:
     CXTradingSession(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
@@ -207,6 +213,15 @@ private:
 
         m_priceManager = factory.CreatePriceManager(m_ctx);
         if(IS_INVALID(m_priceManager)) return;
+
+        m_riskManager = factory.CreateRiskManager(m_ctx);
+        if(IS_INVALID(m_riskManager)) return;
+
+        m_symbolManager = factory.CreateSymbolManager(m_ctx);
+        if(IS_INVALID(m_symbolManager)) return;
+
+        m_inventoryManager = factory.CreateInventoryManager(m_ctx);
+        if(IS_INVALID(m_inventoryManager)) return;
         
         m_ctx.Register("entry_mgr", m_entryMgr); 
         m_ctx.Register("order_mgr", m_orderMgr);
@@ -214,6 +229,9 @@ private:
         m_ctx.Register("exit_mgr", m_exitMgr);
         m_ctx.Register("price_tracker", m_priceTracker);
         m_ctx.Register("price_mgr", m_priceManager);
+        m_ctx.Register("risk_mgr", m_riskManager);
+        m_ctx.Register("sym_mgr", m_symbolManager);
+        m_ctx.Register("inventory_mgr", m_inventoryManager);
 
         m_sequence = factory.CreateSequence(m_ctx, "SessionSeq");
         if(IS_INVALID(m_sequence)) return;
@@ -343,19 +361,6 @@ private:
         seq.From(STATE_EXIT_VERIFY).Execute(exitStep_P)
            .OnSuccess(SESSION_CLOSED)
            .OnFail(SESSION_ERROR)
-           .Timeout(30);
-        
-        seq.Build();
-        
-        //-- [v10.2] Detailed Assembly Report
-        string info = StringFormat("Sequence Assembly Complete: [Name:%s] [Nodes:%d] [States:{%s}]", 
-                                   seq.GetSequenceName(), seq.GetNodeCount(), seq.GetStateSummary());
-        XP_LOG_INFO(GetPointer(xp), info);
-    }
-};
-
-#endif
-#endif
            .Timeout(30);
         
         seq.Build();
