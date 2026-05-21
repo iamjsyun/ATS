@@ -35,77 +35,97 @@ public:
         CXSequenceRegistry::BuildSequence(seq, m_session_map);
     }
 
+    /**
+     * @brief [v11.4] DSL 문자열 배열을 기반으로 시퀀스 맵 구성
+     */
+    void BuildFromDSL(string &SEQS[], CArrayObj* map) {
+        if(IS_INVALID(map)) return;
+        
+        ushort node_delim = StringGetCharacter(SEQ_NODE_DELIMITER, 0);
+        ushort step_delim = StringGetCharacter(SEQ_STEP_DELIMITER, 0);
+
+        for(int i = 0; i < ArraySize(SEQS); i++) {
+            string parts[];
+            int totalParts = StringSplit(SEQS[i], node_delim, parts);
+            if(totalParts < 4) continue;
+            
+            int id = (int)StringToInteger(parts[0]);
+            string stepInfo = parts[1];
+            int next = (int)StringToInteger(parts[2]);
+            int fail = (int)StringToInteger(parts[3]);
+            int timeout = (totalParts > 4) ? (int)StringToInteger(parts[4]) : 0;
+            int retries = (totalParts > 5) ? (int)StringToInteger(parts[5]) : 0;
+            
+            string stepParts[];
+            StringSplit(stepInfo, step_delim, stepParts);
+            string typeStr = stepParts[0];
+            string alias = (ArraySize(stepParts) > 1) ? stepParts[1] : "";
+            string taskStr = (ArraySize(stepParts) > 2) ? stepParts[2] : "";
+            
+            ENUM_STEP_TYPE type = CXStepFactory::GetStepTypeByName(typeStr);
+            if(type == STEP_NONE) {
+                PrintFormat("[ORCH-ERROR] Invalid Step Type: %s in DSL Node: %s", typeStr, SEQS[i]);
+                continue;
+            }
+
+            CXSequenceStep* node = new CXSequenceStep(id, type, next, fail, timeout, retries, alias);
+            
+            // Tasks
+            string tasks[];
+            if(StringSplit(taskStr, ',', tasks) > 0) {
+                for(int t = 0; t < ArraySize(tasks); t++) {
+                    ENUM_TASK_TYPE taskType = CXTaskFactory::GetTaskTypeByName(tasks[t]);
+                    if(taskType != TASK_NONE) node.AddTask(taskType);
+                }
+            }
+            
+            // Branches (Optional Case)
+            if(totalParts > 6 && parts[6] != "") {
+                string cases[];
+                if(StringSplit(parts[6], ',', cases) > 0) {
+                    for(int c = 0; c < ArraySize(cases); c++) {
+                        string kv[];
+                        if(StringSplit(cases[c], '=', kv) == 2) {
+                            node.Case((int)StringToInteger(kv[0]), (int)StringToInteger(kv[1]));
+                        }
+                    }
+                }
+            }
+            
+            map.Add(node);
+        }
+    }
+
 private:
     void InitWatcherMap() {
-        //--- Watcher Matrix: Discovery -> Validation -> Binding
-        m_watcher_map.Add(new CXSequenceStep(ST_W_DISCOVERY,  STEP_W_DISCOVERY,  ST_W_VALIDATION, ST_W_DISCOVERY, T_NONE));
-        m_watcher_map.Add(new CXSequenceStep(ST_W_VALIDATION, STEP_W_VALIDATION, ST_W_BINDING,    ST_W_DISCOVERY, T_NONE));
-        m_watcher_map.Add(new CXSequenceStep(ST_W_BINDING,    STEP_W_BINDING,    ST_W_DISCOVERY,  ST_W_DISCOVERY, T_NONE));
+        string dsl[] = {
+            "0|Discovery|1|0|0|0",
+            "1|Validation|2|0|0|0",
+            "2|Binding|0|0|0|0"
+        };
+        BuildFromDSL(dsl, m_watcher_map);
     }
 
     void InitSessionMap() {
-        //--- Session Matrix (Hyper-Atomized Task Composition)
-
-        // 1. Entry Pipeline
-        CXSequenceStep* entry_logic = new CXSequenceStep(ST_S_READY, STEP_S_COMPOSITE, ST_S_ENTRY_TRANSIT, ST_S_ERROR, T_ENTRY_EXIT, 0, "Step_Entry_Logic");
-        entry_logic.AddTask(TASK_E_L_VALIDATE)
-                   .AddTask(TASK_E_G_SPREAD)
-                   .AddTask(TASK_E_G_VOLATILITY)
-                   .AddTask(TASK_E_P_LOCK)
-                   .AddTask(TASK_E_R_ORDER)
-                   .Case(ST_S_ACTIVE, ST_S_ACTIVE)
-                   .Case(ST_S_LIQUIDATING, ST_S_LIQUIDATING);
-        m_session_map.Add(entry_logic);
-
-        CXSequenceStep* entry_transit = new CXSequenceStep(ST_S_ENTRY_TRANSIT, STEP_S_COMPOSITE, ST_S_ENTRY_VERIFY, ST_S_ERROR, T_VERIFY, 0, "Step_Entry_Transit");
-        entry_transit.AddTask(TASK_E_V_ERROR)
-                     .AddTask(TASK_E_V_TICKET)
-                     .AddTask(TASK_E_V_REAL)
-                     .Case(ST_S_LIQUIDATING, ST_S_LIQUIDATING);
-        m_session_map.Add(entry_transit);
-
-        CXSequenceStep* entry_verify = new CXSequenceStep(ST_S_ENTRY_VERIFY, STEP_S_COMPOSITE, ST_S_ACTIVE, ST_S_ERROR, T_SHORT, 0, "Step_Entry_Verify");
-        entry_verify.AddTask(TASK_E_V_DOUBLECHECK)
-                    .AddTask(TASK_E_P_FINALIZE)
-                    .Case(ST_S_LIQUIDATING, ST_S_LIQUIDATING);
-        m_session_map.Add(entry_verify);
-
-        // 2. Pending Pipeline
-        CXSequenceStep* pending = new CXSequenceStep(ST_S_ENTRY_TRAILING, STEP_S_COMPOSITE, ST_S_ACTIVE, ST_S_ERROR, T_NORMAL, 0, "Step_Pending");
-        pending.AddTask(TASK_P_V_SYNC)
-               .AddTask(TASK_P_L_REBOUND)
-               .AddTask(TASK_P_L_IMPROVE)
-               .AddTask(TASK_P_R_APPLY);
-        m_session_map.Add(pending);
-
-        // 3. Active Pipeline
-        CXSequenceStep* active = new CXSequenceStep(ST_S_ACTIVE, STEP_S_COMPOSITE, ST_S_ACTIVE, ST_S_ERROR, T_LONG, 0, "Step_Active");
-        active.AddTask(TASK_A_INTENT_WATCH)
-              .AddTask(TASK_A_V_STATUS)
-              .AddTask(TASK_A_V_STALE)
-              .AddTask(TASK_A_V_TERMINAL)
-              .AddTask(TASK_A_P_ALIGN)
-              .AddTask(TASK_A_L_STATUS)
-              .AddTask(TASK_A_ALPHA_CALC)
-              .AddTask(TASK_A_ALPHA_APPLY)
-              .Case(ST_S_LIQUIDATING, ST_S_LIQUIDATING);
-        m_session_map.Add(active);
-
-        // 4. Liquidation Pipeline
-        CXSequenceStep* exit_logic = new CXSequenceStep(ST_S_LIQUIDATING, STEP_S_COMPOSITE, ST_S_LIQUIDATING_TRANSIT, ST_S_ERROR, T_ENTRY_EXIT, 3, "Step_Exit_Logic");
-        exit_logic.AddTask(TASK_X_L_PREPARE)
-                  .AddTask(TASK_X_P_LOCK)
-                  .AddTask(TASK_X_R_ORDER);
-        m_session_map.Add(exit_logic);
-
-        CXSequenceStep* exit_transit = new CXSequenceStep(ST_S_LIQUIDATING_TRANSIT, STEP_S_COMPOSITE, ST_S_EXIT_VERIFY, ST_S_ERROR, T_VERIFY, 0, "Step_Exit_Transit");
-        exit_transit.AddTask(TASK_X_V_ERROR)
-                    .AddTask(TASK_X_V_TERMINAL);
-        m_session_map.Add(exit_transit);
-
-        CXSequenceStep* exit_verify = new CXSequenceStep(ST_S_EXIT_VERIFY, STEP_S_COMPOSITE, ST_S_CLOSED, ST_S_ERROR, T_SHORT, 0, "Step_Exit_Verify");
-        exit_verify.AddTask(TASK_X_P_FINALIZE);
-        m_session_map.Add(exit_verify);
+        string dsl[] = {
+            // 1. Entry Pipeline (v11.5: Hyper-Atomized)
+            // Logic(Redirect, Identity, Risk, Price) -> Guard(Spread, Vol) -> Persistence(Intent) -> Request(Order)
+            "0|Composite:Step_Entry_Logic:TASK_E_L_REDIRECT,TASK_E_L_IDENTITY,TASK_E_L_RISK,TASK_E_L_PRICE,TASK_E_G_SPREAD,TASK_E_G_VOLATILITY,TASK_E_P_INTENT,TASK_E_R_ORDER|1|99|300|0|10=10,20=20",
+            "1|Composite:Step_Entry_Transit:TASK_E_V_ERROR,TASK_E_V_TICKET,TASK_E_V_REAL|2|99|60|0|20=20",
+            "2|Composite:Step_Entry_Verify:TASK_E_V_DOUBLECHECK,TASK_E_P_FINALIZE|10|99|30|0|20=20",
+            
+            // 2. Pending Pipeline
+            "5|Composite:Step_Pending:TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0",
+            
+            // 3. Active Pipeline
+            "10|Composite:Step_Active:TASK_A_INTENT_WATCH,TASK_A_V_STATUS,TASK_A_V_STALE,TASK_A_V_TERMINAL,TASK_A_P_ALIGN,TASK_A_L_STATUS,TASK_A_ALPHA_CALC,TASK_A_ALPHA_APPLY|10|99|72000|0|20=20",
+            
+            // 4. Liquidation Pipeline
+            "20|Composite:Step_Exit_Logic:TASK_X_L_PREPARE,TASK_X_P_LOCK,TASK_X_R_ORDER|21|99|300|3",
+            "21|Composite:Step_Exit_Transit:TASK_X_V_ERROR,TASK_X_V_TERMINAL|23|99|60|0",
+            "23|Composite:Step_Exit_Verify:TASK_X_P_FINALIZE|30|99|30|0"
+        };
+        BuildFromDSL(dsl, m_session_map);
     }
 };
 

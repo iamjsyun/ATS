@@ -121,6 +121,11 @@ enum ENUM_STEP_TYPE {
 enum ENUM_TASK_TYPE {
     TASK_NONE = 0,
     // Entry
+    TASK_E_L_REDIRECT,      // [v11.5] State & Intent Redirect
+    TASK_E_L_IDENTITY,      // [v11.5] SID & Magic Validation
+    TASK_E_L_RISK,          // [v11.5] Lot & Margin Validation
+    TASK_E_L_PRICE,         // [v11.5] Price, SL, TP Calculation
+    TASK_E_P_INTENT,        // [v11.5] DB Intent Locking & Price Sync
     TASK_E_L_VALIDATE,
     TASK_E_G_SPREAD,
     TASK_E_G_VOLATILITY,
@@ -183,5 +188,11 @@ enum ENUM_TIMEOUT_VAL {
     T_ENTRY_EXIT = 300,
     T_VERIFY     = 60
 };
+
+//--- [v11.4] 시퀀스 무결성 및 DSL 상수
+#define SEQ_NODE_DELIMITER   "|"
+#define SEQ_STEP_DELIMITER   ":"
+#define MAX_RETRY_COUNT      5
+#define RETRY_BACKOFF_BASE   1000  // MS
 
 #endif

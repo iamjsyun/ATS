@@ -9,6 +9,8 @@
 #property strict
 
 #include "Scenarios\TestEntryValidate.mqh"
+#include "Scenarios\TestSequenceDSL.mqh"
+#include "Scenarios\TestIntegritySimulation.mqh"
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -23,6 +25,8 @@ int OnInit() {
     
     // Run Scenarios
     if (TestEntryValidate::Run()) passed++; else failed++;
+    if (TestSequenceDSL::Run()) passed++; else failed++;
+    if (TestIntegritySimulation::Run()) passed++; else failed++;
     
     // Add more test classes here...
     

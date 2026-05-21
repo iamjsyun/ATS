@@ -33,29 +33,15 @@ public:
 
     /**
      * @brief 진입 주문 실행 (xa_entry 기반)
+     * @details [v11.5 Alignment] L-P 단계를 거쳐 계산/저장된 가격 정보를 기반으로 물리적 주문만 송신 (SRP)
      */
     virtual bool ExecuteEntry(ICXParam* xp) override {
         if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;
 
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) {
-            XP_LOG_ERROR(xp, "[EXEC-ENTRY] FAILED: Signal object is NULL.");
-            return false;
-        }
+        if(IS_INVALID(sig)) return false;
 
-        //--- [v11.3 SSOC Resolution]
-        IXGuard*             guard    = CX_GET_OBJ(m_ctx, "guard", IXGuard);
-        ICXPriceManager*     priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
-        ICXRiskManager*      riskMgr  = CX_GET_OBJ(m_ctx, "risk_mgr", ICXRiskManager);
-        ICXSymbolManager*    symMgr   = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
-        ICXInventoryManager* invMgr   = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-
-        if(IS_INVALID(priceMgr) || IS_INVALID(riskMgr) || IS_INVALID(symMgr) || IS_INVALID(invMgr)) {
-            XP_LOG_ERROR(xp, "[EXEC-ENTRY] CRITICAL: SSOC Services Missing.");
-            return false;
-        }
-
-        //--- 기본 정보 추출
+        //--- [v11.5 SRP] 모든 검증 및 계산은 이전 Task(L-P)에서 완료됨을 전제로 함
         string symbol = sig.GetSymbol();
         int    dir    = sig.GetDir();
         double lot    = sig.GetLot();
@@ -63,13 +49,12 @@ public:
         string comment = sig.GetSid();
         m_sid = comment;
 
-        //--- [v11.3 SSOC Validation]
-        if(IS_VALID(guard)) {
-            if(!guard.ValidateMagic(magic) || !guard.ValidateSID(m_sid)) return false;
-        }
-        if(!riskMgr.ValidateLot(xp, symbol, lot)) return false;
+        //--- 미리 계산된 가격 정보 추출 (L-stage 결과물)
+        double execPrice = sig.GetPriceOpen();
+        double finalSL   = sig.GetPriceSL();
+        double finalTP   = sig.GetPriceTP();
 
-        //--- 주문 타입 및 방향 결정
+        //--- 주문 타입 결정
         ENUM_ORDER_TYPE order_type;
         if(sig.GetType() == ORDER_MARKET) {
             order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
@@ -77,64 +62,27 @@ public:
             order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;
         }
 
-        //--- [v11.1 SSOC Calculation] Centralized via PriceManager
-        double marketPrice = priceMgr.GetMarketPrice(symbol, dir);
+        XP_LOG_TRACE(xp, StringFormat("[EXEC-ENTRY] Physical Request: [Sym:%s, Type:%d, Lot:%.2f, P:%.5f, SL:%.5f, TP:%.5f]", 
+                                      symbol, (int)order_type, lot, execPrice, finalSL, finalTP));
 
-        //--- 1. Execution Price Calculation (For Pending Orders)
-        double execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), sig.GetLimitOffset());
-
-        //--- 2. SL/TP Point-to-Price Calculation (BasePrice 기반)
-        double basePrice = (sig.GetType() == ORDER_MARKET) ? marketPrice : execPrice;
-        double finalSL = priceMgr.CalculateSL(xp, symbol, dir, basePrice, sig.GetSL());
-        double finalTP = priceMgr.CalculateTP(xp, symbol, dir, basePrice, sig.GetTP());
-
-        //--- [v10.10 Enhancement] Pre-flight StopLevel Validation (v11.5: Liquidation Price Aligned)
-        if(IS_VALID(guard)) {
-            double vBase = (sig.GetType() == ORDER_MARKET) ? priceMgr.GetLiquidationPrice(symbol, dir) : basePrice;
-            
-            if(!guard.ValidateStopLevel(symbol, vBase, finalSL)) {
-                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0 to avoid 10016.", vBase, finalSL));
-                finalSL = 0;
-            }
-            if(!guard.ValidateStopLevel(symbol, vBase, finalTP)) {
-                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0 to avoid 10016.", vBase, finalTP));
-                finalTP = 0;
-            }
-        }
-
-        //--- [v11.3 Margin Check] Before execution
-        if(!riskMgr.CheckMarginAvailability(xp, symbol, dir, lot, basePrice)) return false;
-
-        //--- [v10.31] Comprehensive Execution Logging (Standard v10.4)
-        double point = symMgr.GetPoint(symbol);
-        int digits = symMgr.GetDigits(symbol);
-        double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
-        double teLimitPts = sig.GetTELimit();
-        double teLimitPrice = NormalizeDouble(marketPrice - (teLimitPts * point * dir_sign), digits);
-        
-        string entryLog = StringFormat("[EXEC-ENTRY] Sending Order: [Sym:%s, Type:%s, Lot:%.2f, Price:%.5f, SL:%.5f, TP:%.5f, Mkt:%.5f, TELimPts:%.0f, TELimP:%.5f, TESta:%.0f, TESte:%.0f, SID:%s]", 
-                                       symbol, EnumToString(order_type), lot, execPrice, finalSL, finalTP, 
-                                       marketPrice, teLimitPts, teLimitPrice, sig.GetTEStart(), sig.GetTEStep(), m_sid);
-        XP_LOG_INFO(xp, entryLog);
-
-        //--- CTrade 설정
+        //--- CTrade 설정 및 송신
         m_trade.SetExpertMagicNumber(magic);
 
-        //--- 주문 전송 (Execution)
         bool success = false;
         if(sig.GetType() == ORDER_MARKET) {
-            success = m_trade.PositionOpen(symbol, order_type, lot, marketPrice, finalSL, finalTP, comment);
+            success = m_trade.PositionOpen(symbol, order_type, lot, execPrice, finalSL, finalTP, comment);
         } else {
             success = m_trade.OrderOpen(symbol, order_type, lot, 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, comment);
         }
 
-        //--- 결과 로깅 및 상태 업데이트
+        //--- 결과 처리
         uint retCode = m_trade.ResultRetcode();
         if(!success) {
-            string err = StringFormat("[EXEC-ENTRY-FAIL] Broker Code:%u(%s), SysErr:%d. Req:[Sym:%s, Type:%d, Lot:%.2f, P:%.5f, SL:%.5f, TP:%.5f]", 
-                                      retCode, m_trade.ResultRetcodeDescription(), GetLastError(), symbol, (int)order_type, lot, basePrice, finalSL, finalTP);
+            string err = StringFormat("[EXEC-ENTRY-FAIL] Broker Code:%u(%s), SysErr:%d. SID:%s", 
+                                      retCode, m_trade.ResultRetcodeDescription(), GetLastError(), m_sid);
             XP_LOG_ERROR(xp, err);
-            CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
+            // 에러 시 xp에 메시지 전송 (시퀀스 에러 처리용)
+            xp.SetString(err);
             return false;
         }
 
