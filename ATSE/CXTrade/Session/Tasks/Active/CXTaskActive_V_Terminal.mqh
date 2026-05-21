@@ -2,6 +2,7 @@
 #define CX_TASK_ACTIVE_V_TERMINAL_MQH
 
 #include "..\..\..\Interfaces\IXTask.mqh"
+#include "..\..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 
 /**
@@ -13,10 +14,12 @@ public:
     virtual string Name() override { return "Active_V_Terminal"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) return TASK_BREAK;
+        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        
+        if(IS_INVALID(sig) || IS_INVALID(invMgr)) return TASK_BREAK;
 
         ulong ticket = (ulong)sig.GetTicket();
-        bool exists = PositionSelectByTicket(ticket);
+        bool exists = invMgr.IsPositionExists(ticket);
 
         XP_LOG_TRACE(xp, StringFormat("[ACTIVE-V-TERMINAL] Checking Position:%I64u, Found:%d", ticket, exists));
         xp.SetInt(exists ? 1 : 0); 

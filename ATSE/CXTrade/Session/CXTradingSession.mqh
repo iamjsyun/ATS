@@ -63,6 +63,9 @@ public:
         SAFE_DELETE(m_posMgr);   SAFE_DELETE(m_exitMgr);
         SAFE_DELETE(m_priceTracker);
         SAFE_DELETE(m_priceManager);
+        SAFE_DELETE(m_riskManager);
+        SAFE_DELETE(m_symbolManager);
+        SAFE_DELETE(m_inventoryManager);
         SAFE_DELETE(m_sequence); SAFE_DELETE(m_logger);
         SAFE_DELETE(m_ctx);
         SAFE_DELETE(m_signal); //-- [v10.7 Fix] Cleanup signal on destruction
@@ -340,6 +343,19 @@ private:
         seq.From(STATE_EXIT_VERIFY).Execute(exitStep_P)
            .OnSuccess(SESSION_CLOSED)
            .OnFail(SESSION_ERROR)
+           .Timeout(30);
+        
+        seq.Build();
+        
+        //-- [v10.2] Detailed Assembly Report
+        string info = StringFormat("Sequence Assembly Complete: [Name:%s] [Nodes:%d] [States:{%s}]", 
+                                   seq.GetSequenceName(), seq.GetNodeCount(), seq.GetStateSummary());
+        XP_LOG_INFO(GetPointer(xp), info);
+    }
+};
+
+#endif
+#endif
            .Timeout(30);
         
         seq.Build();

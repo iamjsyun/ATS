@@ -2,6 +2,7 @@
 #define CX_TASK_EXIT_V_TERMINAL_MQH
 
 #include "..\..\..\Interfaces\IXTask.mqh"
+#include "..\..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 
 /**
@@ -13,7 +14,9 @@ public:
     virtual string Name() override { return "Exit_V_Terminal"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) return TASK_BREAK;
+        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        
+        if(IS_INVALID(sig) || IS_INVALID(invMgr)) return TASK_BREAK;
 
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket <= 0) {
@@ -23,12 +26,7 @@ public:
 
         XP_LOG_TRACE(xp, StringFormat("[EXIT-V-TERMINAL] Verifying Physical Asset(%I64u) Absence... (Retry:%d)", ticket, GetRetryCount()));
 
-        bool exists = false;
-        if(sig.GetType() == ORDER_MARKET) {
-            exists = PositionSelectByTicket(ticket);
-        } else {
-            exists = OrderSelect(ticket);
-        }
+        bool exists = invMgr.IsAssetExists(ticket, sig.GetType());
 
         if(exists) {
             IncrementRetry();
