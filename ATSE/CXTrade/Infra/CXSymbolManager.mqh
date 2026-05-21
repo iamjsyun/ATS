@@ -18,6 +18,7 @@ struct SymbolCache {
     double minLot;
     double maxLot;
     double lotStep;
+    int    spread;
     datetime lastUpdate;
 };
 
@@ -46,6 +47,7 @@ public:
             m_cache.minLot      = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN);
             m_cache.maxLot      = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);
             m_cache.lotStep     = SymbolInfoDouble(symbol, SYMBOL_VOLUME_STEP);
+            m_cache.spread      = (int)SymbolInfoInteger(symbol, SYMBOL_SPREAD);
             m_cache.lastUpdate  = TimeCurrent();
         }
     }
@@ -88,6 +90,11 @@ public:
     virtual double GetLotStep(string symbol) override {
         if(m_cache.symbol != symbol) Refresh(symbol);
         return m_cache.lotStep;
+    }
+
+    virtual int GetSpread(string symbol) override {
+        if(m_cache.symbol != symbol) Refresh(symbol);
+        return m_cache.spread;
     }
 };
 

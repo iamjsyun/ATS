@@ -25,6 +25,9 @@ public:
     virtual double GetMaxLot(string symbol) = 0;
     virtual double GetLotStep(string symbol) = 0;
 
+    //-- 실시간 데이터
+    virtual int    GetSpread(string symbol) = 0;
+
     //-- 틱 데이터 강제 갱신 (매 틱 시작 시 호출 권장)
     virtual void   Refresh(string symbol) = 0;
 };
