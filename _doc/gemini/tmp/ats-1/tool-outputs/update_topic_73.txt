@@ -1,4 +1,0 @@
-Current topic: "Integrating System Error Codes in Tracing"
-Topic summary: The user requested the inclusion of MQL5 error codes and messages in trade logs. I will enhance `CXOrderManager.mqh` and `CXPositionManager.mqh` to log both the broker's return code (`ResultRetcode`) and the terminal's internal error code (`GetLastError()`) upon failure. This provides a dual-layer diagnostic trace, covering both server-side rejections and local execution environment issues for all four core trade operations.
-
-Strategic Intent: Integrate system-wide error codes (GetLastError) into trade logs.

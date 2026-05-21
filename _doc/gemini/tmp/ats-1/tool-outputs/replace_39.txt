@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA.XData\\Interfaces\\IRepositories.cs (1 replacements). Here is the updated code:\nusing System.Collections.Generic;\nusing System.Threading.Tasks;\nusing XTA.XData.Models;\n\nname
-... [TRUNCATED] ...
-idProfileRepository\n    {\n        Task<XGridProfile?> GetGridProfileAsync(int cno, int dir, int gno);\n        Task<List<XGridProfile>> GetGridProfilesAsync(int cno, int dir);\n        Task SaveGridProfileAsync(XGridProfile profile);\n    }\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779153934693_0_j4xckl.txt
-</tool_output_masked>

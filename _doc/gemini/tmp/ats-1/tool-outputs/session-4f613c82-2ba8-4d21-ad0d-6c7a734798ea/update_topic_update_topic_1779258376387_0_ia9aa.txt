@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"실전 시나리오 종합 - 지정가 TE 전체 흐름\"\nTopic summary: 앞서 분석한 매수 지정가 주문 접수 후의 진입 트레일링(TE) 시나리오 두 가지(Price Improvement 및 Rebound Fallback)를 하나로 묶어 연속적인 흐름으로 설명합니다. 시장 가격이 하락하며 주문가를 유리하게 수정하는 과정부터, 반등 시 대기 주문을 취소하고 시장가로 즉시 진입하는 과정까지의 전체 메커니즘을 명확히 제시합니다.\n\nStrategic Intent: 진입 트레일링(TE) 종합 시나리오 설명."
-}

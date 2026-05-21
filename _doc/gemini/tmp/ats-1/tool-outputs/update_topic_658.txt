@@ -1,4 +1,0 @@
-Current topic: "Startup & Status"
-Topic summary: Active caveman skill. Workspace is D:\Projects\ATS. Goal: Assist with software engineering tasks autonomously. Project ATS includes ATSA (WPF App), ATSE (MQL5), and various services. Will follow GEMINI.md rules: SID/GID formats, UI standards, config paths. ready for task.
-
-Strategic Intent: Activate caveman skill and summarize workspace status.

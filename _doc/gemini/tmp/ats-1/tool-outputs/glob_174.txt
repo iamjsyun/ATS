@@ -1,3 +1,0 @@
-Found 2 file(s) matching "**/NLog.config" across 2 workspace directories (3 additional files were ignored), sorted by modification time (newest first):
-D:\projects\ats\ATSA\ATSA\NLog.config
-D:\projects\ats\ATSA\ATSA.YouTube\NLog.config

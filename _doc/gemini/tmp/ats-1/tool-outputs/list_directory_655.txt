@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Directory listing for D:\\Projects\\ATS\\ATSE\\CXTrade:\n[DIR] App\n[DIR] Infra\n[DIR] Interfaces\n[DIR] Models\n[DIR] Module\n[DIR] Session\nATS.mq5 (4980 bytes)\n\n(1 ignored)\n\n--- Newly Discovered Project Context ---\n--- Context 
-... [TRUNCATED] ...
-ested by the user (Stability Mandate).\r\n\r\n## Responsibilities\r\n- Trading signal execution.\r\n- Signal status tracking.\r\n- Position/Order management.\n--- End of Context from: d:/projects/ats/atse/gemini.md ---\n--- End Project Context ---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\list_directory_list_directory_1779156001280_1_7od2m.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Session:\n[DIR] Execution\n[DIR] Steps\n[DIR] Tasks\nCXTradingSession.mqh (10351 bytes)"
-}

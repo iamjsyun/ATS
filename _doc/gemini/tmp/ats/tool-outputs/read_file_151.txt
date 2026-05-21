@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "//+------------------------------------------------------------------+\n//|                                                      ProjectName |\n//|                                      Copyright 2020, CompanyName |\n//|                
-... [TRUNCATED] ...
-g.xe_status);\n\n         list.Add(sig);\n         count++;\n      }\n\n      // 4. 리소스 해제 및 결과 반환\n      DatabaseFinalize(req);\n\n      if (count > 0) PrintFormat(\"Loaded %d active signals\", count);\n\n      return count;\n   }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778720357979_0_37rzq.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Fixing Project Configuration\"\nTopic summary: ...\n\nStrategic Intent: Fix project dependencies and remove UI-related flags from XTA."
-}

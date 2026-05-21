@@ -1,8 +1,0 @@
-Directory listing for D:\Projects\ATS\ATSE\CXTrade:
-[DIR] App
-[DIR] Infra
-[DIR] Interfaces
-[DIR] Models
-[DIR] Module
-[DIR] Session
-ATS.mq5 (5078 bytes)

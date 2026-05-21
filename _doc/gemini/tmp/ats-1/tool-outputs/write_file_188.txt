@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully overwrote file: D:\\projects\\ats\\ATSE\\_MEM\\MEMORY.md. Here is the updated code:\n# Integrated Project Memory Index\n\n## 1. Core Specifications & Abbreviations\n- **Project Abbreviation**: ATSA.YouTube -> ay\n- **CNO N
-... [TRUNCATED] ...
-shared terminal access.\n\n## 4. Storage & Folder Rules\n- **Documents**: Save all documentation/reports in `_doc` folder.\n- **Memory/State**: Save all memory/state index files in `_mem` folder.\n- **Logs**: Save all log files in `_log` folder.\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\write_file_write_file_1779150336871_0_l0yonj.txt
-</tool_output_masked>

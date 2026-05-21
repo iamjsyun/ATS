@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"== NULL|!= NULL\" across 2 workspace directories (filter: \"ATSE/CXTrade/**/*.mqh\")."
-}

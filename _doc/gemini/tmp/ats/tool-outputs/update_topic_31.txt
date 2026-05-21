@@ -1,4 +1,0 @@
-Current topic: "Locating CXReverseInjector Usage"
-Topic summary: The user asked for code blocks where `CXReverseInjector` is called. I will now search for references to `CXReverseInjector` across the project files to identify its role in terminal-to-DB synchronization and find where it is instantiated or executed.
-
-Strategic Intent: Locating the usage of CXReverseInjector in the codebase.

@@ -1,3 +1,0 @@
-{
-  "output": "Output: On branch main\n\nNo commits yet\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n        ../\n        ../../Files/\n        ../../Images/\n        ../../Include/\n        ../../Indicators/\n        ../../Logs/\n        ../../Profiles/\n        ../../README.md\n        ../../Scripts/\n        ../../_Fable/\n        ../../experts.dat\n\nnothing added to commit but untracked files present (use \"git add\" to track)\nProcess Group PGID: 2884"
-}

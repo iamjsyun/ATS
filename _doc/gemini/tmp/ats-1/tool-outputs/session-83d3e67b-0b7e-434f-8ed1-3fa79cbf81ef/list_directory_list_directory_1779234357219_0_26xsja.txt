@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Module\\Steps\\Watcher:\nCXStepBinding.mqh (3114 bytes)\nCXStepDiscovery.mqh (3109 bytes)\nCXStepValidation.mqh (3194 bytes)"
-}

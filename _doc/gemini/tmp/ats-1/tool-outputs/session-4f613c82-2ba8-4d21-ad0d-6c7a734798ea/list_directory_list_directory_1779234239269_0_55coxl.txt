@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\projects\\ats\\_doc:\n[DIR] _Report\nATS_ATSE_Task_UnitTest_Strategy_v1.0.md (4061 bytes)\nATS_Master_Architecture_Integrity_Report_v1.0.md (3988 bytes)\ntest.txt (0 bytes)\nXTA_Test_Simulation_Strategy_v1.0.md (2732 bytes)"
-}

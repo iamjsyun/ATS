@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"ATSE 로깅 고도화 - OrderManager 적용\"\nTopic summary: CXOrderManager의 ExecuteEntry, ModifyOrder, DeleteOrder 메서드에 'Trading Logging Standard v10.0'을 적용합니다. 성공 시 [EXEC-ENTRY], [ORDER-MODIFY], [ORDER-DELETE] 프리픽스와 함께 모든 파라미터를 출력하고, 실패 시 [FAIL] 프리픽스와 상세 브로커 리턴 코드 및 원본 파라미터를 출력하도록 리팩토링합니다. XP_LOG_INFO 레벨을 기본으로 사용하여 가독성을 확보합니다.\n\nStrategic Intent: CXOrderManager 로깅 표준(v10.0) 적용."
-}

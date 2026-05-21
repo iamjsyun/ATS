@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\_doc\\_Report\\ATSE_Full_Atomization_Audit_Report_v1.0.md. Here is the updated code:\n# ATSE 원자화 리팩토링 종합 감사 및 정량적 분석 보고서\r\n\r\n## 1. 개요\r\n본 보고서는 ATSE 프로젝트의 하이퍼 원자화(Hyper-
-... [TRUNCATED] ...
-# Phase 3: 최종 프로덕션 빌드 및 배포 준비\r\n- **목표**: 실계좌 투입 가능한 수준의 완성도 확보.\r\n- **세부 작업**:\r\n    - `InpTargetMagics` 및 필터 옵션의 기본값 최적화.\r\n    - `ATS.mq5` 메인 진입점 코드 정리 및 최종 빌드.\r\n\r\n---\r\n**보고서 작성일**: 2026-05-20\r\n**작성자**: Gemini CLI (Senior Agent)\r\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779238709313_1_i9h7r7.txt
-</tool_output_masked>

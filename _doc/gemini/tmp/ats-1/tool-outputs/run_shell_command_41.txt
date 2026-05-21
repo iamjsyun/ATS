@@ -1,6 +1,0 @@
-Output: >     virtual bool ValidateStopLevel(string symbol, double base_price, double target_price) {??          if(target_price <= 0) return true; // Ignore if not set??          ??
-          double stops_lvl = SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL) * SymbolInfoDouble(symbol, SYMBOL_POINT);??          double diff = MathAbs(base_price - targe
-t_price);??          ??          if(diff < stops_lvl) {??              return SetError(StringFormat("Distance too small (StopsLevel: %.5f)", stops_lvl));??          }??      
-    return true;??      }??  ??      // String & Protocol Validation??      virtual bool ValidateComment(string comment) {??          if(StringLen(comment) > COMMENT_MAX_LENG
-TH) return SetError("Comment too long");??          return true;
-Process Group PGID: 30352

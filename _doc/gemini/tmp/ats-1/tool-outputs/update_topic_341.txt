@@ -1,4 +1,0 @@
-Current topic: "Adaptive Log Suppression Implementation Log Suppression"
-Topic summary: I'm implementing an "Adaptive Heartbeat" logging strategy in `CXStepDiscovery`. The watcher will log the first 3 consecutive "no signal" events. After that, it will back off the logging frequency: logging every 1 minute for the next 10 minutes, and then every 5 minutes if the "no signal" state persists. This keeps logs clean while ensuring the pulse is still monitored at reasonable intervals. If a new signal is detected or the state changes, the counter and timers reset, restoring immediate logging. This provides a balance between high-frequency visibility and context efficiency.
-
-Strategic Intent: Implement adaptive log suppression for Signal Watcher.

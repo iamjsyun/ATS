@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\XTAStartupV2.cs (1 replacements). Here is the updated code:\nusing System;\nusing System.Threading.Tasks;\nusing Microsoft.Extensions.Hosting;\nusing Microsoft.Extensions.Loggin
-... [TRUNCATED] ...
-[Transfer] Data Transfer Protocol cycle completed.\");\n            }\n            catch (Exception ex)\n            {\n                nlog.Error(ex, $\"[Transfer:ERROR] Data transfer failed: {ex.Message}\");\n            }\n        }\n    }\n}\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779151227725_0_8ugae.txt
-</tool_output_masked>

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef EXITTASKS_MQH\n#define EXITTASKS_MQH\n\n#include \"..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\Interfaces\\IXExitManager.mqh\"\n#include \"..\\..\\Interfaces\\IRepository.
-... [TRUNCATED] ...
-ession Closed.\");\n        if(repo.UpdateStatus(sig)) {\n            XP_LOG_OK(xp, StringFormat(\"[EXIT-P] Finalized Status: %d\", finalStatus));\n            return SESSION_CLOSED;\n        }\n\n        return TASK_YIELD; \n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779234352899_1_d7qmwg.txt
-</tool_output_masked>

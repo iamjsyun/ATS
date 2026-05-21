@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Services\\XTradePolicyService.cs (1 replacements). Here is the updated code:\nusing System;\nusing System.Collections.Generic;\nusing System.Linq;\nusing System.Threading.Tasks;
-... [TRUNCATED] ...
-cy.Exit != null)\n            {\n                s.ts_start = policy.Exit.TsStart;\n                s.ts_step = policy.Exit.TsStep;\n                s.tp = policy.Exit.TP;\n                s.sl = policy.Exit.SL;\n            }\n        }\n    }\n}"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779151171108_0_sflie9.txt
-</tool_output_masked>

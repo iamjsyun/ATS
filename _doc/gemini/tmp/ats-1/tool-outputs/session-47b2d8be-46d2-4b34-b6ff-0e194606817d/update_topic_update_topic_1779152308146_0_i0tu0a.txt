@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Crash Analysis: XTradePolicyService Line 63\"\nTopic summary: The user reported a crash at `XTradePolicyService.cs:63` after recent changes. I need to identify the exact code at that line to determine if it's a `NullReferenceException` or a logic error within the `OnEntry` or `OnExit` blocks of the `FluentSeq`. Plan: 1. Read `XTradePolicyService.cs` near line 63. 2. Diagnose the failure point. 3. Fix and verify.\n\nStrategic Intent: Analyze remaining crash at XTradePolicyService.cs:63."
-}

@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"TE 상세 로깅 적용 완료\"\nTopic summary: 대기 오더(Trailing Entry) 진입 시 TE 포인트가 가격으로 변환되는 상세 계산 로그([EXEC-ENTRY-TE])를 추가하고 이를 Trading Logging Standard v10.1로 공식화했습니다. CXOrderManager에 해당 로직을 적용하여 진입 시점의 시장가(Market Price)와 변환된 실행가(Price)를 명확히 기록합니다. 모든 트레이딩 핵심 모듈에 표준이 동기화되었습니다.\n\nStrategic Intent: TE 로깅 표준 업데이트 완료 및 전역 규칙 동기화."
-}

@@ -1,3 +1,0 @@
-Output: >         m_orderMgr = factory.CreateOrderManager(m_ctx);??          if(IS_INVALID(m_orderMgr)) return;??  ??          m_posMgr   = factory.CreatePositionManager(m_ctx);??   
-       if(IS_INVALID(m_posMgr)) return;??
-Process Group PGID: 34240

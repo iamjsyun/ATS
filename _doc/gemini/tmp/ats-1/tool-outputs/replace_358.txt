@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Interfaces\\CXMacros.mqh (1 replacements). Here is the updated code:\n#ifndef CX_MACROS_MQH\n#define CX_MACROS_MQH\n\n#include \"CXMessageDictionary.mqh\"\n#include \"ICXPar
-... [TRUNCATED] ...
-ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  true); if(IS_VALID(_log)) _log.Warn(xp, msg); }\n#define XP_LOG_SEQ_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, true); if(IS_VALID(_log)) _log.Error(xp, msg); }\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779160066280_2_admjs.txt
-</tool_output_masked>

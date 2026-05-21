@@ -1,3 +1,0 @@
-{
-  "output": "Output: \nLines Words Characters Property\n----- ----- ---------- --------\n  544\nProcess Group PGID: 4552"
-}

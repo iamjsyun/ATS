@@ -1,3 +1,0 @@
-{
-  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Interfaces\\ICXConfig.mqh (1 replacements). Here is the updated code:\n#ifndef ICXCONFIG_MQH\n#define ICXCONFIG_MQH\n\ninterface ICXConfig {\n    virtual ~ICXConfig() {}\n};\n\n#endif\n"
-}

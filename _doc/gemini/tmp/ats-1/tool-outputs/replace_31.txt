@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Module\\Steps\\Watcher\\CXStepDiscovery.mqh (1 replacements). Here is the updated code:\n#ifndef CXSTEPDISCOVERY_MQH\n#define CXSTEPDISCOVERY_MQH\n\n#include \"..\\..\\..\\I
-... [TRUNCATED] ...
-s found in DB.\");\n            }\n        }\n\n        SAFE_DELETE(activeList);\n        return STATE_UNCHANGED;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779243020336_1_l1hd9.txt
-</tool_output_masked>

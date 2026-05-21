@@ -1,5 +1,0 @@
-Output:              m_sid, sig.GetDir(), sig.GetType(), sig.GetLot(), sig.GetPriceSignal()));??  ??          //--- ??? ????????? ??? (DIP/Unified)??          ENUM_ORDER_TYPE order_t
-ype;??          if(sig.GetType() == ORDER_MARKET) {??>             order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;??          } else {
->             order_type = (sig.GetDir() == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;??          }??  ??          //--- ??? OrderSend????? ??? (if-else ????
-???          string sym = sig.GetSymbol();??          if(!SymbolSelect(sym, true)) {
-Process Group PGID: 28372

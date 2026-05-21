@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 2 matches for pattern \"NormalizePrice\" in path \"D:\\Projects\\ATS\\ATSE\":\n---\nFile: CXTrade\\Infra\\CXGuard.mqh\nL63-         if(lot > max_v) return SetError(StringFormat(\"Lot(%.2f) above maximum(%.2f) for %s\", lot, max_v
-... [TRUNCATED] ...
-ong magic) = 0;\nL31- \nL32-     // Result Feedback\nL33-     virtual string GetLastError() const = 0;\nL34- \nL35-     // General Validation\nL36-     virtual bool Check(ICXParam* xp, ICXContext* ctx) = 0;\nL37- };\nL38- \nL39- #endif\nL40- \n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779170481799_0_tss24.txt
-</tool_output_masked>

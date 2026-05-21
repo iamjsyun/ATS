@@ -1,3 +1,0 @@
-{
-  "output": "#ifndef ICXCONTEXT_MQH\n#define ICXCONTEXT_MQH\n\n#include <Object.mqh>\n\nclass ICXParam;\n\nclass ICXContext : public CObject {\npublic:\n    virtual ~ICXContext() {}\n    virtual ICXParam* GetParam() = 0;\n    virtual void      Set(string key, CObject* obj) = 0;\n    virtual void      Register(string key, CObject* obj) = 0;\n    virtual CObject*  Get(string key) = 0;\n};\n\n#endif\n"
-}

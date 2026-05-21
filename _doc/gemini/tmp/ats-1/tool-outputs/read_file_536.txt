@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CX_DEFINE_MQH\n#define CX_DEFINE_MQH\n\n/**\n * @file CXDefine.mqh\n * @brief XTA 시스템 전역 상수 및 열거형 정의 (Constants & Enums)\n * @details 상태 코드, 타입 정의, 고정값 등 정적 데이터 정의 모음\n */\n\n//--- 시스템 규격 상수\n#define SID_MAX_LENGTH       23\n#d
-... [TRUNCATED] ...
-    EVENT_INJECT        = 101\n};\n\n//--- Step 실행 공통 결과 (Generic Step Results)\n#define STATE_UNCHANGED     -1\n\n//--- 계산 스텝 결과 (Alpha Calculation Results)\nenum ENUM_CALC_RESULT {\n    CALC_NO_CHANGE = 0,\n    CALC_MODIFIED  = 1\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156642133_0_cp87a.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ATS\\ATSE\\CXTrade\\Module:\n[DIR] Alpha\n[DIR] Steps\nCXLogDispatcher.mqh (2610 bytes)\nCXSignalWatcher.mqh (3900 bytes)"
-}

@@ -1,3 +1,0 @@
-{
-  "error": "Invalid regular expression pattern provided: XP_LOG_.*(NULL,. Error: Invalid regular expression: /XP_LOG_.*(NULL,/: Unterminated group"
-}

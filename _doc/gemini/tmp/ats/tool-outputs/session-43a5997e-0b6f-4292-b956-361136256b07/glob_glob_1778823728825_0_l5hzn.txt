@@ -1,3 +1,0 @@
-{
-  "output": "No files found matching pattern \"ATSA/XTA/**/SignalNode.cs\" within 2 workspace directories"
-}

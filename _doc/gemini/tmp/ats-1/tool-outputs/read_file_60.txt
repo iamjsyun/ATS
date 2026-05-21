@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 190-240 of 570 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
- _dialogService.ShowError($\"상태 변경 실패: {ex.Message}\", \"에러\");\n            }\n        }\n\n        [Command]\n        public async Task ResetTeSettings()\n        {\n            if (SelectedSignal == null) return;\n            try\n            {"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153459342_0_sfjz7.txt
-</tool_output_masked>

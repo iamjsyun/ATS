@@ -1,5 +1,0 @@
-Output: 
-LineNumber Line
----------- ----
-        87         IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
-Process Group PGID: 19704

@@ -1,5 +1,0 @@
-Output: >     virtual bool ValidateMagic(long magic) {??          ICXConfig* config = CX_GET_OBJ(m_ctx, "config", ICXConfig);??          if(IS_INVALID(config)) return SetError("Config not found for Magic v
-alidation");??          if(!config.IsTargetMagic(magic)) return SetError("Magic Number " + IntegerToString(magic) + " is not registered");??          return true;??      }??  ??      virtual bool V
-alidateSID(string sid) {??          if(StringLen(sid) != SID_MAX_LENGTH) return SetError("Invalid SID length: " + sid);??          return true;??      }
->         if(!ValidateMagic(sig.GetMagic())) return false;??          if(!ValidateSID(sig.GetSid())) return false;??          ??          return true;??      }??  };??  ??  #endif
-Process Group PGID: 23628

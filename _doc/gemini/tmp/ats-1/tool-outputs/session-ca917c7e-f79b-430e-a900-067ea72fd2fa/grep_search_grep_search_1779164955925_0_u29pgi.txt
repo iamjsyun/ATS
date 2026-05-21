@@ -1,3 +1,0 @@
-{
-  "output": "Found 5 matches for pattern \"symbol =\" in path \"D:\\Projects\\ATS\\ATSA\\ATSA\\UI\":\n---\nFile: DataManager\\DataManagerViewModel.cs\nL109:                     SelectedSignal.symbol = \"GOLD#\";\nL462:                 draft.symbol = current.symbol;\nL583:             sig.symbol = \"GOLD#\";\n---\nFile: Models\\BindableXSignal.cs\nL70:         public new string symbol { get => base.symbol; set { if (base.symbol != value) { base.symbol = value; RaisePropertyChanged(nameof(symbol)); } } }\n---\nFile: UCtrls\\UCXSignalViewModel.cs\nL73:                 symbol = \"GOLD\",\n---"
-}

@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Hardening Schema & Transition Logic\"\nTopic summary: The persistent 'Column not found' and 'Illegal Transition' errors, despite my recent fixes, strongly indicate a version mismatch (the user is running an old EX5) or a significant DB schema deviation. I will modify `CXSignalRepository.mqh` to handle missing columns gracefully by defaulting to zero and providing a clear warning. I will also make the `WatcherSeq` transition guard even more permissive and provide the user with a definitive guide to verify if the latest build is actually active in their terminal.\n\nStrategic Intent: Address schema mismatch and transition guard robustness."
-}

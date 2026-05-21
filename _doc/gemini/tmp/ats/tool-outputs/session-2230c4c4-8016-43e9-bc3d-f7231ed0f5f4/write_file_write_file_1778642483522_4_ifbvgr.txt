@@ -1,3 +1,0 @@
-{
-  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Interfaces\\ICXConfig.mqh. Here is the updated code:\n#ifndef ICXCONFIG_MQH\r\n#define ICXCONFIG_MQH\r\n\r\ninterface ICXConfig {\r\n};\r\n\r\n#endif\r\n"
-}

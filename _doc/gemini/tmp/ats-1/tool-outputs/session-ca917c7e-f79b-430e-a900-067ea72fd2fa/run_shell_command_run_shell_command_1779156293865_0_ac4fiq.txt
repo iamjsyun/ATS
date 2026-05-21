@@ -1,3 +1,0 @@
-{
-  "output": "Output:       //-- 1. ?紐諭� 筌�Ŋ�ｌ\n                            ��\n      if(m_hActiveSignals == INVALID_HANDLE) {\n         // [?�\n               ��] XE_CLOSED_SIGNAL?� 20??\n         string sql = StringFormat(\"SELECT * FROM signals WHERE (xa_entry > %d AND xe_status < %d) OR (xa_exit > %d)\", \n                                   XA_RAW, XE_CLOSED_SIGNAL, XA_RAW);\nProcess Group PGID: 28464"
-}

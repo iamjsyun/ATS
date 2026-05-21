@@ -1,2 +1,0 @@
-Output: (empty)
-Process Group PGID: 23188

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 100 matches for pattern \"Close|Liquidation|Sound|DM_INJECTION\" across 2 workspace directories (results limited to 100 matches for performance):\n---\nFile: ats\\ATSA\\ATSA.YouTube\\Infrastructure\\YouTubeHostBuilder.cs\nL64:   
-... [TRUNCATED] ...
-l>> GetClosedSignalsAsync() { var criteria = CriteriaOperator.Parse(\"xe_status >= ?\", (int)XCode.EaStatus.Closed_Signal); var list = await GetLayer().FindListAsync<XpoSignal>(criteria); return list.Select(x => x.ToDomainModel()).ToList(); }\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\grep_search_grep_search_1779153388085_0_6gv4do.txt
-</tool_output_masked>

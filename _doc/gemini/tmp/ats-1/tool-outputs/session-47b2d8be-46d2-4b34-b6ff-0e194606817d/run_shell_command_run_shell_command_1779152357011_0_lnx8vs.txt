@@ -1,3 +1,0 @@
-{
-  "output": "Output:                         bool isManual = ctx.Xdo.CMD == \"DM_INJECTION\" || ctx.Xdo.CMD == \"TEST_INJECTION\";\nProcess Group PGID: 25208"
-}

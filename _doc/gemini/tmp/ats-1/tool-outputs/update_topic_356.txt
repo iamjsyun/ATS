@@ -1,4 +1,0 @@
-Current topic: "Analyzing Lot Validation Failure"
-Topic summary: I've identified a validation failure for ID 106: "Lot above maximum: 0.00". This indicates that the `CXGuard` is comparing the signal's lot size against a zero or uninitialized maximum lot limit. I'm investigating `Infra\CXGuard.mqh` to see how lot limits are retrieved from the configuration. I suspect that the `ATSA.json` config for the channel might have `null` or missing lot limit values, or they are not being correctly loaded into the `CXGuard` instance. I'll also check if the symbol configuration is being correctly mapped.
-
-Strategic Intent: Investigate Lot validation failure for SID 1001-26051912-01-00-1-1.

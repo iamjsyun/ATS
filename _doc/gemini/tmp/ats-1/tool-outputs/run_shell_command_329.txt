@@ -1,2 +1,0 @@
-Output: >          DatabaseColumnText(req,    GetColumnIndex(req, "comment"),      sig.comment);??           DatabaseColumnText(req,    GetColumnIndex(req, "tag"),          sig.tag);??
-Process Group PGID: 29556

@@ -1,6 +1,0 @@
-Output:             if(sig.GetTELimit() > 0) {
-                double limit_dist = guard.PointsToPrice(sym, sig.GetTELimit());
-                price = (sig.GetDir() == CX_DIR_BUY) ? (price - limit_dist) : (price + limit_dist);
-                price = guard.NormalizePrice(sym, price);
-            }
-Process Group PGID: 32660

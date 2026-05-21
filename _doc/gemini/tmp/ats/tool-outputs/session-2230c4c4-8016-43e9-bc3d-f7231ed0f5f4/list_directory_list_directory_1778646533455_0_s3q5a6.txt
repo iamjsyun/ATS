@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade:\n[DIR] App\n[DIR] Infra\n[DIR] Interfaces\n[DIR] Models\n[DIR] Module\n[DIR] Session\nATS.mq5 (2522 bytes)"
-}

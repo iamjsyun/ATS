@@ -1,3 +1,0 @@
-{
-  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Models\\CXParam.mqh. Here is the updated code:\n#ifndef CXPARAM_MQH\r\n#define CXPARAM_MQH\r\n\r\n#include \"..\\Interfaces\\ICXParam.mqh\"\r\n\r\nclass CXParam : public ICXParam {\r\nprivate:\r\n    ICXSignal* m_signal;\r\npublic:\r\n    CXParam() : m_signal(NULL) {}\r\n    ~CXParam() {}\r\n    virtual ICXSignal* GetSignal() override { return m_signal; }\r\n};\r\n\r\n#endif\r\n"
-}

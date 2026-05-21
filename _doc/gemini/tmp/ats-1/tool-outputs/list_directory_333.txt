@@ -1,4 +1,0 @@
-Directory listing for D:\Projects\ats\ATSE\CXTrade\App:
-CXAppService.mqh (6017 bytes)
-CXServiceFactory.mqh (2897 bytes)
-CXTradingSessionPool.mqh (3403 bytes)

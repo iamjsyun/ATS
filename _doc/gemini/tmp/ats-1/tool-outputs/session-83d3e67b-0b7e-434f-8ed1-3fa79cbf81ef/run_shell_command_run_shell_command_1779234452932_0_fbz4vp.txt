@@ -1,3 +1,0 @@
-{
-  "output": "Output: \nName\n----\nActiveTasks.mqh \nEntryTasks.mqh  \nExitTasks.mqh   \nPendingTasks.mqh\nProcess Group PGID: 23296"
-}

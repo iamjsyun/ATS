@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Enforcing Version Visibility & Re-build\"\nTopic summary: I am adding a prominent version banner to `OnInit` in `ATS.mq5` to help the user confirm the active binary version. I will also perform another full build to ensure `ATS.ex5` is freshly generated with all previous fixes (v10.26 and below). This addresses the persistent version mismatch issue and provides an unambiguous visual cue in the logs.\n\nStrategic Intent: Force version visibility and re-verify builds."
-}

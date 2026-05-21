@@ -1,3 +1,0 @@
-Output: >     virtual IXOrderManager* CreateOrderManager(ICXContext* ctx) override {??          return new CXOrderManager(ctx);??      }??      ??      virtual IXPositionManager* Cre
-atePositionManager(ICXContext* ctx) override {??          return new CXPositionManager(ctx);
-Process Group PGID: 28736

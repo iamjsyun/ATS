@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "# ATS Master Design Specification (SSOT)\n**Version**: v9.8.11 (DataManager Sequence Standard)\n**Date**: 2026-05-18\n**Governance**: This document is the **Single Source of Truth (SSOT)** for the XTX/XTA system. All implementations mu
-... [TRUNCATED] ...
-ization (v9.7)\n모든 비즈니스 로직 시퀀스는 원자적 태스크 단위로 분해되어야 하며, **1 Task = 1 Responsibility (SRP 준수)** 원칙을 강제한다.\n- Task Atomization: 인식, 검증, 영속화, 실행, 알림의 5단계 독립 태스크로 분리한다.\n- Independence: 각 태스크는 독립적으로 실행 가능해야 한다.\n- Traceability: 오류 발생 시 실패 단계가 명확해야 한다.\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156847620_0_4ijif.txt
-</tool_output_masked>

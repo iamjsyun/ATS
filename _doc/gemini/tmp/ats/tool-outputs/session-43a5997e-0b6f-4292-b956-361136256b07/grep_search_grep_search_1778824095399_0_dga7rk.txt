@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"class FluentSequence\" across 2 workspace directories."
-}

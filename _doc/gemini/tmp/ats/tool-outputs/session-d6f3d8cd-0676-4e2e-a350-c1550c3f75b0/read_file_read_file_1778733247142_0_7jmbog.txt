@@ -1,3 +1,0 @@
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 50-57 of 57 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 58.\n\n--- FILE CONTENT (truncated) ---\n- **No Manual Pointers**: Always use DI Container resolutions.\n\n---\n\n**Document Status**: Finalized (v7.8 Refresh)\n**Last Updated**: 2026-05-14\n**Governance**: Standard UTF-8 (No BOM)\n"
-}

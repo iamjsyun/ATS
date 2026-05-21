@@ -1,7 +1,0 @@
-Output: >     virtual ICXLogger* CreateLogger(string sid, ICXConfig* config) override {??          CXLogDispatcher* logger = new CXLogDispatcher();??          if(IS_VALID(logger)) {?
-?              logger.SetConfig(config);??              ??              // 1. File Logger (Session Private)??              CXFileLogger* fileLog = new CXFileLogger();??      
-        if(IS_VALID(fileLog) && fileLog.Init(sid)) {??                  logger.SetFileLogger(fileLog);??              } else {??                  SAFE_DELETE(fileLog);??     
-         }??  ??              // 2. Tab Logger (Terminal Experts Tab)??              logger.SetTabLogger(new CXTabLogger());??              ??              // 3. Remote Logge
-r (TCP)??              if(IS_VALID(config)) {??                  string host = config.GetRemoteLogHost();??                  int port = config.GetRemoteLogPort();??
-        if(host != "" && port > 0) {
-Process Group PGID: 32128

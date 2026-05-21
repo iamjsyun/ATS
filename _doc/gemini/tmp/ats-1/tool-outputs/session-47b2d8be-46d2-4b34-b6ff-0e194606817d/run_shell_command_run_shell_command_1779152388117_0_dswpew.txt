@@ -1,3 +1,0 @@
-{
-  "output": "Output:             var ctx = new PolicyContext(xdo, xdo.Signal, ResultSignals: new List<Models.XSignal>());\n            ISequence<string> seq = null!;\n\n            seq = new FluentSeq<string>().Create(\"ResolveConfig\")\n                //.ActivateDebugLogging(nlog) // ?遺얠쒔域�??袁⑹ ??雅�깃� ?���    \n                .ConfigureState(\"ResolveConfig\")\n                    .OnEntry(() => {\n                        var param = XContext.Instance.Parameter;\n                        var merged = param.GetMergedConfig(ctx.MasterSignal.cno);\nProcess Group PGID: 15324"
-}

@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"\\.offset\\s*=|\\.step\\s*=\" in path \"D:\\projects\\ats\\ATSE\\CXTrade\"."
-}

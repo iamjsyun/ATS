@@ -1,7 +1,0 @@
-Directory listing for D:\Projects\ATS\ATSA\XTA\Channels\GlobalGold:
-GG.TXT (5576 bytes)
-GlobalGold.cs (1982 bytes)
-Keywords.txt (508 bytes)
-Template_Entry.txt (451 bytes)
-Template_Exit.txt (280 bytes)
-XLFT.cs (594 bytes)

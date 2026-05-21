@@ -1,4 +1,0 @@
-Output: >         seq.From(WATCHER_DISCOVERY).Execute(new CXStepDiscovery()).OnSuccess(WATCHER_VALIDATION);
->         seq.From(WATCHER_VALIDATION).Execute(new CXStepValidation()).OnSuccess(WATCHER_BINDING).OnFail(WATCHER_DISCOVERY);
->         seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);??  ??          seq.Build();??      }??  };??  
-Process Group PGID: 22452

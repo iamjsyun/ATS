@@ -1,3 +1,0 @@
-{
-  "error": "File not found: C:\\Users\\hijsyun\\.gemini\\tmp\\ats-1\\memory\\MEMORY.md"
-}

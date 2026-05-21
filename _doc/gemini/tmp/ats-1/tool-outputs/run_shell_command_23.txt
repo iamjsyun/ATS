@@ -1,7 +1,0 @@
-Output: > #include "..\..\Interfaces\IXGuard.mqh"??  #include "..\..\Infra\CXMessageProvider.mqh"??  #include <Trade\Trade.mqh>??  ??  /**??   * @class CXOrderManager??   * @brief ??
-???? ??? ??? ??? ??? ???????????   */??  class CXOrderManager : public IXOrderManager {??  private:??      ulong           m_ticket;
->         //--- [Fix] SL/TP ??? ????????)??? ??? ????Absolute Price)??? ????(IXGuard ???)??          double sl_price = 0.0;??          double tp_price = 0.0;
->         IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);??  ??          if(IS_VALID(guard)) {??              if(sig.GetSL() > 0) {??                  double sl_dist = 
-guard.PointsToPrice(sym, sig.GetSL());??                  sl_price = (sig.GetDir() == CX_DIR_BUY) ? (price - sl_dist) : (price + sl_dist);??                  sl_price = guard
-.NormalizePrice(sym, sl_price);??              }??  ??              if(sig.GetTP() > 0) {??                  double tp_dist = guard.PointsToPrice(sym, sig.GetTP());
-Process Group PGID: 34420

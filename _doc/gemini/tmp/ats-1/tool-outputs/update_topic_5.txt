@@ -1,4 +1,0 @@
-Current topic: "Restoring Code Integrity"
-Topic summary: The previous `replace` operation introduced corrupted syntax in `DataManagerViewModel.cs`, causing multiple compiler errors (mismatched braces and duplicated code fragments). I am reading the affected lines to identify the exact corruption points and will apply a surgical fix to restore valid C# syntax and correct the logic flow.
-
-Strategic Intent: Fix syntax errors in DataManagerViewModel.cs.

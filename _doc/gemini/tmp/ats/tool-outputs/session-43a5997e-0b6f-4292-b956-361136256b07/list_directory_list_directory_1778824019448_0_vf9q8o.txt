@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Interfaces:\nIDataService.cs (723 bytes)\nISoundService.cs (384 bytes)\nITtsService.cs (176 bytes)\nIXGatewayService.cs (1256 bytes)\nIXLiquidationService.cs (620 bytes)\nIXSignalService.cs (787 bytes)\nIXTradePolicyService.cs (604 bytes)"
-}

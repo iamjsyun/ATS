@@ -1,4 +1,0 @@
-Current topic: "Analyzing Symbol Truncation"
-Topic summary: I'm investigating why `GOLD#` is being truncated to `GOLD` in the logs and validation. I suspect either a buffer length limitation in the `DatabaseColumnText` call in `CXSignalRepository`, or a truncation during the injection process in ATSA. The `sigInfo` string in `CXStepValidation` uses `sig.GetSymbol()`, so if the log says `GOLD`, the object already holds the truncated value. I'll check `CXSignalRepository.mqh` first to ensure enough space is allocated for string retrieval and then verify the DB content if possible. I'll also add a TRACE log to the repository to see the raw symbol string read from SQLite.
-
-Strategic Intent: Investigate symbol name truncation (GOLD# vs GOLD) in signal detection.

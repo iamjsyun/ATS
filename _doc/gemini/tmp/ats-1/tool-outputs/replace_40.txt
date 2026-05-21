@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Execution\\CXOrderManager.mqh (1 replacements). Here is the updated code:\n#ifndef CXORDERMANAGER_MQH\n#define CXORDERMANAGER_MQH\n\n#include \"..\\..\\Interfaces\\
-... [TRUNCATED] ...
- Ticket:%I64u still exists after deletion.\", ticket));\n            return false;\n        }\n        \n        XP_LOG_OK(NULL, StringFormat(\"[ORDER-DELETE] SUCCESS: Ticket %I64u Deleted.\", ticket));\n        return true;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779242699751_1_oht0t.txt
-</tool_output_masked>

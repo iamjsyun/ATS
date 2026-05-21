@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 180-265 of 588 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-icy?.Entry != null)\n                {\n                    SelectedSignal.te_start = policy.Entry.TeStart;\n                    SelectedSignal.te_step = policy.Entry.TeStep;\n                    SelectedSignal.limit_offset = policy.Entry.TeLimit;"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779155261224_1_8pblz.txt
-</tool_output_masked>

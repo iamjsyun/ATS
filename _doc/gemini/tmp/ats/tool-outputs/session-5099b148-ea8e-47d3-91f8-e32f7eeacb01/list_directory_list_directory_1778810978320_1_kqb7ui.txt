@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\ATSA:\n[DIR] bin\n[DIR] obj\n[DIR] UI\nApp.xaml (334 bytes)\nApp.xaml.cs (2400 bytes)\nAssemblyInfo.cs (644 bytes)\nATSA.csproj (658 bytes)\nMainWindow.xaml (598 bytes)\nMainWindow.xaml.cs (553 bytes)\nNLog.config (1371 bytes)\n\n(1 ignored)"
-}

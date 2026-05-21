@@ -1,3 +1,0 @@
-{
-  "output": "Successfully modified file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Interfaces\\ICXFluentSequence.mqh (1 replacements). Here is the updated code:\n#ifndef ICXFLUENTSEQUENCE_MQH\n#define ICXFLUENTSEQUENCE_MQH\n\n#include \"..\\Interfaces\\ICXContext.mqh\"\n#include \"..\\Interfaces\\ICXParam.mqh\"\n\ninterface IXStep;\n\ninterface ICXFluentSequence {\n    virtual void AddStep(int state_id, IXStep* step) = 0;\n    virtual void Pulse(ICXParam* xp) = 0;\n    virtual int  State() const = 0;\n    virtual void ForceState(int next_state) = 0;\n    virtual void Build() = 0;\n};\n\n#endif\n"
-}

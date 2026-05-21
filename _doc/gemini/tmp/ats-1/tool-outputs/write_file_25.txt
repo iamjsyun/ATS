@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Module\\CXLogDispatcher.mqh. Here is the updated code:\n...\n    ICXLogger* m_tab;\n    ICXLogger* m_ui;\n    ICXLogger* m_remote;\n    ICXConfig* m_config;\n    bool      
-... [TRUNCATED] ...
-les its own filtering at macro level for sequence)\n        if(IS_VALID(m_file) && m_file.IsEnabled()) m_file.Log(level, msg);\n        \n        // 2. MT5 Tab (Journal)\n        if(IS_VALID(m_tab) && m_tab.IsEnabled()) m_tab.Log(level, msg);\n..."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779243160897_0_wdahqu.txt
-</tool_output_masked>

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef CXSTEPDISCOVERY_MQH\n#define CXSTEPDISCOVERY_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Interfaces\\IRepository.mqh\"\n#include \"..\\..\\..\\Models\\CXSignal.mqh\"\n\n#include <Arrays\\Array
-... [TRUNCATED] ...
-}\n            m_noSignalCount++;\n        }\n\n        SAFE_DELETE(activeList);\n        return STATE_UNCHANGED;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779238158192_1_lj6nnp.txt
-</tool_output_masked>

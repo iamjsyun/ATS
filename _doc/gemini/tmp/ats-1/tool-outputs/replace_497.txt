@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXSignalRepository.mqh (1 replacements). Here is the updated code:\n//+------------------------------------------------------------------+\n//|                       
-... [TRUNCATED] ...
- sig.limit_offset);\n         DatabaseColumnDouble(req,  GetColumnIndex(req, \"stop_offset\"),  sig.stop_offset);\n\n         list.Add(sig);\n         count++;\n      }\n      return count;\n   }\n};\n\n#endif\n Applied fuzzy match at line 99-116."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779156977188_1_u0otla.txt
-</tool_output_masked>

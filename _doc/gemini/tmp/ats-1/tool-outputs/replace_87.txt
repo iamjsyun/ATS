@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Pending\\CXTaskPending_R_Apply.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_PENDING_R_APPLY_MQH\n#define CX_TASK_PENDING_R_APPLY_MQH\n\n#
-... [TRUNCATED] ...
-ewPrice));\n            } else {\n                XP_LOG_ERROR(xp, StringFormat(\"[PENDING-R-APPLY] FAILED: Broker rejected price modification to %.5f\", newPrice));\n            }\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239732478_0_ozcjcr.txt
-</tool_output_masked>

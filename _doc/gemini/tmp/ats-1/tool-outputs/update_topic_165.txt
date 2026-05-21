@@ -1,4 +1,0 @@
-Current topic: "Fixing Symbol Truncation Source"
-Topic summary: I've identified the source of the `GOLD#` -> `GOLD` truncation: `UCtrls\UCXSignalViewModel.cs` was incorrectly hardcoded with `"GOLD"` for a new signal model. I'm correcting this to `"GOLD#"` to match the system's expected symbol format. I'm also ensuring that `XSignal.Validate()` in `DomainModels.cs` doesn't inadvertently strip the `#` character during normalization, keeping the validation robust for special characters in symbol names. This should resolve the "Symbol not found" validation error in the Watcher.
-
-Strategic Intent: Fix symbol truncation in UCXSignalViewModel and DomainModels.

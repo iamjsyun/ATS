@@ -1,3 +1,0 @@
-{
-  "output": "namespace FluentSeq.Builder;\n\nusing Core;\n\n/// <summary>\n/// Provides methods for further describing a state\n/// </summary>\n/// <typeparam name=\"TState\">The type of the state</typeparam>\npublic interface IStateBuilder<TState>: IHasSequenceBuilder<TState>, ICanConfigureState<TState>, ICanConfigureActions<TState>, ICanConfigureTrigger<TState>\n    where TState : notnull\n{\n    /// <summary>\n    /// The state that the builder should parameterize\n    /// </summary>\n    SeqState<TState> State { get; }\n\n    /// <summary>\n    /// The root state builder\n    /// </summary>\n    StateBuilder<TState> RootStateBuilder { get; }\n}"
-}

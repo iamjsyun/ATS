@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"IDLE\" across 2 workspace directories (filter: \"*.mqh,*.mq5,*.cs\")."
-}

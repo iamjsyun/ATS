@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "//+------------------------------------------------------------------+\n//|                                                      ProjectName |\n//|                                      Copyright 2020, CompanyName |\n//|                
-... [TRUNCATED] ...
-tColumnIndex(req, \"limit_offset\"), sig.limit_offset);\n         DatabaseColumnDouble(req,  GetColumnIndex(req, \"stop_offset\"),  sig.stop_offset);\n\n         list.Add(sig);\n         count++;\n      }\n      return count;\n   }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779238280898_0_2peti.txt
-</tool_output_masked>

@@ -1,4 +1,0 @@
-Current topic: "TTS Notification Refinement Complete"
-Topic summary: Updated `XSyncWorker.cs` to exclude TTS output for the `xa_exit` 2 -> 3 transition (Archived stage). The log entry is preserved for tracking purposes, but the audible notification has been removed per user request. The system now provides TTS for stages 1 (Command Issued) and 2 (Liquidation Confirmed) only.
-
-Strategic Intent: Finalize refinements for xa_exit TTS notifications.

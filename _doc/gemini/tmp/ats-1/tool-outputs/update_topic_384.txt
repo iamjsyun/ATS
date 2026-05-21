@@ -1,4 +1,0 @@
-Current topic: "Deep Analysis of Signal Mapping"
-Topic summary: The signal detection error persists for ID 105. I've fixed the sequence startup and DB polling, but the watcher remains silent. I suspect a data type mismatch in `CXSignal` mapping or a silent failure in `DatabasePrepare`. I'll now examine `Models\CXSignal.mqh` to verify field types and add more aggressive TRACE logging to `CXStepDiscovery` to see the exact SQL being executed and any SQLite errors. I'll also ensure the Watcher uses its own logger consistently.
-
-Strategic Intent: Deep dive into signal data mapping and logging for ID 105.

@@ -1,4 +1,0 @@
-Current topic: "Input-Driven Multi-Logger Design"
-Topic summary: I will design a granular control system for ATSE logging. The strategy involves adding dedicated Input parameters for each of the 3 log streams (Watcher, System, Session) to toggle their respective File and Remote logging channels independently. I will modify ICXConfig to expose these settings and update CXServiceFactory/CXLogDispatcher to apply these pairs (File/Remote) during logger instantiation, ensuring precise resource management based on user preference.
-
-Strategic Intent: Design multi-logger control system with Input-based toggles for File and Remote streams.

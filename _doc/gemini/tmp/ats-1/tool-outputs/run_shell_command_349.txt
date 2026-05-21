@@ -1,5 +1,0 @@
-Output: >     virtual bool ValidateLot(string symbol, double lot) {??          double min_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN);??          double max_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_M
-AX);??          if(lot < min_v) return SetError("Lot below minimum: " + DoubleToString(min_v, 2));??          if(lot > max_v) return SetError("Lot above maximum: " + DoubleToString(max_v, 2));??   
-       return true;??      }??  ??      virtual bool ValidateSlippage(int slippage) {??          if(slippage < 0 || slippage > MAX_SLIPPAGE) return SetError("Slippage out of range");??          ret
-urn true;
-Process Group PGID: 27352

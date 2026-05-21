@@ -1,6 +1,0 @@
-Output: 
-LastWriteTime
--------------
-2026-05-18 ��
-              10:42:00
-Process Group PGID: 24600

@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef ICXCONFIG_MQH\n#define ICXCONFIG_MQH\n\n#include <Object.mqh>\n\nclass ICXConfig : public CObject {\npublic:\n    virtual ~ICXConfig() {}\n\n    // Magic Number Management\n    virtual string GetTargetMagics() const = 0;\n    v
-... [TRUNCATED] ...
-nst = 0;\n    virtual bool   IsBootLogEnabled() const = 0;\n    virtual bool   IsWatcherRemoteLogEnabled() const = 0;\n    virtual bool   IsSystemLogEnabled() const = 0;\n    virtual bool   IsSequenceLogEnabled(long cno) const = 0;\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779159769838_0_b72utc.txt
-</tool_output_masked>

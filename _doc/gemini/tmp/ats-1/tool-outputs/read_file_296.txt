@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 380-430 of 588 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-ft.SelectedXAExit = \"0:READY\";\n            draft.xe_status_msg = \"New Entry Draft\";\n            SelectedSignal = draft;\n            GenerateCurrentMessage();\n        }\n\n        [Command]\n        public void AddNewExitSignal()\n        {"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779155444381_0_s6hy5d.txt
-</tool_output_masked>

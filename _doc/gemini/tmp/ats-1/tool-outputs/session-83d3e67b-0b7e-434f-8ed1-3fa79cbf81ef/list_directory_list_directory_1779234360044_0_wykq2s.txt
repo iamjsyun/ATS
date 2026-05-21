@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Steps\\Alpha:\nCXStepEntryTrailingCalc.mqh (2146 bytes)\nCXStepExitTrailingCalc.mqh (2387 bytes)"
-}

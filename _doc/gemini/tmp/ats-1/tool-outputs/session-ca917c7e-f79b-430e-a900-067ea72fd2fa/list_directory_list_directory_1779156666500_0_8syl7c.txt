@@ -1,3 +1,0 @@
-{
-  "error": "Path not in workspace: Attempted path \"C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\Common\\Files\\ATSE\" resolves outside the allowed workspace directories: D:\\Projects\\ATS, C:\\Users\\hijsyun\\.gemini\\extensions\\caveman\\skills\\caveman or the project temp directory: C:\\Users\\hijsyun\\.gemini\\tmp\\ats-1"
-}

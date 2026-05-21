@@ -1,3 +1,0 @@
-{
-  "output": "Output:                         if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))\nProcess Group PGID: 776"
-}

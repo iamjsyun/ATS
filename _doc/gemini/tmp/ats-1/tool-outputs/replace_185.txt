@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Interfaces\\ICXConfig.mqh (1 replacements). Here is the updated code:\n#ifndef ICXCONFIG_MQH\n#define ICXCONFIG_MQH\n\n#include <Object.mqh>\n\nclass ICXConfig : public CObj
-... [TRUNCATED] ...
-    // \"Watcher\", \"System\", \"Session\"\n    virtual bool   IsCnoLogEnabled(long cno) const = 0;           // Filtering by CNO\n    virtual bool   IsLogInitOnStart() const = 0;                  // Overwrite log files on startup\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779237223117_0_je4end.txt
-</tool_output_masked>

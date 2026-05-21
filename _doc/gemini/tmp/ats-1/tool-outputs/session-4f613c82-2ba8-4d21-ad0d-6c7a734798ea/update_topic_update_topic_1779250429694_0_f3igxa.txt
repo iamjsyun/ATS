@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"트레이딩 무결성 수정 - SL/TP 기준가 교정\"\nTopic summary: BUY_LIMIT 주문 시 SL이 지정가보다 높게 설정되어 발생하는 'invalid stops(10016)' 에러의 원인을 파악했습니다. 현재 로직이 지정가 주문임에도 SL/TP를 시장가(Market Price) 기준으로 계산하여 발생한 문제입니다. 지정가/스탑 주문의 경우 계산 기준가(basePrice)를 시장가가 아닌 실제 주문 실행가(execPrice)로 변경하여, SL/TP가 주문가 대비 정확한 오프셋에 위치하도록 수정합니다.\n\nStrategic Intent: 지정가 주문 SL/TP 계산 기준 오류 수정 (시장가 -> 실행가)."
-}

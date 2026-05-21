@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\CXTradingSession.mqh (1 replacements). Here is the updated code:\n#ifndef CXTRADINGSESSION_MQH\n#define CXTRADINGSESSION_MQH\n\n#include \"..\\Interfaces\\IReposito
-... [TRUNCATED] ...
-e: [Name:%s] [Nodes:%d] [States:{%s}]\", \n                                   seq.GetSequenceName(), seq.GetNodeCount(), seq.GetStateSummary());\n        XP_LOG_INFO(GetPointer(xp), info);\n    }\n};\n\n#endif\n Applied fuzzy match at line 65-101."
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239365791_0_3tjkyo.txt
-</tool_output_masked>

@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS:\n[DIR] _doc\n[DIR] _log\n[DIR] _MEM\n[DIR] _Test\n[DIR] .gemini\n[DIR] App\n[DIR] CXTrade\n[DIR] Domain\n[DIR] Experts\n[DIR] Infra\n[DIR] Module\n.gitattributes (505 bytes)\n.gitignore (528 bytes)\n기본규칙.md (2756 bytes)\ncompile_error_test.txt (81264 bytes)\ncompile_error.txt (57362 bytes)\nGEMINI.md (6355 bytes)\nREADME.md (9 bytes)\nScenarios.csv (11644 bytes)\nspec.md (4588 bytes)\n\n(2 ignored)"
-}

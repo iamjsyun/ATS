@@ -1,3 +1,0 @@
-{
-  "error": "File not found: D:\\Projects\\ATS\\ATSA\\FluentSeq\\Builder\\ISequenceBuilder.cs"
-}

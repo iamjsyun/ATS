@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 140-175 of 191 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
-... [TRUNCATED] ...
-rategy.Rate, 2);\n                    else s.lot = Math.Round(0.01 * policy.LotStrategy.Rate, 2);\n                    \n                    if (s.lot < 0.01) s.lot = 0.01;\n                }\n            }\n\n            if (policy.Entry != null)"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152193982_1_qlj7k.txt
-</tool_output_masked>

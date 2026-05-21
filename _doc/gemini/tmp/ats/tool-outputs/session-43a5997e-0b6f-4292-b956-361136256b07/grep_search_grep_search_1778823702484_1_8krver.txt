@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"class BindableBase|class MinimalBindableBase\" across 2 workspace directories."
-}

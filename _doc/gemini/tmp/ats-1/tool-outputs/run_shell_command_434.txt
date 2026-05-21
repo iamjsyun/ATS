@@ -1,2 +1,0 @@
-Output: ATSA_20260519_110000.log
-Process Group PGID: 7576

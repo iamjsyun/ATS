@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "#ifndef ACTIVETASKS_MQH\n#define ACTIVETASKS_MQH\n\n#include \"..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\Interfaces\\IXPositionManager.mqh\"\n#include \"..\\..\\Interfaces\\IXPr
-... [TRUNCATED] ...
-g.GetTP())) {\n            sig.SetSL(newSL);\n            sig.SetStatusMsg(MSG_EXIT_TS_MODIFIED);\n            XP_LOG_INFO(xp, StringFormat(\"[TASK-TS] SL Updated: %.5f\", newSL));\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779234352990_2_nvufn.txt
-</tool_output_masked>

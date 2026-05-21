@@ -1,3 +1,0 @@
-{
-  "error": "Path not in workspace: Attempted path \"C:\\Users\\hijsyun\\.gemini\\extensions\\caveman\\skills\\caveman\" resolves outside the allowed workspace directories: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS, C:\\Users\\hijsyun\\AppData\\Roaming\\npm\\node_modules\\@google\\gemini-cli\\bundle\\builtin\\skill-creator or the project temp directory: C:\\Users\\hijsyun\\.gemini\\tmp\\ats"
-}

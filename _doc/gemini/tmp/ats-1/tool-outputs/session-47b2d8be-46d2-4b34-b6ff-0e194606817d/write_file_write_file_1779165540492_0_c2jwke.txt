@@ -1,3 +1,0 @@
-{
-  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\.gemini\\tmp\\ats-1\\memory\\MEMORY.md. Here is the updated code:\n- **Path Shortcuts**:\r\n    - `g:` -> `G:\\내 드라이브\\` (Google Drive Shared Folder)\r\n    - 공용 문서 폴더 -> `G:\\내 드라이브\\_Doc\\`\r\n- **Partial Class Strategy**: Refactoring FluentSeq services into `partial class` files (`.Sequence.cs`, `.Methods.cs`) is approved for AI-optimized context management.\r\n- **Model Aliases**:\r\n    - `@gpro`  -> `gemini-3.1-pro-preview`\r\n    - `@gflash` -> `gemini-3.1-flash-preview`\r\n    - `@glite`  -> `gemini-3.1-flash-lite-preview`\r\n"
-}

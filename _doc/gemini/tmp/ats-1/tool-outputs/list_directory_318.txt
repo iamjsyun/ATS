@@ -1,3 +1,0 @@
-Directory listing for D:\Projects\ats\ATSE\CXTrade\Session\Steps\Alpha:
-CXStepEntryTrailingCalc.mqh (2146 bytes)
-CXStepExitTrailingCalc.mqh (2387 bytes)

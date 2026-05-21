@@ -1,7 +1,0 @@
-Output:                     .OnEntry(() => {
-                        bool isManual = ctx.Xdo.CMD == "DM_INJECTION" || ctx.Xdo.CMD == "TEST_INJECTION";
-                        if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))
-                        {
-                            nlog.Warn($"[Policy] Direction {(ctx.MasterSignal.dir == XCode.BUY ? "BUY" : "SELL")} is disabled for CNO:{ctx.MasterSignal.cno}. Signal Ignore
-d.");
-Process Group PGID: 24612

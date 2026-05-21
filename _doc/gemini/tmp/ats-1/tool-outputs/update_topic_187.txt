@@ -1,4 +1,0 @@
-Current topic: "Merge Complete"
-Topic summary: Merged G:\내 드라이브\_Memory\MEMORY.md and local ATSE\_MEM\MEMORY.md into a single integrated file. Organized into Core Specs, Architectural Standards, Logging Rules, and Storage Rules. Local file updated. Task complete.
-
-Strategic Intent: Finalize memory merge.

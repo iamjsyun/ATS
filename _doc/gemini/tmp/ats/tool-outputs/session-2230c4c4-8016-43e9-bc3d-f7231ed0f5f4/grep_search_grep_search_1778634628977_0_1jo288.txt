@@ -1,3 +1,0 @@
-{
-  "output": "No matches found for pattern \"XE_ST_IDLE\" across 2 workspace directories."
-}

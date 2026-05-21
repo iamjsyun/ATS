@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 2 matches for pattern \"LoggingLevel\" across 2 workspace directories:\n---\nFile: ats\\ATSA\\XTA\\Models\\XConfig.cs\nL49-             if (!File.Exists(path))\nL50-             {\nL51-                 // MetaTrader 5 공용 폴더 경로 동적
-... [TRUNCATED] ...
-ng YouTubeUrl { get; set; } = \"\";\nL153-         public string YouTubeROI { get; set; } = \"0,0,800,400\";\nL154-         public XYouTubeConfig? YouTube { get; set; }\nL155-         public XTradingOption TradingOption { get; set; } = new();\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\grep_search_grep_search_1779151189302_0_boqlxs.txt
-</tool_output_masked>

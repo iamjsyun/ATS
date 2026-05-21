@@ -1,5 +1,0 @@
-Output:       virtual void Build() override {??          CommitCurrent();??>         if(m_current_state == -1) {
->             m_current_state = m_tmp_from;??              XP_LOG_SEQ_INFO(m_ctx.GetParam(), StringFormat("[SEQ:%s] Sequence Started at State: %d", m_name, m_current_state));??          }
-  ??      void UpdateState(int next) {??>         if(m_current_state == next) return;??          TriggerOnExit(m_current_state);
->         m_current_state = next;??          m_state_entered = TimeCurrent();??          TriggerOnEnter(m_current_state);
-Process Group PGID: 29004

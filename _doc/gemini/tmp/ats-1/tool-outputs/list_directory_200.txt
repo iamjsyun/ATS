@@ -1,7 +1,0 @@
-Directory listing for D:\Projects\ATS\ATSA\XTA\Channels:
-[DIR] GlobalGold
-[DIR] GMK
-[DIR] XDUNA
-[DIR] XHANA
-XInterpreterBase.cs (5544 bytes)
-XRuleInterpreter.cs (17799 bytes)

@@ -1,3 +1,0 @@
-Output: [LOG_LVL_INFO] [12:45:45] [RemoteLog] Connected successfully to 127.0.0.1:878 (Socket:2)
-[LOG_LVL_INFO] [12:45:45] >>> Signal Watcher Started <<<
-Process Group PGID: 28336

@@ -1,4 +1,0 @@
-Directory listing for D:\Projects\ats\ATSE\CXTrade\Module\Steps\Watcher:
-CXStepBinding.mqh (3114 bytes)
-CXStepDiscovery.mqh (3109 bytes)
-CXStepValidation.mqh (3194 bytes)

@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Session\\Tasks:\nActiveTasks.mqh (6534 bytes)\nEntryTasks.mqh (6160 bytes)\nExitTasks.mqh (5183 bytes)\nPendingTasks.mqh (6059 bytes)"
-}

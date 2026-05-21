@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\FluentSeq\\Builder:\nConfigureActions.cs (868 bytes)\nConfigureTrigger.cs (977 bytes)\nICanConfigureActions.cs (1243 bytes)\nICanConfigureState.cs (558 bytes)\nICanConfigureTrigger.cs (1005 bytes)\nIHasSequenceBuilder.cs (352 bytes)\nIStateBuilder.cs (641 bytes)\nITriggerBuilder.cs (1874 bytes)\nSequenceBuilder.cs (2957 bytes)\nStateBuilder.cs (2624 bytes)\nTriggerBuilder.cs (3659 bytes)"
-}

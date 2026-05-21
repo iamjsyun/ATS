@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade:\n[DIR] App\n[DIR] Infra\n[DIR] Interfaces\n[DIR] Models\n[DIR] Module\n[DIR] Session\nATS.mq5 (5078 bytes)\n\n(1 ignored)"
-}

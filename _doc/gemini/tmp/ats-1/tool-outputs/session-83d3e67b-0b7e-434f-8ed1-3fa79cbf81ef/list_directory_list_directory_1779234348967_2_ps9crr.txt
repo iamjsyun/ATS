@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Execution:\nCXEntryManager.mqh (1775 bytes)\nCXExitManager.mqh (3643 bytes)\nCXOrderManager.mqh (4939 bytes)\nCXPositionManager.mqh (4568 bytes)"
-}

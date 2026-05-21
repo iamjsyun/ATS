@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 80-150 of 217 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
-... [TRUNCATED] ...
-[SRP: Execution] 게이트웨이 파이프라인으로 재투입\n                ReInjectToGateway(msg);\n\n                // [SRP: Persistence] 재시도 횟수 및 상태 업데이트\n                UpdateMessageStatus(msg);\n            }\n            await uow.CommitChangesAsync();\n        }"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153229769_0_typfj6.txt
-</tool_output_masked>

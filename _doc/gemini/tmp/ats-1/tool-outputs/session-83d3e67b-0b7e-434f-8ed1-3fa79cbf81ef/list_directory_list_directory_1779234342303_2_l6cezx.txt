@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\App:\nCXAppService.mqh (6017 bytes)\nCXServiceFactory.mqh (2897 bytes)\nCXTradingSessionPool.mqh (3403 bytes)"
-}

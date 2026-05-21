@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Active\\CXTaskSync_V_Stale.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_SYNC_V_STALE_MQH\n#define CX_TASK_SYNC_V_STALE_MQH\n\n#include \"
-... [TRUNCATED] ...
-.UpdateStatus(sig)) {\n                    XP_LOG_OK(xp, \"[SYNC-V-STALE] SUCCESS: Zombie record cleaned.\");\n                }\n                return TASK_BREAK; \n            }\n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239741427_0_lrdm1t.txt
-</tool_output_masked>

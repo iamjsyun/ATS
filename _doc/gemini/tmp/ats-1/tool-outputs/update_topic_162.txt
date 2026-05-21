@@ -1,4 +1,0 @@
-Current topic: "Updating Remote Logger Port"
-Topic summary: The user requested to change the remote logger port to 8788. I will update the default value for 'InpRemoteAddr' in ATS.mq5 and also ensure CXConfig.mqh handles this new port correctly if it has any hardcoded defaults. This ensures that all remote logging traffic is directed to the correct destination port as per the updated infrastructure requirements.
-
-Strategic Intent: Update remote logger port to 8788 in ATS configuration.

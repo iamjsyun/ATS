@@ -1,3 +1,0 @@
-{
-  "output": "Current topic: \"Activating Caveman Mode\"\nTopic summary: User requested caveman mode via '/caveman'. I am activating the corresponding skill to transition into ultra-compressed communication style, focusing on technical accuracy while minimizing token usage. I will also check if there are specific 'caveman' skill instructions available now that the extension is installed.\n\nStrategic Intent: Activating caveman mode for ultra-compressed communication."
-}

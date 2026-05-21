@@ -1,3 +1,0 @@
-{
-  "output": "Directory listing for D:\\projects\\ats\\ATSA\\XTA\\Services:\n[DIR] TelegramService\nXDataService.cs (4479 bytes)\nXGatewayService.cs (14940 bytes)\nXLiquidationService.cs (9088 bytes)\nXSignalService.cs (8592 bytes)\nXSyncWorker.cs (11113 bytes)\nXTradePolicyService.cs (762 bytes)\nXTradePolicyService.Methods.cs (1310 bytes)\nXTradePolicyService.Sequence.cs (6670 bytes)"
-}

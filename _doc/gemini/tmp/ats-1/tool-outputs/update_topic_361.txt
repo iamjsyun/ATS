@@ -1,4 +1,0 @@
-Current topic: "Log Level Filtering Recap"
-Topic summary: I have implemented configurable log level filtering as requested. I added the `InpLogLevel` input parameter to `ATS.mq5` and updated `ICXConfig` and `CXConfig` to manage this setting. I also modified the `GetLoggerSafe` macro in `CXMacros.mqh` to filter out logs below the selected level. This ensures users only see relevant logs according to their verbosity preference. All compilation errors have been addressed, and the system is ready for operation with improved signal detection, logging management, and startup efficiency.
-
-Strategic Intent: Recap log level filtering implementation and finalize tasks.

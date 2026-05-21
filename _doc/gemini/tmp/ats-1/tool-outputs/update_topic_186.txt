@@ -1,4 +1,0 @@
-Current topic: "Copy Spec to Remote Storage"
-Topic summary: User wants to copy `spec.md` to `G:\내 드라이브\_Memory\`. I will find the file in the workspace and execute the copy command via PowerShell.
-
-Strategic Intent: Copy spec.md to G: drive.

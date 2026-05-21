@@ -1,4 +1,0 @@
-Current topic: "Implementing State Transition TTS Notifications"
-Topic summary: The user wants TTS notifications when `xa_exit` transitions from 1 (Active) to 2 (Completed) and then to 3 (Archived). I need to identify where `xa_exit` is updated (likely in `XSyncWorker` or `XpoSqliteService`) and insert calls to `ISoundService` to trigger the appropriate TTS messages according to the project's architectural standards.
-
-Strategic Intent: Implement TTS notification for xa_exit state transitions (1 -> 2 -> 3).

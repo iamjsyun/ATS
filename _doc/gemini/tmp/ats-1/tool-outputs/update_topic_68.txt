@@ -1,4 +1,0 @@
-Current topic: "Invalid Stops Fix Completed"
-Topic summary: I've updated `CXOrderManager::ExecuteEntry` to calculate absolute SL and TP prices based on the provided point distances and the current Ask/Bid price, which should prevent the `Retcode 10016` error. If SL or TP from the signal is 0 (or less), they are now passed as 0 to `OrderOpen`, which indicates to the broker that no stop should be set. This matches the user's intent. I will summarize these changes for the user.
-
-Strategic Intent: Verify the fix for Retcode 10016 (invalid stops).

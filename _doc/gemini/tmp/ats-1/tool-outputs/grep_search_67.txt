@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Found 2 matches for pattern \"PointsToPrice\" in path \"D:\\Projects\\ATS\\ATSE\":\n---\nFile: CXTrade\\Infra\\CXGuard.mqh\nL58-             max_v = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);\nL59-             if(max_v <= 0) return S
-... [TRUNCATED] ...
- cno, long magic) = 0;\nL31- \nL32-     // Result Feedback\nL33-     virtual string GetLastError() const = 0;\nL34- \nL35-     // General Validation\nL36-     virtual bool Check(ICXParam* xp, ICXContext* ctx) = 0;\nL37- };\nL38- \nL39- #endif\n---"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779170463356_0_gy1nj.txt
-</tool_output_masked>

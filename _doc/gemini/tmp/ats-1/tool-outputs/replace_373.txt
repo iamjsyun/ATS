@@ -1,9 +1,0 @@
-<tool_output_masked>
-{
-  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Module\\Steps\\Watcher\\CXStepBinding.mqh (1 replacements). Here is the updated code:\n#ifndef CXSTEPBINDING_MQH\n#define CXSTEPBINDING_MQH\n\n#include \"..\\..\\..\\Interfa
-... [TRUNCATED] ...
-작업 완료 후 리스트 정리\n        while(activeList.Total() > 0) activeList.Detach(0); \n\n        return WATCHER_DISCOVERY;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
-}
-
-Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779159374237_0_ig5itq.txt
-</tool_output_masked>

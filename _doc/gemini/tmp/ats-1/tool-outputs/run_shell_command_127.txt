@@ -1,3 +1,0 @@
-Output: >             m_logger = m_factory.CreateLogger("System", m_config);??              if(IS_VALID(m_logger)) {??                  m_globalContext.Register("logger", m_logger);?
-?                  m_logger.Log(LOG_LVL_INFO, ">>> ATSE Framework Initializing (System SID) <<<");??              }??          }
-Process Group PGID: 34932

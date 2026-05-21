@@ -1,5 +1,0 @@
-Directory listing for D:\Projects\ats\ATSE\CXTrade\Session\Execution:
-CXEntryManager.mqh (1775 bytes)
-CXExitManager.mqh (3643 bytes)
-CXOrderManager.mqh (4939 bytes)
-CXPositionManager.mqh (4568 bytes)
