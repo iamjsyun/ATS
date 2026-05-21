@@ -16,9 +16,10 @@ private:
     int      m_noSignalCount;   // 연속 "신호 없음" 카운터
     datetime m_lastLogTime;     // 마지막 로그 출력 시간
     int      m_logInterval;     // 로그 출력 간격 (초)
+    bool     m_isPulsed;        // 최초 1회 출력 여부
 
 public:
-    CXStepDiscovery() : m_noSignalCount(0), m_lastLogTime(0), m_logInterval(0) {}
+    CXStepDiscovery() : m_noSignalCount(0), m_lastLogTime(0), m_logInterval(0), m_isPulsed(false) {}
     virtual ~CXStepDiscovery() {}
 
     virtual string Name() override { return "Step_Discovery"; }
@@ -32,8 +33,9 @@ public:
         ICXLogger* log = CX_GET_OBJ(ctx, "logger", ICXLogger);
         if(IS_INVALID(repo)) return STATE_UNCHANGED;
 
-        if(IS_VALID(log)) {
+        if(IS_VALID(log) && !m_isPulsed) {
             log.Trace(xp, "[WATCHER-DISCOVERY] Pulsing...");
+            m_isPulsed = true;
         }
 
         CArrayObj* activeList = new CArrayObj();
