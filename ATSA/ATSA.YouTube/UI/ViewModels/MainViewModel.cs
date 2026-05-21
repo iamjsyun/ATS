@@ -31,12 +31,12 @@ namespace ATSA.YouTube.UI.ViewModels
                     {
                         ChannelConfig = ch,
                         ChannelName = ch.Name,
-                        Url = !string.IsNullOrEmpty(ch.YouTubeUrl) ? ch.YouTubeUrl : (ch.YouTube?.LiveUrl ?? "https://www.youtube.com"),
+                        Url = ch.YouTube?.Url ?? "https://www.youtube.com",
                         CaptureInterval = ch.YouTube?.IntervalMs ?? 3000
                     };
 
-                    // [v9.5] YouTubeROI CSV 파싱 (X,Y,W,H)
-                    string? roiCsv = !string.IsNullOrEmpty(ch.YouTubeROI) ? ch.YouTubeROI : null;
+                    // [v9.5] YouTube.ROI CSV 파싱 (X,Y,W,H)
+                    string? roiCsv = ch.YouTube?.ROI;
                     
                     if (!string.IsNullOrEmpty(roiCsv))
                     {

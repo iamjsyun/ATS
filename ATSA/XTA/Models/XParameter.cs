@@ -199,36 +199,13 @@ namespace XTA.Models
             var channel = Channels.Values.SelectMany(l => l).FirstOrDefault(c => c.CNO == cno);
             var cfg = Config.Channels.FirstOrDefault(c => c.CNO == cno);
             
-            // Deep Merge Logic for Policy resolution
-            var result = new XChannelConfig 
+            if (cfg != null) return cfg;
+
+            // Fallback for dynamically registered channels not in JSON
+            return new XChannelConfig 
             { 
                 CNO = cno, 
-                Name = cfg?.Name ?? channel?.Name ?? $"CH_{cno}",
-                TradingOption = MergeOptions(Config.ChannelDefault.TradingOption, cfg?.TradingOption)
-            };
-            return result;
-        }
-
-        private XTradingOption MergeOptions(XTradingOption @default, XTradingOption? overrideOpt)
-        {
-            if (overrideOpt == null) return @default;
-            return new XTradingOption
-            {
-                ActiveMode = overrideOpt.ActiveMode ?? @default.ActiveMode,
-                Buy = MergeDir(@default.Buy, overrideOpt.Buy),
-                Sell = MergeDir(@default.Sell, overrideOpt.Sell)
-            };
-        }
-
-        private XDirectionOption MergeDir(XDirectionOption def, XDirectionOption? opt)
-        {
-            if (opt == null) return def;
-            return new XDirectionOption
-            {
-                Enabled = opt.Enabled ?? def.Enabled,
-                LotStrategy = opt.LotStrategy ?? def.LotStrategy,
-                Entry = opt.Entry ?? def.Entry,
-                Exit = opt.Exit ?? def.Exit
+                Name = channel?.Name ?? $"CH_{cno}"
             };
         }
 

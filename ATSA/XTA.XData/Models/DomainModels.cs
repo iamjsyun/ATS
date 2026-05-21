@@ -5,11 +5,13 @@ namespace XTA.XData.Models
 {
     public class XSignal
     {
+        public int id { get; set; }
         public string sid { get; set; } = string.Empty;
         public string gid { get; set; } = string.Empty;
         public int cno { get; set; }
         public int sno { get; set; }
         public int gno { get; set; }
+
         public int msg_id { get; set; }
         public int raw_id { get; set; }
         public int xa_entry { get; set; }
@@ -71,22 +73,17 @@ namespace XTA.XData.Models
                 xe_status = (int)XCode.EaStatus.Ready;    // 0
             }
 
-            string dateStr = created.ToString("yyMMddHH");
             int dirVal = (dir == 2) ? 2 : 1; // v7.5 Standard: 1=BUY, 2=SELL
-
             if (type <= 0) type = 1;
 
             // ID 생성 및 정규화 (거버넌스 규칙 준수: XIdManager 통합)
-            // [Fix] 기존 SID가 잘못된 형식(예: # 포함)이거나 비어있으면 재생성
             if (string.IsNullOrEmpty(sid) || !XIdManager.Instance.IsValidSid(sid))
             {
                 sid = XIdManager.Instance.GenerateSid(cno, created, sno, gno, dirVal, type);
             }
             
-            // 한 번 더 정규화하여 구분자 혼용 방지
             sid = XIdManager.Instance.Normalize(sid);
 
-            // GID 규격 적용
             if (string.IsNullOrEmpty(gid) || !XIdManager.Instance.IsValidGid(gid))
             {
                 gid = XIdManager.Instance.GenerateGid(cno, created, sno, gno);

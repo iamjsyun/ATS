@@ -9,7 +9,7 @@
 
 //--- 시스템 규격 상수
 #define SID_MAX_LENGTH       23
-#define GID_MAX_LENGTH       16
+#define GID_MAX_LENGTH       20
 #define COMMENT_MAX_LENGTH   31
 #define DEFAULT_SLIPPAGE     30
 #define MAX_SLIPPAGE         1000
@@ -50,29 +50,29 @@ enum ENUM_XA_INTENT {
 enum ENUM_XE_STATUS {
     XE_UNKNOWN          = -1,
     XE_READY            = 0,
-    XE_PENDING_PLACED   = 1,
-    XE_PENDING_REQ      = 2,  // [v9.9.2] 브로커 요청 전 DB 잠금 상태
-    XE_IN_TRANSIT       = 3,  // [v9.9.2] 명령 송신 완료, 실물 동기화 대기 중
+    XE_PENDING_REQ      = 1,  // [v11.3] 브로커 요청 전 DB 잠금 상태
+    XE_IN_TRANSIT       = 2,  // [v11.3] 명령 송신 완료, 실물 동기화 대기 중
+    XE_PENDING_PLACED   = 5,  // [v11.3] 대기 주문 터미널 등록 완료
     XE_EXECUTED         = 10,
     XE_CLOSED_SIGNAL    = 20,
-    XE_CLOSED_TP        = 21,
-    XE_CLOSED_SL        = 23,
+    XE_CLOSED_SL        = 21, // [v11.3] 손절 청산
+    XE_CLOSED_TP        = 22, // [v11.3] 익절 청산
     XE_CLOSED_MANUAL    = 24,
-    XE_VERIFY_ABS       = 25, // [v9.9.2] 청산 후 자산 소멸 검증 중
+    XE_VERIFY_ABS       = 25,
     XE_ERROR            = 99
 };
 
 //--- 세션 상태 및 시퀀스 단계 정의 (Sequence States)
 enum ENUM_SESSION_STATE {
     SESSION_READY            = 0,
-    STATE_ENTRY_TRANSIT      = 3,  // [v9.9.2] 주문 송신 후 브로커 응답 대기 상태
-    STATE_ENTRY_VERIFY       = 4,  // [v9.9.2] 브로커 응답 후 실물 자산 존재 확인 상태
-    STATE_ENTRY_TRAILING     = 5,
+    STATE_ENTRY_TRANSIT      = 1,  // [v11.3]
+    STATE_ENTRY_VERIFY       = 2,  // [v11.3]
+    STATE_ENTRY_TRAILING     = 5,  // [v11.3]
     SESSION_ACTIVE           = 10,
-    STATE_SYNC_ALIGN         = 12, // [v9.9.2] DB와 터미널 간 강제 동기화 수행 상태
+    STATE_SYNC_ALIGN         = 12, 
     STATE_EXIT_TRAILING      = 15,
     SESSION_LIQUIDATING      = 20,
-    STATE_LIQUIDATING_TRANSIT = 21, // [v9.9.2] 청산 요청 후 브로커 응답 대기 상태
+    STATE_LIQUIDATING_TRANSIT = 21,
     STATE_EXIT_SWEEP         = 22,
     STATE_EXIT_VERIFY        = 23,
     SESSION_CLOSED           = 30,
@@ -103,6 +103,85 @@ enum ENUM_CX_EVENT {
 enum ENUM_CALC_RESULT {
     CALC_NO_CHANGE = 0,
     CALC_MODIFIED  = 1
+};
+
+//--- 시퀀스 단계 유형 (StepFactory 용)
+enum ENUM_STEP_TYPE {
+    STEP_NONE = 0,
+    //--- Watcher Steps
+    STEP_W_DISCOVERY,
+    STEP_W_VALIDATION,
+    STEP_W_BINDING,
+    //--- Session Steps
+    STEP_S_COMPOSITE, // Task 기반 복합 단계
+    STEP_S_MONITOR
+};
+
+//--- 개별 태스크 유형 (TaskFactory 용)
+enum ENUM_TASK_TYPE {
+    TASK_NONE = 0,
+    // Entry
+    TASK_E_L_VALIDATE,
+    TASK_E_G_SPREAD,
+    TASK_E_G_VOLATILITY,
+    TASK_E_P_LOCK,
+    TASK_E_R_ORDER,
+    TASK_E_V_ERROR,
+    TASK_E_V_TICKET,
+    TASK_E_V_REAL,
+    TASK_E_V_DOUBLECHECK,
+    TASK_E_P_FINALIZE,
+    // Pending
+    TASK_P_V_SYNC,
+    TASK_P_L_REBOUND,
+    TASK_P_L_IMPROVE,
+    TASK_P_R_APPLY,
+    // Active
+    TASK_A_INTENT_WATCH,
+    TASK_A_V_STATUS,
+    TASK_A_V_STALE,
+    TASK_A_V_TERMINAL,
+    TASK_A_P_ALIGN,
+    TASK_A_L_STATUS,
+    TASK_A_ALPHA_CALC,
+    TASK_A_ALPHA_APPLY,
+    // Exit
+    TASK_X_L_PREPARE,
+    TASK_X_P_LOCK,
+    TASK_X_R_ORDER,
+    TASK_X_V_ERROR,
+    TASK_X_V_TERMINAL,
+    TASK_X_P_FINALIZE
+};
+
+//--- 시퀀스 내 고정 상태 주소 (ST_ 접두사로 통일)
+enum ENUM_STATE_ID {
+    // Watcher States
+    ST_W_DISCOVERY  = WATCHER_DISCOVERY,
+    ST_W_VALIDATION = WATCHER_VALIDATION,
+    ST_W_BINDING    = WATCHER_BINDING,
+    
+    // Session States
+    ST_S_READY              = SESSION_READY,
+    ST_S_ENTRY_TRANSIT      = STATE_ENTRY_TRANSIT,
+    ST_S_ENTRY_VERIFY       = STATE_ENTRY_VERIFY,
+    ST_S_ENTRY_TRAILING     = STATE_ENTRY_TRAILING,
+    ST_S_ACTIVE             = SESSION_ACTIVE,
+    ST_S_LIQUIDATING        = SESSION_LIQUIDATING,
+    ST_S_LIQUIDATING_TRANSIT = STATE_LIQUIDATING_TRANSIT,
+    ST_S_EXIT_VERIFY        = STATE_EXIT_VERIFY,
+    ST_S_CLOSED             = SESSION_CLOSED,
+    ST_S_ERROR              = SESSION_ERROR
+};
+
+//--- 타임아웃 표준 정의
+enum ENUM_TIMEOUT_VAL {
+    T_NONE       = 0,
+    T_SHORT      = 30,
+    T_NORMAL     = 3600,
+    T_LONG       = 72000,
+    T_ENTRY_EXIT = 300,
+    T_VERIFY     = 60
 };
 
 #endif

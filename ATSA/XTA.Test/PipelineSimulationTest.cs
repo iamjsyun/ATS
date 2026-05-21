@@ -22,6 +22,8 @@ public class PipelineSimulationTest : IDisposable
     private readonly string _testDbPath;
     private readonly ScenarioRunner _runner;
     private readonly IServiceProvider _serviceProvider;
+    private readonly XParameter _param;
+    private readonly XpoSqliteService _dbSvc;
 
     public PipelineSimulationTest()
     {
@@ -30,16 +32,25 @@ public class PipelineSimulationTest : IDisposable
         if (File.Exists(_testDbPath)) File.Delete(_testDbPath);
 
         var services = new ServiceCollection();
-        var param = new XParameter();
-        param.Config.System.DatabaseFullPath = _testDbPath;
-        
-        // [Fix] 정책 초기화 (Null 정책 드랍 방지)
-        param.Config.ChannelDefault.TradingOption.Buy = new XDirectionOption { Enabled = true, LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01 } };
-        param.Config.ChannelDefault.TradingOption.Sell = new XDirectionOption { Enabled = true, LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01 } };
+        _param = new XParameter();
+        _param.Config.System.DatabaseFullPath = _testDbPath;
 
-        // Core Services
-        services.AddSingleton(param);
-        services.AddSingleton<XpoSqliteService>();
+        // [Important] 정책 초기화
+        var channelConfig = new XChannelConfig 
+        { 
+            CNO = 1001, 
+            TradingOption = new XTradingOption { 
+                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
+                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+            } 
+        };
+        _param.Config.Channels.Add(channelConfig);
+        _param.Config.Channels.Add(new XChannelConfig { CNO = 1002, TradingOption = channelConfig.TradingOption });
+
+        _dbSvc = new XpoSqliteService(_param);
+
+        services.AddSingleton(_param);
+        services.AddSingleton(_dbSvc);
         services.AddSingleton<ISignalRepository>(sp => sp.GetRequiredService<XpoSqliteService>());
         services.AddSingleton<IGridProfileRepository>(sp => sp.GetRequiredService<XpoSqliteService>());
         
@@ -57,24 +68,24 @@ public class PipelineSimulationTest : IDisposable
 
         var ggInfo = new XChannelInfo(1001, 1001, "GlobalGold", "TRADE");
         var gmkInfo = new XChannelInfo(1002, 1002, "GMK", "TRADE");
-        param.RegisterChannel(ggInfo);
-        param.RegisterChannel(gmkInfo);
+        _param.RegisterChannel(ggInfo);
+        _param.RegisterChannel(gmkInfo);
         
         _serviceProvider = services.BuildServiceProvider();
         
         var hostMock = new Mock<IHost>();
         hostMock.Setup(h => h.Services).Returns(_serviceProvider);
-        XContext.Instance.Initialize(hostMock.Object, param);
+        XContext.Instance.Initialize(hostMock.Object, _param);
 
         _serviceProvider.GetRequiredService<XpoSqliteService>().Start();
         _serviceProvider.GetRequiredService<XGatewayService>().Start();
         
-        var gg = new XTA.Channels.GlobalGold.GlobalGold(param, ggInfo);
-        var gmk = new XTA.Channels.GMK.GMK(param, gmkInfo);
-        param.Add(gg);
-        param.Add(gmk);
+        var gg = new XTA.Channels.GlobalGold.GlobalGold(_param, ggInfo);
+        var gmk = new XTA.Channels.GMK.GMK(_param, gmkInfo);
+        _param.Add(gg);
+        _param.Add(gmk);
 
-        _runner = new ScenarioRunner(param, _serviceProvider.GetRequiredService<XpoSqliteService>());
+        _runner = new ScenarioRunner(_param, _serviceProvider.GetRequiredService<XpoSqliteService>());
     }
 
     [Fact]

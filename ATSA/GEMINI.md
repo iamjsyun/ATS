@@ -25,9 +25,9 @@ This agent is the **Orchestrator**.
 - **Template/Keyword Modification**: Unauthorized modification of channel-specific templates (`Template_*.txt`) and keyword files (`Keywords.txt`, `Keywords.json`) is strictly prohibited.
 - **Change Procedure**: Any changes to these files MUST be requested via explicit user directive and verified against system logic (e.g., exit detection sensitivity) before execution.
 
-## Configuration Standards (v9.5)
-- **Architecture**: Unified Channel-Centric design. Root-level `YouTubeRoi` is prohibited.
-- **YouTube Integration**: `YouTubeUrl` and `YouTubeROI` (CSV: "X,Y,W,H") MUST reside within `XChannelConfig`.
+## Configuration Standards (v10.0)
+- **Architecture**: Unified Channel-Centric design. Root-level `YouTubeUrl/ROI` is prohibited.
+- **YouTube Integration**: `Url` and `ROI` (CSV: "X,Y,W,H") MUST reside within the nested `YouTube` object in `XChannelConfig`.
 - **Entry Defaults**: Standardized Trailing Entry parameters: `TeStart=500`, `TeStep=100`, `TeLimit=1000`.
 - **Lot Strategy**: `XLotStrategy` MUST explicitly initialize `Rate` (default: 0) alongside `Value`.
 - **Interpreter Mapping**: Channels use an explicit `Interpreter` property (e.g., "GlobalGold", "GMK") to define logic, regardless of CNO/CID.

@@ -7,6 +7,7 @@
 #include "..\Interfaces\ICXTradingSession.mqh"
 #include "..\Module\CXLogDispatcher.mqh"
 #include "..\Infra\CXFileLogger.mqh"
+#include "..\Infra\CXSequenceOrchestrator.mqh"
 #include "..\Models\CXContext.mqh"
 #include "..\Infra\CXFluentSequence.mqh"
 
@@ -20,17 +21,6 @@
 #include "..\Interfaces\ICXSymbolManager.mqh"
 #include "..\Interfaces\ICXInventoryManager.mqh"
 #include "..\Interfaces\ICXServiceFactory.mqh"
-
-#include "Steps\CXCompositeStep.mqh"
-#include "Tasks\EntryTasks.mqh"
-#include "Tasks\PendingTasks.mqh"
-#include "Tasks\ActiveTasks.mqh"
-#include "Tasks\ExitTasks.mqh"
-
-#include "Steps\Exit\CXStepExitTicket.mqh"
-#include "Steps\Exit\CXStepExitSweep.mqh"
-#include "Steps\Exit\CXStepExitVerify.mqh"
-
 
 /**
  * @class CXTradingSession
@@ -83,7 +73,7 @@ public:
     void Pulse(ICXParam* xp) {
         if(IS_INVALID(xp)) return;
 
-        // 1. 세션 활성화 상태 및 이벤트 타입 체크
+        // 1. 세션 활성화 상태 및 이벤트에 대한 체크
         if(!m_isActive && xp.GetEvent() != EVENT_START && xp.GetEvent() != EVENT_INJECT) {
             return;
         }
@@ -123,7 +113,7 @@ public:
         if(IS_VALID(m_sequence)) {
             m_sequence.Pulse(xp);
             
-            // [v7.9 Error Recovery] 회로 차단기 등 치명적 에러 발생 시 처리
+            // [v7.9 Error Recovery] 회로 차단기 및 치명적 에러 발생 시 처리
             if(m_sequence.State() == SESSION_ERROR) {
                 string errorDetail = ""; 
                 // 시퀀스 내에서 발생한 마지막 에러 메시지 추출 시도
@@ -147,6 +137,12 @@ public:
         m_isActive = true;
         m_signal = (IS_VALID(xp)) ? xp.GetSignal() : NULL;
         m_sid = (IS_VALID(m_signal)) ? m_signal.GetSid() : "";
+        
+        //--- [SSOC] 글로벌 트리에 등록
+        if(m_sid != "" && IS_VALID(m_globalCtx)) {
+            m_globalCtx.AddChild(m_sid, m_ctx);
+        }
+
         InitLogger(m_sid, factory);
         xp.SetEvent(EVENT_START);
         Pulse(xp);
@@ -156,6 +152,12 @@ public:
         m_isActive = true;
         m_signal = (IS_VALID(xp)) ? xp.GetSignal() : NULL;
         m_sid = (IS_VALID(m_signal)) ? m_signal.GetSid() : "";
+
+        //--- [SSOC] 글로벌 트리에 등록
+        if(m_sid != "" && IS_VALID(m_globalCtx)) {
+            m_globalCtx.AddChild(m_sid, m_ctx);
+        }
+
         xp.SetEvent(EVENT_START);
         Pulse(xp);
     }
@@ -164,6 +166,12 @@ public:
         m_isActive = true;
         m_signal = sig;
         m_sid = IS_VALID(sig) ? sig.GetSid() : "";
+
+        //--- [SSOC] 글로벌 트리에 등록
+        if(m_sid != "" && IS_VALID(m_globalCtx)) {
+            m_globalCtx.AddChild(m_sid, m_ctx);
+        }
+
         CXParam xp;
         xp.SetSignal(sig);
         xp.SetEvent(EVENT_INJECT);
@@ -171,6 +179,11 @@ public:
     }
 
     void Reset() {
+        //--- [SSOC] 글로벌 트리에서 제거
+        if(m_sid != "" && IS_VALID(m_globalCtx)) {
+            m_globalCtx.AddChild(m_sid, NULL); // 제거
+        }
+
         m_isActive = false;
         m_sid = "";
         SAFE_DELETE(m_signal); //-- [v10.7 Fix] Clear ownership
@@ -191,7 +204,8 @@ private:
         if(IS_VALID(m_globalCtx)) {
             m_ctx.Register("guard", m_globalCtx.Get("guard"));
             m_ctx.Register("config", m_globalCtx.Get("config"));
-            m_ctx.Register("logger", m_globalCtx.Get("logger")); // 초기 조립 로그용 (System Logger)
+            m_ctx.Register("logger", m_globalCtx.Get("logger"));
+            m_ctx.Register("orchestrator", m_globalCtx.Get("orchestrator"));
         }
 
         m_ctx.Register("repo", m_repo);
@@ -238,7 +252,7 @@ private:
 
         InitSequence();
         
-        m_isActive = true; //-- [Warm-up Fix] 생성 시 즉시 활성화 (Pool에서 관리됨)
+        m_isActive = true; 
     }
 
     void InitLogger(string sid, ICXServiceFactory* factory) {
@@ -257,118 +271,18 @@ private:
         CXFluentSequence* seq = dynamic_cast<CXFluentSequence*>(m_sequence);
         if(IS_INVALID(seq)) return;
 
-        // 로그 출력을 위한 임시 파라미터 (Context 연결 필수)
-        CXParam xp;
-        xp.SetContext(m_ctx);
-
-        XP_LOG_TRACE(GetPointer(xp), "Assembling Hyper-Atomized Sequence Architecture...");
-
-        //-- 1. 진입 파이프라인 (Entry Pipeline) - Hyper-Atomized (L-G-G-P-R -> V-V-V -> V-P)
-        
-        //-- [1.1] Entry: Logic & Request -> Transit
-        CXCompositeStep* entryStep_L = new CXCompositeStep("Step_Entry_Logic");
-        entryStep_L.AddTask(new CXTaskEntry_L_Validate())
-                 .AddTask(new CXTaskGuard_V_Spread())
-                 .AddTask(new CXTaskGuard_V_Volatility())
-                 .AddTask(new CXTaskEntry_P_Lock())
-                 .AddTask(new CXTaskEntry_R_Order()); // Returns STATE_ENTRY_TRANSIT
-
-        seq.From(SESSION_READY).Execute(entryStep_L)
-           .OnSuccess(STATE_ENTRY_TRANSIT)
-           .OnFail(SESSION_ERROR)
-           .Case(SESSION_ACTIVE, SESSION_ACTIVE)
-           .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)
-           .Timeout(300);
-
-        //-- [1.2] Entry: Transit & Terminal Verify -> Verify Ready
-        CXCompositeStep* entryStep_V = new CXCompositeStep("Step_Entry_Transit");
-        entryStep_V.AddTask(new CXTaskEntry_V_Error())
-                 .AddTask(new CXTaskEntry_V_Ticket())
-                 .AddTask(new CXTaskEntry_V_Real()); // Returns STATE_ENTRY_VERIFY
-
-        seq.From(STATE_ENTRY_TRANSIT).Execute(entryStep_V)
-           .OnSuccess(STATE_ENTRY_VERIFY)
-           .OnFail(SESSION_ERROR)
-           .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)
-           .Timeout(60);
-
-        //-- [1.3] Entry: DoubleCheck & Persistence -> Active/Trailing
-        CXCompositeStep* entryStep_P = new CXCompositeStep("Step_Entry_Verify");
-        entryStep_P.AddTask(new CXTaskFinalize_V_DoubleCheck())
-                 .AddTask(new CXTaskEntry_P_Finalize()); // Returns SESSION_ACTIVE or STATE_ENTRY_TRAILING
-
-        seq.From(STATE_ENTRY_VERIFY).Execute(entryStep_P)
-           .OnFail(SESSION_ERROR)
-           .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)
-           .Timeout(30);
-
-        //-- 2. 대기 파이프라인 (Pending Pipeline)
-        CXCompositeStep* pendingStep = new CXCompositeStep("Step_PendingComposite");
-        pendingStep.AddTask(new CXTaskPending_V_Sync())
-                   .AddTask(new CXTaskPending_L_Rebound())
-                   .AddTask(new CXTaskPending_L_Improve())
-                   .AddTask(new CXTaskPending_R_Apply());
-
-        seq.From(STATE_ENTRY_TRAILING).Execute(pendingStep)
-           .OnSuccess(SESSION_ACTIVE)
-           .OnFail(SESSION_ERROR)
-           .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)
-           .Timeout(3600);
-
-        //-- 3. 활성 파이프라인 (Monitoring & TS)
-        CXCompositeStep* activeStep = new CXCompositeStep("Step_ActiveComposite");
-        activeStep.AddTask(new CXTaskIntentWatch()) //-- [v11.7] Prioritize intent check
-                  .AddTask(new CXTaskComm_V_Status())
-                  .AddTask(new CXTaskSync_V_Stale())
-                  .AddTask(new CXTaskActive_V_Terminal())
-                  .AddTask(new CXTaskActive_P_Align())
-                  .AddTask(new CXTaskActive_L_Status())
-                  .AddTask(new CXTaskAlphaCalc())
-                  .AddTask(new CXTaskAlphaApply());
-
-        seq.From(SESSION_ACTIVE).Execute(activeStep)
-           .Case(SESSION_LIQUIDATING, SESSION_LIQUIDATING)
-           .Timeout(72000); 
-
-        //-- 4. 청산 파이프라인 (Liquidation Pipeline) - Hyper-Atomized (L-P-R -> V-V -> P)
-        
-        //-- [4.1] Exit: Logic & Request -> Transit
-        CXCompositeStep* exitStep_L = new CXCompositeStep("Step_Exit_Logic");
-        exitStep_L.AddTask(new CXTaskExit_L_Prepare())
-                .AddTask(new CXTaskExit_P_Lock())
-                .AddTask(new CXTaskExit_R_Order()); // Returns STATE_LIQUIDATING_TRANSIT
-
-        seq.From(SESSION_LIQUIDATING).Execute(exitStep_L)
-           .OnSuccess(STATE_LIQUIDATING_TRANSIT)
-           .OnFail(SESSION_ERROR)
-           .Timeout(300)
-           .Retries(3);
-
-        //-- [4.2] Exit: Transit & Terminal Verify -> Verify Ready
-        CXCompositeStep* exitStep_V = new CXCompositeStep("Step_Exit_Transit");
-        exitStep_V.AddTask(new CXTaskExit_V_Error())
-                .AddTask(new CXTaskExit_V_Terminal()); // Returns STATE_EXIT_VERIFY
-
-        seq.From(STATE_LIQUIDATING_TRANSIT).Execute(exitStep_V)
-           .OnSuccess(STATE_EXIT_VERIFY)
-           .OnFail(SESSION_ERROR)
-           .Timeout(60);
-
-        //-- [4.3] Exit: Persistence -> Closed
-        CXCompositeStep* exitStep_P = new CXCompositeStep("Step_Exit_Verify");
-        exitStep_P.AddTask(new CXTaskExit_P_Finalize()); // Returns SESSION_CLOSED
-
-        seq.From(STATE_EXIT_VERIFY).Execute(exitStep_P)
-           .OnSuccess(SESSION_CLOSED)
-           .OnFail(SESSION_ERROR)
-           .Timeout(30);
-        
-        seq.Build();
+        //--- [Orchestration] 시퀀스 조립 위임
+        CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(m_ctx, "orchestrator", CXSequenceOrchestrator);
+        if(IS_VALID(orchestrator)) {
+            orchestrator.BuildSessionSequence(seq);
+        }
         
         //-- [v10.2] Detailed Assembly Report
         string info = StringFormat("Sequence Assembly Complete: [Name:%s] [Nodes:%d] [States:{%s}]", 
                                    seq.GetSequenceName(), seq.GetNodeCount(), seq.GetStateSummary());
-        XP_LOG_INFO(GetPointer(xp), info);
+        
+        ICXLogger* log = CX_GET_OBJ(m_ctx, "logger", ICXLogger);
+        if(IS_VALID(log)) log.Info(NULL, info);
     }
 };
 

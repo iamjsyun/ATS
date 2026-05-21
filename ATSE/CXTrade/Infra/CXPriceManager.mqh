@@ -2,7 +2,6 @@
 #define CXPRICEMANAGER_MQH
 
 #include "..\Interfaces\ICXPriceManager.mqh"
-#include "..\Interfaces\ICXPriceManager.mqh"
 #include "..\Interfaces\ICXSymbolManager.mqh"
 #include "..\Interfaces\ICXContext.mqh"
 #include "..\Interfaces\CXDefine.mqh"
@@ -39,6 +38,15 @@ public:
         double currentAsk = SymbolInfoDouble(symbol, SYMBOL_ASK);
         double currentBid = SymbolInfoDouble(symbol, SYMBOL_BID);
         return (dir == CX_DIR_BUY) ? currentAsk : currentBid;
+    }
+
+    /**
+     * @brief 방향에 따른 청산 가격 추출 (Buy->Bid, Sell->Ask)
+     */
+    virtual double GetLiquidationPrice(string symbol, int dir) override {
+        double currentAsk = SymbolInfoDouble(symbol, SYMBOL_ASK);
+        double currentBid = SymbolInfoDouble(symbol, SYMBOL_BID);
+        return (dir == CX_DIR_BUY) ? currentBid : currentAsk;
     }
 
     /**

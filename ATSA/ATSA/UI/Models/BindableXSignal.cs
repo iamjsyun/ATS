@@ -113,11 +113,13 @@ namespace ATSA.UI.Models
         {
             get => (XCode.EaStatus)base.xe_status switch { 
                 XCode.EaStatus.Ready => "0:READY", 
-                XCode.EaStatus.PendingPlaced => "1:PENDING", 
+                XCode.EaStatus.PendingReq => "1:PENDING_REQ", 
+                XCode.EaStatus.InTransit => "2:IN_TRANSIT", 
+                XCode.EaStatus.PendingPlaced => "5:PENDING_PLACED", 
                 XCode.EaStatus.Executed => "10:EXECUTED", 
                 XCode.EaStatus.Closed_Signal => "20:CLOSED_SIG", 
-                XCode.EaStatus.Closed_TP => "21:CLOSED_TP", 
-                XCode.EaStatus.Closed_SL => "23:CLOSED_SL", 
+                XCode.EaStatus.Closed_SL => "21:CLOSED_SL", 
+                XCode.EaStatus.Closed_TP => "22:CLOSED_TP", 
                 XCode.EaStatus.Closed_Manual => "24:CLOSED_MANUAL", 
                 XCode.EaStatus.Error => "99:ERROR", 
                 _ => $"{base.xe_status}:UNK" 

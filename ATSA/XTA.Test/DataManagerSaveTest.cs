@@ -43,11 +43,19 @@ namespace XTA.Test
             _param = new XParameter();
             _param.Config.System.DatabaseFullPath = _testDbPath;
 
-            // 기본 정책 설정
-            _param.Config.ChannelDefault.TradingOption.Buy = new XDirectionOption { Enabled = true, LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01 } };
-            _param.Config.ChannelDefault.TradingOption.Sell = new XDirectionOption { Enabled = true, LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01 } };
+            // [Important] 정책 초기화
+            var channelConfig = new XChannelConfig 
+            { 
+                CNO = 1001, 
+                TradingOption = new XTradingOption { 
+                    Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
+                    Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                } 
+            };
+            _param.Config.Channels.Add(channelConfig);
 
             _dbSvc = new XpoSqliteService(_param);
+
             services.AddSingleton(_param);
             services.AddSingleton(_dbSvc);
             services.AddSingleton<ISignalRepository>(_dbSvc);

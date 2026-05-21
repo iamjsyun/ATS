@@ -107,31 +107,34 @@ namespace ATSA.UI.DataManager
                 if (policy != null)
                 {
                     SelectedSignal.symbol = "GOLD#";
-                    if (policy.LotStrategy != null)
+                    var strategy = policy.LotStrategyObj;
+                    if (strategy != null)
                     {
-                        if (policy.LotStrategy.Type == "Fixed")
+                        if (strategy.Type == "Fixed")
                         {
                             SelectedSignal.SelectedLotType = "1:고정 로트";
-                            SelectedSignal.lot = policy.LotStrategy.Value;
+                            SelectedSignal.lot = strategy.Value;
                         }
-                        else if (policy.LotStrategy.Type == "Rate")
+                        else if (strategy.Type == "Rate")
                         {
                             SelectedSignal.SelectedLotType = "2:배수 로트";
-                            SelectedSignal.lot = policy.LotStrategy.Rate;
+                            SelectedSignal.lot = strategy.Rate;
                         }
                     }
-                    if (policy.Entry != null)
+                    var entry = policy.EntryObj;
+                    if (entry != null)
                     {
-                        SelectedSignal.te_start = policy.Entry.TeStart;
-                        SelectedSignal.te_step = policy.Entry.TeStep;
-                        SelectedSignal.te_limit = policy.Entry.TeLimit;
+                        SelectedSignal.te_start = entry.TeStart;
+                        SelectedSignal.te_step = entry.TeStep;
+                        SelectedSignal.te_limit = entry.TeLimit;
                     }
-                    if (policy.Exit != null)
+                    var exit = policy.ExitObj;
+                    if (exit != null)
                     {
-                        SelectedSignal.ts_start = policy.Exit.TsStart;
-                        SelectedSignal.ts_step = policy.Exit.TsStep;
-                        SelectedSignal.tp = policy.Exit.TP;
-                        SelectedSignal.sl = policy.Exit.SL;
+                        SelectedSignal.ts_start = exit.TsStart;
+                        SelectedSignal.ts_step = exit.TsStep;
+                        SelectedSignal.tp = exit.TP;
+                        SelectedSignal.sl = exit.SL;
                     }
                 }
 
@@ -258,11 +261,12 @@ namespace ATSA.UI.DataManager
             {
                 var merged = _param.GetMergedConfig(SelectedSignal.cno);
                 var policy = (SelectedSignal.dir == XCode.BUY) ? merged.TradingOption.Buy : merged.TradingOption.Sell;
-                if (policy?.Entry != null)
+                var entry = policy?.EntryObj;
+                if (entry != null)
                 {
-                    SelectedSignal.te_start = policy.Entry.TeStart;
-                    SelectedSignal.te_step = policy.Entry.TeStep;
-                    SelectedSignal.te_limit = policy.Entry.TeLimit;
+                    SelectedSignal.te_start = entry.TeStart;
+                    SelectedSignal.te_step = entry.TeStep;
+                    SelectedSignal.te_limit = entry.TeLimit;
                     SelectedSignal.RefreshAll();
                     GenerateCurrentMessage();
                 }
@@ -278,12 +282,13 @@ namespace ATSA.UI.DataManager
             {
                 var merged = _param.GetMergedConfig(SelectedSignal.cno);
                 var policy = (SelectedSignal.dir == XCode.BUY) ? merged.TradingOption.Buy : merged.TradingOption.Sell;
-                if (policy?.Exit != null)
+                var exit = policy?.ExitObj;
+                if (exit != null)
                 {
-                    SelectedSignal.ts_start = policy.Exit.TsStart;
-                    SelectedSignal.ts_step = policy.Exit.TsStep;
-                    SelectedSignal.tp = policy.Exit.TP;
-                    SelectedSignal.sl = policy.Exit.SL;
+                    SelectedSignal.ts_start = exit.TsStart;
+                    SelectedSignal.ts_step = exit.TsStep;
+                    SelectedSignal.tp = exit.TP;
+                    SelectedSignal.sl = exit.SL;
                     SelectedSignal.RefreshAll();
                     GenerateCurrentMessage();
                 }

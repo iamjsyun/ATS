@@ -21,6 +21,37 @@ namespace XTA.Services
         private void OnRawMessageReceived(XDataObject xdo)
         {
             if (xdo == null) return;
+
+            // [v10.0] Global SourceType Check
+            string globalSource = param.Config?.System?.SourceType ?? "Telegram";
+            
+            // Simulator 모드인 경우, 명시적으로 Simulator에서 온 메시지만 허용 (또는 다른 필터링 로직)
+            if (globalSource == "Simulator")
+            {
+                if (xdo.Sender != "Simulator")
+                {
+                    nlog.Trace($"[Gateway:SKIP] Global source is Simulator. Dropping {xdo.Sender} message (MsgId:{xdo.MsgId})");
+                    return;
+                }
+            }
+            else if (globalSource == "YouTube")
+            {
+                // YouTube 모드인 경우, Telegram 등 타 소스 무시
+                if (xdo.Sender != "YouTubeVision")
+                {
+                    nlog.Trace($"[Gateway:SKIP] Global source is YouTube. Dropping {xdo.Sender} message (MsgId:{xdo.MsgId})");
+                    return;
+                }
+            }
+            else // Default: Telegram
+            {
+                if (xdo.Sender != "XTelegram")
+                {
+                    nlog.Trace($"[Gateway:SKIP] Global source is Telegram. Dropping {xdo.Sender} message (MsgId:{xdo.MsgId})");
+                    return;
+                }
+            }
+
             lock (_processedMsgIds) {
                 if (_processedMsgIds.Contains(xdo.MsgId)) return;
                 _processedMsgIds.Add(xdo.MsgId);

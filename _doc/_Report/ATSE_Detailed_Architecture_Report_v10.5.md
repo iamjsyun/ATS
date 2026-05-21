@@ -1,4 +1,7 @@
-﻿# 📘 ATSE Master Design & Architecture Specification (v10.5)
+﻿# ⚠️ DEPRECATED: Superseded by _doc/spec.md (v11.3)
+**Note**: This document (v10.5) is now for historical reference only. All active development and architectural mandates must follow the **ATS Master Design Specification (v11.3)** in `_doc/spec.md`.
+
+# 📘 ATSE Master Design & Architecture Specification (v10.5)
 
 ## 1. 아키텍처 철학 및 핵심 원칙 (Core Principles)
 - **1 Task = 1 Responsibility (1T1R)**: 모든 비즈니스 로직은 하이퍼 원자화(Hyper-Atomized)되어 단일 책임을 가짐.

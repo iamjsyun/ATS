@@ -88,14 +88,16 @@ public:
         double finalSL = priceMgr.CalculateSL(xp, symbol, dir, basePrice, sig.GetSL());
         double finalTP = priceMgr.CalculateTP(xp, symbol, dir, basePrice, sig.GetTP());
 
-        //--- [v10.10 Enhancement] Pre-flight StopLevel Validation
+        //--- [v10.10 Enhancement] Pre-flight StopLevel Validation (v11.5: Liquidation Price Aligned)
         if(IS_VALID(guard)) {
-            if(!guard.ValidateStopLevel(symbol, basePrice, finalSL)) {
-                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0 to avoid 10016.", basePrice, finalSL));
+            double vBase = (sig.GetType() == ORDER_MARKET) ? priceMgr.GetLiquidationPrice(symbol, dir) : basePrice;
+            
+            if(!guard.ValidateStopLevel(symbol, vBase, finalSL)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0 to avoid 10016.", vBase, finalSL));
                 finalSL = 0;
             }
-            if(!guard.ValidateStopLevel(symbol, basePrice, finalTP)) {
-                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0 to avoid 10016.", basePrice, finalTP));
+            if(!guard.ValidateStopLevel(symbol, vBase, finalTP)) {
+                XP_LOG_WARN(xp, StringFormat("[EXEC-ENTRY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0 to avoid 10016.", vBase, finalTP));
                 finalTP = 0;
             }
         }
@@ -229,17 +231,22 @@ public:
         //--- [v11.2 StopLevel Validation]
         ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
         IXGuard*             guard  = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+        ICXPriceManager*     priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
 
-        if(IS_VALID(invMgr) && IS_VALID(guard) && PositionSelectByTicket(ticket)) {
+        if(IS_VALID(invMgr) && IS_VALID(guard) && IS_VALID(priceMgr) && PositionSelectByTicket(ticket)) {
             string symbol = PositionGetString(POSITION_SYMBOL);
-            double price  = PositionGetDouble(POSITION_PRICE_OPEN);
+            ENUM_POSITION_TYPE posType = (ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE);
+            int dir = (posType == POSITION_TYPE_BUY) ? CX_DIR_BUY : CX_DIR_SELL;
             
-            if(!guard.ValidateStopLevel(symbol, price, sl)) {
-                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] SL too close (P:%.5f, SL:%.5f). Resetting SL to 0.", price, sl));
+            //--- [v11.5 Alignment] For active positions, StopLevel is validated against liquidation price (Bid for Buy, Ask for Sell)
+            double vBase = priceMgr.GetLiquidationPrice(symbol, dir);
+            
+            if(!guard.ValidateStopLevel(symbol, vBase, sl)) {
+                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0.", vBase, sl));
                 sl = 0;
             }
-            if(!guard.ValidateStopLevel(symbol, price, tp)) {
-                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] TP too close (P:%.5f, TP:%.5f). Resetting TP to 0.", price, tp));
+            if(!guard.ValidateStopLevel(symbol, vBase, tp)) {
+                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0.", vBase, tp));
                 tp = 0;
             }
         }

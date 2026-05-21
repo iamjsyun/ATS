@@ -8,7 +8,7 @@ namespace XTA.Services
     {
         private void ApplyDirectionPolicy(Models.XSignal s, XDirectionOption policy)
         {
-            var strategy = policy.LotStrategy;
+            var strategy = policy.LotStrategyObj;
             if (strategy != null)
             {
                 if (strategy.Type == "Fixed")
@@ -24,19 +24,21 @@ namespace XTA.Services
                 }
             }
 
-            if (policy.Entry != null)
+            var entry = policy.EntryObj;
+            if (entry != null)
             {
-                s.te_start = policy.Entry.TeStart;
-                s.te_step = policy.Entry.TeStep;
-                s.te_limit = policy.Entry.TeLimit;
+                s.te_start = entry.TeStart;
+                s.te_step = entry.TeStep;
+                s.te_limit = entry.TeLimit;
             }
 
-            if (policy.Exit != null)
+            var exit = policy.ExitObj;
+            if (exit != null)
             {
-                s.ts_start = policy.Exit.TsStart;
-                s.ts_step = policy.Exit.TsStep;
-                s.tp = policy.Exit.TP;
-                s.sl = policy.Exit.SL;
+                s.ts_start = exit.TsStart;
+                s.ts_step = exit.TsStep;
+                s.tp = exit.TP;
+                s.sl = exit.SL;
             }
         }
     }

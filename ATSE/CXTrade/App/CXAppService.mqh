@@ -20,6 +20,8 @@
 #include "..\Models\CXContext.mqh"
 #include "..\Infra\Sync\CXReverseInjector.mqh"
 
+#include "..\Infra\CXSequenceOrchestrator.mqh"
+
 class CXAppService : public ICXAppService {
 private:
     ICXConfig*            m_config;
@@ -30,6 +32,7 @@ private:
     CXReverseInjector*    m_injector;
     ICXContext*           m_globalContext;
     IXGuard*              m_guard;
+    CXSequenceOrchestrator* m_orchestrator;
     ICXServiceFactory*    m_factory;
     ICXLogger*            m_logger; // 시스템 통합 로거
     
@@ -37,7 +40,7 @@ public:
     CXAppService(ICXConfig* config) : m_config(config), m_db(NULL), m_repo(NULL), 
                                       m_watcher(NULL), m_sessionPool(NULL), 
                                       m_injector(NULL), m_globalContext(NULL), 
-                                      m_guard(NULL), m_factory(NULL), m_logger(NULL) {}
+                                      m_guard(NULL), m_orchestrator(NULL), m_factory(NULL), m_logger(NULL) {}
     
     virtual ~CXAppService() {
         SAFE_DELETE(m_db);
@@ -46,6 +49,7 @@ public:
         SAFE_DELETE(m_injector);
         SAFE_DELETE(m_sessionPool);
         SAFE_DELETE(m_guard);
+        SAFE_DELETE(m_orchestrator);
         SAFE_DELETE(m_globalContext);
         SAFE_DELETE(m_factory);
         SAFE_DELETE(m_logger);
@@ -59,9 +63,14 @@ public:
         m_factory = new CXServiceFactory();
         if(IS_INVALID(m_factory)) return false;
 
-        m_globalContext = new CXContext();
+        m_globalContext = new CXContext("Global");
         if(IS_INVALID(m_globalContext)) return false;
         m_globalContext.Register("config", m_config);
+
+        // 1.1 시퀀스 오케스트레이터 초기화 (모든 시퀀스 조립의 근간)
+        m_orchestrator = new CXSequenceOrchestrator();
+        if(IS_INVALID(m_orchestrator)) return false;
+        m_globalContext.Register("orchestrator", m_orchestrator);
 
         // 2. 시스템 통합 로거 초기화 (SID: System)
         if(m_config.IsBootLogEnabled()) {
@@ -121,7 +130,32 @@ public:
         if(IS_INVALID(m_watcher)) return false;
         
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_INFO, ">>> ATSE Framework Initialization Complete <<<");
+        
+        ExportSchema(); // [SSOT Bridge]
         return true;
+    }
+    
+    /**
+     * @brief [SSOT Bridge] MQL5 매크로 스키마를 JSON으로 익스포트
+     */
+    void ExportSchema() {
+        string json = "{\n  \"fields\": [\n";
+        #define X(type, name, dbType, getter) \
+            json += StringFormat("    { \"name\": \"%s\", \"type\": \"%s\", \"dbType\": \"%s\", \"getter\": \"%s\" },\n", \
+                                 #name, typename(type), #dbType, #getter);
+        SIGNAL_SCHEMA_FIELDS
+        #undef X
+        
+        // 마지막 쉼표 제거
+        if(StringLen(json) > 3) json = StringSubstr(json, 0, StringLen(json)-2) + "\n";
+        json += "  ]\n}";
+
+        int h = FileOpen("SCHEMA.json", FILE_WRITE|FILE_TXT|FILE_COMMON|FILE_ANSI);
+        if(h != INVALID_HANDLE) {
+            FileWriteString(h, json);
+            FileClose(h);
+            if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_DEBUG, "[BRIDGE] Schema metadata exported to Common\\Files\\SCHEMA.json");
+        }
     }
     
     virtual void Pulse() override {

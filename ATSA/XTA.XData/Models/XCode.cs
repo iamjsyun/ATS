@@ -47,9 +47,9 @@ namespace XTA.XData.Models
         public enum EaStatus
         {
             Ready = 0,            // 초기 상태 (XE_READY)
-            PendingPlaced = 1,    // 대기 오더 접수 중 (XE_PENDING_PLACED)
-            PendingReq = 2,       // [v9.9.2] 브로커 요청 전 DB 잠금 (XE_PENDING_REQ)
-            InTransit = 3,        // [v9.9.2] 명령 송신 완료, 동기화 대기 (XE_IN_TRANSIT)
+            PendingReq = 1,       // [v11.3] 브로커 요청 전 DB 잠금 (XE_PENDING_REQ)
+            InTransit = 2,        // [v11.3] 명령 송신 완료, 동기화 대기 (XE_IN_TRANSIT)
+            PendingPlaced = 5,    // [v11.3] 대기 오더 접수 중 (XE_PENDING_PLACED)
             Executed = 10,        // 체결 완료 / 포지션 진입 (XE_EXECUTED)
 
             // [v1.5] 익절 트레일링(IkTe) 전용 상태 코드
@@ -58,11 +58,11 @@ namespace XTA.XData.Models
 
             // [v1.3 Patch] 청산 상세 상태 코드 (XE_CLOSED_XXX)
             Closed_Signal = 20,   // 신호 청산 (XE_CLOSED_SIGNAL)
-            Closed_TP = 21,       // 익절 청산 (XE_CLOSED_TP)
-            Closed_IKTE = 22,     // 익트 청산 (XE_CLOSED_IKTE)
-            Closed_SL = 23,       // 손절 청산 (XE_CLOSED_SL)
+            Closed_SL = 21,       // [v11.3] 손절 청산 (XE_CLOSED_SL)
+            Closed_TP = 22,       // [v11.3] 익절 청산 (XE_CLOSED_TP)
+            Closed_IKTE = 23,     // 익트 청산 (XE_CLOSED_IKTE)
             Closed_Manual = 24,   // 수동 청산 (XE_CLOSED_MANUAL)
-            VerifyAbs = 25,       // [v9.9.2] 청산 후 소멸 검증 (XE_VERIFY_ABS)
+            VerifyAbs = 25,       // 청산 후 소멸 검증 (XE_VERIFY_ABS)
 
             Error = 99            // 에러 발생 (XE_ERROR)
         }

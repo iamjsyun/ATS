@@ -79,6 +79,23 @@ namespace XTA.XData.Models
             return Regex.IsMatch(gid, @"^\d{4}-\d{8}-\d{2}-\d{2}$");
         }
 
+        /// <summary>
+        /// SID에서 GNO(Grid Number) 추출 (DB 스키마 GNO 필드 삭제에 따른 동적 추론)
+        /// Format: CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)
+        /// </summary>
+        public int ExtractGnoFromSid(string sid)
+        {
+            if (IsValidSid(sid))
+            {
+                var parts = sid.Split(SEP[0]);
+                if (parts.Length >= 4 && int.TryParse(parts[3], out int gno))
+                {
+                    return gno;
+                }
+            }
+            return 0;
+        }
+
         private void AddToCache(string id)
         {
             if (_idCache.TryAdd(id, 0))

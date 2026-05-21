@@ -83,11 +83,13 @@ public:
     virtual bool ValidateStopLevel(string symbol, double base_price, double target_price) {
         if(target_price <= 0) return true; // Ignore if not set
         
-        double stops_lvl = SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL) * SymbolInfoDouble(symbol, SYMBOL_POINT);
+        //--- [v11.5 Enhancement] Add 1-point safety buffer to avoid tight rejects
+        double pt = SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double stops_lvl = (SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL) + 1) * pt;
         double diff = MathAbs(base_price - target_price);
         
         if(diff < stops_lvl) {
-            return SetError(StringFormat("Distance too small (StopsLevel: %.5f)", stops_lvl));
+            return SetError(StringFormat("Distance too small (StopsLevel+1: %.5f, Current: %.5f)", stops_lvl, diff));
         }
         return true;
     }

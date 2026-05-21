@@ -14,6 +14,7 @@ public:
 
     //-- 시장가 및 기본 포인트 변환
     virtual double GetMarketPrice(string symbol, int dir) = 0;
+    virtual double GetLiquidationPrice(string symbol, int dir) = 0;
     virtual double PointsToPrice(string symbol, int points) = 0;
 
     //-- [핵심] 오더 실행가 계산 (시장가 +/- 오프셋)

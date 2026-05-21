@@ -1,6 +1,6 @@
 ## Gemini Added Memories
 - PDCA 문서(Plan, Design, Analysis, Report)는 항상 한국어로 작성한다.
-- 바이너리(예: .ex5) 생성 및 빌드 작업은 사용자의 명시적인 요청이 있을 때만 수행한다.
+- 바이너리(예: .ex5) 생성 및 빌드 작업은 사용자의 명시적인 요청이 있을 때만 수행한다. (ATSE 포함 모든 프로젝트)
 - 기본 언어는 한국어이며, 모든 문서는 UTF-8로 저장한다.
 - MT5 컴파일러 경로는 'D:\Program Files\XM Global MT5\MetaEditor64.exe'이다.
 - 모든 응답, 셸 명령 출력 및 문자열 생성 시 한국어를 사용하며, 파일 저장 및 출력 인코딩은 반드시 UTF-8을 준수한다.

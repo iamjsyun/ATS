@@ -19,22 +19,59 @@ The ATS system is a modern, object-oriented trading engine designed to replace c
 
 ## 2. System Architecture
 
-### 2.1 Framework Fundamentals (MQL5 Implementation)
+### 2.1. 데이터 스키마 (signals 테이블 / 41개 필드)
+시스템의 모든 영속 데이터는 SQLite의 `signals` 테이블을 기준으로 관리된다.
+
+| 분류 | 필드명 | 타입 | 상세 설명 |
+| :--- | :--- | :---: | :--- |
+| **식별자** | `id`, `sid`, `gid` | PK, string | 레코드 ID, 신호 식별자, 그룹 식별자 |
+| | `cno`, `sno` | int | 채널 번호, 세션 번호 |
+| | `msg_id`, `raw_id` | int | 텔레그램 메시지 ID, 원본 데이터 ID |
+| **의도 및 상태** | `xa_entry`, `xa_exit` | int | 진입 의도(1=ACTIVE), 청산 의도(1=ACTIVE, 2=COMP, 3=ARCH) |
+| | `xe_status`, `xe_status_msg` | int, text | 상세 실행 상태 코드 및 결과 메시지 |
+| **시장 정보** | `time`, `symbol`, `dir`, `type` | string, int | 신호 발생 시간, 심볼, 방향(1=Buy, 2=Sell), 타입(1=Trl, 2=Lim, 3=Stop, 9=Mkt) |
+| | `price_signal`, `lot` | double | 신호 발생 당시 가격, 주문 로트 수량 |
+| **트레일링(TE/TS)** | `te_start`, `te_step`, `te_limit` | double | 트레일링 진입 시작점, 간격, 한계점 |
+| | `te_interval`, `ikte_start`, `ikte_step` | int, double | 트레일링 체크 간격, 익절 트레일링 시작/간격 |
+| **리스크 및 목표** | `tp`, `sl` | double | 목표가(TP), 손절가(SL) |
+| | `ts_start`, `ts_step`, `close_type` | int | 트레일링 스탑 시작/간격, 종료 타입 |
+| **물리 실행 정보** | `trail_price`, `price_limit`, `price` | double | 현재 추적 가격, 진입 한계가, 최종 실행가 |
+| | `price_open`, `price_close` | double | 실물 오픈 가격, 실물 청산 가격 |
+| | `price_tp`, `price_sl` | double | 실물 적용 TP/SL 가격 |
+| | `ticket`, `magic` | numeric | 브로커 티켓 번호, 엑스퍼트 매직 넘버 |
+| **메타데이터** | `comment`, `tag` | string | 주문 코멘트, 태그 |
+| | `created`, `updated` | datetime | 생성일시, 수정일시 |
+
+### 2.2 Framework Fundamentals (MQL5 Implementation)
 - **Dependency Injection (CXContext)**: Service Locator & DI Container.
 - **Message Passing (CXParam)**: Transient Event DTO.
 - **Surgical Resolve (CX_GET_OBJ)**: Type-safe service resolution.
 
-### 2.2 ID Design Rules (v8.2)
+### 2.3 ID Design Rules (v8.2)
 - **SID (Signal ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)` (총 23자)
 - **GID (Group ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)` (총 19자)
 
-### 2.3 DataManager State Transition Matrix (v9.8.11)
+### 2.4 DataManager State Transition Matrix (v9.8.11)
+
+#### 2.3.1 Logical Intent Matrix (Governance)
 | 작업 명칭 | xa_entry | xa_exit | xe_status | 상세 설명 |
 | :--- | :---: | :---: | :---: | :--- |
 | **신규 주입 (Save)** | **1** | **0** | **0 (READY)** | 신규 신호 READY 상태 |
 | **청산 요청 (Exit)** | 유지 | **1 (ACTIVE)** | 유지 | 청산 명령 ACTIVE 상태 |
 | **청산 완료 (Comp)** | 유지 | **2 (COMP)** | **20 (CLOSED)** | 실행 계층 강제 종료 마킹 |
 | **이관 대기 (Arch)** | 유지 | **3 (ARCH)** | 유지 | 아카이브 대기 상태 |
+
+#### 2.3.2 Physical Execution States (xe_status Details)
+실행 계층(ATSE)은 다음의 상세 상태 코드를 사용하여 생명주기를 관리한다.
+1. **READY (0)**: 신호 최초 주입 및 대기.
+2. **PENDING_REQ (1)**: 브로커로 대기 주문(Limit/Stop) 송신 중.
+3. **IN_TRANSIT (2)**: 시장가(Market) 주문 송신 및 체결 대기 중.
+4. **PENDING_PLACED (5)**: 대기 주문이 브로커 터미널에 정상 등록됨.
+5. **EXECUTED (10)**: 실제 포지션 오픈 완료 (Active Trading).
+6. **CLOSED_SIGNAL (20)**: 사용자/시스템 신호에 의한 청산 완료.
+7. **CLOSED_SL (21)**: Stop Loss에 의한 강제 청산 완료.
+8. **CLOSED_TP (22)**: Take Profit에 의한 청산 완료.
+9. **ERROR (99)**: 치명적 에러 발생 및 시스템 강제 종료.
 
 ---
 
@@ -76,4 +113,4 @@ Every trading action must verify physical state in MT5 immediately after the req
 3.  **물리적 자산 재검색**: 함수 호출 직후 터미널의 실물 자산 존재 여부를 재확인한다.
 
 ---
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-05-21

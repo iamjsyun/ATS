@@ -6,6 +6,7 @@ This agent is the **Executor**.
 
 ## Constraints
 - **Architecture**: Interface-First Mandate (IX*).
+- **No Magic Numbers**: Raw numbers (state IDs, types, timeouts) are PROHIBITED. Use `enum` or named constants.
 - **ID Safety**: SIDs/GIDs are IMMUTABLE. Do NOT modify them.
 - **Log Standard**: Use `_log/` directory. Use MQL5 `FILE_COMMON`.
 - **Validation**: Post-Action Verification (MT5 re-check) is MANDATORY.
