@@ -1,18 +1,20 @@
-﻿#ifndef CXPOSITIONMANAGER_MQH
+#ifndef CXPOSITIONMANAGER_MQH
 #define CXPOSITIONMANAGER_MQH
 
 #include "..\..\Interfaces\IXPositionManager.mqh"
 #include "..\..\Interfaces\ICXContext.mqh"
 #include "..\..\Interfaces\ICXParam.mqh"
+#include "..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\Interfaces\CXDefine.mqh"
 #include "..\..\Interfaces\CXMacros.mqh"
+#include "..\..\Infra\CXMessageProvider.mqh"
 #include <Trade\Trade.mqh>
 
 #include "..\..\Interfaces\IXTrailingStrategy.mqh"
 
 /**
  * @class CXPositionManager
- * @brief 샌드박스 세션 내의 포지션 감시 및 사후 관리 담당
+ * @brief 샌드박스 세션 내의 포지션 감시 및 사후 관리 담당 (v11.3 SSOC Alignment)
  */
 class CXPositionManager : public IXPositionManager {
 private:
@@ -30,7 +32,7 @@ public:
         m_exitTrl = strategy;
     }
 
-    void SetMagic(ulong magic) { m_trade.SetExpertMagicNumber(magic); }
+    virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
 
     /**
      * @brief 포지션 유효성 확인 및 상태 업데이트
@@ -43,33 +45,32 @@ public:
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket == 0) return;
 
-        // 1. 터미널에 포지션이 살아있는지 확인
-        if(PositionSelectByTicket(ticket)) {
-            return; // 정상
+        //--- [v11.3 SSOC Resolution]
+        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        if(IS_INVALID(invMgr)) {
+            XP_LOG_ERROR(xp, "[POS-MANAGER] CRITICAL: InventoryManager Missing.");
+            return;
         }
 
-        // 2. 포지션이 사라졌다면(Broker Close), 히스토리를 뒤져 청산 사유 파악
-        if(HistorySelect(0, TimeCurrent())) {
-            int total = HistoryDealsTotal();
-            for(int i = total - 1; i >= 0; i--) {
-                ulong dealTicket = HistoryDealGetTicket(i);
-                if(HistoryDealGetInteger(dealTicket, DEAL_POSITION_ID) == ticket &&
-                   HistoryDealGetInteger(dealTicket, DEAL_ENTRY) == DEAL_ENTRY_OUT) {
-                   
-                    string comment = HistoryDealGetString(dealTicket, DEAL_COMMENT);
-                    // 터미널 자동 생성 코멘트에 SL 또는 TP 문자열이 포함됨
-                    if(StringFind(comment, "[sl]") >= 0 || StringFind(comment, "sl") >= 0) {
-                        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SL, "Closed by SL");
-                    } else if(StringFind(comment, "[tp]") >= 0 || StringFind(comment, "tp") >= 0) {
-                        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_TP, "Closed by TP");
-                    } else {
-                        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, "Closed by Broker/Terminal");
-                    }
-                    
-                    XP_LOG_INFO(xp, StringFormat("[POS-MANAGER] Position closed by broker. Reason: %s", comment));
-                    return;
-                }
-            }
+        // 1. 터미널에 포지션이 살아있는지 확인 (SSOC)
+        if(invMgr.IsPositionExists(ticket)) {
+            return; // 포지션 존재 시 정상
+        }
+
+        // 1.1 [v11.6] 포지션은 없으나 '대기 오더'로 살아있는지 확인
+        if(invMgr.IsOrderExists(ticket)) {
+            XP_LOG_TRACE(xp, StringFormat("[POS-MANAGER] OK: Position missing but Order:%I64u still active.", ticket));
+            return; 
+        }
+
+        // 2. 포지션/오더 모두 사라졌다면(Broker Close), 히스토리를 뒤져 청산 사유 파악 (SSOC)
+        string reason = "";
+        int status = invMgr.CheckHistoryClosure(ticket, reason);
+
+        if(status != XE_UNKNOWN) {
+            CXMessageProvider::UpdateStatus(sig, status, reason);
+            XP_LOG_INFO(xp, StringFormat("[POS-MANAGER] Asset closed/canceled by broker. Reason: %s", reason));
+            return;
         }
         
         // 3. 딜(Deal) 히스토리에서도 찾지 못한 경우 (동기화 지연 또는 이상 삭제)
@@ -79,18 +80,14 @@ public:
     }
 
     /**
-     * @brief 티켓으로 포지션 선택
-     */
-    bool SelectPosition(ICXParam* xp) {
-        return false;
-    }
-
-    /**
      * @brief 브로커 포지션 수정 (SL/TP) 및 상태 재확인
      */
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) override {
         XP_LOG_INFO(xp, StringFormat("[POS-MODIFY] Sending Request: [Ticket:%I64u, SL:%.5f, TP:%.5f]", 
                                         ticket, sl, tp));
+
+        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        if(IS_INVALID(invMgr)) return false;
 
         // 1. 수정 시도
         if(!m_trade.PositionModify(ticket, sl, tp)) {
@@ -105,10 +102,10 @@ public:
             return false;
         }
         
-        // 2. 재확인
-        if(PositionSelectByTicket(ticket)) {
-            double currentSL = PositionGetDouble(POSITION_SL);
-            double currentTP = PositionGetDouble(POSITION_TP);
+        // 2. 재확인 (SSOC)
+        if(invMgr.IsPositionExists(ticket)) {
+            double currentSL = invMgr.GetCurrentSL(ticket);
+            double currentTP = invMgr.GetCurrentTP(ticket);
             
             if(MathAbs(currentSL - sl) < _Point * 10 && MathAbs(currentTP - tp) < _Point * 10) {
                 XP_LOG_OK(xp, StringFormat("[POS-MODIFY] SUCCESS: Ticket %I64u Modified.", ticket));
@@ -128,6 +125,3 @@ public:
 };
 
 #endif
-
-
-

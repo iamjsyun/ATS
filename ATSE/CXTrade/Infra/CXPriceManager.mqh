@@ -10,11 +10,23 @@
 
 /**
  * @class CXPriceManager
- * @brief 가격 계산 및 무결성 검증 전문 구현체
+ * @brief 가격 계산 및 무결성 검증 전문 구현체 (v11.5 Standard)
  */
 class CXPriceManager : public ICXPriceManager {
 private:
     ICXContext* m_ctx;
+
+    /**
+     * @brief 심볼의 TickSize에 맞춰 가격을 정규화 (Standard v11.5)
+     */
+    double NormalizePrice(string symbol, double price) {
+        ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
+        double tickSize = IS_VALID(symMgr) ? symMgr.GetTickSize(symbol) : SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
+        int    digits   = IS_VALID(symMgr) ? symMgr.GetDigits(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+        
+        if(tickSize <= 0) return NormalizeDouble(price, digits);
+        return NormalizeDouble(MathRound(price / tickSize) * tickSize, digits);
+    }
 
 public:
     CXPriceManager(ICXContext* ctx) : m_ctx(ctx) {}
@@ -45,24 +57,35 @@ public:
         ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
         double marketPrice = GetMarketPrice(symbol, dir);
         double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
-        int digits = IS_VALID(symMgr) ? symMgr.GetDigits(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
         
-        if(type == ORDER_MARKET) return marketPrice;
+        if(type == ORDER_MARKET) return NormalizePrice(symbol, marketPrice);
 
         double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
-        double execPrice = NormalizeDouble(marketPrice - (offsetPts * point * dir_sign), digits);
+        double rawExecPrice = marketPrice - (offsetPts * point * dir_sign);
+        double execPrice = NormalizePrice(symbol, rawExecPrice);
 
-        // [v11.1 Guard] invalid price 사전 차단 (매수 지정가가 시장가보다 높거나 매도 지정가가 시장가보다 낮은 경우)
-        if(dir == CX_DIR_BUY && execPrice > marketPrice) {
-            XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] Correcting BUY_LIMIT: ExecPrice(%.5f) > Market(%.5f) -> Forced to Market", execPrice, marketPrice));
-            execPrice = marketPrice;
-        }
-        else if(dir == CX_DIR_SELL && execPrice < marketPrice) {
-            XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] Correcting SELL_LIMIT: ExecPrice(%.5f) < Market(%.5f) -> Forced to Market", execPrice, marketPrice));
-            execPrice = marketPrice;
+        //--- [v11.5 StopsLevel Guard] 브로커의 최소 거리 제한 준수
+        int stopsLevel = IS_VALID(symMgr) ? symMgr.GetStopsLevel(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL);
+        double tickSize = IS_VALID(symMgr) ? symMgr.GetTickSize(symbol) : SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
+        double minDistance = (stopsLevel + 1) * point; // 안전을 위해 +1 틱 적용
+        
+        if(dir == CX_DIR_BUY) {
+            // Buy Limit은 시장가(Ask)보다 아래에 있어야 함
+            double maxAllowed = marketPrice - minDistance;
+            if(execPrice > maxAllowed) {
+                XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] BUY_LIMIT Price Correction: %.5f -> %.5f (StopsLevel:%d)", execPrice, maxAllowed, stopsLevel));
+                execPrice = NormalizePrice(symbol, maxAllowed);
+            }
+        } else {
+            // Sell Limit은 시장가(Bid)보다 위에 있어야 함
+            double minAllowed = marketPrice + minDistance;
+            if(execPrice < minAllowed) {
+                XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] SELL_LIMIT Price Correction: %.5f -> %.5f (StopsLevel:%d)", execPrice, minAllowed, stopsLevel));
+                execPrice = NormalizePrice(symbol, minAllowed);
+            }
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] ExecPrice: Mkt:%.5f, Off:%.0f pts -> Exec:%.5f", marketPrice, offsetPts, execPrice));
+        XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] ExecPrice: Mkt:%.5f, Off:%.0f pts -> Final:%.5f", marketPrice, offsetPts, execPrice));
         return execPrice;
     }
 
@@ -74,10 +97,9 @@ public:
         
         ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
         double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
-        int digits = IS_VALID(symMgr) ? symMgr.GetDigits(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
         double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
 
-        double sl = NormalizeDouble(basePrice - (slPts * point * dir_sign), digits);
+        double sl = NormalizePrice(symbol, basePrice - (slPts * point * dir_sign));
         XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] SL: Base:%.5f, Off:%.0f pts -> SL:%.5f", basePrice, slPts, sl));
         return sl;
     }
@@ -90,10 +112,9 @@ public:
 
         ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
         double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
-        int digits = IS_VALID(symMgr) ? symMgr.GetDigits(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
         double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
 
-        double tp = NormalizeDouble(basePrice + (tpPts * point * dir_sign), digits);
+        double tp = NormalizePrice(symbol, basePrice + (tpPts * point * dir_sign));
         XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] TP: Base:%.5f, Off:%.0f pts -> TP:%.5f", basePrice, tpPts, tp));
         return tp;
     }

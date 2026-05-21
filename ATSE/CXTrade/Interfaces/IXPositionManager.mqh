@@ -10,6 +10,7 @@
  */
 class IXPositionManager : public CObject {
 public:
+    virtual void SetMagic(ulong magic) = 0;
     virtual void Pulse(ICXParam* xp) = 0;
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) = 0;
 };

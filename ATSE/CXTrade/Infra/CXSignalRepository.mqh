@@ -115,8 +115,9 @@ virtual int LoadActiveSignals(CArrayObj* list) override {
    }
 
    //-- 2. 필터링 쿼리 실행 (v10.22: Exclude XE_ERROR(99) to prevent zombie sessions)
-   string sql = StringFormat("SELECT * FROM signals WHERE (xa_entry > %d AND xe_status < %d AND xe_status <> %d)", 
-                             XA_RAW, XE_CLOSED_SIGNAL, XE_ERROR);
+   //-- [v11.6] Include signals with liquidation intent (xa_exit > 0)
+   string sql = StringFormat("SELECT * FROM signals WHERE ((xa_entry > %d OR xa_exit > %d) AND xe_status < %d AND xe_status <> %d)", 
+                             XA_RAW, XA_RAW, XE_CLOSED_SIGNAL, XE_ERROR);
 
    int hQuery = DatabasePrepare(m_db.GetHandle(), sql);
    if(hQuery == INVALID_HANDLE) {

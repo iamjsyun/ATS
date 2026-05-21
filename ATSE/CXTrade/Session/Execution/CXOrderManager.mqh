@@ -177,6 +177,7 @@ public:
             string err = StringFormat("[EXEC-EXIT-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
                                       m_trade.ResultRetcodeDescription(), m_trade.ResultRetcode(), GetLastError(), ticket);
             XP_LOG_ERROR(xp, err);
+            if(IS_VALID(xp)) xp.SetString(err); //-- [v11.5] Error propagation
             return false;
         }
 

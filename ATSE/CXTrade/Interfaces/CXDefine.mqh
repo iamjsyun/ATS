@@ -48,6 +48,7 @@ enum ENUM_XA_INTENT {
 
 //--- XE_STATUS (EA 실행 상태)
 enum ENUM_XE_STATUS {
+    XE_UNKNOWN          = -1,
     XE_READY            = 0,
     XE_PENDING_PLACED   = 1,
     XE_PENDING_REQ      = 2,  // [v9.9.2] 브로커 요청 전 DB 잠금 상태

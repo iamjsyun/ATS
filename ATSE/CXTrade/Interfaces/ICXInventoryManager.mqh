@@ -23,7 +23,12 @@ public:
     //-- 속성 추출
     virtual double GetCurrentVolume(ulong ticket, bool isPosition) = 0;
     virtual double GetCurrentPriceOpen(ulong ticket, bool isPosition) = 0;
+    virtual double GetCurrentSL(ulong ticket) = 0;
+    virtual double GetCurrentTP(ulong ticket) = 0;
     virtual double GetCurrentProfit(ulong ticket) = 0;
+
+    //-- 히스토리 추적
+    virtual int    CheckHistoryClosure(ulong ticket, string &reason) = 0;
 };
 
 #endif
