@@ -1,0 +1,3 @@
+{
+  "output": "Output: #ifndef CXSTEPDISCOVERY_MQH\n#define CXSTEPDISCOVERY_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"     \n#include \"..\\..\\..\\Interfaces\\IRepository.mqh\"\n#include \"..\\..\\..\\Models\\CXSignal.mqh\"       \n\n#include <Arrays\\ArrayObj.mqh>\n\n/**\n * @class CXStepDiscovery\n * @brief DB?癒�� ?醫� ?�苑� ?醫���??癒��?�\n                                           �� ?�ｍ�\n */\nclass CXStepDiscovery : public IXStep {\npublic:\n    CXStepDiscovery() {}\n    virtual ~CXStepDiscovery() {}\n\n    virtual string Name() override { return \"Step_Discovery\"; }\nProcess Group PGID: 17268"
+}

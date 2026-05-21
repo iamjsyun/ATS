@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"XE_ST_\" across 2 workspace directories."
+}

@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"SetLimitOffset\" in the workspace directory."
+}

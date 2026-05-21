@@ -1,0 +1,3 @@
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\EntryTasks.mqh. Here is the updated code:\n#ifndef ENTRYTASKS_MQH\n#define ENTRYTASKS_MQH\n\n#include \"Entry\\CXTaskEntry_L_Validate.mqh\"\n#include \"Entry\\CXTaskEntry_P_Lock.mqh\"\n#include \"Entry\\CXTaskEntry_R_Order.mqh\"\n#include \"Entry\\CXTaskEntry_V_Ticket.mqh\"\n#include \"Entry\\CXTaskEntry_V_Real.mqh\"\n#include \"Entry\\CXTaskEntry_P_Finalize.mqh\"\n\n#endif\n"
+}

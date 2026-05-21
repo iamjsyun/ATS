@@ -1,0 +1,4 @@
+Current topic: "Redirecting Watcher Logs"
+Topic summary: I've discovered why Watcher logs were missing: the `XP_LOG_XXX` macros use the logger from the `CXParam`'s context, which is the global system context, not the Watcher's private context. This sent logs to the System log file instead of the SignalWatcher log file. I'm modifying the Watcher steps (Discovery, Validation, Binding) to explicitly use the logger registered in their local context. I'm also adding a TRACE log to `Discovery` to confirm it's pulsing. This will ensure full visibility into why ID 105 is not being detected.
+
+Strategic Intent: Redirect Watcher logs to correct file and add TRACE diagnostics.

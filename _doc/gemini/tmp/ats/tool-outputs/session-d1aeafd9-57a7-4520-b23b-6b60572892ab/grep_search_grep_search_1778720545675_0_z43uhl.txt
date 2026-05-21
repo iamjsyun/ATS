@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"\\(CX[A-Z][a-z]+Manager\\*\\)|dynamic_cast<CX[A-Z][a-z]+Manager\\*>\" in the workspace directory (filter: \"ATSE/**/*.mqh\")."
+}

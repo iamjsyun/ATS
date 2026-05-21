@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSA\\ATSA\\UI\\DataManager:\nDataManagerView.xaml (27652 bytes)\nDataManagerView.xaml.cs (324 bytes)\nDataManagerViewModel.cs (24426 bytes)"
+}

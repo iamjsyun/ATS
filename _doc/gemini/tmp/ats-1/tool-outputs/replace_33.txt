@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Session\\Execution\\CXOrderManager.mqh (1 replacements). Here is the updated code:\n#ifndef CXORDERMANAGER_MQH\n#define CXORDERMANAGER_MQH\n\n#include \"..\\..\\Interfaces\\
+... [TRUNCATED] ...
+        if(OrderSelect(ticket)) {\n            XP_LOG_ERROR(NULL, StringFormat(\"[ORDER-MANAGER] Failed to confirm deletion for ticket:%lld\", ticket));\n            return false;\n        }\n        \n        return true;\n    }\n};\n\n#endif\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\replace_replace_1779172501126_0_fwjq75.txt
+</tool_output_masked>

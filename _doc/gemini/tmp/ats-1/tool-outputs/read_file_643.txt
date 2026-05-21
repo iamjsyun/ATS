@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXSTEPENTRY_MQH\n#define CXSTEPENTRY_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Interfaces\\CXDefine.mqh\"\n#include \"..\\..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\..\\Interface
+... [TRUNCATED] ...
+text* ctx) override {\n        XP_LOG_DEBUG(NULL, \"[STEP-ENTRY] Entering Entry State\");\n    }\n\n    virtual void OnExit(ICXContext* ctx) override {\n        XP_LOG_DEBUG(NULL, \"[STEP-ENTRY] Exiting Entry State\");\n    }\n};\n\n#endif\n\n\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156030380_0_2ghyur.txt
+</tool_output_masked>

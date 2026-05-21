@@ -1,0 +1,2 @@
+Output: 由ъ
+Process Group PGID: 22392

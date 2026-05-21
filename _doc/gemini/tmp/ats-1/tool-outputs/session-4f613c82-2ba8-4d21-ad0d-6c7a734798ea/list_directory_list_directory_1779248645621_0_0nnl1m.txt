@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Pending:\nCXTaskPending_L_Improve.mqh (2079 bytes)\nCXTaskPending_L_Rebound.mqh (1489 bytes)\nCXTaskPending_R_Apply.mqh (3730 bytes)\nCXTaskPending_V_Sync.mqh (1536 bytes)"
+}

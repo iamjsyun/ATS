@@ -1,0 +1,3 @@
+{
+  "output": "Output: \nATSA\\XTA\\Infrastructure\\Data\\XpoSqliteService.cs:157:                    nlog.Warn($\"[DB:SAVE_IMMEDIATE] Signal {signal.sid} is already archived. Ignoring update to preve\nnt zombie state.\");\nATSA\\XTA\\Infrastructure\\Data\\XpoSqliteService.cs:259:                                    nlog.Warn($\"[DB:QUEUE] Signal {xdo.Signal.sid} is already archived. Ignoring upda\nte to prevent zombie state.\");\nProcess Group PGID: 13368"
+}

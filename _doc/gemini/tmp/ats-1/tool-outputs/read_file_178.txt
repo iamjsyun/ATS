@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using Microsoft.Extensions.Configuration;\nusing NLog;\nusing System;\nusing System.Collections.Concurrent;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Linq;\nusing XTA.Services.TelegramService;\n\nnamespace XTA.
+... [TRUNCATED] ...
+            Exit = opt.Exit ?? def.Exit\n            };\n        }\n\n        public XChannelInfo? GetChannelByCno(int cno)\n        {\n            return Channels.Values.SelectMany(l => l).FirstOrDefault(c => c.CNO == cno);\n        }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151121531_0_7vihlh.txt
+</tool_output_masked>

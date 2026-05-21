@@ -1,0 +1,22 @@
+#ifndef ICXTRADINGSESSIONPOOL_MQH
+#define ICXTRADINGSESSIONPOOL_MQH
+
+#include <Object.mqh>
+#include "IRepository.mqh"
+#include "ICXContext.mqh"
+#include "ICXParam.mqh"
+#include "ICXServiceFactory.mqh"
+
+class CXTradingSession;
+
+class ICXTradingSessionPool : public CObject {
+public:
+    virtual ~ICXTradingSessionPool() {}
+    
+    virtual void              Initialize(IRepository* repo, ICXContext* ctx, ICXServiceFactory* factory) = 0;
+    virtual void              Pulse(ICXParam* xp) = 0;
+    virtual CXTradingSession* BorrowSession() = 0;
+    virtual void              ReturnSession(CXTradingSession* session) = 0;
+};
+
+#endif

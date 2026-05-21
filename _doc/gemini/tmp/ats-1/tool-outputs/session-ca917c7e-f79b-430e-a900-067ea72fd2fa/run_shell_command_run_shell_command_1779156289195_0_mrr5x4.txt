@@ -1,0 +1,3 @@
+{
+  "output": "Output:                    );\n      return m_db.Execute(sql);\n   }\n\n   virtual int LoadActiveSignals(CArrayObj* list) override {\n      if (IS_INVALID(m_db) || IS_INVALID(list)) return 0;   \n\n      //-- 1. ?紐諭� 筌�Ŋ�ｌ\n                            ��\n      if(m_hActiveSignals == INVALID_HANDLE) {\n         // [?�\n               ��] XE_CLOSED_SIGNAL?� 20??\nProcess Group PGID: 23716"
+}

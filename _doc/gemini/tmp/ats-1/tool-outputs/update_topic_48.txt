@@ -1,0 +1,4 @@
+Current topic: "Enforcing DB & Schema Integrity"
+Topic summary: I am refactoring `CXDatabase.mqh` to enforce strict database and schema verification. I will remove the "No DDL authority" comments as requested. If the database file is missing or the 'signals' table schema is invalid, the system will now log a critical error to the system log and trigger a native `MessageBox` popup to stop execution. This ensures that the EA only runs when the required data infrastructure is fully intact and correctly mapped.
+
+Strategic Intent: Implement robust database verification with MessageBox alerts.

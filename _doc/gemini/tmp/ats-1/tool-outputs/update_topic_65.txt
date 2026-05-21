@@ -1,0 +1,4 @@
+Current topic: "Refactoring Price Conversion Logic"
+Topic summary: The user correctly pointed out that I manually calculated price normalization and point conversions instead of using the designated utility class. The `IXGuard` interface (implemented by `CXGuard`) contains `PointsToPrice` and `NormalizePrice` methods exactly for this purpose. I will refactor `CXOrderManager::ExecuteEntry` to fetch `IXGuard` from the context and use its methods to perform the conversions, ensuring compliance with the project's architectural standards.
+
+Strategic Intent: Refactor price calculation to adhere to utility class rules.

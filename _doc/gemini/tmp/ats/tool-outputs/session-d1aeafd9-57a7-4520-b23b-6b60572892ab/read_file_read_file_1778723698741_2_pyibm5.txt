@@ -1,0 +1,3 @@
+{
+  "output": "#ifndef ICXTRADINGSESSIONPOOL_MQH\n#define ICXTRADINGSESSIONPOOL_MQH\n\n#include <Object.mqh>\n#include \"IRepository.mqh\"\n#include \"ICXContext.mqh\"\n#include \"ICXParam.mqh\"\n#include \"ICXServiceFactory.mqh\"\n#include \"ICXTradingSession.mqh\"\n\nclass ICXTradingSessionPool : public CObject {\npublic:\n    virtual ~ICXTradingSessionPool() {}\n    \n    virtual void              Initialize(IRepository* repo, ICXContext* ctx, ICXServiceFactory* factory) = 0;\n    virtual void              Pulse(ICXParam* xp) = 0;\n    virtual ICXTradingSession* BorrowSession() = 0;\n    virtual void              ReturnSession(ICXTradingSession* session) = 0;\n};\n\n#endif\n"
+}

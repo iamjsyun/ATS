@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXSTEPVALIDATION_MQH\n#define CXSTEPVALIDATION_MQH\n\n#include \"..\\..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\..\\Interfaces\\IXGuard.mqh\"\n#include \"..\\..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\..\\
+... [TRUNCATED] ...
+ingFormat(\"[WATCHER-VALIDATION] All %d signals failed validation.\", total));\n        return WATCHER_DISCOVERY;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156016298_0_tqj56f.txt
+</tool_output_masked>

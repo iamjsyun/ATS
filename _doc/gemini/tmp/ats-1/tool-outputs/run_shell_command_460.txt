@@ -1,0 +1,12 @@
+Output:         if(IS_INVALID(m_ctx)) return;
+
+        //-- [Fix] ?���??嚥≪�� 獄��???��よ�
+苑� ?怨猷る립 ?袁⑹ Param ?�밴쉐
+        CXParam* sysParam = new CXParam();
+        sysParam.SetContext(m_ctx);
+        m_ctx.SetParam(CX_CAST(ICXParam, sysParam));
+
+        m_ctx.Set("repo", m_repo);
+        m_ctx.Set("config", m_config);
+        m_ctx.Set("session_pool", pool);
+Process Group PGID: 28212

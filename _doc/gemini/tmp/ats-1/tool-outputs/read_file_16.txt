@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 360-420 of 588 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
+... [TRUNCATED] ...
+iled to save/inject signal.\");\n                _dialogService.ShowError($\"주입 실패: {ex.Message}\", \"에러\");\n            }\n        }\n\n        [Command]\n        public void AddNewEntrySignal()\n        {\n            var draft = CreateDraft();"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779154810663_0_npsiy.txt
+</tool_output_masked>

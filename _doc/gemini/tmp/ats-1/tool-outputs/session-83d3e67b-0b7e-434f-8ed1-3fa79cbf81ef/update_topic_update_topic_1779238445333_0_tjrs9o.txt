@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Fixing Session Execution Context\"\nTopic summary: Watcher bound the signal, but the session failed to progress because subsequent pulses from AppService lacked the signal context. I've identified that tasks return TASK_BREAK when xp.GetSignal() is empty. I will modify CXTradingSession.mqh to persist the ICXSignal reference and automatically inject it into the parameter object during every Pulse, ensuring tasks have the context they need to execute the trading sequence.\n\nStrategic Intent: Fix signal persistence in trading sessions to ensure continuous execution."
+}

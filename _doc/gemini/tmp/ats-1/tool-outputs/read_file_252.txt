@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 80-108 of 108 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
+... [TRUNCATED] ...
+    EVENT_INJECT        = 101\n};\n\n//--- Step 실행 공통 결과 (Generic Step Results)\n#define STATE_UNCHANGED     -1\n\n//--- 계산 스텝 결과 (Alpha Calculation Results)\nenum ENUM_CALC_RESULT {\n    CALC_NO_CHANGE = 0,\n    CALC_MODIFIED  = 1\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779235019807_2_ou1rjl.txt
+</tool_output_masked>

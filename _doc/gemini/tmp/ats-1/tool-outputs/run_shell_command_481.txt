@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: 媛 "        //-- [Fix] ?���??嚥≪�� 獄��???��よ�
+苑� ?怨猷る립 ?袁⑹ Param ?�밴쉐"�
+                                 (瑜�) "System.Char" ����쇰� 蹂�� ��듬��. ��몄댁몄 1�ъ� �⑸��."
+�
+ 移
+   :1 臾몄
++ ... Watcher.mqh" | Select-Object -Skip 40 -First 10 | % { [int][char]$_ }
++                                                           ~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [], RuntimeException
+    + FullyQualifiedErrorId : InvalidCastParseTargetInvocation
+
+... [80 lines omitted] ...
+
+ 
+媛 "        m_logger = new CXLogDispatcher();"�
+                                               (瑜�) "System.Char" ����쇰� 蹂�� ��듬��. ��몄댁몄 1�ъ� �⑸��."
+�
+ 移
+   :1 臾몄
++ ... Watcher.mqh" | Select-Object -Skip 40 -First 10 | % { [int][char]$_ }
++                                                           ~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [], RuntimeException
+    + FullyQualifiedErrorId : InvalidCastParseTargetInvocation
+Process Group PGID: 20852
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779157121971_0_2yqgzg.txt
+</tool_output_masked>

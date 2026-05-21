@@ -1,0 +1,4 @@
+Current topic: "Verifying Magic Number Assignment"
+Topic summary: The user is asking if the Expert Magic Number is set per trading session. I will review `CXOrderManager.mqh` and `CXTradingSession.mqh` to confirm how and when the Magic Number is assigned to the `CTrade` object. The `CXOrderManager` should be calling `m_trade.SetExpertMagicNumber()` using the magic number derived from the signal (`sig.GetMagic()`). I'll verify if this is happening consistently before order execution and during session initialization.
+
+Strategic Intent: Verify Expert Magic Number setting per trading session.

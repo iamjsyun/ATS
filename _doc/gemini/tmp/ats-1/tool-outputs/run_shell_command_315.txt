@@ -1,0 +1,5 @@
+Output: 
+Lines Words Characters Property
+----- ----- ---------- --------
+  544
+Process Group PGID: 4552

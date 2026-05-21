@@ -37,6 +37,7 @@ packages/
 *log.txt
 _log/
 MQL5/Logs/
+_doc/gemini/history/
 
 # Temporary files
 _temp/

@@ -1,0 +1,18 @@
+Successfully modified file: C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69E0\MQL5\Experts\ATS\ATSE\CXTrade\Interfaces\IXPositionManager.mqh (1 replacements). Here is the updated code:
+#ifndef IXPOSITIONMANAGER_MQH
+#define IXPOSITIONMANAGER_MQH
+
+#include <Object.mqh>
+#include "ICXParam.mqh"
+
+/**
+ * @class IXPositionManager
+ * @brief 오픈된 포지션의 모니터링 및 관리를 위한 인터페이스
+ */
+class IXPositionManager : public CObject {
+public:
+    virtual void Pulse(ICXParam* xp) = 0;
+    virtual bool ModifyPosition(ulong ticket, double sl, double tp) = 0;
+};
+
+#endif

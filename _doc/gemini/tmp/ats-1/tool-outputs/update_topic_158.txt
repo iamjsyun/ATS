@@ -1,0 +1,4 @@
+Current topic: "Correcting Remote Logger Port to 878"
+Topic summary: The user specified 'port = 878'. I previously incorrectly assumed 8788. I will now correct the default port to 878 in ATS.mq5 and CXConfig.mqh to match the user's literal request. This ensures the system communicates on the exact port specified by the user.
+
+Strategic Intent: Correct remote logger port to 878 and update configuration.

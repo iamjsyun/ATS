@@ -1,0 +1,11 @@
+Output: 
+
+    ���
+       곕━: D:\Projects\ATS\ATSA\ATSA\bin\Debug\net10.0-windows\_log
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        2026-05-19  ��
+                             10:57           4127 ATSA_20260519_100000.log
+Process Group PGID: 14996

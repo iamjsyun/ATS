@@ -1,0 +1,3 @@
+{
+  "output": "Successfully created and wrote to new file: C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\CXTrade\\Infra\\CXDatabase.mqh. Here is the updated code:\n#ifndef CXDATABASE_MQH\r\n#define CXDATABASE_MQH\r\n\r\n#include \"..\\Interfaces\\IRepository.mqh\"\r\n\r\nclass CXDatabase : public IRepository {\r\npublic:\r\n    CXDatabase() {}\r\n    ~CXDatabase() {}\r\n    virtual void SaveSignal(ICXSignal* signal) override {}\r\n    virtual void LoadParam(ICXParam* param) override {}\r\n};\r\n\r\n#endif\r\n"
+}

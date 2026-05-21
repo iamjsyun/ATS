@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"에러 상태(99) 신호 격리 및 세션 방지 로직 적용\"\nTopic summary: DB에 xe_status=99(XE_ERROR)로 기록된 신호가 Watcher에 의해 유효한 것으로 간주되어 세션이 시작되려는 문제를 진단합니다. CXSignalWatcher의 검증 로직을 수정하여 99 상태의 신호는 세션 시작 대상에서 영구 제외하도록 필터링을 강화하겠습니다. 또한 세션 풀 관리 로직에서 에러 상태의 세션이 부활하지 않도록 방어 기제를 추가합니다.\n\nStrategic Intent: XE_ERROR(99) 상태 신호의 세션 시작 방지 및 Watcher 필터링 강화."
+}

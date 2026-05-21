@@ -1,0 +1,4 @@
+Current topic: "UI & CNO-Filtered Logging Design"
+Topic summary: I will extend the logging strategy to include UI Logger controls and granular CNO-based filtering via Input parameters. The design introduces InpLog_UseUI for real-time dashboard updates and InpLog_FilterCnos for selective session logging. I'll update CXConfig to handle these filters, ensuring the dispatcher only routes logs for specified channels, thus optimizing performance and readability.
+
+Strategic Intent: Design UI and CNO-specific log filtering with Input parameters.

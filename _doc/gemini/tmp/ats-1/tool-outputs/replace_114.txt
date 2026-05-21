@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Exit\\CXTaskExit_L_Prepare.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_EXIT_L_PREPARE_MQH\n#define CX_TASK_EXIT_L_PREPARE_MQH\n\n#includ
+... [TRUNCATED] ...
+-L-PREPARE] CONTINUE: Waiting for Exit Intent (XA_ACTIVE).\");\n            return TASK_CONTINUE; \n        }\n\n        XP_LOG_INFO(xp, \"[EXIT-L-PREPARE] OK: Liquidation Intent Confirmed.\");\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238985479_1_0zlbws.txt
+</tool_output_masked>

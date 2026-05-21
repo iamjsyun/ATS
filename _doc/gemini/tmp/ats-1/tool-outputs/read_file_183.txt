@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 30-60 of 175 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example,
+... [TRUNCATED] ...
+- **XDUNA**: `-1003697953708` (CNO 3002)\r\n- **Zero Matching**: Fuzzy CID matching and CID-to-CNO mapping are deprecated. 1:1 ID-to-CNO mapping is enforced.\n--- End of Context from: d:/projects/ats/atsa/gemini.md ---\n--- End Project Context ---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151109410_1_g3oy5.txt
+</tool_output_masked>

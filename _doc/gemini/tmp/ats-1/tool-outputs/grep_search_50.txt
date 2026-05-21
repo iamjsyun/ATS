@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 46 matches for pattern \"(GetType|GetDir)\\(\\)\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Infra\\CXSignalRepository.mqh\nL63:                       signal.GetTime(), signal.GetSymbol(), signal.GetDir(), signal.G
+... [TRUNCATED] ...
+   bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (target < sig.GetPriceSignal() - sig.GetTEStep() * point)\nL116:             double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);\n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779171743130_0_gemibl.txt
+</tool_output_masked>

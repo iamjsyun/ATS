@@ -1,0 +1,27 @@
+<tool_output_masked>
+Command was cancelled by user before it could complete. Below is the output before it was cancelled:
+[LOG_LVL_INFO] [12:45:45] [RemoteLog] Connected successfully to 127.0.0.1:878 (Socket:1)
+[LOG_LVL_INFO] [12:45:45] >>> ATSE Framework Initializing (System SID) <<<
+[LOG_LVL_INFO] [12:45:45] [STEP 1/6] Initializing Guard System...
+[LOG_LVL_INFO] [12:45:45] [STEP 2/6] Connecting to Database & Repository...
+[LOG_LVL_INFO] [12:45:45] [STEP 3/6] Initializing Session Pool (Size: 50)...
+[LOG_LVL_INFO] [12:45:45] Assembling Sequence Architecture...
+[LOG_LVL_INFO] [12:45:45]  -> Added: Entry Pipeline (Prepare -> Execute)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Pending Pipeline (Sync -> Calc -> Apply)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Active Pipeline (PosSync -> IntentWatch -> AlphaCalc -> AlphaApply)
+
+... [179 lines omitted] ...
+
+[LOG_LVL_INFO] [12:45:45]  -> Added: Active Pipeline (PosSync -> IntentWatch -> AlphaCalc -> AlphaApply)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Liquidation Pipeline (Ticket -> Sweep -> Verify)
+[LOG_LVL_INFO] [12:45:45] Sequence Assembly Complete.
+[LOG_LVL_INFO] [12:45:45] Assembling Sequence Architecture...
+[LOG_LVL_INFO] [12:45:45]  -> Added: Entry Pipeline (Prepare -> Execute)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Pending Pipeline (Sync -> Calc -> Apply)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Active Pipeline (PosSync -> IntentWatch -> AlphaCalc -> AlphaApply)
+[LOG_LVL_INFO] [12:45:45]  -> Added: Liquidation Pipeline (Ticket -> Sweep -> Verify)
+[LOG_LVL_INFO] [12:45:45] Sequence Assembly Complete.
+[LOG_LVL_INFO] [12:45:45] Assembling Sequence Architecture...
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779156687563_0_0lerah.txt
+</tool_output_masked>

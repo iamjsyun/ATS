@@ -1,0 +1,3 @@
+{
+  "output": "## [Visual Studio / C#]\n# Build results\n[Dd]ebug/\n[Dd]ebugPublic/\n[Rr]elease/\n[Rr]eleases/\nx64/\nx86/\n[Aa]rm/\n[Aa]rm64/\nbbin/\nbin/\nobj/\n\n# Visual Studio Cache/Config\n.vs/\n*.user\n*.userosscache\n*.sln.docstates\n*.suo\n*.vstoken\n\n# NuGet Packages\n*.nuget.props\n*.nuget.targets\npackages/\n\n# Roslyn cache directories\n.vs/\n\n## [MQL5]\n# Compiled binaries\n*.ex5\n\n# Logs\n*.log\n*log.txt\n_log/\nMQL5/Logs/\n\n# Temporary files\n_temp/\n*.tmp\n*.bak\n\n## [Common]\n.DS_Store\nThumbs.db\n\nbuild_log.txt\n"
+}

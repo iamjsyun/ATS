@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"xa_entry\" across 2 workspace directories (filter: \"*.md\")."
+}

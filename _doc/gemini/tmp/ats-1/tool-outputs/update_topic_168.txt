@@ -1,0 +1,4 @@
+Current topic: "Locating Symbol Truncation Source"
+Topic summary: The validation error "Symbol GOLD not found" confirms that the system is receiving "GOLD" instead of "GOLD#". This truncation is likely happening during the C# (ATSA) to SQLite (ATS.db) save operation, or within the C# `XSignal.Validate()` normalization logic. I will check `XTA.XData.Models.XSignal.Validate()` in `DomainModels.cs` to see if `symbol` is being aggressively normalized there. If clean, I'll check the ATSA side where the signal is prepared for DB injection.
+
+Strategic Intent: Identify source of symbol truncation (GOLD# → GOLD) and fix it.

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Module\\CXSignalWatcher.mqh (1 replacements). Here is the updated code:\n#ifndef CXSIGNALWATCHER_MQH\n#define CXSIGNALWATCHER_MQH\n\n#include \"..\\Interfaces\\IRepository.m
+... [TRUNCATED] ...
+ATCHER_VALIDATION).Execute(new CXStepValidation()).OnSuccess(WATCHER_BINDING).OnFail(WATCHER_DISCOVERY);\n        seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);\n\n        seq.Build();\n    }\n};\n\n#endif\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779235186608_0_jls1m9.txt
+</tool_output_masked>

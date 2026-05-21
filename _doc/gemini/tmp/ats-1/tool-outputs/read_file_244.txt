@@ -1,0 +1,57 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 80-130 of 224 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 131.
+
+--- FILE CONTENT (truncated) ---
+                        if (_ctx.DbService == null || _ctx.PendingMessages.Count == 0) { _syncSeq.SetState("MonitorClose"); return; }
+
+                        nlog.Info($"[SyncWorker] Found {_ctx.PendingMessages.Count} unprocessed messages. Recovering...");
+                        
+                        await ProcessRecoveryAsync();
+                        
+                        _syncSeq.SetState("MonitorClose"); // 완료 후 MonitorClose로 전이
+                    })
+
+                // 5. [v9.8.5] MonitorClose 상태: EA 청산 완료 모니터링 및 TTS 알림
+                .ConfigureState("MonitorClose")
+                    .OnEntry(async () => {
+                        await ProcessCloseMonitoringAsync();
+                        _syncSeq.SetState("Idle");
+                    })
+
+                .Builder().DisableValidation().Build();
+        }
+
+        private async Task ProcessCloseMonitoringAsync()
+        {
+            var repo = XContext.Instance.SignalRepo;
+            if (repo == null) return;
+            
+            var closedSignals = await repo.GetClosedSignalsAsync();
+            foreach (var s in closedSignals)
+            {
+                if (s.xa_exit == XCode.XA_ACTIVE || s.xa_exit == XCode.XA_RAW)
+                {
+                    // 1. [v9.0] 1 -> 2 단계 전이: 청산 완료 확인 TTS
+                    string soundCmd = (s.sno == 0) ? "GROUP_CLOSE" : "SID_COMPLETED";
+                    var domainSignal = s as Models.XSignal ?? Models.XSignal.FromBase(s);
+                    XContext.Instance.Sound?.PlaySound(domainSignal, soundCmd);
+                    nlog.Debug($"[SyncWorker:TTS] Triggered {soundCmd} for SID:{s.sid} (xa_exit 1->2)");
+                    XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 청산 완료 확인 (1->2)");
+                    
+                    // 2. 청산 완료 상태(2)로 마킹
+                    await repo.UpdateXaStatusAsync(s.sid, XCode.XA_CLOSED_COMPLETED);
+                    nlog.Debug($"[SyncWorker:STATUS] SID:{s.sid} updated to XA_CLOSED_COMPLETED(2)");
+                }
+                else if (s.xa_exit == XCode.XA_CLOSED_COMPLETED)
+                {
+                    // 3. [v9.0] 2 -> 3 단계 전이 (TTS 제외, 로그만 기록)
+                    nlog.Debug($"[SyncWorker:STATUS] SID:{s.sid} transition to XA_ARCHIVE_READY(3) started.");
+                    XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 데이터 이관 대기 확인 (2->3)");
+
+                    // 4. 이관 대기 상태(3)로 마킹
+                    await repo.UpdateXaStatusAsync(s.sid, XCode.XA_ARCHIVE_READY);
+                    nlog.Debug($"[SyncWorker:STATUS] SID:{s.sid} updated to XA_ARCHIVE_READY(3)");
+                }
+            }

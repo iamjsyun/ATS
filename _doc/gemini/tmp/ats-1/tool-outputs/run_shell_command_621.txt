@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: #ifndef CXSTEPDISCOVERY_MQH
+#define CXSTEPDISCOVERY_MQH
+
+#include "..\..\..\Interfaces\IXStep.mqh"     
+#include "..\..\..\Interfaces\IRepository.mqh"
+#include "..\..\..\Models\CXSignal.mqh"       
+
+#include <Arrays\ArrayObj.mqh>
+
+/**
+
+... [10 lines omitted] ...
+
+
+    virtual bool OnCondition(ICXParam* xp, ICXContext* ctx, int current_state) override {
+        return true;
+    }
+
+    virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
+        IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+        if(IS_INVALID(repo)) return STATE_UNCHANGED;
+
+        CArrayObj* activeList = new CArrayObj();
+Process Group PGID: 24824
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779156110973_0_50794d.txt
+</tool_output_masked>

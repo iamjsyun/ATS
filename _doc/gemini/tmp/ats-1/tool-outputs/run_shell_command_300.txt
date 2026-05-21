@@ -1,0 +1,2 @@
+Output: >     virtual bool ValidateLot(string symbol, double lot) {??          if(symbol == "" || symbol == "NULL") return SetError("Symbol is empty");??
+Process Group PGID: 25120

@@ -1,0 +1,2 @@
+Output: >     virtual double NormalizePrice(string symbol, double price) const {??          int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);??          return NormalizeDouble(price, digits);
+Process Group PGID: 28644

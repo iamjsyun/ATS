@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Refining Version Banner Output\"\nTopic summary: The user requested that the version banner in `OnInit` be output via UI logs (XP_LOG) instead of the native `Print` function. I will modify `ATS.mq5` to move the banner logging to a point after `g_app` is successfully initialized, ensuring the `XP_LOG_INFO` macro can access the global logging context and route the version information to the UI, File, and Experts tab simultaneously.\n\nStrategic Intent: Replace Print with UI logs for the version banner."
+}

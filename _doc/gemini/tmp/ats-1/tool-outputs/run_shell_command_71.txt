@@ -1,0 +1,5 @@
+Output:           double price = sig.GetPriceSignal();??          if(sig.GetType() == ORDER_MARKET) {??              price = (sig.GetDir() == CX_DIR_BUY) ? SymbolInfoDouble(sym, SYMB
+OL_ASK) : SymbolInfoDouble(sym, SYMBOL_BID);??          }??          ??>         bool res = m_trade.OrderOpen(sym, order_type, sig.GetLot(), 0, price, sig.GetSL(), sig.GetTP(
+), ORDER_TIME_GTC, 0, m_sid);??  ??          if(!res) {??              string err_msg = StringFormat("%s (Retcode: %d - %s)", ??                  CXMessageProvider::Format(MS
+G_ERR_TRADE_FAILED, ""), ??                  m_trade.ResultRetcode(),
+Process Group PGID: 30876

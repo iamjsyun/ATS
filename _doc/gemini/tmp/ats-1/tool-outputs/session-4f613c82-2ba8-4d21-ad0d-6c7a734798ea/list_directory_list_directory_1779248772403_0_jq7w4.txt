@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Exit:\nCXTaskExit_L_Prepare.mqh (1287 bytes)\nCXTaskExit_P_Finalize.mqh (1181 bytes)\nCXTaskExit_P_Lock.mqh (1034 bytes)\nCXTaskExit_R_Order.mqh (1488 bytes)\nCXTaskExit_V_Error.mqh (1329 bytes)\nCXTaskExit_V_Terminal.mqh (1739 bytes)"
+}

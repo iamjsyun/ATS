@@ -1,0 +1,3 @@
+{
+  "output": "No files found matching pattern \"**/*BindableBase.cs\" within 2 workspace directories"
+}

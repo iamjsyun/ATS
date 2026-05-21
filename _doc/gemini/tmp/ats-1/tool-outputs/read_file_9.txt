@@ -1,0 +1,32 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 155-180 of 223 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 181.
+
+--- FILE CONTENT (truncated) ---
+        public XYouTubeConfig? YouTube { get; set; }
+        public XTradingOption TradingOption { get; set; } = new();
+
+        public XTradingOption OverrideOptions 
+        { 
+            get => TradingOption; 
+            set => TradingOption = value; 
+        }
+    }
+
+    public class XYouTubeConfig
+    {
+        public string LiveUrl { get; set; } = "";
+        public int IntervalMs { get; set; } = 3000;
+        public XOcrFilterConfig Filter { get; set; } = new();
+    }
+
+    public class XOcrFilterConfig
+    {
+        public int BufferSize { get; set; } = 10;
+        public double ThresholdPercentage { get; set; } = 0.8;
+    }
+
+    public class XTradingOption
+    {
+        public string? ActiveMode { get; set; } = "Simulation";

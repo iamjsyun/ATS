@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"#include \".*Execution\\\\CX.*\\.mqh\"\" in the workspace directory (filter: \"ATSE/CXTrade/Session/Steps/**/*.mqh\")."
+}

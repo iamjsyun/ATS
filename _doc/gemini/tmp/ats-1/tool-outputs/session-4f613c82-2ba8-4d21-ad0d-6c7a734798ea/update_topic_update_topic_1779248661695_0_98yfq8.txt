@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"에러 원인 전파 고도화 - OrderManager 수정\"\nTopic summary: CXOrderManager의 ExecuteEntry, ModifyOrder, DeleteOrder 메서드에서 트레이딩 실패 시 구체적인 에러 메시지를 xp.SetString()을 통해 전달하도록 수정합니다. 이를 통해 CXTradingSession에서 'Sequence Logic Interruption' 대신 실제 브로커 에러나 검증 실패 원인을 로그와 DB에 기록할 수 있게 됩니다. 에러 추적의 정밀도를 높이는 작업입니다.\n\nStrategic Intent: 트레이딩 에러 발생 시 상세 원인 전파 로직 구현 (CXOrderManager)."
+}

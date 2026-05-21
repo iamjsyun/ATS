@@ -1,0 +1,4 @@
+Current topic: "Researching Signal Detection Error"
+Topic summary: User reports injected signal detection error. ID 104 has xa_entry=1, xa_exit=0, xe_status=0 (READY) but not detected/processed. Targeted project: ATSE MQL5 (D:\Projects\ATS\ATSE). Will research signal detection logic in MQL5 files.
+
+Strategic Intent: Investigate injected signal detection error in ATSE MQL5 project.

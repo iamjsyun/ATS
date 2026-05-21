@@ -1,0 +1,77 @@
+
+IMPORTANT: The file content has been truncated.
+Status: Showing lines 180-250 of 283 total lines.
+Action: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 251.
+
+--- FILE CONTENT (truncated) ---
+                                            return;
+                                        }
+                                    }
+                                }
+                                finally { _saveWaiters.TryRemove(s.sid, out _); }
+                            }
+                            seq.SetState("Idle");
+                        })
+                    .ConfigureState("RollbackPersistence")
+                        .OnEntry(async () => {
+                            var repo = ctx.SignalRepo;
+                            if (preparedSignals != null && repo != null) {
+                                foreach (var s in preparedSignals) {
+                                    if (s.cmd == XCode.CLOSE) continue;
+                                    await repo.DeleteSignalAsync(s.sid);
+                                    PendingSignals.TryRemove(s.sid, out _);
+                                    nlog.Warn($"[Gateway:ROLLBACK] Signal {s.sid} removed from Memory/DB due to downstream failure.");
+                                }
+                            }
+                            seq.SetState("Idle");
+                        })
+                    .Builder().DisableValidation().Build();
+
+                // 시퀀스 실행 (Finally 보장)
+                try 
+                {
+                    seq.SetState("Enrich");
+                    int safety = 0;
+                    while (!seq.IsInState("Idle") && safety++ < 10) await seq.RunAsync();
+                }
+                catch (Exception ex) { nlog.Error(ex, $"[Gateway:PROC] Signal processing failed for MsgId:{xdo.MsgId}"); }
+                finally { seq.SetState("Idle"); }
+            }
+        }
+
+        public void EnqueueRawMessage(XDataObject xdo) => OnRawMessageReceived(xdo);
+
+        public void Log(string message) => nlog.Info($"[LOG:HUB] {message}");
+
+        private bool _isStarted = false;
+        private readonly HashSet<int> _processedMsgIds = new();
+
+        public override void Start()
+        {
+            lock (_processedMsgIds) { if (_isStarted) return; _isStarted = true; }
+            _cts = new CancellationTokenSource();
+            Task.Run(() => ProcessMessageQueueAsync(_cts.Token));
+            Task.Run(() => ProcessInterpretedQueueAsync(_cts.Token));
+        }
+
+        public override void Stop() { _cts?.Cancel(); _isStarted = false; }
+
+        private void OnRawMessageReceived(XDataObject xdo)
+        {
+            if (xdo == null) return;
+            lock (_processedMsgIds) {
+                if (_processedMsgIds.Contains(xdo.MsgId)) return;
+                _processedMsgIds.Add(xdo.MsgId);
+                if (_processedMsgIds.Count > 1000) _processedMsgIds.Remove(_processedMsgIds.First());
+            }
+            if (!_msgChannel.Writer.TryWrite(xdo)) nlog.Error($"[Gateway:ERROR] Msg queue full: MsgId={xdo.MsgId}");
+        }
+
+        private async Task ProcessMessageQueueAsync(CancellationToken ct)
+        {
+            while (await _msgChannel.Reader.WaitToReadAsync(ct)) {
+                while (_msgChannel.Reader.TryRead(out var xdo)) {
+                    try {
+                        _currentXdo = xdo;
+                        _currentInfo = param.GetChannel(xdo.CID);
+                        _msgSeq.SetState(XHubState.Received);

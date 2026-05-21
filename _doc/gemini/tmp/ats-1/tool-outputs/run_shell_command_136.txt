@@ -1,0 +1,12 @@
+Output: 35 
+36             var ctx = new PolicyContext(xdo, xdo.Signal, ResultSignals: new List<Models.XSignal>());
+37             ISequence<string> seq = null!;
+38
+39             seq = new FluentSeq<string>().Create("ResolveConfig")
+40                 //.ActivateDebugLogging(nlog) // ?遺얠쒔域�??袁⑹ ??雅�깃� ?���
+41                 .ConfigureState("ResolveConfig")
+42                     .OnEntry(() => {
+43                         var param = XContext.Instance.Parameter;
+44                         var merged = param.GetMergedConfig(ctx.MasterSignal.cno);
+45
+Process Group PGID: 7328

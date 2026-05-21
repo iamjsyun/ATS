@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: >    int count = FetchSignals(hQuery, list);??     DatabaseFinalize(hQuery);??     return count;??  }??     virtual ICXSignal* GetSignalBySid(const string sid) override {??        if (IS_INVALID(m_
+db) || sid == "") return NULL;??  ??        //-- 2. ?????? ???????? ??? ?????        if(m_hSignalBySid == INVALID_HANDLE) {??           string sql = "SELECT * FROM signals WHERE sid = ?";??        
+   m_hSignalBySid = DatabasePrepare(m_db.GetHandle(), sql);??           if(m_hSignalBySid == INVALID_HANDLE) return NULL;??        } else {??           DatabaseReset(m_hSignalBySid);??        }??  
+??        //-- 3. ?????? ????????????        DatabaseBind(m_hSignalBySid, 0, sid);??        ??        CArrayObj list;
+>       if (FetchSignals(m_hSignalBySid, GetPointer(list)) > 0) {??           return CX_CAST(ICXSignal, list.Detach(0));??        }??        return NULL;??     }??  ??  private:
+>    int FetchSignals(int req, CArrayObj* list) {??        int count = 0;??        while (DatabaseRead(req)) {??           CXSignal* sig = new CXSignal();??  ??           DatabaseColumnInteger(req,
+ GetColumnIndex(req, "id"),           sig.id);??           DatabaseColumnText(req,    GetColumnIndex(req, "sid"),          sig.sid);??           DatabaseColumnText(req,    GetColumnIndex(req, "gid"
+),          sig.gid);??           DatabaseColumnInteger(req, GetColumnIndex(req, "cno"),          sig.cno);??           DatabaseColumnInteger(req, GetColumnIndex(req, "sno"),          sig.sno);??  
+         DatabaseColumnInteger(req, GetColumnIndex(req, "msg_id"),       sig.msg_id);??           DatabaseColumnInteger(req, GetColumnIndex(req, "raw_id"),       sig.raw_id);??           DatabaseCo
+lumnInteger(req, GetColumnIndex(req, "xa_entry"),     sig.xa_entry);??           DatabaseColumnInteger(req, GetColumnIndex(req, "xa_exit"),      sig.xa_exit);??           DatabaseColumnInteger(req,
+
+... [6 lines omitted] ...
+
+mnIndex(req, "ikte_start"),    sig.ikte_start);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "ikte_step"),     sig.ikte_step);??           DatabaseColumnDouble(req,  GetColumnIndex(re
+q, "tp"),           sig.tp);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "sl"),           sig.sl);??           DatabaseColumnInteger(req, GetColumnIndex(req, "ts_start"),     sig.ts_
+start);??           DatabaseColumnInteger(req, GetColumnIndex(req, "ts_step"),      sig.ts_step);??           DatabaseColumnInteger(req, GetColumnIndex(req, "close_type"),   sig.close_type);??     
+      DatabaseColumnDouble(req,  GetColumnIndex(req, "trail_price"),  sig.trail_price);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "price_limit"),  sig.price_limit);??           Dat
+abaseColumnDouble(req,  GetColumnIndex(req, "price"),        sig.price);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "price_open"),   sig.price_open);??           DatabaseColumnDoubl
+e(req,  GetColumnIndex(req, "price_close"),  sig.price_close);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "price_tp"),     sig.price_tp);??           DatabaseColumnDouble(req,  GetC
+olumnIndex(req, "price_sl"),     sig.price_sl);??           DatabaseColumnDouble(req,  GetColumnIndex(req, "lot"),          sig.lot);??           DatabaseColumnLong(req,    GetColumnIndex(req, "tic
+ket"),       sig.ticket);??           DatabaseColumnLong(req,    GetColumnIndex(req, "magic"),        sig.magic);??           DatabaseColumnText(req,    GetColumnIndex(req, "comment"),      sig.com
+ment);??           DatabaseColumnText(req,    GetColumnIndex(req, "tag"),          sig.tag);??           ??           string created_str;??           if(DatabaseColumnText(req, GetColumnIndex(req, 
+"created"), created_str))??              sig.created = StringToTime(created_str);??
+Process Group PGID: 22384
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779157845331_0_048weh.txt
+</tool_output_masked>

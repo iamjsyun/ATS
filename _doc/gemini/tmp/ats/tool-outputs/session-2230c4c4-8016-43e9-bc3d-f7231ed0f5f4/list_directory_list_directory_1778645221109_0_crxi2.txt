@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\Domain\\Engine:\n[DIR] Guards\nCXContext.mqh (1642 bytes)\nCXDirection.mqh (4761 bytes)\nCXFluentSequence.mqh (4168 bytes)\nCXOrderExecutor.mqh (5864 bytes)\nCXProceduralSequence.mqh (1840 bytes)\nCXResult.mqh (2718 bytes)\nCXResumeStrategies.mqh (2518 bytes)\nCXSpecification.mqh (3295 bytes)\nIXGuard.mqh (1045 bytes)\nIXResumeStrategy.mqh (837 bytes)\nIXStep.mqh (1276 bytes)"
+}

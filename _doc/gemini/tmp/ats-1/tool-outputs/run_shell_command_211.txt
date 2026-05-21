@@ -1,0 +1,3 @@
+Output: >     virtual bool Check(ICXParam* xp, ICXContext* ctx) {??          if(IS_INVALID(xp)) return true;??          ICXSignal* sig = xp.GetSignal();??          if(IS_INVALID(sig)) return true;??       
+   ??          if(!ValidateMagic(sig.GetMagic())) return false;??          if(!ValidateSID(sig.GetSid())) return false;??          ??          return true;??      }??  };
+Process Group PGID: 32520

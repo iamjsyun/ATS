@@ -1,0 +1,8 @@
+Output:       int                         m_current_state;??      datetime                    m_state_entered;??      CHashMap<int, CXStepNode*>  m_map;??      string                      m_name;??      ??
+>     // Builder State??      int                         m_tmp_from;??      IXStep*                     m_tmp_step;??      IXGuard*                    m_tmp_guard;??      int
+   m_tmp_success;??      int                         m_tmp_fail;
+      CXFluentSequence* OnFail(int next) { m_tmp_fail = next; return GetPointer(this); }??      CXFluentSequence* Timeout(int sec) { m_tmp_timeout = sec; return GetPointer(this); }??      CXFluentS
+equence* Retries(int count) { m_tmp_retries = count; return GetPointer(this); }??      CXFluentSequence* Case(int code, int state) { m_tmp_branches.Add(code, state); return GetPointer(this); }??  ?
+?>     virtual void Build() override {??          CommitCurrent();??          if(m_current_state == -1) {??              m_current_state = m_tmp_from;??              XP_LOG_SEQ_INFO(m_ctx.GetParam(
+), StringFormat("[SEQ:%s] Sequence Started at State: %d", m_name, m_current_state));??          }
+Process Group PGID: 15404

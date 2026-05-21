@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"ATSE 로깅 고도화 - ExitManager 적용 및 Sweep 강화\"\nTopic summary: CXExitManager의 CloseByTicket 및 SweepBySid 메서드에 트레이딩 로깅 표준을 적용합니다. PositionClose 시 [POS-CLOSE], OrderDelete 시 [ORDER-DELETE] 프리픽스를 사용하며, 실패 시 상세 브로커 리턴 코드를 출력합니다. 또한 Sweep 로직 수행 시 로그 가시성을 확보하여 대량 청산 상황에서도 추적 가능성을 높입니다.\n\nStrategic Intent: CXExitManager 로깅 표준 적용 및 Sweep 로직 강화."
+}

@@ -1,0 +1,6 @@
+Output: >     CXFluentSequence* From(int state) { CommitCurrent(); m_tmp_from = state; return GetPointer(this); }??      CXFluentSequence* Execute(IXStep* step) { m_tmp_step = step; return GetPointer(this)
+; }??      CXFluentSequence* Guard(IXGuard* guard) { m_tmp_guard = guard; return GetPointer(this); }
+>         if(m_tmp_from == -1 || IS_INVALID(m_tmp_step)) return;??          CXStepNode* node = new CXStepNode(m_tmp_step, m_tmp_success, m_tmp_fail, m_tmp_timeout, m_tmp_retries, m_tmp_guard);??   
+       if(IS_INVALID(node)) return;
+>         m_tmp_from = -1; m_tmp_step = NULL; m_tmp_guard = NULL; m_tmp_success = -1; m_tmp_fail = -1;??      }??
+Process Group PGID: 1680

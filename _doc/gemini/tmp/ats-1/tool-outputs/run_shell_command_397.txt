@@ -1,0 +1,5 @@
+Output: 
+Name           Used (GB)     Free (GB) Provider      Root                                                                                                                            CurrentLocation
+----           ---------     --------- --------      ----                                                                                                                            ---------------
+G                 135.75         26.62 FileSystem    G:\
+Process Group PGID: 21576

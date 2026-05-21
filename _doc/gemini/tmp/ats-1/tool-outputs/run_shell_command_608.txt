@@ -1,0 +1,16 @@
+Output:       if(m_hSignalBySid == INVALID_HANDLE) {
+         string sql = "SELECT * FROM signals WHERE sid = ?";     
+         m_hSignalBySid = DatabasePrepare(m_db.GetHandle(), sql);
+         if(m_hSignalBySid == INVALID_HANDLE) return NULL;       
+      } else {
+         DatabaseReset(m_hSignalBySid);
+      }
+
+      //-- 3. ?????? ??????????
+      DatabaseBind(m_hSignalBySid, 0, sid);
+
+      CArrayObj list;
+      if (FetchSignals(m_hSignalBySid, GetPointer(list)) > 0) {
+         return CX_CAST(ICXSignal, list.Detach(0));
+      }
+Process Group PGID: 23916

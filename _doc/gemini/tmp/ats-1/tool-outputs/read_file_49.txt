@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 50-100 of 211 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example
+... [TRUNCATED] ...
+ToList();\n            foreach (var key in keysToRemove)\n            {\n                _services.TryRemove(key, out _);\n            }\n            nlog?.Trace($\"[ServiceRemoved] {typeof(T).Name}\");\n        }\n\n        public void StartAll()"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153687976_0_nwv7zv.txt
+</tool_output_masked>

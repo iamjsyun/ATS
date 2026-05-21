@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Text.Json;\nusing System.Text.Json.Serialization;\n\nnamespace XTA.Models\n{\n    /// <summary>\n    /// XTA 시스템 통합 설정 모델 (ATSA.json v9.0 표준 - 중복 통합 버전)\n
+... [TRUNCATED] ...
+c string DataPath { get; set; } = @\".\\tessdata\";\n        public string Language { get; set; } = \"eng\";\n        public string Whitelist { get; set; } = \"0123456789.BUYSELTPSL\";\n        public int PageSegMode { get; set; } = 7;\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779151128198_0_mhvfib.txt
+</tool_output_masked>

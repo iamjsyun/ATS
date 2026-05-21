@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Infra\\CXSignalRepository.mqh (1 replacements). Here is the updated code:\n//+------------------------------------------------------------------+\n//|                       
+... [TRUNCATED] ...
+tColumnIndex(req, \"limit_offset\"), sig.limit_offset);\n         DatabaseColumnDouble(req,  GetColumnIndex(req, \"stop_offset\"),  sig.stop_offset);\n\n         list.Add(sig);\n         count++;\n      }\n      return count;\n   }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238293244_0_32reqh.txt
+</tool_output_masked>

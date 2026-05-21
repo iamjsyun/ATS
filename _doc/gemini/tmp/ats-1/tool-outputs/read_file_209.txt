@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 1-50 of 110 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, 
+... [TRUNCATED] ...
+SetInteger(0, ver_name, OBJPROP_XDISTANCE, 20);\n        ObjectSetInteger(0, ver_name, OBJPROP_YDISTANCE, 40);\n        ObjectSetInteger(0, ver_name, OBJPROP_COLOR, clrWhite);\n        ObjectSetInteger(0, ver_name, OBJPROP_FONTSIZE, 10);\n        "
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779236291127_0_jp4c6k.txt
+</tool_output_masked>

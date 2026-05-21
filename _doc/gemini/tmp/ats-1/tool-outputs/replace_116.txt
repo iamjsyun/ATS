@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskEntry_P_Finalize.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_ENTRY_P_FINALIZE_MQH\n#define CX_TASK_ENTRY_P_FINALIZE_MQH\n\n
+... [TRUNCATED] ...
+ DB Updated. Moving Session to %d.\", nextSessionState));\n            return nextSessionState;\n        }\n\n        XP_LOG_WARN(xp, \"[ENTRY-P-FINALIZE] YIELD: DB Update Delayed. Retrying...\");\n        return TASK_YIELD;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238976297_0_ym3kk.txt
+</tool_output_masked>

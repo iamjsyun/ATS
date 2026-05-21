@@ -1,0 +1,4 @@
+Current topic: "Error Recovery Strategy (xe_status=99)"
+Topic summary: A signal with `xe_status=99` and a critical error message has been detected. I am analyzing the current error handling and recovery logic to design a strategy for identifying the root cause, providing user feedback, and implementing automated or manual recovery paths (e.g., re-triggering, clearing, or manual override) to prevent system deadlocks.
+
+Strategic Intent: Design a strategy to handle critical system error (xe_status=99) signals.

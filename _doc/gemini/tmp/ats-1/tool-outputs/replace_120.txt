@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Entry\\CXTaskEntry_P_Lock.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_ENTRY_P_LOCK_MQH\n#define CX_TASK_ENTRY_P_LOCK_MQH\n\n#include \".
+... [TRUNCATED] ...
+_OK(xp, \"[ENTRY-P] SUCCESS: Status Locked to XE_PENDING_REQ.\");\n            return TASK_CONTINUE;\n        }\n\n        XP_LOG_ERROR(xp, \"[ENTRY-P] FAILED: DB Update for PENDING_REQ Lock.\");\n        return TASK_BREAK; \n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779238943941_0_z2ula.txt
+</tool_output_masked>

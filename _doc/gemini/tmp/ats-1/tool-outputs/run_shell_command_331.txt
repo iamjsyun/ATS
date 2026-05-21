@@ -1,0 +1,2 @@
+Output: > #define GID_MAX_LENGTH       16??  #define COMMENT_MAX_LENGTH   31??  #define DEFAULT_SLIPPAGE     30
+Process Group PGID: 30464

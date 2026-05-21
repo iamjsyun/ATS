@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSE\\CXTrade\\Session\\Steps\\Exit:\nCXStepExit.mqh (2405 bytes)\nCXStepExitSweep.mqh (1328 bytes)\nCXStepExitTicket.mqh (1324 bytes)\nCXStepExitTrailing.mqh (3188 bytes)\nCXStepExitVerify.mqh (1775 bytes)"
+}

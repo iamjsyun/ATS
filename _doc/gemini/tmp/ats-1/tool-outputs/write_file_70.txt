@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Execution\\CXOrderManager.mqh. Here is the updated code:\n...\n           sig.GetSymbol(), EnumToString(order_type), sig.GetLot(), price, sig.GetSL(), sig.GetTP(),
+... [TRUNCATED] ...
+emErr:%d). Ticket:%I64u\", \n                                            retMsg, retCode, sysErr, ticket));\n            ResetLastError();\n            return false;\n        }\n        \n        // 2. 삭제 확인\n        if(OrderSelect(ticket)) {\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779240128186_0_ke8q5.txt
+</tool_output_masked>

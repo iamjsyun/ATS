@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: Name                                                        LastWriteTime
+----                                                        -------------
+Channels                                                    2026-05-18 ��
+                                                                          10:29:56
+cs                                                          2026-05-18 ��
+                                                                          10:37:31
+de                                                          2026-05-18 ��
+                                                                          10:37:31
+es                                                          2026-05-18 ��
+                                                                          10:37:31
+
+... [144 lines omitted] ...
+
+WTelegramClient.dll                                         2024-04-28 �
+                                                                         10:20:06
+XTA.dll                                                     2026-05-19 ��
+                                                                          10:42:04
+XTA.pdb                                                     2026-05-19 ��
+                                                                          10:42:04
+XTA.XData.dll                                               2026-05-19 ��
+                                                                          10:38:26
+XTA.XData.pdb                                               2026-05-19 ��
+                                                                          10:38:26
+Process Group PGID: 24560
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\run_shell_command_run_shell_command_1779156881589_0_3wp7yh.txt
+</tool_output_masked>

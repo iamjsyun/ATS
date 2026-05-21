@@ -1,0 +1,3 @@
+{
+  "output": "Output:                     .OnEntry(() => {\n                        bool isManual = ctx.Xdo.CMD == \"DM_INJECTION\" || ctx.Xdo.CMD == \"TEST_INJECTION\";\n                        if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))\n                        {\n                            nlog.Warn($\"[Policy] Direction {(ctx.MasterSignal.dir == XCode.BUY ? \"BUY\" : \"SELL\")} is disabled for CNO:{ctx.MasterSignal.cno}. Signal Ignore\nd.\");\n                            seq.SetState(\"End\");\n                        }\n                        else if (ctx.MasterSignal.cmd == XCode.CLOSE)\n                        {\n                            ctx.MasterSignal.Validate();\nProcess Group PGID: 23224"
+}

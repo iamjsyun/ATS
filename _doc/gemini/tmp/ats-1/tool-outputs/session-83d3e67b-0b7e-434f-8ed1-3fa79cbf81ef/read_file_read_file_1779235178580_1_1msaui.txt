@@ -1,0 +1,3 @@
+{
+  "output": "#ifndef IREPOSITORY_MQH\n#define IREPOSITORY_MQH\n\n#include <Object.mqh>\n#include <Arrays\\ArrayObj.mqh>\n#include \"ICXSignal.mqh\"\n#include \"ICXParam.mqh\"\n\nclass IRepository : public CObject {\npublic:\n    virtual ~IRepository() {}\n    virtual void SaveSignal(ICXSignal* signal) = 0;\n    virtual void LoadParam(ICXParam* param) = 0;\n    virtual int  GetStatusBySid(const string sid) = 0;\n    virtual bool UpdateStatus(ICXSignal* signal) = 0;\n    virtual int  LoadActiveSignals(CArrayObj* list) = 0;\n    virtual ICXSignal* GetSignalBySid(const string sid) = 0;\n};\n\n#endif\n"
+}

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ATS\\ATSA\\XTA\\Models\\XConfig.cs (1 replacements). Here is the updated code:\nusing System;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Text.Json;\nusing System.Text.Js
+... [TRUNCATED] ...
+c string DataPath { get; set; } = @\".\\tessdata\";\n        public string Language { get; set; } = \"eng\";\n        public string Whitelist { get; set; } = \"0123456789.BUYSELTPSL\";\n        public int PageSegMode { get; set; } = 7;\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\replace_replace_1779154435346_0_zjdanc.txt
+</tool_output_masked>

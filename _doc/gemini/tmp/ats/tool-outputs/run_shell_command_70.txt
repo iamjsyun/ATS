@@ -1,0 +1,16 @@
+Output: & : 'C:\Program Files\XM Global MT5\metaeditor64.exe' �⑹닿� cmdlet, �⑥ㅽщ┰�� �� �ㅽ�� �� �
+                                                                                          濡洹몃 �
+                                                                                                  �쇰� � ��듬��. �
+                                                                                                                  ���吏 ��� 寃쎈�媛 ��ы⑤ 寃쎌� 寃쎈�
+媛 ��瑜몄� 寃利 �ㅼ �ㅼ ���
+                           ���.
+�
+ 移
+   :1 臾몄
++ ... g]::UTF8; & "C:\Program Files\XM Global MT5\metaeditor64.exe" /compil ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Program File...etaeditor64.exe:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+Exit Code: 1
+Process Group PGID: 26172

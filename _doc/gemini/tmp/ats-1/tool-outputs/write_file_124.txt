@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ATS\\ATSE\\CXTrade\\Infra\\CXFileLogger.mqh. Here is the updated code:\n...\n\n#include \"..\\Interfaces\\ICXLogger.mqh\"\n\n/**\n * @class CXFileLogger\n * @brief 세션별 독립 로그 파일 생성 및 기록 담당 (자동 
+... [TRUNCATED] ...
+            return true;\n        }\n        return false;\n    }\n\npublic:\n    virtual void SetEnabled(bool enabled) override { m_enabled = enabled; }\n    virtual bool IsEnabled() const override { return m_enabled; }\n\n    void Close() {\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\write_file_write_file_1779167076025_0_xcw4yg.txt
+</tool_output_masked>

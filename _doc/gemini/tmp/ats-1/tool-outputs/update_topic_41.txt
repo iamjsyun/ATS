@@ -1,0 +1,4 @@
+Current topic: "Market-Price Based Execution Logic"
+Topic summary: The user requested that the signal price be ignored and that SL, TP, and Limit Offset be calculated relative to the current Market Price (Ask/Bid). I will modify `CXOrderManager.mqh` to retrieve real-time Ask/Bid prices for all entry types and use them as the baseline for point-to-price conversions. This ensures that stop levels and limit offsets are always synchronized with the latest market conditions at the moment of execution, preventing 'invalid stops' due to stale signal data.
+
+Strategic Intent: Switch SL/TP calculation to use Current Market Price instead of Signal Price.

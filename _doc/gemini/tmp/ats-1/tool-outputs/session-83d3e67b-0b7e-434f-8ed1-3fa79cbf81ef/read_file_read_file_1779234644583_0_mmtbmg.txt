@@ -1,0 +1,3 @@
+{
+  "error": "File path 'D:\\Projects\\ats\\ATSE\\CXTrade\\compile.log' is ignored by configured ignore patterns."
+}

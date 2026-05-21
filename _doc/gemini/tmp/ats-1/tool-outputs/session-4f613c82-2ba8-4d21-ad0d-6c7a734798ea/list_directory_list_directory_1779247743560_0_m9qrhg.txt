@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\projects\\ats\\ATSA\\XTA\\Interfaces:\nIDataService.cs (723 bytes)\nISoundService.cs (384 bytes)\nITelegramAuthService.cs (349 bytes)\nITtsService.cs (176 bytes)\nIXGatewayService.cs (1256 bytes)\nIXLiquidationService.cs (620 bytes)\nIXSignalService.cs (1022 bytes)\nIXTradePolicyService.cs (604 bytes)"
+}

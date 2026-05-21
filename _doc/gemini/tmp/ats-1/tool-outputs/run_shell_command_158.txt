@@ -1,0 +1,9 @@
+Output:           m_sid = sid;??          MqlDateTime dt;??          TimeCurrent(dt);??          m_lastHour = dt.hour;??  ??>         return OpenByTime(dt);??      }??  ??      virtual void Log(ENUM_LOG_LE
+VEL level, string msg) override {??          if(!m_enabled) return;??  ??          //-- ??? ??????? ????? ?????(Hourly Rotation)??          MqlDateTime dt;??          TimeCurrent(dt);??          if
+(dt.hour != m_lastHour) {??              m_lastHour = dt.hour;
+>             OpenByTime(dt);??          }??  ??          if(m_handle == INVALID_HANDLE) return;??  ??          string line = StringFormat("[%s] [%s] %s\n", EnumToString(level), TimeToString(TimeCu
+rrent(), TIME_SECONDS), msg);??          FileWriteString(m_handle, line);??          FileFlush(m_handle);??      }??  ??  private:
+>     bool OpenByTime(MqlDateTime &dt) {??          Close();??  ??          string timestamp = StringFormat("%02d%02d%02d-%02d0000", ??              dt.year % 100, dt.mon, dt.day, dt.hour);??  ??  
+        m_filename = StringFormat("ATSE\\%s-%s.log", m_sid, timestamp);        // FILE_READ|FILE_WRITE ?????? ??? ????????????????(Append) ?????          m_handle = FileOpen(m_filename, FILE_READ|F
+ILE_WRITE|FILE_TXT|FILE_SHARE_READ|FILE_ANSI|FILE_COMMON);??  ??          if(m_handle != INVALID_HANDLE) {??              FileSeek(m_handle, 0, SEEK_END);
+Process Group PGID: 35348

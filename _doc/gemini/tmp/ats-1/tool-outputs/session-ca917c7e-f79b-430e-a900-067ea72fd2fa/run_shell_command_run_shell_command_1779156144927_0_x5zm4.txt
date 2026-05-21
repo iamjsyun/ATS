@@ -1,0 +1,3 @@
+{
+  "output": "Output:       if (IS_INVALID(m_db) || IS_INVALID(list)) return 0;\n\n      //-- 1. ??? ??? ???\n      if(m_hActiveSignals == INVALID_HANDLE) {\n         // [???] XE_CLOSED_SIGNAL?? 20??\n         string sql = StringFormat(\"SELECT * FROM signals WHERE (xa_entry > %d AND xe_status < %d) OR (xa_exit > %d)\", \n                                   XA_RAW, XE_CLOSED_SIGNAL, XA_RAW);\n         m_hActiveSignals = DatabasePrepare(m_db.GetHandle(), sql);\n         if(m_hActiveSignals == INVALID_HANDLE) return 0;\n      } else {\n         DatabaseReset(m_hActiveSignals);\n      }\n\n      return FetchSignals(m_hActiveSignals, list);\n   }\nProcess Group PGID: 5124"
+}

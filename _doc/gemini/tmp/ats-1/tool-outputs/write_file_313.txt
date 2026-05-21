@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully created and wrote to new file: D:\\Projects\\ats\\_doc\\_Report\\ATSE_Atomization_Quantitative_Report_v1.0.md. Here is the updated code:\n# ATSE 정량적 분석 보고서 (Atomized Task Strategy 기준)\r\n\r\n## 1. 개요\r\n본 보고서는 `ATS_Atomize
+... [TRUNCATED] ...
+r\n2. **상태 코드 정밀화**: `XE_VERIFY_ABS` 등 과도기 상태를 실제 시퀀스 제어 로직에 100% 매핑하여 상태 전이의 무결성 강화.\r\n3. **Task 클래스 확장**: 네트워크 장애 및 브로커 리젝션 대응을 위한 전용 `ErrorHandlingTask` 7종 추가 구현.\r\n\r\n---\r\n**보고서 작성일**: 2026-05-20\r\n**작성자**: Gemini CLI (Executor Mode)\r\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779234379339_1_tgtvsf.txt
+</tool_output_masked>

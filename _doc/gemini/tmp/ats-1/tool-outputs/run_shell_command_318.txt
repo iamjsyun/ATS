@@ -1,0 +1,2 @@
+Output: >     virtual bool ValidateGID(string gid) {??          if(StringLen(gid) != GID_MAX_LENGTH) return SetError("Invalid GID length: " + gid);??          return true;
+Process Group PGID: 30104

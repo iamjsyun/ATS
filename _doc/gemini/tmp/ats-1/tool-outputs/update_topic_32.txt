@@ -1,0 +1,4 @@
+Current topic: "Enforcing 0.5s Pulse Frequency"
+Topic summary: I've identified redundant suppression logic in `CXStepDiscovery.mqh` that enforces 60s/300s intervals, conflicting with the user's 0.5s request. I will remove this legacy suppression and the `(Interval: 60s)` string, allowing the pulse to occur every 0.5s as driven by the EA timer. I will also disable the minute-based adaptive logic in `CXSignalWatcher::Pulse` to ensure consistent high-frequency reporting for the current test phase.
+
+Strategic Intent: Enforce 0.5s Watcher-Discovery pulse by removing legacy suppression.

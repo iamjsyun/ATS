@@ -1,0 +1,4 @@
+Current topic: "Universal Log Deduplication Integration"
+Topic summary: The user requested that the `[REPO-DIAG]` message, which uses `Print()`, also be deduplicated. I will modify `CXSignalRepository.mqh` to route these diagnostic messages through the `XP_LOG` system instead of calling `Print()` directly. By centralizing these logs through `CXLogDispatcher`, they will automatically inherit the `v10.17` deduplication logic, ensuring a cleaner output in both the Experts tab and the system log files.
+
+Strategic Intent: Extend log deduplication to all output channels, including native Print().

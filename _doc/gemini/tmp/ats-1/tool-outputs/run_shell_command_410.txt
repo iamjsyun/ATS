@@ -1,0 +1,4 @@
+Output:       CXFluentSequence* Case(int code, int state) { m_tmp_branches.Add(code, state); return GetPointer(this); }??  ??      virtual void Build() override {??          CommitCurrent();??          if(
+m_current_state == -1) {??>             m_current_state = m_tmp_from;??              XP_LOG_SEQ_INFO(m_ctx.GetParam(), StringFormat("[SEQ:%s] Sequence Started at State: %d", m_name, m_current_state
+));??          }??          TriggerOnEnter(m_current_state);??      }??
+Process Group PGID: 26188

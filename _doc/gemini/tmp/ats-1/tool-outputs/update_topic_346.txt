@@ -1,0 +1,4 @@
+Current topic: "Suppressing Redundant Logs & Fixing Validation"
+Topic summary: I'm addressing the "Lot above maximum: 0.00" error by ensuring `CXGuard` correctly handles cases where symbol data isn't fully loaded, preventing false validation failures. I'm also implementing a suppression mechanism in `CXStepDiscovery` to limit consecutive "Pulsing" and "No active signals" TRACE logs to a maximum of 3 occurrences. This significantly reduces log file bloat while maintaining enough visibility to confirm the watcher is alive. I'll also add the symbol name to the validation error for better debugging.
+
+Strategic Intent: Implement log suppression for redundant TRACE messages and fix Lot validation.

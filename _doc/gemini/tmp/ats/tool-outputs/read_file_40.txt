@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXTERMINALSCANNER_MQH\n#define CXTERMINALSCANNER_MQH\n\n#include <Arrays\\ArrayObj.mqh>\n#include \"..\\..\\Models\\CXParam.mqh\"\n\n/**\n * @class CXTerminalScanner\n * @brief ?곕??먯쓽 臾쇰━???먯궛(?ъ???二쇰Ц) ?꾩닔 議곗궗 ?대떦\n */\nclass 
+... [TRUNCATED] ...
+     p.SetLong((long)ticket);\n                    p.SetInt(1); // Type: Pending Order\n                    list.Add(p);\n                    count++;\n                }\n            }\n        }\n\n        return count;\n    }\n};\n\n#endif\n\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778722386583_0_mr4seq.txt
+</tool_output_masked>

@@ -1,0 +1,3 @@
+{
+  "output": "Output:         int found = repo.LoadActiveSignals(activeList);\n        if(found > 0) {\n            XP_LOG_INFO(NULL, StringFormat(\"[WATCHER-DISCOVERY] Found %d active signals in DB.\", found));\n            ctx.Set(\"active_signals\", activeList);\n            return WATCHER_VALIDATION;\n        }\n\n        SAFE_DELETE(activeList);\n        return STATE_UNCHANGED;\n    }\n\n    virtual void OnEnter(ICXContext* ctx) override {}\n    virtual void OnExit(ICXContext* ctx) override {}\n};\n\n#endif\nProcess Group PGID: 27912"
+}

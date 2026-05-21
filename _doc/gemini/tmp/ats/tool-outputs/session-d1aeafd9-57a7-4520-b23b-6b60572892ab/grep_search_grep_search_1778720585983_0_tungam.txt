@@ -1,0 +1,3 @@
+{
+  "output": "Found 5 matches for pattern \"#include \".*CXTradingSession\\.mqh\"\" in the workspace directory (filter: \"ATSE/**/*.mqh\"):\n---\nFile: ATSE\\CXTrade\\App\\CXAppService.mqh\nL17: #include \"..\\Session\\CXTradingSession.mqh\"\n---\nFile: ATSE\\CXTrade\\App\\CXTradingSessionPool.mqh\nL5: #include \"..\\Session\\CXTradingSession.mqh\"\n---\nFile: ATSE\\CXTrade\\Interfaces\\ICXTradingSessionPool.mqh\nL9: #include \"ICXTradingSession.mqh\"\n---\nFile: ATSE\\CXTrade\\Module\\Steps\\Watcher\\CXStepBinding.mqh\nL6: #include \"..\\..\\..\\Interfaces\\ICXTradingSession.mqh\"\n---\nFile: ATSE\\CXTrade\\Session\\CXTradingSession.mqh\nL7: #include \"..\\Interfaces\\ICXTradingSession.mqh\"\n---"
+}

@@ -1,0 +1,4 @@
+Current topic: "Verifying Pending Order Logic Flow"
+Topic summary: I need to confirm that for Type 1 (Pending/Limit) signals, the EA correctly uses `PriceSignal +/- te_limit` instead of the current Ask/Bid price, and that the order is placed as a Limit order. I will review the `CXOrderManager::ExecuteEntry` logic one last time to ensure the conditional flow for `isMarket` handles `type == 1` signals correctly by falling through to the `else` block, which applies the `te_limit` calculation. I will generate a summary confirming this logic flow for the user.
+
+Strategic Intent: Verify and document Pending Order price calculation for Type 1 signals.

@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: � caveman installer
+  JuliusBrussee/caveman
+
+
+Detected agents:
+  [1] Gemini CLI
+  [2] Cursor
+  [a] all   [q] quit
+Install which? (default: all) 1
+� Gemini CLI detected
+
+... [75 lines omitted] ...
+
+    �� gemini
+
+  start any session and say 'caveman mode', or run /caveman in Claude Code
+  uninstall: npx -y github:JuliusBrussee/caveman -- --uninstall
+npm notice
+npm notice New minor version of npm available! 11.9.0 -> 11.14.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.14.1
+npm notice To update run: npm install -g npm@11.14.1
+npm notice
+由ъ
+Process Group PGID: 22924
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\run_shell_command_run_shell_command_1778720989793_0_s5jrb7.txt
+</tool_output_masked>

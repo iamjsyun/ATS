@@ -1,0 +1,3 @@
+{
+  "output": "Output: \n\n    ���\n       곕━: G:\\�� ��\\_Doc\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\nd-----        2026-05-19  ��\n                             11:18                _Report\n\n------        2026-05-19   �\n                             6:48           2408 XTX_Atomized_Task_Strategy_Report_v1.0.md\n\n------        2026-05-19   �\n                             6:48           2912 XTX_Hyper_Atomized_Architecture_Review_v1.0.md\n\n------        2026-05-19   �\n                             9:25           2576 ATS_Trading_Scenario_v1.0.md\n\n------        2026-05-19   �\n                             8:33           4717 ATS_ATSE_Process_Flow_v1.0.md\nProcess Group PGID: 25228"
+}

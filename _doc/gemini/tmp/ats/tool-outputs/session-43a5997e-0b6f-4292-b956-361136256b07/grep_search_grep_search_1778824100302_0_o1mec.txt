@@ -1,0 +1,3 @@
+{
+  "output": "Found 6 matches for pattern \"\\.Step\\(\" across 2 workspace directories:\n---\nFile: ATS\\ATSA\\XTA\\XTAStartupV2.cs\nL24:                 .Step(\"InitializeParameter\", () => {\nL30:                 .Step(\"BuildStandardHost\", () => {\nL37:                 .Step(\"StartHost\", async () => {\nL43:                 .Step(\"LegacyStartBridge\", () => {\nL64:                 .Step(\"ScanClosedSignals\", async () => {\nL70:                 .Step(\"ExecuteTransfer\", async () => {\n---"
+}

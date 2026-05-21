@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXCOMPOSITESTEP_MQH\n#define CXCOMPOSITESTEP_MQH\n\n#include \"..\\..\\Interfaces\\IXStep.mqh\"\n#include \"..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\Interfaces\\CXMacros.mqh\"\n#include <Arrays\\ArrayObj.mqh>\n\n/**
+... [TRUNCATED] ...
+ (%d tasks)\", m_name, m_tasks.Total()));\n    }\n    \n    virtual void OnExit(ICXContext* ctx) override {\n        m_currentTaskIndex = 0; \n        XP_LOG_DEBUG(NULL, StringFormat(\"[%s] Composite Step Exited\", m_name));\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779238920376_1_iixon8.txt
+</tool_output_masked>

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 330-450 of 570 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For exampl
+... [TRUNCATED] ...
+t.SelectedLotType;\n                draft.xa_entry = current.xa_entry;\n                draft.SelectedXAEntry = current.SelectedXAEntry;\n            }\n            else\n            {\n                UpdateToDefaults(draft, yy);\n            }\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153394251_0_vljgqs.txt
+</tool_output_masked>

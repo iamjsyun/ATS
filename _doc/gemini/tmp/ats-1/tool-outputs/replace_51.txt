@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\App\\CXAppService.mqh (1 replacements). Here is the updated code:\n#ifndef CXAPPSERVICE_MQH\n#define CXAPPSERVICE_MQH\n\n#include \"..\\Interfaces\\ICXAppService.mqh\"\n#inc
+... [TRUNCATED] ...
+    \n        if(IS_VALID(m_sessionPool)) m_sessionPool.Pulse(GetPointer(xp));\n    }\n\n    CXTradingSession* StartSession(ICXParam* param) {\n        return (IS_VALID(m_sessionPool)) ? m_sessionPool.BorrowSession() : NULL;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779242257508_0_uc6j8.txt
+</tool_output_masked>

@@ -1,0 +1,4 @@
+Current topic: "Fixing CXOrderManager Scope & Syntax"
+Topic summary: The compiler is reporting "illegal assignment use" and "global scope" errors, which strongly suggest that I inadvertently closed the `ExecuteEntry` method scope early (with an extra `}`) and placed logic in the class scope. This explains the cascading errors. I will carefully restore the method structure in `CXOrderManager.mqh` by fixing the braces and ensuring variables like `sl_price` are properly declared inside the method.
+
+Strategic Intent: Fix compilation errors in CXOrderManager caused by syntax and scope issues in ExecuteEntry.

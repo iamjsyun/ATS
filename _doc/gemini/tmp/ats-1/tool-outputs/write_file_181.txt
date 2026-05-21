@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully overwrote file: D:\\Projects\\ats\\ATSE\\CXTrade\\ATS.mq5. Here is the updated code:\n//+------------------------------------------------------------------+\n//|                                                          ATS
+... [TRUNCATED] ...
+        InpSession_UseFile, InpSession_UseRemote, InpSession_UseUI,\n                            InpLog_InitOnStart);\n    \n    if(IS_INVALID(g_config)) return INIT_FAILED;\n\n    // 2. 앱 서비스 초기화 및 기동\n    g_app = new CXAppService(g_config);\n..."
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\write_file_write_file_1779237255881_0_8fnlf.txt
+</tool_output_masked>

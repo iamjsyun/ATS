@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXSIGNAL_MQH\n#define CXSIGNAL_MQH\n\n#include \"..\\Interfaces\\ICXSignal.mqh\"\n#include \"..\\Interfaces\\CXDefine.mqh\"\n\n/**\n * @class CXSignal\n * @brief 시스템 전반에서 사용되는 신호 엔티티 (spec.md 2.3 SSOT 준수)\n */\nclass CXSignal :
+... [TRUNCATED] ...
+ }\n    virtual datetime  GetUpdated() const override { return updated; }\n    virtual double    GetLimitOffset() const override { return limit_offset; }\n    virtual double    GetStopOffset() const override { return stop_offset; }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779238209739_0_r4swgc.txt
+</tool_output_masked>

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Execution\\CXPositionManager.mqh (1 replacements). Here is the updated code:\n﻿#ifndef CXPOSITIONMANAGER_MQH\n#define CXPOSITIONMANAGER_MQH\n\n#include \"..\\..\\In
+... [TRUNCATED] ...
+n        XP_LOG_ERROR(NULL, StringFormat(\"[POS-MODIFY] VERIFY FAILED: Modification sent but values not reflected for ticket:%I64u\", ticket));\n        return false;\n    }\n\n    void Reset() {\n        m_ticket = 0;\n    }\n};\n\n#endif\n\n\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779240135857_0_ucmb4d.txt
+</tool_output_masked>

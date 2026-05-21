@@ -1,0 +1,4 @@
+Current topic: "Updating Watcher Pulse Interval"
+Topic summary: The user requested to change the Watcher-Discovery pulse interval from 60 seconds to 0.5 seconds. I will investigate `CXSignalWatcher.mqh` and related configuration files to locate the interval control logic and update it to ensure a 0.5-second frequency, aligning with the current timer-only test mode.
+
+Strategic Intent: Change Watcher-Discovery pulse interval to 0.5 seconds.

@@ -1,0 +1,3 @@
+{
+  "output": "Output: \n\n    ���\n       곕━: G:\\�� ��\\_Doc\n\n\nMode                 LastWriteTime         Length Name\n----                 -------------         ------ ----\nd-----        2026-05-19  ��\n                             11:11                _Report\nProcess Group PGID: 13388"
+}

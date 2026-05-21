@@ -1,0 +1,139 @@
+Successfully modified file: D:\Projects\ATS\ATSA\XTA\Models\XChannelInfo.cs (1 replacements). Here is the updated code:
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using XTA.XData.Models;
+
+namespace XTA.Models
+{
+    public class XChannelInfo
+    {
+
+        public int CNO { get; set; }        
+        public long CID { get; set; }        
+        public string Name { get; set; } = string.Empty;
+
+        public string Type { get; set; } = "TRADE"; // TRADE, YOUTUBE_VISION, INFO
+        public string RunMode { get; set; } = "LIVE";
+        public bool IsDebugLogging { get; set; } = false;
+        public bool IsSoundEnabled { get; set; } = true;
+        public XPluginConfig Plugin { get; set; } = new();
+        public BuyOption? BuyOption { get; set; }
+        public SellOption? SellOption { get; set; }
+        public XVisionOptions? VisionOptions { get; set; }
+
+        public XChannelInfo() { }
+
+        public XChannelInfo(long cid, int cno, string name = "", string type = "TRADE")
+        {
+            this.CID = cid;
+            this.CNO = cno;
+            this.Name = name;
+            this.Type = type;
+        }
+
+        public List<double> DefaultTps { get; set; } = new();
+        public List<double> DefaultSls { get; set; } = new();
+        public List<double> DefaultOffsets { get; set; } = new();
+        public List<double> DefaultLots { get; set; } = new();
+    }
+
+    public class XPluginConfig
+    {
+        public string AssemblyName { get; set; } = string.Empty;
+        public string ClassName { get; set; } = string.Empty;
+    }
+
+    public class BuyOption
+    {
+        public bool Enable { get; set; } = true;
+        public int GridCount { get; set; } = 5;
+        public List<string> Profiles { get; set; } = new();
+
+        public List<XGridProfile> GetProfiles(int cno)
+        {
+            var result = new List<XGridProfile>();
+            if (Profiles == null) return result;
+
+            foreach (var str in Profiles)
+            {
+                if (string.IsNullOrWhiteSpace(str)) continue;
+                var parts = str.Split(',');
+                // 그리드 프로필 (v3.3): {GNO},{OrderType},{LotType},{Lot},{limit offset},{te start},{te step},{ts start},{ts step},{tp},{sl} (총 11개 필드)
+                if (parts.Length < 11) continue;
+
+                try
+                {
+                    result.Add(new XGridProfile
+                    {
+                        cno = cno,
+                        dir = 1,
+                        gno = int.Parse(parts[0].Trim()),
+                        type = int.Parse(parts[1].Trim()),
+                        lot_type = int.Parse(parts[2].Trim()),
+                        lot = double.Parse(parts[3].Trim()),
+                        offset = double.Parse(parts[4].Trim()),
+                        te_start = double.Parse(parts[5].Trim()),
+                        te_step = double.Parse(parts[6].Trim()),
+                        ts_start = int.Parse(parts[7].Trim()),
+                        ts_step = int.Parse(parts[8].Trim()),
+                        tp = double.Parse(parts[9].Trim()),
+                        sl = double.Parse(parts[10].Trim()),
+                        gap_min = 200
+                    });
+                }
+                catch { /* skip invalid format */ }
+            }
+            return result;
+        }
+    }
+
+    public class SellOption
+    {
+        public bool Enable { get; set; } = true;
+        public int GridCount { get; set; } = 5;
+        public List<string> Profiles { get; set; } = new();
+
+        public List<XGridProfile> GetProfiles(int cno)
+        {
+            var result = new List<XGridProfile>();
+            if (Profiles == null) return result;
+
+            foreach (var str in Profiles)
+            {
+                if (string.IsNullOrWhiteSpace(str)) continue;
+                var parts = str.Split(',');
+                // 그리드 프로필 (v3.3): {GNO},{OrderType},{LotType},{Lot},{limit offset},{te start},{te step},{ts start},{ts step},{tp},{sl} (총 11개 필드)
+                if (parts.Length < 11) continue;
+
+                try
+                {
+                    result.Add(new XGridProfile
+                    {
+                        cno = cno,
+                        dir = -1,
+                        gno = int.Parse(parts[0].Trim()),
+                        type = int.Parse(parts[1].Trim()),
+                        lot_type = int.Parse(parts[2].Trim()),
+                        lot = double.Parse(parts[3].Trim()),
+                        offset = double.Parse(parts[4].Trim()),
+                        te_start = double.Parse(parts[5].Trim()),
+                        te_step = double.Parse(parts[6].Trim()),
+                        ts_start = int.Parse(parts[7].Trim()),
+                        ts_step = int.Parse(parts[8].Trim()),
+                        tp = double.Parse(parts[9].Trim()),
+                        sl = double.Parse(parts[10].Trim()),
+                        gap_min = 200
+                    });
+                }
+                catch { /* skip invalid format */ }
+            }
+            return result;
+        }
+    }
+
+    public class XVisionOptions
+    {
+        public int CaptureIntervalMs { get; set; } = 1000;
+        public Dictionary<string, int[]> RoiRegions { get; set; } = new();
+    }
+}

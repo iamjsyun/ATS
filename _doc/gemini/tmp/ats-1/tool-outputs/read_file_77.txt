@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXORDERMANAGER_MQH\n#define CXORDERMANAGER_MQH\n\n#include \"..\\..\\Interfaces\\IXOrderManager.mqh\"\n#include \"..\\..\\Interfaces\\ICXContext.mqh\"\n#include \"..\\..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\..\\Interface
+... [TRUNCATED] ...
+        if(OrderSelect(ticket)) {\n            XP_LOG_ERROR(NULL, StringFormat(\"[ORDER-MANAGER] Failed to confirm deletion for ticket:%lld\", ticket));\n            return false;\n        }\n        \n        return true;\n    }\n};\n\n#endif\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779239827702_0_gsz08m.txt
+</tool_output_masked>

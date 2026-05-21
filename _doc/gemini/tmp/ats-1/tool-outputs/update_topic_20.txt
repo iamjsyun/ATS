@@ -1,0 +1,4 @@
+Current topic: "Fixing SQL Discovery for Error States"
+Topic summary: Analysis of the user's report shows that signals in `xe_status=99` (XE_ERROR) are being ignored by the Watcher's SQL query because of the `xe_status < 20` (XE_CLOSED_SIGNAL) filter. I will modify `CXSignalRepository.mqh` to include `xe_status = 99` in the discovery query, allowing the system to pick up and potentially recover or report on signals that encountered errors. I will also ensure the `xa_exit > 0` condition remains prioritized for liquidation needs.
+
+Strategic Intent: Fix SQL query logic to correctly discover signals with XE_ERROR status.

@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Tasks\\Pending\\CXTaskPending_L_Improve.mqh (1 replacements). Here is the updated code:\n#ifndef CX_TASK_PENDING_L_IMPROVE_MQH\n#define CX_TASK_PENDING_L_IMPROVE_MQ
+... [TRUNCATED] ...
+tringFormat(\"[PENDING-L-IMPROVE] OK: Price improvement detected: %.5f -> %.5f\", sig.GetPriceSignal(), newPrice));\n            xp.SetDouble(newPrice);\n            xp.SetInt(1); \n        }\n\n        return TASK_CONTINUE;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779239026487_1_x5ffy.txt
+</tool_output_masked>

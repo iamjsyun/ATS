@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXAPPSERVICE_MQH\n#define CXAPPSERVICE_MQH\n\n#include \"..\\Interfaces\\ICXAppService.mqh\"\n#include \"..\\Interfaces\\ICXConfig.mqh\"\n#include \"..\\Interfaces\\IDatabase.mqh\"\n#include \"..\\Interfaces\\IRepository.mqh\"\
+... [TRUNCATED] ...
+    \n        if(IS_VALID(m_sessionPool)) m_sessionPool.Pulse(GetPointer(xp));\n    }\n\n    CXTradingSession* StartSession(ICXParam* param) {\n        return (IS_VALID(m_sessionPool)) ? m_sessionPool.BorrowSession() : NULL;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats\tool-outputs\session-d1aeafd9-57a7-4520-b23b-6b60572892ab\read_file_read_file_1778723751247_0_29eil.txt
+</tool_output_masked>

@@ -1,0 +1,224 @@
+Successfully modified file: D:\Projects\ATS\ATSA\XTA\Models\XConfig.cs (1 replacements). Here is the updated code:
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace XTA.Models
+{
+    /// <summary>
+    /// XTA 시스템 통합 설정 모델 (ATSA.json v9.0 표준 - 중복 통합 버전)
+    /// </summary>
+    public class XConfig
+    {
+        public static class XChannelIds
+        {
+            public const long GlobalGold = -1002204600811;
+            public const long GMK = -1002218781954;
+            public const long XHANA = -1003778889507;
+            public const long XDUNA = -1003697953708;
+        }
+
+        /// <summary>
+        /// 커스텀 설정 파일 경로 (지정되지 않으면 기본값 사용)
+        /// </summary>
+        public static string? CustomConfigPath { get; set; }
+
+        /// <summary>
+        /// 시스템 및 트레이딩 엔진 통합 설정 (단일 관리 지점)
+        /// </summary>
+        public XEngineSystemSettings System { get; set; } = new();
+
+        public XChannelConfig ChannelDefault { get; set; } = new();
+        public List<XChannelConfig> Channels { get; set; } = new();
+
+        public static string GetConfigPath() 
+        {
+            if (!string.IsNullOrEmpty(CustomConfigPath)) return CustomConfigPath;
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "_config", "ATSA.json");
+        }
+
+        public static void EnsureExists(string? customPath = null)
+        {
+            if (!string.IsNullOrEmpty(customPath)) CustomConfigPath = customPath;
+            
+            string path = GetConfigPath();
+            string? dir = Path.GetDirectoryName(path);
+            if (dir != null && !Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            if (!File.Exists(path))
+            {
+                // MetaTrader 5 공용 폴더 경로 동적 계산
+                string commonPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    @"MetaQuotes\Terminal\Common\Files");
+                
+                string dbFullPath = Path.Combine(commonPath, "ATS.db");
+
+                var defaultConfig = new XConfig
+                {
+                    System = new XEngineSystemSettings 
+                    { 
+                        Version = "v9.0.0", 
+                        DatabaseFullPath = dbFullPath, // 공용 폴더 FullPath 명시
+                        LoggingLevel = "Info",
+                        RefreshIntervalMs = 1000
+                    },
+                    ChannelDefault = new XChannelConfig
+                    {
+                        CNO = 0,
+                        ChannelId = 0,
+                        Name = "Default",
+                        Symbol = "GOLD#",
+                        SourceType = "Telegram",
+                        YouTubeUrl = "https://www.youtube.com/live/example",
+                        YouTubeROI = "0,0,800,400",
+                        TradingOption = new XTradingOption
+                        {
+                            ActiveMode = "Simulation",
+                            Buy = new XDirectionOption
+                            {
+                                Enabled = true,
+                                LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01, Rate = 0 },
+                                Entry = new XEntryOption { TeStart = 500, TeStep = 100, TeLimit = 1000 },
+                                Exit = new XExitOption { TsStart = 500, TsStep = 100, TP = 1500, SL = 700 }
+                            },
+                            Sell = new XDirectionOption
+                            {
+                                Enabled = true,
+                                LotStrategy = new XLotStrategy { Type = "Fixed", Value = 0.01, Rate = 0 },
+                                Entry = new XEntryOption { TeStart = 500, TeStep = 100, TeLimit = 1000 },
+                                Exit = new XExitOption { TsStart = 500, TsStep = 100, TP = 1500, SL = 700 }
+                            }
+                        }
+                    },
+                    Channels = new List<XChannelConfig>
+                    {
+                        new XChannelConfig { 
+                            CNO = 1001, Name = "GlobalGold", Symbol = "GOLD#", ChannelId = XChannelIds.GlobalGold, SourceType = "Telegram",
+                            Interpreter = "GlobalGold",
+                            TradingOption = new XTradingOption { ActiveMode = "Live" }
+                        },
+                        new XChannelConfig { 
+                            CNO = 1002, Name = "GMK", Symbol = "GOLD#", ChannelId = XChannelIds.GMK, SourceType = "Telegram",
+                            Interpreter = "GMK",
+                            TradingOption = new XTradingOption { ActiveMode = "Live" }
+                        },
+                        new XChannelConfig { 
+                            CNO = 3001, Name = "XHANA", Symbol = "GOLD#", ChannelId = XChannelIds.XHANA, SourceType = "Telegram",
+                            Interpreter = "GlobalGold",
+                            TradingOption = new XTradingOption { ActiveMode = "Simulation" }
+                        },
+                        new XChannelConfig { 
+                            CNO = 3002, Name = "XDUNA", Symbol = "GOLD#", ChannelId = XChannelIds.XDUNA, SourceType = "Telegram",
+                            Interpreter = "GMK",
+                            TradingOption = new XTradingOption { ActiveMode = "Simulation" }
+                        },
+                        new XChannelConfig {
+                            CNO = 2001, Name = "YouTube_CH1", SourceType = "YouTube",
+                            YouTubeUrl = "https://youtu.be/-ps7V40GrA4", YouTubeROI = "100,100,400,200",
+                            YouTube = new XYouTubeConfig { IntervalMs = 3000 }
+                        },
+                        new XChannelConfig {
+                            CNO = 2002, Name = "YouTube_CH2", SourceType = "YouTube",
+                            YouTubeUrl = "https://youtu.be/P4V456LsOYk", YouTubeROI = "0,0,800,400",
+                            YouTube = new XYouTubeConfig { IntervalMs = 3000 }
+                        }
+                    }
+                };
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                File.WriteAllText(path, JsonSerializer.Serialize(defaultConfig, options));
+            }
+        }
+    }
+
+    public class XEngineSystemSettings
+    {
+        public string Version { get; set; } = "1.0.0";
+        public string DatabaseFullPath { get; set; } = "ATS.db";
+        public string LoggingLevel { get; set; } = "Info";
+        public int RefreshIntervalMs { get; set; } = 1000;
+    }
+
+    public class XChannelConfig
+    {
+        public bool Enabled { get; set; } = true;
+        public bool SoundEnabled { get; set; } = true;
+        public int CNO { get; set; }
+        public long ChannelId { get; set; }
+        public string Name { get; set; } = "";
+        public string Symbol { get; set; } = "GOLD#";
+        public string SourceType { get; set; } = "Telegram";
+        public string Interpreter { get; set; } = ""; // [v9.6] 명시적 해석기 클래스명
+        public string YouTubeUrl { get; set; } = "";
+        public string YouTubeROI { get; set; } = "0,0,800,400";
+        public XYouTubeConfig? YouTube { get; set; }
+        public XTradingOption TradingOption { get; set; } = new();
+
+        public XTradingOption OverrideOptions 
+        { 
+            get => TradingOption; 
+            set => TradingOption = value; 
+        }
+    }
+
+    public class XYouTubeConfig
+    {
+        public string LiveUrl { get; set; } = "";
+        public int IntervalMs { get; set; } = 3000;
+        public XOcrFilterConfig Filter { get; set; } = new();
+    }
+
+    public class XOcrFilterConfig
+    {
+        public int BufferSize { get; set; } = 10;
+        public double ThresholdPercentage { get; set; } = 0.8;
+    }
+
+    public class XTradingOption
+    {
+        public string? ActiveMode { get; set; } = "Simulation";
+        public XDirectionOption Buy { get; set; } = new();
+        public XDirectionOption Sell { get; set; } = new();
+    }
+
+    public class XDirectionOption
+    {
+        public bool? Enabled { get; set; }
+        public XLotStrategy? LotStrategy { get; set; }
+        public XEntryOption? Entry { get; set; }
+        public XExitOption? Exit { get; set; }
+    }
+
+    public class XLotStrategy
+    {
+        public string Type { get; set; } = "Fixed";
+        public double Value { get; set; }
+        public double Rate { get; set; }
+    }
+
+    public class XEntryOption
+    {
+        public double TeStart { get; set; }
+        public double TeStep { get; set; }
+        public double TeLimit { get; set; }
+    }
+
+    public class XExitOption
+    {
+        public int TsStart { get; set; }
+        public int TsStep { get; set; }
+        public double TP { get; set; }
+        public double SL { get; set; }
+    }
+
+    public class XOcrSettings
+    {
+        public string DataPath { get; set; } = @".\tessdata";
+        public string Language { get; set; } = "eng";
+        public string Whitelist { get; set; } = "0123456789.BUYSELTPSL";
+        public int PageSegMode { get; set; } = 7;
+    }
+}

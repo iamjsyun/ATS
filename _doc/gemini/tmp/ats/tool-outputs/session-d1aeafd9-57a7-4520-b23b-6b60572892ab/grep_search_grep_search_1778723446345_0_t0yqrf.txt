@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"#include \".*CXReverseInjector\\.mqh\"\" across 2 workspace directories."
+}

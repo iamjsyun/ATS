@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using DevExpress.Mvvm;\nusing DevExpress.Mvvm.DataAnnotations;\nusing System;\nusing System.Collections.Generic;\nusing System.Collections.ObjectModel;\nusing System.Linq;\nusing System.Threading.Tasks;\nusing System.IO;\nusing XTA.Mod
+... [TRUNCATED] ...
+0]);\n            sig.xa_exit = int.Parse(sig.SelectedXAExit.Split(':')[0]);\n            sig.xe_status = int.Parse(sig.SelectedXEStatus.Split(':')[0]);\n            sig.updated = DateTime.Now;\n            sig.RefreshAll();\n        }\n    }\n}\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779155280074_0_rdri3k.txt
+</tool_output_masked>

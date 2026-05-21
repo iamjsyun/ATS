@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 8 matches for pattern \"WATCHER_DISCOVERY\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Interfaces\\CXDefine.mqh\nL76:     WATCHER_DISCOVERY      = 0,\n---\nFile: Module\\CXSignalWatcher.mqh\nL101:         seq.From(
+... [TRUNCATED] ...
+VALID(pool)) return WATCHER_DISCOVERY;\nL76:         return WATCHER_DISCOVERY;\n---\nFile: Module\\Steps\\Watcher\\CXStepValidation.mqh\nL29:         if(IS_INVALID(activeList)) return WATCHER_DISCOVERY;\nL63:         return WATCHER_DISCOVERY;\n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779156064273_0_296qe.txt
+</tool_output_masked>

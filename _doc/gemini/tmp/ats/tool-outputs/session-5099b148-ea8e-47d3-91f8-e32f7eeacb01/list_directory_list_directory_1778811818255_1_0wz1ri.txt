@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal\\540829AD6BE27960E4557E2CFD5C69E0\\MQL5\\Experts\\ATS\\ATSA\\XTA\\Services\\TelegramService:\nXTelegram.cs (6008 bytes)\nXTelegramBase.cs (5692 bytes)\nXTelegramExtensions.cs (7628 bytes)"
+}

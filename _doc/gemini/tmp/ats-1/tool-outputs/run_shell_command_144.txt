@@ -1,0 +1,11 @@
+Output: >         if(!m_isActive && xp.GetEvent() != EVENT_START && xp.GetEvent() != EVENT_INJECT) return;??  ??          // 2. [SANDBOX GUARD] SID ??? ??????          ICXSignal* sig = xp.GetSignal();??   
+       if(IS_VALID(sig)) {??              string incomingSid = sig.GetSid();??              ??              // ??? SID?? ?????? ???(????? ?? ?????              if(m_sid == "") m_sid = incomingSid;?
+?              ??              // ?????SID?? ??? SID?? ???????? ??? (???????? ???)
+>     void Start(ICXParam* xp, ICXServiceFactory* factory) {??          m_isActive = true;??          m_sid = (IS_VALID(xp) && IS_VALID(xp.GetSignal())) ? xp.GetSignal().GetSid() : "";??          I
+nitLogger(m_sid, factory);
+>         xp.SetEvent(EVENT_START);??          Pulse(xp);??      }??
+>     void Start(ICXParam* xp) {??          // Fallback for existing calls without factory (though ideally should always pass it or store it)??          m_isActive = true;??          m_sid = (IS_VA
+LID(xp) && IS_VALID(xp.GetSignal())) ? xp.GetSignal().GetSid() : "";
+>         xp.SetEvent(EVENT_START);??          Pulse(xp);??      }??  ??      void InjectState(CXSignal* sig) {??          m_isActive = true;??          m_sid = IS_VALID(sig) ? sig.GetSid() : "";??
+          CXParam xp;??          xp.SetSignal(sig);??          xp.SetEvent(EVENT_INJECT);??          Pulse(GetPointer(xp));
+Process Group PGID: 30936

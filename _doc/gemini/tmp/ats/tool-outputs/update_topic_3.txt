@@ -1,0 +1,4 @@
+Current topic: "SQL Performance Optimization"
+Topic summary: I am implementing a performance optimization for database access. Instead of re-parsing fixed SQL queries on every call, I will cache the `DatabasePrepare` handles (Prepared Statements) for frequently used queries like 'LoadActiveSignals' and 'GetSignalBySid'. This includes utilizing `DatabaseBind` for parameter-driven queries, which significantly reduces CPU overhead and improves system responsiveness during high-frequency signal monitoring.
+
+Strategic Intent: Optimizing SQL performance by implementing Prepared Statement caching in CXSignalRepository.

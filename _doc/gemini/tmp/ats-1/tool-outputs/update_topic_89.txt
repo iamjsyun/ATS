@@ -1,0 +1,4 @@
+Current topic: "Fixing Order Manager Execution Error"
+Topic summary: The immediate transition to 99 is happening because `CXOrderManager` is returning `false` during `OrderOpen` or order confirmation. The symbol validation pass logs show `Sym:GOLD#`, but MT5 might still require `SymbolSelect("GOLD#", true)` before trading, or `OrderOpen` itself is failing due to an invalid price, volume, or missing symbol. I will add an explicit `SymbolSelect` inside `CXOrderManager::ExecuteEntry` before `OrderOpen`. Also, I'll fix `CXStepBinding` to properly pass the factory when starting the session so logs don't silently fail within the session.
+
+Strategic Intent: Fix factory parameter missing in session start and missing terminal check.

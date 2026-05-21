@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"Updating Project Specs & Mandates\"\nTopic summary: I am documenting the real-time market-price based calculation rules for Pending Orders, Trailing (Entry/Exit), and SL/TP. I will update `spec.md` with the detailed technical specifications of the DB columns used (`limit_offset`, `te_start`, `ts_start`, etc.) and add a foundational mandate to `GEMINI.md` to ensure all future tasks strictly follow this 'Market-Relative' conversion principle.\n\nStrategic Intent: Update spec.md and project mandates with price calculation rules."
+}

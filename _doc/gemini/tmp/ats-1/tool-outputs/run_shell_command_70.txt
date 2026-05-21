@@ -1,0 +1,4 @@
+Output:           if(slippage < 0 || slippage > MAX_SLIPPAGE) return SetError("Slippage out of range");??          return true;??      }??      ??      // Price & Point Processing??>
+     virtual double PointsToPrice(string symbol, double points) const {??          double pt = SymbolInfoDouble(symbol, SYMBOL_POINT);??          return points * pt;??      }
+??  ??      virtual double NormalizePrice(string symbol, double price) const {
+Process Group PGID: 35672

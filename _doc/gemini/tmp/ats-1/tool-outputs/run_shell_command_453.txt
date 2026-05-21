@@ -1,0 +1,11 @@
+Output:         if(IS_INVALID(m_ctx)) return;
+
+        //-- [Fix] ????????? ????????????? ???????? ??? Param ???
+        CXParam* sysParam = new CXParam();
+        sysParam.SetContext(m_ctx);
+        m_ctx.SetParam(CX_CAST(ICXParam, sysParam));
+
+        m_ctx.Set("repo", m_repo);
+        m_ctx.Set("config", m_config);
+        m_ctx.Set("session_pool", pool);
+Process Group PGID: 22824

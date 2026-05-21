@@ -1,0 +1,4 @@
+Current topic: "Persistent 10016 Analysis & PDCA"
+Topic summary: Despite fixing the market price calculation and symbol normalization, `Retcode 10016` (Invalid Stops) persists for GOLD#. This indicates that the broker's `StopsLevel` (minimum distance for SL/TP) is not being respected, or the calculated SL/TP absolute price is still mathematically invalid. For GOLD symbols, the `StopsLevel` is often significant. I will analyze the `ValidateStopLevel` logic in `CXGuard` to see how it calculates the `stops_lvl` and compare it against the requested SL/TP. I will then generate a detailed PDCA report explaining why this broker-specific constraint causes the 10016 error and providing a robust fix.
+
+Strategic Intent: Deep analysis and report on Retcode 10016 for GOLD#.

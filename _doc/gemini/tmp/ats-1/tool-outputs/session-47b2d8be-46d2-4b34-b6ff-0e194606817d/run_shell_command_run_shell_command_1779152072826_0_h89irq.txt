@@ -1,0 +1,3 @@
+{
+  "output": "Output: \nATSA\\XTA\\XTAHostBuilder.cs:51:                    if (!Enum.TryParse<Microsoft.Extensions.Logging.LogLevel>(levelStr, true, out var minLevel))\nATSA\\XTA\\XTAHostBuilder.cs:53:                        minLevel = Microsoft.Extensions.Logging.LogLevel.Info;\nATSA\\XTA\\XTAHostBuilder.cs:56:                    logging.SetMinimumLevel(minLevel);\nATSA\\XTA\\Models\\XChannelObject.cs:30:        protected void LogCNO(int cno, LogLevel level, string message)\nProcess Group PGID: 16692"
+}

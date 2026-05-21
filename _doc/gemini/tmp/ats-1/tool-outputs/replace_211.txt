@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Successfully modified file: D:\\Projects\\ats\\ATSE\\CXTrade\\App\\CXServiceFactory.mqh (1 replacements). Here is the updated code:\n#ifndef CXSERVICEFACTORY_MQH\n#define CXSERVICEFACTORY_MQH\n\n#include \"..\\Interfaces\\ICXServiceFac
+... [TRUNCATED] ...
+    virtual IXExitManager* CreateExitManager(ICXContext* ctx) override {\n        return new CXExitManager(ctx);\n    }\n    \n    virtual IXPriceTracker* CreatePriceTracker() override {\n        return new CXPriceTracker();\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\replace_replace_1779236277117_0_5ne8yw.txt
+</tool_output_masked>

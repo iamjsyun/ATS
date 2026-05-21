@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "namespace FluentSeq.Core;\n\nusing IegTools.Extensions;\nusing NLog;\n\n/// <summary>\n/// A sequence that could be executed\n/// </summary>\n/// <typeparam name=\"TState\">Type of the state (string, enum, int...)</typeparam>\npublic c
+... [TRUNCATED] ...
+te bool CurrentStateHasChanged() =>\n        !CurrentState?.Equals(PreviousState) ?? false;\n\n\n    /// <inheritdoc />\n    public ISequence<TState> SetState(TState state, Func<bool> condition) =>\n        condition() ? SetState(state) : this;\n}"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779152540213_1_zd5a4q.txt
+</tool_output_masked>

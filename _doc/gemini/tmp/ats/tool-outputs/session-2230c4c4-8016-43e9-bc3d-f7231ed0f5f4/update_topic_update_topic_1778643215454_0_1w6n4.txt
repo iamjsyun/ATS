@@ -1,0 +1,3 @@
+{
+  "output": "Current topic: \"CXParam Universal Carrier Design\"\nTopic summary: I am designing a universal carrier function (Payload pattern) that utilizes `CXParam` to facilitate flexible and type-safe data transmission across different architectural layers. This design focuses on centralizing data handling, reducing method signature complexity, and ensuring that all necessary context (signals, database handles, logging) can be bundled into a single object. I will provide a conceptual overview and skeleton implementation for this carrier function, aligning with the project's 'Payloader' strategy defined in the memory.\n\nStrategic Intent: Designing a universal carrier function using CXParam for flexible data transmission."
+}

@@ -1,0 +1,3 @@
+{
+  "output": "Strategic Intent: Implementing CXExitManager in the CXTrade architecture."
+}

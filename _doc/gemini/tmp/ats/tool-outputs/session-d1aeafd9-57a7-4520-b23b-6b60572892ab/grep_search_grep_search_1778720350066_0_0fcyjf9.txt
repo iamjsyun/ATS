@@ -1,0 +1,3 @@
+{
+  "output": "No matches found for pattern \"#include \".*CXTradingSession.mqh\"|#include \".*CXOrderManager.mqh\"|#include \".*CXPositionManager.mqh\"|#include \".*CXExitManager.mqh\"\" in the workspace directory (filter: \"ATSE/CXTrade/Session/Execution/*.mqh\")."
+}

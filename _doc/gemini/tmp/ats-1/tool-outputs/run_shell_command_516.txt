@@ -1,0 +1,28 @@
+Output: �泥댁�
+      깆�듬��. �대� ��
+                      깆怨� �
+                             ㅼ� 媛�ν吏 寃利��.
+�
+ 移
+   :1 臾몄
++ ... ing]::UTF8; [Console]::Encoding = [System.Text.Encoding]::UTF8; sqlit ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : PropertyAssignmentException
+ 
+sqlite3 : 'sqlite3' �⑹닿� cmdlet, �⑥ㅽщ┰�� �� �ㅽ�� �� �
+                                                        濡洹몃 �
+                                                                �쇰� � ��듬��. �
+                                                                                ���吏 ��� 寃쎈�媛 ��ы⑤ 寃쎌� 寃쎈�媛 ��瑜몄� 寃利 �ㅼ �ㅼ ���
+                                                                                                                                             �
+���.
+�
+ 移
+   :1 臾몄
++ ... ; [Console]::Encoding = [System.Text.Encoding]::UTF8; sqlite3 --versi ...
++                                                           ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sqlite3:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+Exit Code: 1
+Process Group PGID: 27084

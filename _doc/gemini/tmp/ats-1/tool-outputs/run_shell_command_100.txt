@@ -1,0 +1,8 @@
+Output:           if(IS_INVALID(sig)) return false;??  ??          //--- [Point 4] ??? ?????????????(CXGuard) ?????          IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);??  
+        if(IS_VALID(guard)) {??>             if(!guard.ValidateMagic(sig.GetMagic()) ||
+>                !guard.ValidateSID(sig.GetSid()) ||
+>                !guard.ValidateLot(sig.GetSymbol(), sig.GetLot()) ||
+>                !guard.ValidatePrice(sig.GetSymbol(), sig.GetPriceSignal())) {??                  ??                  string err = CXMessageProvider::Format(MSG_ERR_GUARD_DE
+NIED, guard.GetLastError());??                  XP_LOG_ERROR(xp, err);??                  CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);??                  return false
+;??              }??          }??  ??          m_sid = sig.GetSid();??          m_trade.SetExpertMagicNumber((ulong)sig.GetMagic());
+Process Group PGID: 34208

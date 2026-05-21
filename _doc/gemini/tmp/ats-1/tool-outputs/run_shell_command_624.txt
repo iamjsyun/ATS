@@ -1,0 +1,21 @@
+Output: #ifndef CXSTEPDISCOVERY_MQH
+#define CXSTEPDISCOVERY_MQH
+
+#include "..\..\..\Interfaces\IXStep.mqh"     
+#include "..\..\..\Interfaces\IRepository.mqh"
+#include "..\..\..\Models\CXSignal.mqh"       
+
+#include <Arrays\ArrayObj.mqh>
+
+/**
+ * @class CXStepDiscovery
+ * @brief DB?癒�� ?醫� ?�苑� ?醫���??癒��?�
+                                           �� ?�ｍ�
+ */
+class CXStepDiscovery : public IXStep {
+public:
+    CXStepDiscovery() {}
+    virtual ~CXStepDiscovery() {}
+
+    virtual string Name() override { return "Step_Discovery"; }
+Process Group PGID: 8564

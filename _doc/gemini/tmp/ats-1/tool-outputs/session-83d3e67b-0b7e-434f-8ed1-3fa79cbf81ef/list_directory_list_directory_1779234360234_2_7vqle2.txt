@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for D:\\Projects\\ats\\ATSE\\CXTrade\\Session\\Steps\\Exit:\nCXStepExit.mqh (2415 bytes)\nCXStepExitSweep.mqh (1341 bytes)\nCXStepExitTicket.mqh (1337 bytes)\nCXStepExitTrailing.mqh (3613 bytes)\nCXStepExitVerify.mqh (2088 bytes)"
+}

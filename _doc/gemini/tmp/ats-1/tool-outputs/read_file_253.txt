@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef CXSIGNALWATCHER_MQH\n#define CXSIGNALWATCHER_MQH\n\n#include \"..\\Interfaces\\IRepository.mqh\"\n#include \"..\\Interfaces\\ICXConfig.mqh\"\n#include \"..\\Interfaces\\ICXParam.mqh\"\n#include \"..\\Interfaces\\ICXFluentSequen
+... [TRUNCATED] ...
+ATCHER_VALIDATION).Execute(new CXStepValidation()).OnSuccess(WATCHER_BINDING).OnFail(WATCHER_DISCOVERY);\n        seq.From(WATCHER_BINDING).Execute(new CXStepBinding()).OnSuccess(WATCHER_DISCOVERY);\n\n        seq.Build();\n    }\n};\n\n#endif\n\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\read_file_read_file_1779235019801_1_9a1yai.txt
+</tool_output_masked>

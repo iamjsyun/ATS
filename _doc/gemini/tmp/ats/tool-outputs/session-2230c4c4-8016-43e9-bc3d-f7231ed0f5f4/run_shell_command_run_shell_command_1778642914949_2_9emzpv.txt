@@ -1,0 +1,3 @@
+{
+  "output": "Output: Move-Item : ���쇰�濡 留�� ��듬��.\n�\n 移\n   :1 臾몄\n+ Move-Item -Path \"C:\\Users\\hijsyun\\AppData\\Roaming\\MetaQuotes\\Terminal ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : WriteError: (C:\\Users\\hijsyu...entSequence.mqh:FileInfo) [Move-Item], IOException\n    + FullyQualifiedErrorId : MoveFileInfoItemIOError,Microsoft.PowerShell.Commands.MoveItemCommand\n \nExit Code: 1\nProcess Group PGID: 20932"
+}

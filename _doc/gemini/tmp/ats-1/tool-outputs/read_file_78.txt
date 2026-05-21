@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "using System;\n\nnamespace XTA.XData.Models\n{\n    /// <summary>\n    /// XTA 시스템 공통 코드 및 상태 정의 (SSOT)\n    /// XTA.XData 프로젝트로 이동하여 하위 레이어에서 공통 참조 가능하도록 함.\n    /// </summary>\n    public static class XCode\n    {\n        public con
+... [TRUNCATED] ...
+l Entity Schema.\r\n\r\n## Responsibilities\r\n- Domain Model maintenance.\r\n- SQLite persistence & Xpo helpers.\r\n- ID/SID/GID generation logic.\n--- End of Context from: d:/projects/ats/atsa/xta.xdata/gemini.md ---\n--- End Project Context ---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-47b2d8be-46d2-4b34-b6ff-0e194606817d\read_file_read_file_1779153236875_0_9rekyj.txt
+</tool_output_masked>

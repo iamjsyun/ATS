@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "Found 2 matches for pattern \"XA_RAW\" in path \"D:\\Projects\\ATS\\ATSE\\CXTrade\":\n---\nFile: Infra\\CXSignalRepository.mqh\nL92-       if(IS_INVALID(m_db) || IS_INVALID(signal)) return false;\nL93-       string sql = StringFormat(\
+... [TRUNCATED] ...
+DING_PLACED   = 1,\nL53-     XE_EXECUTED         = 10,\nL54-     XE_CLOSED_SIGNAL    = 20,\nL55-     XE_CLOSED_TP        = 21,\nL56-     XE_CLOSED_SL        = 23,\nL57-     XE_CLOSED_MANUAL    = 24,\nL58-     XE_ERROR            = 99\nL59- };\n---"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\grep_search_grep_search_1779156009084_0_q3uzfq.txt
+</tool_output_masked>

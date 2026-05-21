@@ -1,0 +1,4 @@
+Current topic: "Inheritance & Diagnostic Logging"
+Topic summary: I've identified that `CXSignalWatcher` is not inheriting the `"guard"` service from the global context, which might cause `StepValidation` to fail silently or behave unexpectedly. I'm also suspecting that the EA has not properly reloaded the latest logic. I will modify `CXSignalWatcher` to accept the global context and properly register all required services (repo, config, pool, guard). I'll also add explicit TRACE logging for the SQL execution in `SignalRepository` to confirm ID 105 is being queried correctly.
+
+Strategic Intent: Enable Guard inheritance in Watcher and add diagnostic logging for ID 105.

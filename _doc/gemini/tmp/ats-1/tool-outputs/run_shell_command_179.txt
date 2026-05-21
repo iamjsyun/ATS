@@ -1,0 +1,28 @@
+<tool_output_masked>
+Output: D:\Projects\ats\ATSE\CXTrade\ATS.mq5 : information: compiling D:\Projects\ats\ATSE\CXTrade\ATS.mq5
+D:\Projects\ats\ATSE\CXTrade\ATS.mq5 : information: including D:\Projects\ats\ATSE\CXTrade\App\CXAppService.mqh
+D:\Projects\ats\ATSE\CXTrade\App\CXAppService.mqh : information: including D:\Projects\ats\ATSE\CXTrade\Interfaces\ICXAppService.mqh
+D:\Projects\ats\ATSE\CXTrade\Interfaces\ICXAppService.mqh : information: including C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69
+E0\MQL5\Include\Object.mqh
+C:\Users\hijsyun\AppData\Roaming\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69E0\MQL5\Include\Object.mqh : information: including C:\Users\hijsyun\AppData\Roamin
+g\MetaQuotes\Terminal\540829AD6BE27960E4557E2CFD5C69E0\MQL5\Include\StdLibErr.mqh
+D:\Projects\ats\ATSE\CXTrade\Interfaces\ICXAppService.mqh : information: including D:\Projects\ats\ATSE\CXTrade\Interfaces\CXDefine.mqh
+D:\Projects\ats\ATSE\CXTrade\App\CXAppService.mqh : information: including D:\Projects\ats\ATSE\CXTrade\Interfaces\ICXConfig.mqh
+D:\Projects\ats\ATSE\CXTrade\App\CXAppService.mqh : information: including D:\Projects\ats\ATSE\CXTrade\Interfaces\IDatabase.mqh
+
+... [152 lines omitted] ...
+
+ : information: generating code 78%
+ : information: generating code 81%
+ : information: generating code 84%
+ : information: generating code 87%
+ : information: generating code 90%
+ : information: generating code 93%
+ : information: generating code 95%
+ : information: generating code 100%
+ : information: code generated
+Result: 0 errors, 0 warnings, 2633 ms elapsed, cpu='X64 Regular'
+Process Group PGID: 26272
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-83d3e67b-0b7e-434f-8ed1-3fa79cbf81ef\run_shell_command_run_shell_command_1779237265476_0_2r2o3g.txt
+</tool_output_masked>

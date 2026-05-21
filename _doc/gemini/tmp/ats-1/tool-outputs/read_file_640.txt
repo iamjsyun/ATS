@@ -1,0 +1,9 @@
+<tool_output_masked>
+{
+  "output": "#ifndef ENTRYTASKS_MQH\n#define ENTRYTASKS_MQH\n\n#include \"..\\..\\Interfaces\\IXTask.mqh\"\n#include \"..\\..\\Interfaces\\CXMacros.mqh\"\n#include \"..\\..\\Interfaces\\IXOrderManager.mqh\"\n#include \"..\\..\\Interfaces\\IXGuard.m
+... [TRUNCATED] ...
+ // 시장가 성공\n            }\n            return STATE_ENTRY_TRAILING; // 대기 주문 성공\n        }\n\n        XP_LOG_ERROR(xp, \"[TASK-ENTRY] Entry execution failed. Transitioning to SESSION_ERROR.\");\n        return SESSION_ERROR;\n    }\n};\n\n#endif\n"
+}
+
+Output too large. Full output available at: C:\Users\hijsyun\.gemini\tmp\ats-1\tool-outputs\session-ca917c7e-f79b-430e-a900-067ea72fd2fa\read_file_read_file_1779156038805_0_rqhqji.txt
+</tool_output_masked>

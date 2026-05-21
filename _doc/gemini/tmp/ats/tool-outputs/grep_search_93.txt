@@ -1,0 +1,17 @@
+Found 5 matches for pattern "#include ".*CXTradingSession\.mqh"" in the workspace directory (filter: "ATSE/**/*.mqh"):
+---
+File: ATSE\CXTrade\App\CXAppService.mqh
+L17: #include "..\Session\CXTradingSession.mqh"
+---
+File: ATSE\CXTrade\App\CXTradingSessionPool.mqh
+L5: #include "..\Session\CXTradingSession.mqh"
+---
+File: ATSE\CXTrade\Interfaces\ICXTradingSessionPool.mqh
+L9: #include "ICXTradingSession.mqh"
+---
+File: ATSE\CXTrade\Module\Steps\Watcher\CXStepBinding.mqh
+L6: #include "..\..\..\Interfaces\ICXTradingSession.mqh"
+---
+File: ATSE\CXTrade\Session\CXTradingSession.mqh
+L7: #include "..\Interfaces\ICXTradingSession.mqh"
+---
