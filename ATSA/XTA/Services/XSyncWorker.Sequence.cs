@@ -53,7 +53,8 @@ namespace XTA.Services
 
                         _ctx.PendingMessages = new XPCollection<XpoTgMessage>(uow, criteria).ToList();
                         
-                        if (_ctx.PendingMessages.Count == 0) _syncSeq.SetState("Idle");
+                        // [Fix] 메시지가 없어도 모니터링은 수행해야 함
+                        if (_ctx.PendingMessages.Count == 0) _syncSeq.SetState("MonitorClose");
                         else _syncSeq.SetState("Recover");
                     })
 
@@ -81,7 +82,7 @@ namespace XTA.Services
                 .Builder().DisableValidation().Build();
         }
 
-        private void OnSyncTimerCallback(object? state)
+        private async void OnSyncTimerCallback(object? state)
         {
             if (Interlocked.CompareExchange(ref _isBusyInt, 1, 0) != 0) return;
             try
@@ -89,9 +90,13 @@ namespace XTA.Services
                 _syncSeq.SetState("Prepare");
                 
                 int safety = 0;
-                while (!_syncSeq.IsInState("Idle") && safety++ < 5)
+                // [v13.5] Async-Aware Loop: 
+                // OnEntry가 async void이므로 내부에서 상태가 변경될 때까지 대기할 수 있는 구조 필요
+                // 여기서는 우선 safety를 늘리고 RunAsync가 있다면 활용 고려
+                while (!_syncSeq.IsInState("Idle") && safety++ < 30)
                 {
                     _syncSeq.Run();
+                    await Task.Delay(100); // 비동기 OnEntry가 상태를 변경할 시간을 줌
                 }
             }
             catch (Exception ex) { nlog.Error(ex, "[SyncWorker:SEQ] Execution failed."); }

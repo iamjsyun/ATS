@@ -118,7 +118,7 @@
 
                         <!-- Row 1: Identity & Timing -->
                         <StackPanel Margin="0,0,0,3" Orientation="Horizontal">
-                            <StackPanel Width="50">
+                            <StackPanel Width="80">
                                 <TextBlock Style="{StaticResource HeaderStyle}" Text="CNO" />
                                 <ComboBox
                                     ItemsSource="{Binding DataContext.CnoList, RelativeSource={RelativeSource AncestorType=UserControl}}"

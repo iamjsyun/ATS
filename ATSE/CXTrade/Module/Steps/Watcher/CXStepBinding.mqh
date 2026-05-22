@@ -43,11 +43,28 @@ public:
 
             string sid = sig.GetSid();
 
-            //-- 0. 중복 바인딩 방지
+            //-- 0. 중복 바인딩 방지 및 강제 개입 로직 (v14.3)
             ICXTradingSession* existing = pool.FindSessionBySid(sid);
             if(IS_VALID(existing)) {
-                if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] SKIP: SID:%s is already active.", sid));
-                skipped++;
+                // 이미 가동 중인데 청산 의도가 들어온 경우 -> 기존 세션에 강제 청산 명령 하달
+                if(sig.GetXAExit() == XA_ACTIVE) {
+                    if(IS_VALID(log)) log.Warn(xp, StringFormat("[WATCHER-BINDING] INTERRUPT: SID:%s is active. Forcing Liquidation.", sid));
+                    
+                    // 1. 기존 세션 상태 강제 전이
+                    existing.ForceTransition(SESSION_LIQUIDATING);
+                    
+                    // 2. DB 상태 즉시 업데이트 (ATSA 가시성 확보)
+                    IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+                    if(IS_VALID(repo)) {
+                        sig.SetStatus(XE_CLOSED_SIGNAL); // 혹은 SESSION_LIQUIDATING
+                        sig.SetStatusMsg("Liquidation Forced by Watcher");
+                        repo.UpdateStatus(sig);
+                    }
+                    skipped++;
+                } else {
+                    if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] SKIP: SID:%s is already active.", sid));
+                    skipped++;
+                }
                 SAFE_DELETE(sig); //-- [v10.7 Fix] Delete orphan signal object
                 continue;
             }

@@ -16,6 +16,12 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
+        // [v14.0 Exit-First Priority]
+        if(sig.GetXAExit() == XA_ACTIVE) {
+            XP_LOG_WARN(xp, "[ENTRY-V-TICKET] ABORT: Exit intent detected. Redirecting to LIQUIDATING.");
+            return SESSION_LIQUIDATING;
+        }
+
         ulong ticket = sig.GetTicket();
         XP_LOG_TRACE(xp, StringFormat("[ENTRY-V-TICKET] Verifying Ticket Acquisition... Current Ticket:%I64u", ticket));
 

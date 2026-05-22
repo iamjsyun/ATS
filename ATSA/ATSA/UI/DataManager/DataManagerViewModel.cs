@@ -363,6 +363,15 @@ namespace ATSA.UI.DataManager
 
             try
             {
+                // [v13.6] Mandatory Pre-Injection Validation
+                var uiValResult = signalSvc.Validate(SelectedSignal);
+                if (!uiValResult.IsValid)
+                {
+                    string errors = string.Join("\n", uiValResult.Errors.Select(e => $"• {e.ErrorMessage}"));
+                    _dialogService.ShowError($"입력 데이터가 유효하지 않습니다:\n\n{errors}", "검증 실패");
+                    return;
+                }
+
                 GenerateCurrentMessage();
                 string rawText = SelectedSignal.GeneratedMessage;
                 
@@ -486,11 +495,11 @@ namespace ATSA.UI.DataManager
                 draft.sno = current.sno;
                 draft.gno = current.gno;
                 draft.symbol = current.symbol;
-                draft.dir = current.dir;
+                draft.dir = current.dir; // Directly transfer the numeric direction
                 draft.type = current.type;
                 draft.lot = current.lot;
                 draft.price_signal = current.price_signal;
-                draft.SelectedDir = current.SelectedDir;
+                draft.SelectedDir = current.SelectedDir; 
                 draft.SelectedType = current.SelectedType;
                 draft.SelectedLotType = current.SelectedLotType;
                 draft.xa_entry = current.xa_entry;
@@ -604,8 +613,11 @@ namespace ATSA.UI.DataManager
             if (SnoList.Any()) sig.sno = SnoList[0];
             if (GnoList.Any()) sig.gno = GnoList[0];
             sig.SelectedDir = DirList.FirstOrDefault() ?? "1:BUY";
+            
+            // [v10.4.1] Standardize to 0-th index initialization
             sig.SelectedType = TypeList.FirstOrDefault() ?? "1:TRL (추적 진입)";
             sig.SelectedLotType = LotTypeList.FirstOrDefault() ?? "1:고정 로트";
+            
             sig.symbol = "GOLD#";
             sig.price_signal = 0.00;
             sig.lot = 0.01;

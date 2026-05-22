@@ -25,7 +25,6 @@ namespace XTA.Validation
             // [진입 상태 검증] xa_entry가 활성화된 경우
             When(x => x.xa_entry > 0, () =>
             {
-                RuleFor(x => x.price_signal).GreaterThan(0).WithMessage("진입 신호 가격은 0보다 커야 합니다.");
                 RuleFor(x => x.lot).GreaterThan(0).WithMessage("랏은 0보다 커야 합니다.");
                 RuleFor(x => x.dir).Must(d => d == 1 || d == 2).WithMessage("방향은 1(BUY) 또는 2(SELL)여야 합니다.");
             });

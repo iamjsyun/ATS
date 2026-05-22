@@ -17,6 +17,7 @@ public:
     virtual void Start(ICXParam* xp, ICXServiceFactory* factory) = 0;
     virtual void Start(ICXParam* xp) = 0;
     virtual void InjectState(CXSignal* sig) = 0;
+    virtual void ForceTransition(int state) = 0;
     virtual void Reset() = 0;
     virtual bool IsActive() const = 0;
     virtual string GetSid() const = 0;

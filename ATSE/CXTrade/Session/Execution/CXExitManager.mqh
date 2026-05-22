@@ -28,11 +28,20 @@ public:
      * @brief Layer 1: 티켓 기반 정밀 청산 및 사후 검증
      */
     virtual bool CloseByTicket(ICXParam* xp, ICXSignal* sig) override {
+        if(IS_INVALID(sig)) return false;
         ulong ticket = (ulong)sig.GetTicket();
+        string sid = sig.GetSid();
         if(ticket <= 0) return true;
         
         bool res = false;
         if(PositionSelectByTicket(ticket)) {
+            // [v14.0 Strict SID/Ticket Verification]
+            if(PositionGetString(POSITION_COMMENT) != sid) {
+                XP_LOG_ERROR(xp, StringFormat("[POS-CLOSE] ABORT: SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
+                                              ticket, PositionGetString(POSITION_COMMENT), sid));
+                return false;
+            }
+
             XP_LOG_INFO(xp, StringFormat("[POS-CLOSE] Sending Request: [Ticket:%I64u]", ticket));
             if(m_trade.PositionClose(ticket)) {
                 // 재확인: 포지션 소멸 확인
@@ -54,6 +63,13 @@ public:
             }
         }
         else if(OrderSelect(ticket)) {
+            // [v14.0 Strict SID/Ticket Verification]
+            if(OrderGetString(ORDER_COMMENT) != sid) {
+                XP_LOG_ERROR(xp, StringFormat("[ORDER-DELETE] ABORT: SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
+                                              ticket, OrderGetString(ORDER_COMMENT), sid));
+                return false;
+            }
+
             XP_LOG_INFO(xp, StringFormat("[ORDER-DELETE] Sending Request: [Ticket:%I64u]", ticket));
             if(m_trade.OrderDelete(ticket)) {
                 // 재확인: 주문 소멸 확인

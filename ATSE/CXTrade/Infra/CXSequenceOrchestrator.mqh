@@ -109,13 +109,12 @@ private:
     void InitSessionMap() {
         string dsl[] = {
             // 1. Entry Pipeline (v11.5: Hyper-Atomized)
-            // Logic(Redirect, Identity, Risk, Price) -> Guard(Spread, Vol) -> Persistence(Intent) -> Request(Order)
             "0|Composite:Step_Entry_Logic:TASK_E_L_REDIRECT,TASK_E_L_IDENTITY,TASK_E_L_RISK,TASK_E_L_PRICE,TASK_E_G_SPREAD,TASK_E_G_VOLATILITY,TASK_E_P_INTENT,TASK_E_R_ORDER|1|99|300|0|10=10,20=20",
-            "1|Composite:Step_Entry_Transit:TASK_E_V_ERROR,TASK_E_V_TICKET,TASK_E_V_REAL|2|99|60|0|20=20",
+            "1|Composite:Step_Entry_Transit:TASK_A_INTENT_WATCH,TASK_E_V_ERROR,TASK_E_V_TICKET,TASK_E_V_REAL|2|99|60|0|20=20",
             "2|Composite:Step_Entry_Verify:TASK_E_V_DOUBLECHECK,TASK_E_P_FINALIZE|10|99|30|0|20=20",
             
             // 2. Pending Pipeline
-            "5|Composite:Step_Pending:TASK_P_V_TERMINAL,TASK_P_P_ALIGN,TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0",
+            "5|Composite:Step_Pending:TASK_A_INTENT_WATCH,TASK_P_V_TERMINAL,TASK_P_P_ALIGN,TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0|20=20",
             
             // 3. Active Pipeline
             "10|Composite:Step_Active:TASK_A_INTENT_WATCH,TASK_A_V_STATUS,TASK_A_V_STALE,TASK_A_V_TERMINAL,TASK_A_P_ALIGN,TASK_A_L_STATUS,TASK_A_ALPHA_CALC,TASK_A_ALPHA_APPLY|10|99|72000|0|20=20",

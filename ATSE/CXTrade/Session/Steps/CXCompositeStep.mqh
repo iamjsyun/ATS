@@ -51,12 +51,18 @@ public:
         ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
         int startIndex = IS_VALID(pIdx) ? pIdx.GetInt() : 0;
         
-        for(int i = startIndex; i < m_tasks.Total(); i++) {
+        for(int i = 0; i < m_tasks.Total(); i++) {
+            // [v14.3 Priority Execution] 
+            // 인덱스 0번 태스크(보통 IntentWatch)는 이전의 Yield 지점과 상관없이 "매 틱 무조건 실행"
+            if(i > 0 && i < startIndex) continue; 
+
             IXTask* task = dynamic_cast<IXTask*>(m_tasks.At(i));
             if(IS_VALID(task)) {
                 // [v9.9.2] 타임아웃 검증
                 if(task.IsTimedOut()) {
-                    XP_LOG_ERROR(xp, StringFormat("[%s] Task Timeout. Moving to SESSION_ERROR.", task.Name()));
+                    string timeoutErr = StringFormat("[%s] Task Timeout. Moving to SESSION_ERROR.", task.Name());
+                    XP_LOG_ERROR(xp, timeoutErr);
+                    if(IS_VALID(xp)) xp.SetString(timeoutErr);
                     if(IS_VALID(pIdx)) pIdx.SetInt(0);
                     return SESSION_ERROR;
                 }
@@ -80,14 +86,17 @@ public:
                         pIdx = new CXParam();
                         ctx.Set(indexKey, pIdx);
                     }
-                    pIdx.SetInt(i);
+                    pIdx.SetInt(i); // 현재 지점 저장
                     
                     task.IncrementRetry();
                     if(task.IsMaxRetriesExceeded()) {
-                        XP_LOG_ERROR(xp, StringFormat("[%s] Max Retries Exceeded. Moving to SESSION_ERROR.", task.Name()));
+                        string retryErr = StringFormat("[%s] Max Retries Exceeded. Moving to SESSION_ERROR.", task.Name());
+                        XP_LOG_ERROR(xp, retryErr);
+                        if(IS_VALID(xp)) xp.SetString(retryErr);
                         pIdx.SetInt(0);
                         return SESSION_ERROR;
                     }
+                    // Yield 발생 시 0번(감시자)은 다음 틱에도 실행되어야 하므로 루프 종료
                     return STATE_UNCHANGED;
                 }
                 // 4. TASK_CONTINUE(-1) 시 다음 태스크로 진행

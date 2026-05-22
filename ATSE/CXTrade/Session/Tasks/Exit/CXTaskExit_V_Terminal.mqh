@@ -31,7 +31,9 @@ public:
         if(exists) {
             IncrementRetry();
             if(GetRetryCount() > 5) {
-                XP_LOG_ERROR(xp, StringFormat("[EXIT-V-TERMINAL] FAILED: Physical Asset(%I64u) still exists after 5 retries.", ticket));
+                string assetErr = StringFormat("[EXIT-V-TERMINAL] FAILED: Physical Asset(%I64u) still exists after 5 retries.", ticket);
+                XP_LOG_ERROR(xp, assetErr);
+                if(IS_VALID(xp)) xp.SetString(assetErr);
                 return SESSION_ERROR;
             }
             XP_LOG_DEBUG(xp, StringFormat("[EXIT-V-TERMINAL] YIELD: Asset(%I64u) still in terminal. Waiting...", ticket));

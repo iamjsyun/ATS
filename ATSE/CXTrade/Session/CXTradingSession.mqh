@@ -178,6 +178,16 @@ public:
         Pulse(GetPointer(xp));
     }
 
+    /**
+     * @brief [v14.3] 외부 강제 상태 전이 (Interruption)
+     */
+    virtual void ForceTransition(int state) override {
+        if(!m_isActive || IS_INVALID(m_sequence)) return;
+        
+        XP_LOG_WARN(NULL, StringFormat("[SESSION-INTERRUPT] Force Transition to State:%d for SID:%s", state, m_sid));
+        m_sequence.ForceState(state);
+    }
+
     void Reset() {
         //--- [SSOC] 글로벌 트리에서 제거
         if(m_sid != "" && IS_VALID(m_globalCtx)) {

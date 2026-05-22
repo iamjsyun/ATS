@@ -41,20 +41,22 @@ namespace XTA.Services
             var closedSignals = await repo.GetClosedSignalsAsync();
             foreach (var s in closedSignals)
             {
-                if (s.xa_exit == XCode.XA_ACTIVE || s.xa_exit == XCode.XA_RAW)
+                // [v9.8.11] Matrix Alignment:
+                // xe_status >= 20 (CLOSED) 인데 xa_exit가 아직 0(READY) 또는 1(ACTIVE)인 경우
+                if (s.xa_exit == XCode.XA_RAW || s.xa_exit == XCode.XA_ACTIVE)
                 {
                     string soundCmd = (s.sno == 0) ? "GROUP_CLOSE" : "SID_COMPLETED";
                     var domainSignal = s as Models.XSignal ?? Models.XSignal.FromBase(s);
                     XContext.Instance.Sound?.PlaySound(domainSignal, soundCmd);
-                    nlog.Debug($"[SyncWorker:TTS] Triggered {soundCmd} for SID:{s.sid} (xa_exit 1->2)");
-                    XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 청산 완료 확인 (1->2)");
+                    nlog.Debug(s.ToAuditString("SYNC-COMP", $"xa_exit {s.xa_exit}->2, xe_status:{s.xe_status}"));
+                    XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 청산 완료 확인 ({s.xa_exit}->2)");
                     
                     await repo.UpdateXaStatusAsync(s.sid, XCode.XA_CLOSED_COMPLETED);
                     nlog.Debug($"[SyncWorker:STATUS] SID:{s.sid} updated to XA_CLOSED_COMPLETED(2)");
                 }
                 else if (s.xa_exit == XCode.XA_CLOSED_COMPLETED)
                 {
-                    nlog.Debug($"[SyncWorker:STATUS] SID:{s.sid} transition to XA_ARCHIVE_READY(3) started.");
+                    nlog.Debug(s.ToAuditString("SYNC-ARCH", "xa_exit 2->3"));
                     XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 데이터 이관 대기 확인 (2->3)");
 
                     await repo.UpdateXaStatusAsync(s.sid, XCode.XA_ARCHIVE_READY);
