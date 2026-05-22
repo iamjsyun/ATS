@@ -26,8 +26,8 @@ public:
         if(flag == 10) {
             XP_LOG_TRACE(xp, "[PENDING-R-APPLY] Processing Market Fallback due to rebound...");
             if(orderMgr.DeleteOrder(xp, (ulong)sig.GetTicket())) {
-                //-- [v10.31] Do not switch to Market order. Keep it as Limit order, but apply te_limit offset.
-                sig.SetLimitOffset(sig.GetTELimit());
+                // [v13.9 Refactoring] limit_offset을 삭제했으므로 te_start를 te_limit값으로 교체하여 진입 유도
+                sig.SetTEStart(sig.GetTELimit());
                 if(orderMgr.ExecuteEntry(xp)) {
                     if(IS_VALID(repo)) repo.UpdateStatus(sig);
                     XP_LOG_OK(xp, "[PENDING-R-APPLY] SUCCESS: Fallback to Limit executed (Offset replaced).");
