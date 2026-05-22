@@ -11,6 +11,7 @@ namespace XTA.Services
 {
     /// <summary>
     /// [Partial] Sequence: FluentSeq 기반의 신호 Enrichment 워크플로우 정의 (Workflow)
+    /// [v11.3 Mandatory] Trading Process Standard 준수 (Enrichment -> Validation -> Persistence)
     /// </summary>
     public partial class XSignalService
     {
@@ -65,14 +66,14 @@ namespace XTA.Services
                         })
                     .ConfigureState("CheckDuplicates")
                         .OnEntry(async () => {
-                            nlog.Debug($"[Signal:ENRICH] SID:{ctx.CurrentSignal.sid} GID:{ctx.CurrentSignal.gid} CNO:{ctx.CurrentSignal.cno} Dir:{ctx.CurrentSignal.dir} Type:{ctx.CurrentSignal.type}");
+                            nlog.Debug(ctx.CurrentSignal.ToAuditString("SIGNAL-CHECK", "Enrichment in progress..."));
 
                             if (ctx.Xdo.CMD != "DM_INJECTION" && globalCtx.SignalRepo != null)
                             {
                                 var existing = await globalCtx.SignalRepo.GetSignalBySidAsync(ctx.CurrentSignal.sid);
                                 if (existing != null)
                                 {
-                                    nlog.Warn($"[Signal:DROP] Duplicate SID detected. Injection aborted for SID:{ctx.CurrentSignal.sid}");
+                                    nlog.Warn(ctx.CurrentSignal.ToAuditString("SIGNAL-DROP", "Duplicate SID detected. Injection aborted."));
                                     ctx = ctx with { IsDropped = true };
                                     seq.SetState("End");
                                     return;
@@ -86,13 +87,14 @@ namespace XTA.Services
                             var valResult = _validator.Validate(ctx.CurrentSignal);
                             if (valResult.IsValid)
                             {
+                                nlog.Info(ctx.CurrentSignal.ToAuditString("SIGNAL-READY", "Validation Success"));
                                 finalResults.Add(ctx.CurrentSignal);
                             }
                             else
                             {
                                 string errors = string.Join(", ", valResult.Errors.Select(e => e.ErrorMessage));
                                 string errorMsg = $"[VAL-99] Validation Failed: {errors}";
-                                nlog.Warn($"[Signal:VALIDATE-FAIL] SID:{ctx.CurrentSignal.sid} | {errorMsg}");
+                                nlog.Warn(ctx.CurrentSignal.ToAuditString("SIGNAL-VAL-FAIL", errorMsg));
                                 
                                 ctx.CurrentSignal.xe_status = 99;
                                 ctx.CurrentSignal.xe_status_msg = errorMsg;

@@ -19,6 +19,8 @@ namespace ATSA.UI.DataManager
     /// <summary>
     /// DataManager UI의 로직을 담당하는 ViewModel
     /// [v9.5] Command 이름과 메서드 이름을 일치시켜 바인딩 안정성 확보
+    /// [v9.8.11] Status Transition Matrix 준수 (READY=0, EXECUTED=10, CLOSED=20)
+    /// [v8.8] UI/UX Binding Standard 준수 (Lowercase bindings)
     /// </summary>
     public class DataManagerViewModel : ViewModelBase
     {
@@ -423,7 +425,7 @@ namespace ATSA.UI.DataManager
                     final.xe_status_msg = "Manually Reset by DataManager";
                     
                     await repo.SaveSignalImmediateAsync(final, IsForceInject);
-                    _param.nlog.Info($"[DM:SAVE] New Signal {final.sid} injected (EN=1, EX=0, ST=0, Force={IsForceInject}).");
+                    _param.nlog.Info(final.ToAuditString("DM-SAVE", $"Force={IsForceInject}, Msg: Manual Injection Success"));
 
                     // [v9.0] 신규 주입 시 즉시 TTS 출력 (xa_entry 0->1 전이 효과)
                     XContext.Instance.Sound?.PlaySound(final, "SIGNAL_RECEIVED");

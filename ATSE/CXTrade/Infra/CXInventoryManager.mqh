@@ -7,7 +7,7 @@
 
 /**
  * @class CXInventoryManager
- * @brief 터미널 실물 자산 상태 확인 및 동기화 구현체 (SSOC: Inventory)
+ * @brief 터미널 실물 자산 상태 확인 및 동기화 구현체 (v13.5 UAF Standard)
  */
 class CXInventoryManager : public ICXInventoryManager {
 public:

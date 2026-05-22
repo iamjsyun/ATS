@@ -18,7 +18,7 @@
 
 /**
  * @class CXOrderManager
- * @brief 주문 전송 및 관리 전담 구현체 (v13.4 UAF Standard)
+ * @brief 주문 전송 및 관리 전담 구현체 (v13.5 UAF & Resilience Standard)
  */
 class CXOrderManager : public IXOrderManager {
 private:

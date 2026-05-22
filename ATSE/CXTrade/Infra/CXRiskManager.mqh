@@ -10,7 +10,7 @@
 
 /**
  * @class CXRiskManager
- * @brief 리스크 관리 및 자금 관리 전문 구현체
+ * @brief 리스크 관리 및 자금 관리 전문 구현체 (v13.5 UAF Standard)
  */
 class CXRiskManager : public ICXRiskManager {
 private:

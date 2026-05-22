@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                          ATS.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v10.27] Main ATS Expert Advisor Entry Point (Unified)           |
+//| [v13.5] Main ATS Engine - UAF & Resilience Standard              |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2026, Gemini CLI"
 #property link      "https://github.com/google-gemini/gemini-cli"

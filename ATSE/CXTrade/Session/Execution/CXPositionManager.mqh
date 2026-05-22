@@ -15,7 +15,7 @@
 
 /**
  * @class CXPositionManager
- * @brief 샌드박스 세션 내의 포지션 감시 및 사후 관리 담당 (v11.3 SSOC Alignment)
+ * @brief 샌드박스 세션 내의 포지션 감시 및 사후 관리 담당 (v13.5 UAF & Resilience Standard)
  */
 class CXPositionManager : public IXPositionManager {
 private:

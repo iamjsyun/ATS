@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                           CXScenarioRunner.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v1.2] Scenario-based Signal Injector for ATSE Self-Testing      |
+//| [v13.5] Scenario-based Signal Injector for ATSE Self-Testing      |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2026, Gemini CLI"
 #property link      "https://github.com/google-gemini/gemini-cli"

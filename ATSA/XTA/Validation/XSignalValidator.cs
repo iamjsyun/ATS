@@ -3,6 +3,10 @@ using XTA.XData.Models;
 
 namespace XTA.Validation
 {
+    /// <summary>
+    /// [v9.8 Standard] 신호 엔티티 유효성 검증 클래스.
+    /// 비즈니스 로직 및 리스크 관리 규칙 준수 여부 확인.
+    /// </summary>
     public class XSignalValidator : AbstractValidator<XSignal>
     {
         public XSignalValidator()

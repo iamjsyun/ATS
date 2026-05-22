@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace XTA.XData.Models
 {
+    /// <summary>
+    /// [v9.8 Standard] 신호 엔티티 도메인 모델.
+    /// [v8.2 Governance] ID 생성 및 검증 로직 포함.
+    /// </summary>
     public class XSignal
     {
         public int id { get; set; }

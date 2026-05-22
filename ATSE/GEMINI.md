@@ -17,19 +17,19 @@ This agent is the **Executor**.
 - Signal status tracking.
 - Position/Order management.
 
-## Trading Logging Standard (v12.5 - Explicit Function Audit)
-모든 트레이딩 함수 호출 및 로그 출력은 다음의 강화된 규칙을 엄격히 준수해야 한다.
+## Trading Logging Standard (v13.5 - UAF Unified)
+모든 트레이딩 함수 호출 및 로그 출력은 다음의 강화된 규칙을 엄격히 준수한다.
 
-1.  **Full-Audit Trading Log (m_trade 호출 시)**
-    - 모든 `m_trade` 함수 호출 직전/직후에 **실제 호출된 함수명(PositionOpen, OrderOpen, OrderDelete, PositionClose, OrderModify, PositionModify)**을 명확히 포함한다.
-    - 당시 주입된 **모든 파라미터**를 기록한다.
-    - 트레일링 진입(TE)의 경우, 원본 포인트(`Sta`, `Ste`, `Lim`)와 당시 시장가 기준 변환된 가격(`TEPri`)을 모두 포함해야 한다.
-    - 형식: `[FUNC:{name}] [Sym:{symbol}, Lot:{lot}, Price:{price}, TEPts:[Sta,Ste,Lim], TEPri:[Sta,Ste,Lim], Mkt:{mkt}, SID:{sid}]`
-... (나머지 규칙 유지) ...
-2.  **High-Frequency Category Muting (금지 카운터)**
-    - 주기적으로 반복되는 시퀀스 중 다음 카테고리의 일반 상태 로그는 출력을 금지한다.
-    - **금지 대상**: `[PRICE-MGR]` (가격 보정 로그), `[GUARD-V-SPREAD]` (PASSED 로그)
-    - **예외**: 치명적 에러(`LOG_LVL_ERROR`) 상황인 경우에만 예외적으로 출력을 허용한다.
+1.  **Universal Audit Format (UAF)**
+    - 모든 `m_trade` 호출 전후에 명시적 함수명과 표준 파라미터를 기록한다.
+    - 형식: `[FUNC:Name] [SID] [Sym, Lot, Dir, Status] [TE:Pts TS:Pts SL:Pts TP:Pts] [P:Open, SL:Price, TP:Price, Mkt:Price] {SPEC:Extra}`
+    - `Print()` 함수를 병행 사용하여 터미널 전문가 탭의 영구 가시성을 확보한다.
 
-3.  **지능형 중복 방지 (Deduplication)**
-    - 동일 메시지 또는 A-B-A-B 교차 패턴 발생 시 10회당 1회만 출력(Heartbeat)하는 로직을 로거 베이스 레이어에서 수행한다.
+2.  **Architectural Mandates (v13.5 Resilience)**
+    - **Atomic Binding**: 세션 할당 즉시 DB 상태를 `XE_PENDING_REQ(1)`로 잠금하여 중복 생성을 원천 차단한다.
+    - **Exit-First Priority**: `xa_exit=1` 발견 시 모든 진입 시퀀스를 즉시 Abort하고 청산으로 전이한다.
+    - **Sync Latency Guard**: 실물 부재 시 즉시 종료하지 않고 최대 5틱 동안 히스토리를 재조회(Retry)한다.
+
+3.  **High-Frequency Muting**
+    - `[PRICE-MGR]`, `[GUARD-V-SPREAD]` 등 단순 상태 보고 로그는 출력을 금지한다. (에러 시 예외)
+    - 지능형 중복 방지 로직(10회당 1회 출력)을 기본 적용한다.
