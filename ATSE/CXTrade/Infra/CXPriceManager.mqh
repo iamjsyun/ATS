@@ -74,26 +74,23 @@ public:
 
         //--- [v11.5 StopsLevel Guard] 브로커의 최소 거리 제한 준수
         int stopsLevel = IS_VALID(symMgr) ? symMgr.GetStopsLevel(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL);
-        double tickSize = IS_VALID(symMgr) ? symMgr.GetTickSize(symbol) : SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
-        double minDistance = (stopsLevel + 1) * point; // 안전을 위해 +1 틱 적용
+        double minDistance = (stopsLevel + 3) * point; // [v12.3 Resilience] 안전을 위해 +3 틱 적용 (10015 에러 방지)
         
         if(dir == CX_DIR_BUY) {
             // Buy Limit은 시장가(Ask)보다 아래에 있어야 함
             double maxAllowed = marketPrice - minDistance;
             if(execPrice > maxAllowed) {
-                XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] BUY_LIMIT Price Correction: %.5f -> %.5f (StopsLevel:%d)", execPrice, maxAllowed, stopsLevel));
                 execPrice = NormalizePrice(symbol, maxAllowed);
             }
         } else {
             // Sell Limit은 시장가(Bid)보다 위에 있어야 함
             double minAllowed = marketPrice + minDistance;
             if(execPrice < minAllowed) {
-                XP_LOG_WARN(xp, StringFormat("[PRICE-MGR] SELL_LIMIT Price Correction: %.5f -> %.5f (StopsLevel:%d)", execPrice, minAllowed, stopsLevel));
                 execPrice = NormalizePrice(symbol, minAllowed);
             }
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] ExecPrice: Mkt:%.5f, Off:%.0f pts -> Final:%.5f", marketPrice, offsetPts, execPrice));
+        // [v12.7 Muted] XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] ExecPrice: Mkt:%.5f, Off:%.0f pts -> Final:%.5f", marketPrice, offsetPts, execPrice));
         return execPrice;
     }
 
@@ -108,7 +105,7 @@ public:
         double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
 
         double sl = NormalizePrice(symbol, basePrice - (slPts * point * dir_sign));
-        XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] SL: Base:%.5f, Off:%.0f pts -> SL:%.5f", basePrice, slPts, sl));
+        // [v12.7 Muted] XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] SL: Base:%.5f, Off:%.0f pts -> SL:%.5f", basePrice, slPts, sl));
         return sl;
     }
 
@@ -123,7 +120,7 @@ public:
         double dir_sign = (dir == CX_DIR_BUY) ? 1.0 : -1.0;
 
         double tp = NormalizePrice(symbol, basePrice + (tpPts * point * dir_sign));
-        XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] TP: Base:%.5f, Off:%.0f pts -> TP:%.5f", basePrice, tpPts, tp));
+        // [v12.7 Muted] XP_LOG_TRACE(xp, StringFormat("[PRICE-MGR] TP: Base:%.5f, Off:%.0f pts -> TP:%.5f", basePrice, tpPts, tp));
         return tp;
     }
 };

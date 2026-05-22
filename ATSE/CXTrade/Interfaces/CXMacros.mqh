@@ -64,19 +64,19 @@ inline ICXLogger* GetLoggerSafe(ICXParam* xp, ENUM_LOG_LEVEL level, bool is_sequ
     return dynamic_cast<ICXLogger*>(ctx.Get("logger"));
 }
 
-//--- 로깅 매크로 (CXParam/Context 기반)
-#define XP_LOG_TRACE(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_TRACE, false); if(IS_VALID(_log)) _log.Trace(xp, msg); }
-#define XP_LOG_INFO(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_INFO,  false); if(IS_VALID(_log)) _log.Info(xp, msg);  }
-#define XP_LOG_DEBUG(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_DEBUG, false); if(IS_VALID(_log)) _log.Debug(xp, msg); }
-#define XP_LOG_WARN(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  false); if(IS_VALID(_log)) _log.Warn(xp, msg);  }
-#define XP_LOG_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, false); if(IS_VALID(_log)) _log.Error(xp, msg); }
-#define XP_LOG_OK(xp, msg)    { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_OK,    false); if(IS_VALID(_log)) _log.Ok(xp, msg);    }
+//--- 로깅 매크로 (CXParam/Context 기반) - On-Change Deduplication Enabled
+#define XP_LOG_TRACE(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_TRACE, false); if(IS_VALID(_log)) _log.Trace(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_INFO(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_INFO,  false); if(IS_VALID(_log)) _log.Info(xp, msg, LOG_POLICY_ON_CHANGE);  }
+#define XP_LOG_DEBUG(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_DEBUG, false); if(IS_VALID(_log)) _log.Debug(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_WARN(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  false); if(IS_VALID(_log)) _log.Warn(xp, msg, LOG_POLICY_ON_CHANGE);  }
+#define XP_LOG_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, false); if(IS_VALID(_log)) _log.Error(xp, msg, LOG_POLICY_ALWAYS); }
+#define XP_LOG_OK(xp, msg)    { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_OK,    false); if(IS_VALID(_log)) _log.Ok(xp, msg, LOG_POLICY_ALWAYS);    }
 
 //--- 시퀀스 전용 로깅 매크로 (필터링 적용)
-#define XP_LOG_SEQ_TRACE(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_TRACE, true); if(IS_VALID(_log)) _log.Trace(xp, msg); }
-#define XP_LOG_SEQ_INFO(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_INFO,  true); if(IS_VALID(_log)) _log.Info(xp, msg); }
-#define XP_LOG_SEQ_DEBUG(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_DEBUG, true); if(IS_VALID(_log)) _log.Debug(xp, msg); }
-#define XP_LOG_SEQ_WARN(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  true); if(IS_VALID(_log)) _log.Warn(xp, msg); }
-#define XP_LOG_SEQ_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, true); if(IS_VALID(_log)) _log.Error(xp, msg); }
+#define XP_LOG_SEQ_TRACE(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_TRACE, true); if(IS_VALID(_log)) _log.Trace(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_SEQ_INFO(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_INFO,  true); if(IS_VALID(_log)) _log.Info(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_SEQ_DEBUG(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_DEBUG, true); if(IS_VALID(_log)) _log.Debug(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_SEQ_WARN(xp, msg)  { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_WARN,  true); if(IS_VALID(_log)) _log.Warn(xp, msg, LOG_POLICY_ON_CHANGE); }
+#define XP_LOG_SEQ_ERROR(xp, msg) { ICXLogger* _log = GetLoggerSafe(xp, LOG_LVL_ERROR, true); if(IS_VALID(_log)) _log.Error(xp, msg, LOG_POLICY_ALWAYS); }
 
 #endif

@@ -21,9 +21,9 @@ public:
 
         ICXSignal* sig = xp.GetSignal();
         if(IS_VALID(sig) && (sig.GetTicket() > 0 || sig.GetStatus() >= XE_IN_TRANSIT)) {
-            XP_LOG_DEBUG(xp, StringFormat("[ENTRY-R] SKIP: Asset already in transit (Ticket:%I64u, Status:%d)", 
+            XP_LOG_TRACE(xp, StringFormat("[ENTRY-R] SKIP: Asset already in transit (Ticket:%I64u, Status:%d)", 
                                           sig.GetTicket(), sig.GetStatus()));
-            return TASK_CONTINUE;
+            return STATE_ENTRY_TRANSIT;
         }
 
         XP_LOG_TRACE(xp, "[ENTRY-R] Sending Physical Order to Broker...");

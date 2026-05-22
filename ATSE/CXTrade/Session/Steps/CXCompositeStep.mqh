@@ -46,13 +46,18 @@ public:
      * @brief 등록된 태스크들을 순차적으로 실행
      */
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
-        for(int i = m_currentTaskIndex; i < m_tasks.Total(); i++) {
+        // [v11.9 Fix] Persist current index across ticks by retrieving it from Context
+        string indexKey = StringFormat("CompositeIndex_%s", m_name);
+        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        int startIndex = IS_VALID(pIdx) ? pIdx.GetInt() : 0;
+        
+        for(int i = startIndex; i < m_tasks.Total(); i++) {
             IXTask* task = dynamic_cast<IXTask*>(m_tasks.At(i));
             if(IS_VALID(task)) {
                 // [v9.9.2] 타임아웃 검증
                 if(task.IsTimedOut()) {
                     XP_LOG_ERROR(xp, StringFormat("[%s] Task Timeout. Moving to SESSION_ERROR.", task.Name()));
-                    m_currentTaskIndex = 0; // Reset
+                    if(IS_VALID(pIdx)) pIdx.SetInt(0);
                     return SESSION_ERROR;
                 }
 
@@ -61,21 +66,26 @@ public:
                 // 1. 특정 상태로 전이 지시 시 즉시 반환 (성공/상태변경)
                 if(res >= 0) {
                     task.ResetRetry(); 
-                    m_currentTaskIndex = 0; // Reset for next state
+                    if(IS_VALID(pIdx)) pIdx.SetInt(0);
                     return res;
                 }
                 // 2. 실행 중지(Break) 지시 시 남은 태스크 무시하고 현재 상태 유지
                 else if(res == TASK_BREAK) {
-                    m_currentTaskIndex = 0; // Restart chain on next process call
+                    if(IS_VALID(pIdx)) pIdx.SetInt(0);
                     return STATE_UNCHANGED;
                 }
                 // 3. 비차단 대기(Yield) 시 인덱스 유지하고 다음 틱 대기
                 else if(res == TASK_YIELD) {
-                    m_currentTaskIndex = i; // [Refinement 1] Save current position
+                    if(IS_INVALID(pIdx)) {
+                        pIdx = new CXParam();
+                        ctx.Set(indexKey, pIdx);
+                    }
+                    pIdx.SetInt(i);
+                    
                     task.IncrementRetry();
                     if(task.IsMaxRetriesExceeded()) {
                         XP_LOG_ERROR(xp, StringFormat("[%s] Max Retries Exceeded. Moving to SESSION_ERROR.", task.Name()));
-                        m_currentTaskIndex = 0;
+                        pIdx.SetInt(0);
                         return SESSION_ERROR;
                     }
                     return STATE_UNCHANGED;
@@ -83,22 +93,29 @@ public:
                 // 4. TASK_CONTINUE(-1) 시 다음 태스크로 진행
                 else if(res == TASK_CONTINUE) {
                     task.ResetRetry(); 
-                    m_currentTaskIndex = i + 1; // Move to next
                 }
             }
         }
         
-        m_currentTaskIndex = 0; // 체인 완주 시 리셋
+        if(IS_VALID(pIdx)) pIdx.SetInt(0);
         return STATE_UNCHANGED; 
     }
 
     virtual void OnEnter(ICXContext* ctx) override {
-        m_currentTaskIndex = 0; // 진입 시 항상 0부터 시작
+        string indexKey = StringFormat("CompositeIndex_%s", m_name);
+        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        if(IS_INVALID(pIdx)) {
+            pIdx = new CXParam();
+            ctx.Set(indexKey, pIdx);
+        }
+        pIdx.SetInt(0);
         XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Entered (%d tasks)", m_name, m_tasks.Total()));
     }
     
     virtual void OnExit(ICXContext* ctx) override {
-        m_currentTaskIndex = 0; 
+        string indexKey = StringFormat("CompositeIndex_%s", m_name);
+        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        if(IS_VALID(pIdx)) pIdx.SetInt(0);
         XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Exited", m_name));
     }
 };

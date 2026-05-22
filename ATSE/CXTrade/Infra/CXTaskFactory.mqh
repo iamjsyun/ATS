@@ -23,6 +23,8 @@
 
 // Pending Tasks
 #include "..\Session\Tasks\Pending\CXTaskPending_V_Sync.mqh"
+#include "..\Session\Tasks\Pending\CXTaskPending_V_Terminal.mqh"
+#include "..\Session\Tasks\Pending\CXTaskPending_P_Align.mqh"
 #include "..\Session\Tasks\Pending\CXTaskPending_L_Rebound.mqh"
 #include "..\Session\Tasks\Pending\CXTaskPending_L_Improve.mqh"
 #include "..\Session\Tasks\Pending\CXTaskPending_R_Apply.mqh"
@@ -72,6 +74,8 @@ public:
         if(name == "TASK_E_P_FINALIZE")    return TASK_E_P_FINALIZE;
         
         if(name == "TASK_P_V_SYNC")        return TASK_P_V_SYNC;
+        if(name == "TASK_P_V_TERMINAL")    return TASK_P_V_TERMINAL;
+        if(name == "TASK_P_P_ALIGN")       return TASK_P_P_ALIGN;
         if(name == "TASK_P_L_REBOUND")     return TASK_P_L_REBOUND;
         if(name == "TASK_P_L_IMPROVE")     return TASK_P_L_IMPROVE;
         if(name == "TASK_P_R_APPLY")       return TASK_P_R_APPLY;
@@ -116,6 +120,8 @@ public:
             
             // Pending
             case TASK_P_V_SYNC:        return new CXTaskPending_V_Sync();
+            case TASK_P_V_TERMINAL:    return new CXTaskPending_V_Terminal();
+            case TASK_P_P_ALIGN:       return new CXTaskPending_P_Align();
             case TASK_P_L_REBOUND:     return new CXTaskPending_L_Rebound();
             case TASK_P_L_IMPROVE:     return new CXTaskPending_L_Improve();
             case TASK_P_R_APPLY:       return new CXTaskPending_R_Apply();

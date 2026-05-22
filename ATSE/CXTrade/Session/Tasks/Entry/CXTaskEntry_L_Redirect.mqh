@@ -15,9 +15,9 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
-        // 1. 청산 의도 감지 시 즉시 청산 파이프라인으로 이동
+        // 1. [v12.7 Exit-First Priority] 청산 의도가 주입된 경우 모든 진입 로직 중단 및 청산 전이
         if(sig.GetXAExit() == XA_ACTIVE) {
-            XP_LOG_INFO(xp, "[ENTRY-L] Redirecting to LIQUIDATING (Exit Intent Detected)");
+            XP_LOG_WARN(xp, "[ENTRY-L] ABORT: Exit intent detected. Redirecting to LIQUIDATING.");
             return SESSION_LIQUIDATING;
         }
 
@@ -26,9 +26,25 @@ public:
             XP_LOG_ERROR(xp, "[ENTRY-L] Redirecting to ERROR (Signal in XE_ERROR state)");
             return SESSION_ERROR;
         }
+
+        // [v11.6 Recovery] 이미 실물 처리 단계인 경우 해당 시퀀스로 점프
+        if(sig.GetStatus() == XE_IN_TRANSIT) {
+            XP_LOG_INFO(xp, "[ENTRY-L] Redirecting to TRANSIT (Recovery)");
+            return STATE_ENTRY_TRANSIT;
+        }
         
-        // 3. 진입 의도가 없거나 이미 실행 완료된 경우 중단
-        if(sig.GetXAEntry() != XA_ACTIVE || sig.GetStatus() >= XE_EXECUTED) {
+        if(sig.GetStatus() == XE_PENDING_PLACED) {
+            XP_LOG_INFO(xp, "[ENTRY-L] Redirecting to PENDING (Recovery)");
+            return STATE_ENTRY_TRAILING;
+        }
+
+        if(sig.GetStatus() >= XE_EXECUTED) {
+            XP_LOG_INFO(xp, "[ENTRY-L] Redirecting to ACTIVE (Recovery)");
+            return SESSION_ACTIVE;
+        }
+        
+        // 3. 진입 의도가 없거나 이미 실행 완료된 경우 중단 (XA_ACTIVE 가 아니면 무시)
+        if(sig.GetXAEntry() != XA_ACTIVE) {
             XP_LOG_TRACE(xp, StringFormat("[ENTRY-L] TASK_BREAK (XAEntry:%d, Status:%d)", sig.GetXAEntry(), sig.GetStatus()));
             return TASK_BREAK;
         }

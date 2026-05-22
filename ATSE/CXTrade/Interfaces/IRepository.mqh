@@ -15,6 +15,8 @@ public:
     virtual bool UpdateStatus(ICXSignal* signal) = 0;
     virtual int  LoadActiveSignals(CArrayObj* list) = 0;
     virtual ICXSignal* GetSignalBySid(const string sid) = 0;
+    virtual bool DeleteBySid(const string sid) = 0;
+    virtual ICXSignal* GetSignalByCnoSno(int cno, int sno, string symbol) = 0;
 };
 
 #endif

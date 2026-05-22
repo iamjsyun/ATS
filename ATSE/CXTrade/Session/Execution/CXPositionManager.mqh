@@ -8,6 +8,7 @@
 #include "..\..\Interfaces\CXDefine.mqh"
 #include "..\..\Interfaces\CXMacros.mqh"
 #include "..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 #include <Trade\Trade.mqh>
 
 #include "..\..\Interfaces\IXTrailingStrategy.mqh"
@@ -33,6 +34,26 @@ public:
     }
 
     virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
+
+    /**
+     * @brief [v13.4 Audit] 포지션 감사 문자열 생성
+     */
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) return "[" + actionLabel + "] INVALID_SIGNAL";
+
+        ulong ticket = sig.GetTicket();
+        double profit = 0;
+        double currentSL = 0;
+        
+        if(PositionSelectByTicket(ticket)) {
+            profit = PositionGetDouble(POSITION_PROFIT);
+            currentSL = PositionGetDouble(POSITION_SL);
+        }
+
+        string spec = StringFormat("Profit:%.2f, SL:%.5f", profit, currentSL);
+        return CXAuditFormatter::Build(actionLabel, xp, spec);
+    }
 
     /**
      * @brief 포지션 유효성 확인 및 상태 업데이트
@@ -73,18 +94,34 @@ public:
             return;
         }
         
-        // 3. 딜(Deal) 히스토리에서도 찾지 못한 경우 (동기화 지연 또는 이상 삭제)
-        // 보수적으로 청산 신호로 간주하여 시퀀스를 넘김
-        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, "Position Not Found in Terminal");
-        XP_LOG_WARN(xp, "[POS-MANAGER] Position missing but not in history. Force closing.");
+        // 3. 딜(Deal) 히스토리에서도 찾지 못한 경우 (동기화 지연 대비 Retry)
+        string retryKey = StringFormat("HistRetry_%I64u", ticket);
+        int retryCount = 0;
+        CObject* obj = m_ctx.Get(retryKey);
+        if(IS_VALID(obj)) {
+            CXParam* pOld = dynamic_cast<CXParam*>(obj);
+            if(IS_VALID(pOld)) retryCount = pOld.GetInt();
+        }
+
+        if(retryCount < 5) {
+            CXParam* pRetry = new CXParam();
+            pRetry.SetInt(retryCount + 1);
+            m_ctx.Set(retryKey, pRetry);
+            
+            XP_LOG_DEBUG(xp, StringFormat("[POS-MANAGER] Closure not in history yet. Sync Latency? (Retry:%d/5). Yielding...", retryCount + 1));
+            return; // 다음 틱에서 재시도
+        }
+
+        // 5회 이상 실패 시 보수적으로 청산 처리
+        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, "Position Missing & History Timeout");
+        XP_LOG_WARN(xp, "[POS-MANAGER] History timeout. Forced closing session.");
     }
 
     /**
      * @brief 브로커 포지션 수정 (SL/TP) 및 상태 재확인
      */
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) override {
-        XP_LOG_INFO(xp, StringFormat("[POS-MODIFY] Sending Request: [Ticket:%I64u, SL:%.5f, TP:%.5f]", 
-                                        ticket, sl, tp));
+        XP_LOG_INFO(xp, GetAuditString(xp, "POS-MODIFY-START"));
 
         ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
         if(IS_INVALID(invMgr)) return false;
@@ -94,8 +131,8 @@ public:
             string retMsg = m_trade.ResultRetcodeDescription();
             uint retCode = m_trade.ResultRetcode();
             int sysErr = GetLastError();
-            string err_msg = StringFormat("[POS-MODIFY-FAIL] Broker Code:%u(%s), SysErr:%d. Original Params: [Ticket:%I64u, SL:%.5f, TP:%.5f]", 
-                                            retCode, retMsg, sysErr, ticket, sl, tp);
+            string err_msg = StringFormat("[POS-MODIFY-FAIL] Broker Code:%u(%s), SysErr:%d. %s", 
+                                            retCode, retMsg, sysErr, GetAuditString(xp));
             XP_LOG_ERROR(xp, err_msg);
             if(IS_VALID(xp)) xp.SetString(err_msg);
             ResetLastError();
@@ -108,12 +145,12 @@ public:
             double currentTP = invMgr.GetCurrentTP(ticket);
             
             if(MathAbs(currentSL - sl) < _Point * 10 && MathAbs(currentTP - tp) < _Point * 10) {
-                XP_LOG_OK(xp, StringFormat("[POS-MODIFY] SUCCESS: Ticket %I64u Modified.", ticket));
+                XP_LOG_OK(xp, GetAuditString(xp, "POS-MODIFY-SUCCESS"));
                 return true;
             }
         }
         
-        string vErr = StringFormat("[POS-MODIFY-FAIL] VERIFY FAILED: Modification sent but values not reflected for ticket:%I64u", ticket);
+        string vErr = StringFormat("[POS-MODIFY-FAIL] VERIFY FAILED for ticket:%I64u", ticket);
         XP_LOG_ERROR(xp, vErr);
         if(IS_VALID(xp)) xp.SetString(vErr);
         return false;

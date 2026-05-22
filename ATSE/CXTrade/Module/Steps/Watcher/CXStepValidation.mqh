@@ -76,7 +76,7 @@ public:
                     activeList.Delete(i);
                     failed++;
                 } else {
-                    if(isStatusChanged && IS_VALID(log)) log.Debug(xp, StringFormat("[WATCHER-VALIDATION] PASSED [%s]", sigInfo));
+                    if(isStatusChanged && IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-VALIDATION] PASSED [%s]", sigInfo));
                     sig.SetLastStatus(sig.GetStatus());
                 }
             }
@@ -84,7 +84,7 @@ public:
         
         int passed = activeList.Total();
         if(passed > 0) {
-            if(IS_VALID(log)) log.Info(xp, StringFormat("[WATCHER-VALIDATION] Passed: %d, Failed: %d", passed, failed));
+            if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-VALIDATION] Passed: %d, Failed: %d", passed, failed));
             return WATCHER_BINDING;
         }
 

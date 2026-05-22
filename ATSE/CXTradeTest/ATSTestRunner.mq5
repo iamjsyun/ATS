@@ -11,6 +11,7 @@
 #include "Scenarios\TestEntryValidate.mqh"
 #include "Scenarios\TestSequenceDSL.mqh"
 #include "Scenarios\TestIntegritySimulation.mqh"
+#include "Scenarios\TestRedirectRecovery.mqh"
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -27,6 +28,7 @@ int OnInit() {
     if (TestEntryValidate::Run()) passed++; else failed++;
     if (TestSequenceDSL::Run()) passed++; else failed++;
     if (TestIntegritySimulation::Run()) passed++; else failed++;
+    if (TestRedirectRecovery::Run()) passed++; else failed++;
     
     // Add more test classes here...
     

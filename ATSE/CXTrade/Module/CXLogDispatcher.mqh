@@ -18,15 +18,12 @@ private:
     ICXLogger* m_remote;
     ICXConfig* m_config;
     bool       m_enabled;
-    string     m_last_msgs[2]; //-- [v10.28] 2-slot history for alternating spam
-    int        m_repeat_count; 
 
 public:
-    CXLogDispatcher() : m_file(NULL), m_tab(NULL), m_ui(NULL), m_remote(NULL), m_config(NULL), m_enabled(true), m_repeat_count(0) {
-        m_last_msgs[0] = ""; m_last_msgs[1] = "";
+    CXLogDispatcher() : m_file(NULL), m_tab(NULL), m_ui(NULL), m_remote(NULL), m_config(NULL), m_enabled(true) {
     }
     
-    virtual ~CXLogDispatcher() {
+    virtual ~CXLogDispatcher() override {
         SAFE_DELETE(m_file);
         SAFE_DELETE(m_tab);
         SAFE_DELETE(m_ui);
@@ -37,25 +34,6 @@ public:
 
     virtual void Log(ENUM_LOG_LEVEL level, string msg) override {
         if(!m_enabled) return;
-        
-        //-- [v10.28] Advanced Deduplication: Handle alternating pairs (A-B-A-B)
-        if(level < LOG_LVL_ERROR) {
-            bool matched = (msg == m_last_msgs[0] || msg == m_last_msgs[1]);
-            
-            if(matched) {
-                m_repeat_count++;
-                if(m_repeat_count >= 4) return; // 2쌍(A-B, A-B) 출력 후 차단
-            } else {
-                //-- 완전히 새로운 메시지 유입 시 히스토리 밀어내기 및 리셋
-                m_repeat_count = 0;
-                m_last_msgs[1] = m_last_msgs[0];
-                m_last_msgs[0] = msg;
-            }
-        } else {
-            //-- 에러 이상 로그는 즉시 통과 및 히스토리 초기화
-            m_repeat_count = 0;
-            m_last_msgs[0] = ""; m_last_msgs[1] = "";
-        }
 
         // 1. File Logger (Always on if SID initialized)
         if(IS_VALID(m_file) && m_file.IsEnabled()) m_file.Log(level, msg);

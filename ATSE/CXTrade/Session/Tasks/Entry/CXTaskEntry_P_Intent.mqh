@@ -19,7 +19,7 @@ public:
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 
         if(sig.GetStatus() >= XE_PENDING_REQ) {
-            XP_LOG_DEBUG(xp, "[ENTRY-P] SKIP: Intent already persisted.");
+            XP_LOG_TRACE(xp, "[ENTRY-P] SKIP: Intent already persisted.");
             return TASK_CONTINUE;
         }
 

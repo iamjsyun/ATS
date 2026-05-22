@@ -73,7 +73,9 @@ namespace ATSA.UI.DataManager
 
         private async void OnSelectedSignalPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(BindableXSignal.cno) || e.PropertyName == nameof(BindableXSignal.gno))
+            if (e.PropertyName == nameof(BindableXSignal.cno) || 
+                e.PropertyName == nameof(BindableXSignal.gno) ||
+                e.PropertyName == nameof(BindableXSignal.dir))
             {
                 await ApplyChannelDefaultsAsync();
             }
@@ -438,7 +440,7 @@ namespace ATSA.UI.DataManager
         }
 
         [Command]
-        public void AddNewEntrySignal()
+        public async Task AddNewEntrySignal()
         {
             var draft = CreateDraft();
             draft.xa_entry = 1; // [v10.33] New Entry defaults to ACTIVE (1)
@@ -449,11 +451,13 @@ namespace ATSA.UI.DataManager
             draft.SelectedXEStatus = "0:READY";
             draft.xe_status_msg = "New Entry Draft";
             SelectedSignal = draft;
+            
+            await ApplyChannelDefaultsAsync();
             GenerateCurrentMessage();
         }
 
         [Command]
-        public void AddNewExitSignal()
+        public async Task AddNewExitSignal()
         {
             var draft = CreateDraft();
             draft.xa_exit = 1; // [v9.8.9] 1: ACTIVE (청산 접수)
@@ -462,6 +466,8 @@ namespace ATSA.UI.DataManager
             draft.SelectedXEStatus = "20:CLOSED_SIG";
             draft.xe_status_msg = "Manual Exit Injection";
             SelectedSignal = draft;
+
+            await ApplyChannelDefaultsAsync();
             GenerateCurrentMessage();
         }
 

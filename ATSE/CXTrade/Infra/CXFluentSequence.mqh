@@ -156,7 +156,7 @@ public:
             if(next_state != m_current_state && next_state != -1) {
                 // [v11.0] Duplicate Transition Log Suppression
                 if(m_current_state != m_last_log_from || next_state != m_last_log_to) {
-                    XP_LOG_SEQ_DEBUG(xp, StringFormat("[SEQ:%s] Transition: %d -> %d (Step: %s)", m_name, m_current_state, next_state, node.step.Name()));
+                    XP_LOG_SEQ_TRACE(xp, StringFormat("[SEQ:%s] Transition: %d -> %d (Step: %s)", m_name, m_current_state, next_state, node.step.Name()));
                     m_last_log_from = m_current_state;
                     m_last_log_to = next_state;
                 }

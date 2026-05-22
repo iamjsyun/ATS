@@ -45,7 +45,7 @@
     X(double,   price_tp,     Double,  PriceTP)     \
     X(double,   price_sl,     Double,  PriceSL)     \
     X(double,   lot,          Double,  Lot)         \
-    X(long,     ticket,       Long,    Ticket)      \
+    X(ulong,    ticket,       Long,    Ticket)      \
     X(long,     magic,        Long,    Magic)       \
     X(string,   comment,      Text,    Comment)     \
     X(string,   tag,          Text,    Tag)         \

@@ -29,6 +29,9 @@ public:
 
     //-- 히스토리 추적
     virtual int    CheckHistoryClosure(ulong ticket, string &reason) = 0;
+
+    // [v13.4 UAF Standard]
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") = 0;
 };
 
 #endif

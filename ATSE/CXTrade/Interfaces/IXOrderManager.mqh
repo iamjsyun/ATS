@@ -11,11 +11,15 @@
 class IXOrderManager : public CObject {
 public:
     virtual void SetMagic(ulong magic) = 0;
+    virtual void Pulse(ICXParam* xp) = 0;
     virtual bool ExecuteEntry(ICXParam* xp) = 0;
     virtual bool ExecuteExit(ICXParam* xp) = 0;
     virtual bool ModifyOrder(ICXParam* xp, ulong ticket, double price, double sl, double tp) = 0;
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) = 0;
     virtual bool DeleteOrder(ICXParam* xp, ulong ticket) = 0;
+    
+    // [v13.4 UAF Standard]
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") = 0;
 };
 
 #endif

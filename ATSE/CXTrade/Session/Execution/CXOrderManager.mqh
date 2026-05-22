@@ -8,15 +8,17 @@
 #include "..\..\Interfaces\ICXRiskManager.mqh"
 #include "..\..\Interfaces\ICXSymbolManager.mqh"
 #include "..\..\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\Interfaces\ICXAuditProvider.mqh"
 #include "..\..\Interfaces\IXGuard.mqh"
 #include "..\..\Interfaces\CXDefine.mqh"
 #include "..\..\Interfaces\CXMacros.mqh"
 #include "..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 #include <Trade\Trade.mqh>
 
 /**
  * @class CXOrderManager
- * @brief 주문 전송 및 관리 전담 구현체 (v11.3 SSOC Alignment)
+ * @brief 주문 전송 및 관리 전담 구현체 (v13.4 UAF Standard)
  */
 class CXOrderManager : public IXOrderManager {
 private:
@@ -29,19 +31,78 @@ public:
     CXOrderManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0), m_sid("") {}
     virtual ~CXOrderManager() override {}
 
+    /**
+     * @brief [v13.4 UAF] 통합 감사 로그 문자열 생성
+     */
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) return "[" + actionLabel + "] INVALID_SIGNAL";
+        
+        string symbol = sig.GetSymbol();
+        ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double mkt   = SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
+
+        string spec = StringFormat("TEPts:[%d,%d,%d], TEPri:[%.5f,%.5f,%.5f]",
+                                    sig.GetTEStart(), sig.GetTEStep(), sig.GetTELimit(),
+                                    mkt - (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?1:-1)),
+                                    sig.GetTEStep() * point,
+                                    mkt - (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?1:-1)));
+
+        return CXAuditFormatter::Build(actionLabel, xp, spec);
+    }
+
     virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
 
-    /**
-     * @brief 진입 주문 실행 (xa_entry 기반)
-     * @details [v11.5 Alignment] L-P 단계를 거쳐 계산/저장된 가격 정보를 기반으로 물리적 주문만 송신 (SRP)
-     */
+    virtual void Pulse(ICXParam* xp) override {
+        if(IS_INVALID(m_ctx) || IS_INVALID(xp)) return;
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) return;
+
+        ulong ticket = sig.GetTicket();
+        if(ticket == 0) return;
+
+        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        if(IS_INVALID(invMgr)) return;
+
+        if(invMgr.IsOrderExists(ticket)) return;
+
+        string reason = "";
+        int status = invMgr.CheckHistoryClosure(ticket, reason);
+
+        if(status != XE_UNKNOWN) {
+            IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+            CXMessageProvider::UpdateStatus(sig, status, reason);
+            if(IS_VALID(repo)) repo.UpdateStatus(sig);
+            XP_LOG_INFO(xp, StringFormat("[ORDER-MANAGER] Pending Order closed. Reason: %s", reason));
+            return;
+        }
+
+        string retryKey = StringFormat("OrdHistRetry_%I64u", ticket);
+        int retryCount = 0;
+        CObject* obj = m_ctx.Get(retryKey);
+        if(IS_VALID(obj)) {
+            CXParam* pOld = dynamic_cast<CXParam*>(obj);
+            if(IS_VALID(pOld)) retryCount = pOld.GetInt();
+        }
+
+        if(retryCount < 5) {
+            CXParam* pRetry = new CXParam();
+            pRetry.SetInt(retryCount + 1);
+            m_ctx.Set(retryKey, pRetry);
+            return;
+        }
+
+        IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, "Order History Timeout");
+        if(IS_VALID(repo)) repo.UpdateStatus(sig);
+    }
+
     virtual bool ExecuteEntry(ICXParam* xp) override {
         if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;
-
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return false;
 
-        //--- [v11.5 SRP] 모든 검증 및 계산은 이전 Task(L-P)에서 완료됨을 전제로 함
         string symbol = sig.GetSymbol();
         int    dir    = sig.GetDir();
         double lot    = sig.GetLot();
@@ -49,185 +110,135 @@ public:
         string comment = sig.GetSid();
         m_sid = comment;
 
-        //--- 미리 계산된 가격 정보 추출 (L-stage 결과물)
         double execPrice = sig.GetPriceOpen();
         double finalSL   = sig.GetPriceSL();
         double finalTP   = sig.GetPriceTP();
+        
+        ENUM_ORDER_TYPE order_type = (sig.GetType() == ORDER_MARKET) ? 
+                                     (dir == CX_DIR_BUY ? ORDER_TYPE_BUY : ORDER_TYPE_SELL) : 
+                                     (dir == CX_DIR_BUY ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT);
 
-        //--- 주문 타입 결정
-        ENUM_ORDER_TYPE order_type;
-        if(sig.GetType() == ORDER_MARKET) {
-            order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
-        } else {
-            order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;
-        }
-
-        XP_LOG_TRACE(xp, StringFormat("[EXEC-ENTRY] Physical Request: [Sym:%s, Type:%d, Lot:%.2f, P:%.5f, SL:%.5f, TP:%.5f]", 
-                                      symbol, (int)order_type, lot, execPrice, finalSL, finalTP));
-
-        //--- CTrade 설정 및 송신
         m_trade.SetExpertMagicNumber(magic);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
 
-        bool success = false;
-        if(sig.GetType() == ORDER_MARKET) {
-            success = m_trade.PositionOpen(symbol, order_type, lot, execPrice, finalSL, finalTP, comment);
-        } else {
-            success = m_trade.OrderOpen(symbol, order_type, lot, 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, comment);
+        double currentMkt = SymbolInfoDouble(symbol, (dir == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
+        int stopsLevel = IS_VALID(symMgr) ? symMgr.GetStopsLevel(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL);
+        double minDistance = (stopsLevel + 1) * point;
+        
+        if(sig.GetType() != ORDER_MARKET) {
+            if(dir == CX_DIR_BUY && execPrice > currentMkt - minDistance) execPrice = currentMkt - minDistance;
+            else if (dir == CX_DIR_SELL && execPrice < currentMkt + minDistance) execPrice = currentMkt + minDistance;
         }
 
-        //--- 결과 처리
+        string funcName = (sig.GetType() == ORDER_MARKET) ? "PositionOpen" : "OrderOpen";
+        
+        if(sig.GetType() != ORDER_MARKET && sig.GetTELimit() > 0) {
+            double distPts = MathAbs(currentMkt - execPrice) / point;
+            if(distPts > (double)sig.GetTELimit() + 2.0) {
+                string err = StringFormat("TE-LIMIT VIOLATION: Dist %.1f > Limit %d", distPts, sig.GetTELimit());
+                CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
+                IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+                if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                return false;
+            }
+        }
+
+        string auditMsg = GetAuditString(xp, "AUDIT-CALL:" + funcName);
+        XP_LOG_OK(xp, auditMsg);
+        Print(auditMsg);
+
+        IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+        CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), "Calling " + funcName + "...");
+        if(IS_VALID(repo)) repo.UpdateStatus(sig);
+
+        bool success = (sig.GetType() == ORDER_MARKET) ?
+            m_trade.PositionOpen(symbol, order_type, lot, execPrice, finalSL, finalTP, comment) :
+            m_trade.OrderOpen(symbol, order_type, lot, 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, comment);
+
         uint retCode = m_trade.ResultRetcode();
+        string receptionMsg = StringFormat("[AUDIT-RECEPTION] %s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", retCode);
+        XP_LOG_INFO(xp, receptionMsg);
+        Print(receptionMsg);
+
         if(!success) {
-            string err = StringFormat("[EXEC-ENTRY-FAIL] Broker Code:%u(%s), SysErr:%d. SID:%s", 
-                                      retCode, m_trade.ResultRetcodeDescription(), GetLastError(), m_sid);
+            string err = StringFormat("[EXEC-ENTRY-FAIL] %s. Code:%u(%s)", funcName, retCode, m_trade.ResultRetcodeDescription());
             XP_LOG_ERROR(xp, err);
-            // 에러 시 xp에 메시지 전송 (시퀀스 에러 처리용)
-            xp.SetString(err);
+            CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
+            if(IS_VALID(repo)) repo.UpdateStatus(sig);
             return false;
         }
 
         ulong ticket = (sig.GetType() == ORDER_MARKET) ? m_trade.ResultDeal() : m_trade.ResultOrder();
-        if(ticket == 0) ticket = m_trade.ResultOrder(); 
-        
-        sig.SetTicket((long)ticket);
-        XP_LOG_OK(xp, StringFormat("[EXEC-ENTRY] SUCCESS: Ticket %I64u Opened. Code:%u", ticket, retCode));
-        
+        if(ticket == 0) ticket = m_trade.ResultOrder();
+        sig.SetTicket(ticket);
+        CXMessageProvider::UpdateStatus(sig, XE_IN_TRANSIT, "Order Placed: " + (string)ticket);
+        if(IS_VALID(repo)) repo.UpdateStatus(sig);
+
         return true;
     }
 
-    /**
-     * @brief 청산 주문 실행 (xa_exit 기반)
-     */
     virtual bool ExecuteExit(ICXParam* xp) override {
-        if(IS_NULL(m_ctx) || IS_NULL(xp)) return false;
-
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return false;
-
         ulong ticket = (ulong)sig.GetTicket();
-        if(ticket <= 0) return false;
-
         ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-        if(IS_INVALID(invMgr)) return false;
+        if(IS_INVALID(invMgr) || ticket <= 0) return false;
 
-        m_sid = sig.GetSid();
-        XP_LOG_INFO(xp, StringFormat("[EXEC-EXIT] Requesting Close for Ticket:%I64u, SID:%s", ticket, m_sid));
-
-        bool success = false;
-        if(invMgr.IsPositionExists(ticket)) {
-            success = m_trade.PositionClose(ticket);
-        } else if(invMgr.IsOrderExists(ticket)) {
-            success = m_trade.OrderDelete(ticket);
-        } else {
-            XP_LOG_WARN(xp, StringFormat("[EXEC-EXIT] Ticket %I64u not found in terminal. Marked as phantom.", ticket));
-            return true; 
-        }
-
-        if(!success) {
-            string err = StringFormat("[EXEC-EXIT-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
-                                      m_trade.ResultRetcodeDescription(), m_trade.ResultRetcode(), GetLastError(), ticket);
-            XP_LOG_ERROR(xp, err);
-            if(IS_VALID(xp)) xp.SetString(err); //-- [v11.5] Error propagation
-            return false;
-        }
-
-        XP_LOG_OK(xp, StringFormat("[EXEC-EXIT] SUCCESS: Ticket %I64u Close Request Sent.", ticket));
-        return true;
+        string funcName = invMgr.IsPositionExists(ticket) ? "PositionClose" : "OrderDelete";
+        string auditMsg = GetAuditString(xp, "AUDIT-CALL:" + funcName);
+        XP_LOG_INFO(xp, auditMsg);
+        Print(auditMsg);
+        
+        bool success = invMgr.IsPositionExists(ticket) ? m_trade.PositionClose(ticket) : m_trade.OrderDelete(ticket);
+        
+        PrintFormat("[AUDIT-RECEPTION] %s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", m_trade.ResultRetcode());
+        return success;
     }
 
     virtual bool ModifyOrder(ICXParam* xp, ulong ticket, double price, double sl, double tp) override {
-        if(ticket == 0) return false;
+        string auditMsg = GetAuditString(xp, "AUDIT-CALL:OrderModify");
+        XP_LOG_INFO(xp, auditMsg);
+        Print(auditMsg);
         
-        //--- [v11.2 Enhancement] Pre-flight StopLevel Validation for Modification
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-        IXGuard*             guard  = CX_GET_OBJ(m_ctx, "guard", IXGuard);
+        bool success = m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0);
         
-        if(IS_VALID(invMgr) && IS_VALID(guard)) {
-            string symbol = "";
-            if(OrderSelect(ticket)) symbol = OrderGetString(ORDER_SYMBOL);
-            
-            if(symbol != "") {
-                if(!guard.ValidateStopLevel(symbol, price, sl)) {
-                    XP_LOG_WARN(xp, StringFormat("[ORDER-MODIFY] SL too close (P:%.5f, SL:%.5f). Resetting SL to 0.", price, sl));
-                    sl = 0;
-                }
-                if(!guard.ValidateStopLevel(symbol, price, tp)) {
-                    XP_LOG_WARN(xp, StringFormat("[ORDER-MODIFY] TP too close (P:%.5f, TP:%.5f). Resetting TP to 0.", price, tp));
-                    tp = 0;
-                }
-            }
-        }
-
-        XP_LOG_INFO(xp, StringFormat("[ORDER-MODIFY] Sending Request: [Ticket:%I64u, Price:%.5f, SL:%.5f, TP:%.5f]", 
-                                        ticket, price, sl, tp));
+        uint retCode = m_trade.ResultRetcode();
+        string receptionMsg = StringFormat("[AUDIT-RECEPTION] OrderModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        XP_LOG_INFO(xp, receptionMsg);
+        Print(receptionMsg);
         
-        if(!m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0)) {
-            string vErr = StringFormat("[ORDER-MODIFY-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
-                                       m_trade.ResultRetcode(), m_trade.ResultRetcodeDescription(), GetLastError(), ticket);
-            XP_LOG_ERROR(xp, vErr);
-            if(IS_VALID(xp)) xp.SetString(vErr);
-            return false;
-        }
-        
-        XP_LOG_OK(xp, StringFormat("[ORDER-MODIFY] SUCCESS: Ticket %I64u Modified.", ticket));
-        return true;
+        return success;
     }
 
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) override {
-        if(ticket == 0) return false;
+        string auditMsg = GetAuditString(xp, "AUDIT-CALL:PositionModify");
+        XP_LOG_INFO(xp, auditMsg);
+        Print(auditMsg);
         
-        //--- [v11.2 StopLevel Validation]
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-        IXGuard*             guard  = CX_GET_OBJ(m_ctx, "guard", IXGuard);
-        ICXPriceManager*     priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
-
-        if(IS_VALID(invMgr) && IS_VALID(guard) && IS_VALID(priceMgr) && PositionSelectByTicket(ticket)) {
-            string symbol = PositionGetString(POSITION_SYMBOL);
-            ENUM_POSITION_TYPE posType = (ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE);
-            int dir = (posType == POSITION_TYPE_BUY) ? CX_DIR_BUY : CX_DIR_SELL;
-            
-            //--- [v11.5 Alignment] For active positions, StopLevel is validated against liquidation price (Bid for Buy, Ask for Sell)
-            double vBase = priceMgr.GetLiquidationPrice(symbol, dir);
-            
-            if(!guard.ValidateStopLevel(symbol, vBase, sl)) {
-                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] SL too close (Base:%.5f, SL:%.5f). Resetting SL to 0.", vBase, sl));
-                sl = 0;
-            }
-            if(!guard.ValidateStopLevel(symbol, vBase, tp)) {
-                XP_LOG_WARN(xp, StringFormat("[POS-MODIFY] TP too close (Base:%.5f, TP:%.5f). Resetting TP to 0.", vBase, tp));
-                tp = 0;
-            }
-        }
-
-        XP_LOG_INFO(xp, StringFormat("[POS-MODIFY] Sending Request: [Ticket:%I64u, SL:%.5f, TP:%.5f]", ticket, sl, tp));
+        bool success = m_trade.PositionModify(ticket, sl, tp);
         
-        if(!m_trade.PositionModify(ticket, sl, tp)) {
-            string vErr = StringFormat("[POS-MODIFY-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
-                                       m_trade.ResultRetcode(), m_trade.ResultRetcodeDescription(), GetLastError(), ticket);
-            XP_LOG_ERROR(xp, vErr);
-            if(IS_VALID(xp)) xp.SetString(vErr);
-            return false;
-        }
+        uint retCode = m_trade.ResultRetcode();
+        string receptionMsg = StringFormat("[AUDIT-RECEPTION] PositionModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        XP_LOG_INFO(xp, receptionMsg);
+        Print(receptionMsg);
         
-        XP_LOG_OK(xp, StringFormat("[POS-MODIFY] SUCCESS: Ticket %I64u Modified.", ticket));
-        return true;
+        return success;
     }
 
     virtual bool DeleteOrder(ICXParam* xp, ulong ticket) override {
-        if(ticket == 0) return false;
+        string auditMsg = GetAuditString(xp, "AUDIT-CALL:OrderDelete");
+        XP_LOG_INFO(xp, auditMsg);
+        Print(auditMsg);
         
-        XP_LOG_INFO(xp, StringFormat("[ORDER-DELETE] Sending Request: [Ticket:%I64u]", ticket));
+        bool success = m_trade.OrderDelete(ticket);
         
-        if(!m_trade.OrderDelete(ticket)) {
-            string vErr = StringFormat("[ORDER-DELETE-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
-                                       m_trade.ResultRetcode(), m_trade.ResultRetcodeDescription(), GetLastError(), ticket);
-            XP_LOG_ERROR(xp, vErr);
-            if(IS_VALID(xp)) xp.SetString(vErr);
-            return false;
-        }
+        uint retCode = m_trade.ResultRetcode();
+        string receptionMsg = StringFormat("[AUDIT-RECEPTION] OrderDelete Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        XP_LOG_INFO(xp, receptionMsg);
+        Print(receptionMsg);
         
-        XP_LOG_OK(xp, StringFormat("[ORDER-DELETE] SUCCESS: Ticket %I64u Deleted.", ticket));
-        return true;
+        return success;
     }
 };
 

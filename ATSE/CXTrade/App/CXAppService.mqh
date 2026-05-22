@@ -35,12 +35,13 @@ private:
     CXSequenceOrchestrator* m_orchestrator;
     ICXServiceFactory*    m_factory;
     ICXLogger*            m_logger; // 시스템 통합 로거
+    CXTerminalScanner*    m_scanner;
     
 public:
     CXAppService(ICXConfig* config) : m_config(config), m_db(NULL), m_repo(NULL), 
                                       m_watcher(NULL), m_sessionPool(NULL), 
                                       m_injector(NULL), m_globalContext(NULL), 
-                                      m_guard(NULL), m_orchestrator(NULL), m_factory(NULL), m_logger(NULL) {}
+                                      m_guard(NULL), m_orchestrator(NULL), m_factory(NULL), m_logger(NULL), m_scanner(NULL) {}
     
     virtual ~CXAppService() {
         SAFE_DELETE(m_db);
@@ -53,6 +54,7 @@ public:
         SAFE_DELETE(m_globalContext);
         SAFE_DELETE(m_factory);
         SAFE_DELETE(m_logger);
+        SAFE_DELETE(m_scanner);
     }
 
     /**
@@ -119,7 +121,8 @@ public:
 
         // 6. 역주입 엔진 (Sync Engine) 실행
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 4/6] Running Cold-Boot Synchronization...");
-        m_injector = new CXReverseInjector(m_repo, m_sessionPool);
+        m_scanner = new CXTerminalScanner();
+        m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionPool);
         if(IS_VALID(m_injector)) {
             m_injector.Pulse(GetPointer(xp));
         }

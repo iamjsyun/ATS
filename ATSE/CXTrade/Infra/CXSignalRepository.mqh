@@ -21,6 +21,7 @@ public:
    static void Fill(int req, int idx, int& var)      { DatabaseColumnInteger(req, idx, var); }
    static void Fill(int req, int idx, double& var)   { DatabaseColumnDouble(req, idx, var); }
    static void Fill(int req, int idx, long& var)     { DatabaseColumnLong(req, idx, var); }
+   static void Fill(int req, int idx, ulong& var)    { long l; if(DatabaseColumnLong(req, idx, l)) var = (ulong)l; }
    static void Fill(int req, int idx, datetime& var) {
       string dt_str;
       if(DatabaseColumnText(req, idx, dt_str)) var = StringToTime(dt_str);
@@ -36,6 +37,7 @@ public:
    static string ToSql(string v)   { return "'" + v + "'"; }
    static string ToSql(double v)   { return DoubleToString(v, 5); }
    static string ToSql(long v)     { return (string)v; }
+   static string ToSql(ulong v)    { return (string)v; }
    static string ToSql(int v)      { return (string)v; }
    static string ToSql(datetime v) { return "datetime('" + TimeToString(v, TIME_DATE|TIME_SECONDS) + "')"; }
 };
@@ -116,9 +118,40 @@ public:
    virtual bool UpdateStatus(ICXSignal* signal) override {
       if(IS_INVALID(m_db) || IS_INVALID(signal)) return false;
       string sql = StringFormat(
-                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', updated=datetime('now','localtime') WHERE sid='%s'",
-                      signal.GetStatus(), signal.GetStatusMsg(), signal.GetSid()
+                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', xa_exit=%d, updated=datetime('now','localtime') WHERE sid='%s'",
+                      signal.GetStatus(), signal.GetStatusMsg(), signal.GetXAExit(), signal.GetSid()
                    );
+      return m_db.Execute(sql);
+   }
+
+   virtual bool DeleteBySid(const string sid) override {
+      if(IS_INVALID(m_db) || sid == "") return false;
+      string sql = StringFormat("DELETE FROM signals WHERE sid='%s'", sid);
+      return m_db.Execute(sql);
+   }
+
+   virtual ICXSignal* GetSignalByCnoSno(int cno, int sno, string symbol) override {
+      if(IS_INVALID(m_db)) return NULL;
+      string sql = StringFormat("SELECT * FROM signals WHERE cno=%d AND sno=%d AND symbol='%s' ORDER BY id DESC LIMIT 1", 
+                                cno, sno, symbol);
+      int hQuery = DatabasePrepare(m_db.GetHandle(), sql);
+      if(hQuery == INVALID_HANDLE) return NULL;
+      
+      CArrayObj list;
+      ICXSignal* sig = NULL;
+      if(FetchSignals(hQuery, GetPointer(list)) > 0) {
+         sig = CX_CAST(ICXSignal, list.Detach(0));
+      }
+      DatabaseFinalize(hQuery);
+      return sig;
+   }
+
+   //--- [Test Runner Helpers]
+   bool Add(ICXSignal* sig) { SaveSignal(sig); return true; }
+   bool DeleteSignalByCnoSno(int cno, int sno, string symbol) {
+      if(IS_INVALID(m_db)) return false;
+      string sql = StringFormat("DELETE FROM signals WHERE cno=%d AND sno=%d AND symbol='%s'", 
+                                cno, sno, symbol);
       return m_db.Execute(sql);
    }
 

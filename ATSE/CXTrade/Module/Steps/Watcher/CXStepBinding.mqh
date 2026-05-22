@@ -46,7 +46,7 @@ public:
             //-- 0. 중복 바인딩 방지
             ICXTradingSession* existing = pool.FindSessionBySid(sid);
             if(IS_VALID(existing)) {
-                if(IS_VALID(log)) log.Debug(xp, StringFormat("[WATCHER-BINDING] SKIP: SID:%s is already active.", sid));
+                if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] SKIP: SID:%s is already active.", sid));
                 skipped++;
                 SAFE_DELETE(sig); //-- [v10.7 Fix] Delete orphan signal object
                 continue;
@@ -55,7 +55,15 @@ public:
             //-- 1. 세션 풀에서 세션 대여
             ICXTradingSession* session = pool.BorrowSession();
             if(IS_VALID(session)) {
-                //-- 2. 세션 기동 및 신호 주입 (Ownership transfer to Session)
+                // [v13.3 Atomic Binding] 세션 기동 전 DB 상태 선제 잠금
+                IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+                if(IS_VALID(repo)) {
+                    sig.SetStatus(XE_PENDING_REQ);
+                    sig.SetStatusMsg("Session Bound (Pre-lock)");
+                    repo.UpdateStatus(sig);
+                }
+
+                //-- 2. 세션 기동 및 신호 주입
                 CXParam sp;
                 sp.SetSignal(sig);
                 session.Start(GetPointer(sp));
@@ -70,7 +78,7 @@ public:
         }
 
         if(total > 0) {
-            if(IS_VALID(log)) log.Info(xp, StringFormat("[WATCHER-BINDING] Complete. Success: %d, Skipped: %d, Failed: %d", success, skipped, failed));
+            if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] Complete. Success: %d, Skipped: %d, Failed: %d", success, skipped, failed));
         }
 
         // 3. 작업 완료 후 리스트 정리

@@ -30,7 +30,7 @@ public:
             return TASK_YIELD;
         }
 
-        XP_LOG_DEBUG(xp, "[GUARD-V-SPREAD] PASSED.");
+        // [v12.4 Muted] XP_LOG_DEBUG(xp, "[GUARD-V-SPREAD] PASSED.");
         return TASK_CONTINUE;
     }
 };

@@ -22,6 +22,9 @@ public:
 
     //-- 계좌 리스크 한도 검증 (전체 세션 합산 리스크 등 확장용)
     virtual bool   ValidateAccountRisk(ICXParam* xp) = 0;
+
+    // [v13.4 UAF Standard]
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") = 0;
 };
 
 #endif

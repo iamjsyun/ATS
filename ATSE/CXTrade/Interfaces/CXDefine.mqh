@@ -138,6 +138,8 @@ enum ENUM_TASK_TYPE {
     TASK_E_P_FINALIZE,
     // Pending
     TASK_P_V_SYNC,
+    TASK_P_V_TERMINAL,
+    TASK_P_P_ALIGN,
     TASK_P_L_REBOUND,
     TASK_P_L_IMPROVE,
     TASK_P_R_APPLY,

@@ -3,6 +3,7 @@
 
 #include "..\Interfaces\ICXInventoryManager.mqh"
 #include "..\Interfaces\CXDefine.mqh"
+#include "..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXInventoryManager
@@ -12,6 +13,16 @@ class CXInventoryManager : public ICXInventoryManager {
 public:
     CXInventoryManager() {}
     virtual ~CXInventoryManager() {}
+
+    /**
+     * @brief [v13.4 Audit] 인벤토리 요약 감사 문자열 생성
+     */
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
+        int posTotal = PositionsTotal();
+        int ordTotal = OrdersTotal();
+        string spec = StringFormat("PosCount:%d, OrdCount:%d", posTotal, ordTotal);
+        return CXAuditFormatter::Build(actionLabel, xp, spec);
+    }
 
     virtual bool IsPositionExists(ulong ticket) override {
         if(ticket <= 0) return false;

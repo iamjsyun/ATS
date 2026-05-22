@@ -6,6 +6,7 @@
 #include "..\Interfaces\ICXContext.mqh"
 #include "..\Interfaces\CXDefine.mqh"
 #include "..\Interfaces\CXMacros.mqh"
+#include "..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXRiskManager
@@ -18,6 +19,16 @@ private:
 public:
     CXRiskManager(ICXContext* ctx) : m_ctx(ctx) {}
     virtual ~CXRiskManager() {}
+
+    /**
+     * @brief [v13.4 Audit] 리스크 상태 감사 문자열 생성
+     */
+    virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
+        double freeMargin = AccountInfoDouble(ACCOUNT_MARGIN_FREE);
+        double equity = AccountInfoDouble(ACCOUNT_EQUITY);
+        string spec = StringFormat("FreeMargin:%.2f, Equity:%.2f", freeMargin, equity);
+        return CXAuditFormatter::Build(actionLabel, xp, spec);
+    }
 
     /**
      * @brief 로트 사이즈 유효성 검사 (브로커 규격 준수 여부)
@@ -94,7 +105,6 @@ public:
      * @brief 계좌 전체 리스크 한도 검증
      */
     virtual bool ValidateAccountRisk(ICXParam* xp) override {
-        // [v11.2] 향후 전체 세션 합산 노출도(Exposure)나 최대 드로다운 제한 로직 추가 지점
         return true;
     }
 };

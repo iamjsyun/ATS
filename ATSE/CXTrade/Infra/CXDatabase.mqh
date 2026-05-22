@@ -23,15 +23,7 @@ public:
         return OpenByConfig(NULL);
     }
 
-    virtual bool OpenByConfig(ICXConfig* config) {
-        string dbName = "ATS.db";
-        bool isCommon = true;
-
-        if(IS_VALID(config)) {
-            dbName = config.GetDatabaseName();
-            isCommon = config.IsDatabaseCommon();
-        }
-
+    virtual bool OpenByParams(string dbName, bool isCommon) {
         int flags = DATABASE_OPEN_READWRITE;
         if(isCommon) flags |= DATABASE_OPEN_COMMON;
 
@@ -43,7 +35,6 @@ public:
         if(m_db == INVALID_HANDLE) {
             string err = StringFormat("CRITICAL: Database file NOT FOUND!\nFile: %s\nPath: %s\n\nATSA(DataManager) must create the database first.", dbName, pathType);
             Print(err);
-            MessageBox(err, "ATSE Infrastructure Error", MB_OK|MB_ICONHAND);
             return false;
         }
         
@@ -53,7 +44,6 @@ public:
             if(hCheck != INVALID_HANDLE) DatabaseFinalize(hCheck);
             string err = StringFormat("CRITICAL: Database Schema Mismatch!\nTable 'signals' not found in %s.\n\nPlease check if you are using the correct ATS.db file.", dbName);
             Print(err);
-            MessageBox(err, "ATSE Schema Integrity Error", MB_OK|MB_ICONHAND);
             return false;
         }
         DatabaseFinalize(hCheck);
@@ -63,6 +53,17 @@ public:
 
         PrintFormat("[DB-OK] Connected to %s (%s)", dbName, pathType);
         return true;
+    }
+
+    virtual bool OpenByConfig(ICXConfig* config) {
+        string dbName = "ATS.db";
+        bool isCommon = true;
+
+        if(IS_VALID(config)) {
+            dbName = config.GetDatabaseName();
+            isCommon = config.IsDatabaseCommon();
+        }
+        return OpenByParams(dbName, isCommon);
     }
 
     virtual void Close() override {

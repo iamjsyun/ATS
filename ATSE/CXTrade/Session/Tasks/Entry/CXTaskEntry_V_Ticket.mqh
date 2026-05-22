@@ -16,7 +16,7 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
-        long ticket = sig.GetTicket();
+        ulong ticket = sig.GetTicket();
         XP_LOG_TRACE(xp, StringFormat("[ENTRY-V-TICKET] Verifying Ticket Acquisition... Current Ticket:%I64u", ticket));
 
         if(ticket <= 0) {

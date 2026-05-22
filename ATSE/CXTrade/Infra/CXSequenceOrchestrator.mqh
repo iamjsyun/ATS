@@ -115,7 +115,7 @@ private:
             "2|Composite:Step_Entry_Verify:TASK_E_V_DOUBLECHECK,TASK_E_P_FINALIZE|10|99|30|0|20=20",
             
             // 2. Pending Pipeline
-            "5|Composite:Step_Pending:TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0",
+            "5|Composite:Step_Pending:TASK_P_V_TERMINAL,TASK_P_P_ALIGN,TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0",
             
             // 3. Active Pipeline
             "10|Composite:Step_Active:TASK_A_INTENT_WATCH,TASK_A_V_STATUS,TASK_A_V_STALE,TASK_A_V_TERMINAL,TASK_A_P_ALIGN,TASK_A_L_STATUS,TASK_A_ALPHA_CALC,TASK_A_ALPHA_APPLY|10|99|72000|0|20=20",
