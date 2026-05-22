@@ -6,7 +6,7 @@
 
 /**
  * @class CXScenarioLoader
- * @brief CSV 파일을 읽어 시나리오 큐(CXScenarioParam)로 변환
+ * @brief CSV 파일을 읽어 시나리오 큐(CXScenarioParam)로 변환 (v13.8 Granular)
  */
 class CXScenarioLoader {
 public:
@@ -37,9 +37,15 @@ public:
             p.lot = StringToDouble(FileReadString(handle));
             p.sl_pts = (int)StringToInteger(FileReadString(handle));
             p.tp_pts = (int)StringToInteger(FileReadString(handle));
-            p.te_pts = (int)StringToInteger(FileReadString(handle));
-            p.ts_pts = (int)StringToInteger(FileReadString(handle));
-            p.exp_status = FileReadString(handle); // [v13.3] String Enum Name
+            
+            // [v13.8] Granular TE/TS Reading
+            p.te_start = (int)StringToInteger(FileReadString(handle));
+            p.te_step  = (int)StringToInteger(FileReadString(handle));
+            p.te_limit = (int)StringToInteger(FileReadString(handle));
+            p.ts_start = (int)StringToInteger(FileReadString(handle));
+            p.ts_step  = (int)StringToInteger(FileReadString(handle));
+            
+            p.exp_status = FileReadString(handle); 
             p.comment = FileReadString(handle);
 
             if(p.action != "") {

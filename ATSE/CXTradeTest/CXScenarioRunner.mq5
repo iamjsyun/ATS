@@ -219,8 +219,14 @@ CXSignal* CreateSignalFromParam(CXScenarioParam* p) {
 
     sig.sl = p.sl_pts;
     sig.tp = p.tp_pts;
-    sig.te_start = p.te_pts;
-    sig.ts_start = p.ts_pts;
+    
+    // [v13.8 Granular Mapping]
+    sig.te_start     = (double)p.te_start;
+    sig.te_step      = (double)p.te_step;
+    sig.te_limit     = (double)p.te_limit; 
+    
+    sig.ts_start     = p.ts_start;
+    sig.ts_step      = (double)p.ts_step;
     
     sig.xa_entry = XA_ACTIVE; 
     sig.xa_exit = 0;

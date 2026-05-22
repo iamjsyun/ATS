@@ -25,7 +25,9 @@ public:
         double marketPrice = priceMgr.GetMarketPrice(symbol, dir);
 
         // 1. 실행 가격 계산 (Pending Order용 또는 Market용)
-        double execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), sig.GetLimitOffset());
+        // [v13.9 Refactoring] limit_offset을 삭제하고 te_start를 직접 사용
+        double offset = sig.GetTEStart();
+        double execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), offset);
         
         // 2. SL/TP 가격 계산 (BasePrice 기반)
         double basePrice = (sig.GetType() == ORDER_MARKET) ? marketPrice : execPrice;

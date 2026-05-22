@@ -51,7 +51,6 @@
     X(string,   tag,          Text,    Tag)         \
     X(datetime, created,      Text,    Created)     \
     X(datetime, updated,      Text,    Updated)     \
-    X(double,   limit_offset, Double,  LimitOffset) \
     X(double,   stop_offset,  Double,  StopOffset)
 
 #endif

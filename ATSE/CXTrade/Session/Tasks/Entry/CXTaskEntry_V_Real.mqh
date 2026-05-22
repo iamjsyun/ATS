@@ -22,22 +22,32 @@ public:
         }
 
         ulong ticket = (ulong)sig.GetTicket();
-        string assetType = (sig.GetType() == ORDER_MARKET) ? "Position" : "Order";
+        
+        // [v13.7 Resilience] Asset-Agnostic Check: Order 또는 Position 중 하나라도 존재하면 OK
+        bool exists = invMgr.IsPositionExists(ticket) || invMgr.IsOrderExists(ticket);
 
-        XP_LOG_TRACE(xp, StringFormat("[ENTRY-V-REAL] Verifying Real Asset: %s(%I64u)...", assetType, ticket));
+        if(!exists) {
+            // 실물이 전혀 없다면 히스토리를 즉시 확인 (수동 삭제/청산 대응)
+            string reason = "";
+            int histStatus = invMgr.CheckHistoryClosure(ticket, reason);
+            if(histStatus != XE_UNKNOWN) {
+                XP_LOG_WARN(xp, StringFormat("[ENTRY-V-REAL] ABORT: Asset found in history as %d (%s).", histStatus, reason));
+                IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+                CXMessageProvider::UpdateStatus(sig, histStatus, reason);
+                if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                return SESSION_LIQUIDATING;
+            }
 
-        // InventoryManager를 통한 실물 존재 확인 (SSOC)
-        if(!invMgr.IsAssetExists(ticket, sig.GetType())) {
             if(IsTimedOut()) {
-                XP_LOG_ERROR(xp, StringFormat("[ENTRY-V-REAL] FAILED: %s(%I64u) Verification Timeout.", assetType, ticket));
+                XP_LOG_ERROR(xp, StringFormat("[ENTRY-V-REAL] FAILED: Ticket(%I64u) Verification Timeout.", ticket));
                 return SESSION_ERROR;
             }
             return TASK_YIELD;
         }
 
-        // 실물 데이터 동기화 (Shadowing)
+        // 실물 데이터 동기화 (Shadowing) - 이제 어떤 형태든 살아있으면 동기화 후 다음 단계로
         invMgr.SyncToSignal(sig);
-        XP_LOG_OK(xp, StringFormat("[ENTRY-V-REAL] SUCCESS: %s(%I64u) Confirmed and Synced.", assetType, ticket));
+        XP_LOG_OK(xp, StringFormat("[ENTRY-V-REAL] SUCCESS: Ticket(%I64u) Confirmed and Synced.", ticket));
 
         return STATE_ENTRY_VERIFY;
     }
