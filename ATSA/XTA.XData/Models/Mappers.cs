@@ -12,7 +12,6 @@ namespace XTA.XData.Models
                 gid = xpo.gid,
                 cno = xpo.cno,
                 sno = xpo.sno,
-                gno = xpo.gno,
                 msg_id = xpo.msg_id,
                 raw_id = xpo.raw_id,
                 xa_entry = xpo.xa_entry,
@@ -30,7 +29,6 @@ namespace XTA.XData.Models
                 te_interval = xpo.te_interval,
                 ikte_start = xpo.ikte_start,
                 ikte_step = xpo.ikte_step,
-                gap_min = xpo.gap_min,
                 tp = xpo.tp,
                 sl = xpo.sl,
                 ts_start = xpo.ts_start,
@@ -49,9 +47,7 @@ namespace XTA.XData.Models
                 comment = xpo.comment,
                 tag = xpo.tag,
                 created = xpo.created,
-                updated = xpo.updated,
-                limit_offset = xpo.limit_offset,
-                stop_offset = xpo.stop_offset
+                updated = xpo.updated
             };
         }
 
@@ -61,7 +57,6 @@ namespace XTA.XData.Models
             xpo.gid = domain.gid;
             xpo.cno = domain.cno;
             xpo.sno = domain.sno;
-            xpo.gno = domain.gno;
             xpo.msg_id = domain.msg_id;
             xpo.raw_id = domain.raw_id;
             xpo.xa_entry = domain.xa_entry;
@@ -79,7 +74,6 @@ namespace XTA.XData.Models
             xpo.te_interval = domain.te_interval;
             xpo.ikte_start = domain.ikte_start;
             xpo.ikte_step = domain.ikte_step;
-            xpo.gap_min = domain.gap_min;
             xpo.tp = domain.tp;
             xpo.sl = domain.sl;
             xpo.ts_start = domain.ts_start;
@@ -99,8 +93,6 @@ namespace XTA.XData.Models
             xpo.tag = domain.tag;
             xpo.created = domain.created;
             xpo.updated = domain.updated;
-            xpo.limit_offset = domain.limit_offset;
-            xpo.stop_offset = domain.stop_offset;
         }
 
         public static XChannelOption ToDomainModel(this XpoChannelOption xpo)
@@ -198,7 +190,6 @@ namespace XTA.XData.Models
             target.gid = source.gid;
             target.cno = source.cno;
             target.sno = source.sno;
-            target.gno = source.gno;
             target.msg_id = source.msg_id;
             target.raw_id = source.raw_id;
             target.xa_entry = source.xa_entry;
@@ -233,8 +224,6 @@ namespace XTA.XData.Models
             target.tag = source.tag;
             target.created = source.created;
             target.updated = source.updated;
-            target.limit_offset = source.limit_offset;
-            target.stop_offset = source.stop_offset;
         }
 
         public static XTgMessage ToDomainModel(this XpoTgMessage xpo)
@@ -258,7 +247,6 @@ namespace XTA.XData.Models
                 gid = xpo.gid,
                 cno = xpo.cno,
                 sno = xpo.sno,
-                gno = xpo.gno,
                 msg_id = xpo.msg_id,
                 raw_id = xpo.raw_id,
                 xa_entry = xpo.xa_entry,
@@ -276,7 +264,6 @@ namespace XTA.XData.Models
                 te_interval = xpo.te_interval,
                 ikte_start = xpo.ikte_start,
                 ikte_step = xpo.ikte_step,
-                gap_min = xpo.gap_min,
                 tp = xpo.tp,
                 sl = xpo.sl,
                 ts_start = xpo.ts_start,
@@ -295,9 +282,7 @@ namespace XTA.XData.Models
                 comment = xpo.comment,
                 tag = xpo.tag,
                 created = xpo.created,
-                updated = xpo.updated,
-                limit_offset = xpo.limit_offset,
-                stop_offset = xpo.stop_offset
+                updated = xpo.updated
             };
         }
     }

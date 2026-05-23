@@ -184,19 +184,27 @@ public:
     virtual void ForceTransition(int state) override {
         if(!m_isActive || IS_INVALID(m_sequence)) return;
         
-        XP_LOG_WARN(NULL, StringFormat("[SESSION-INTERRUPT] Force Transition to State:%d for SID:%s", state, m_sid));
+        // [v14.5 Guard] 이미 해당 상태거나 종료 상태면 무시
+        if(m_sequence.State() == state || m_sequence.State() >= SESSION_CLOSED) return;
+
+        XP_LOG_WARN(NULL, StringFormat("[SESSION-INTERRUPT] Force Transition Triggered: %d -> %d for SID:%s", 
+                                       m_sequence.State(), state, m_sid));
         m_sequence.ForceState(state);
     }
 
     void Reset() {
+        if(!m_isActive && m_sid == "") return;
+
         //--- [SSOC] 글로벌 트리에서 제거
         if(m_sid != "" && IS_VALID(m_globalCtx)) {
-            m_globalCtx.AddChild(m_sid, NULL); // 제거
+            m_globalCtx.AddChild(m_sid, NULL); 
         }
+
+        XP_LOG_INFO(NULL, StringFormat("[SESSION-RESET] Releasing Session for SID:%s", m_sid));
 
         m_isActive = false;
         m_sid = "";
-        SAFE_DELETE(m_signal); //-- [v10.7 Fix] Clear ownership
+        SAFE_DELETE(m_signal); 
         if(IS_VALID(m_sequence)) m_sequence.ForceState(SESSION_READY);
     }
 

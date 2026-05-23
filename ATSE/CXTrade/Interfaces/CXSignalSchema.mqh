@@ -50,7 +50,6 @@
     X(string,   comment,      Text,    Comment)     \
     X(string,   tag,          Text,    Tag)         \
     X(datetime, created,      Text,    Created)     \
-    X(datetime, updated,      Text,    Updated)     \
-    X(double,   stop_offset,  Double,  StopOffset)
+    X(datetime, updated,      Text,    Updated)
 
 #endif

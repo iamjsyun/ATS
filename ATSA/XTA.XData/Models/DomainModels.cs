@@ -14,7 +14,6 @@ namespace XTA.XData.Models
         public string gid { get; set; } = string.Empty;
         public int cno { get; set; }
         public int sno { get; set; }
-        public int gno { get; set; }
 
         public int msg_id { get; set; }
         public int raw_id { get; set; }
@@ -33,7 +32,6 @@ namespace XTA.XData.Models
         public int te_interval { get; set; }
         public double ikte_start { get; set; }
         public double ikte_step { get; set; }
-        public int gap_min { get; set; }
         public double tp { get; set; }
         public double sl { get; set; }
         public int ts_start { get; set; } = 500;
@@ -53,12 +51,6 @@ namespace XTA.XData.Models
         public string tag { get; set; } = string.Empty;
         public DateTime created { get; set; } = DateTime.Now;
         public DateTime updated { get; set; } = DateTime.Now;
-        public double limit_offset { get; set; }
-        public double stop_offset { get; set; }
-
-        // Logic Helpers (from original XSignal)
-        public string cmd { get; set; } = string.Empty;
-        public string args { get; set; } = string.Empty;
 
         public bool Validate()
         {
@@ -83,14 +75,18 @@ namespace XTA.XData.Models
             // ID 생성 및 정규화 (거버넌스 규칙 준수: XIdManager 통합)
             if (string.IsNullOrEmpty(sid) || !XIdManager.Instance.IsValidSid(sid))
             {
-                sid = XIdManager.Instance.GenerateSid(cno, created, sno, gno, dirVal, type);
+                // gno는 SID에 포함되지만 별도 필드가 아니므로, sid가 없을 경우 gno를 외부에서 주입받아야 함.
+                // 여기서는 sid가 유효하지 않을 때 최소한의 생성 시도를 함 (gno=0 기본값)
+                int vGno = XIdManager.Instance.ExtractGnoFromSid(sid);
+                sid = XIdManager.Instance.GenerateSid(cno, created, sno, vGno, dirVal, type);
             }
             
             sid = XIdManager.Instance.Normalize(sid);
 
             if (string.IsNullOrEmpty(gid) || !XIdManager.Instance.IsValidGid(gid))
             {
-                gid = XIdManager.Instance.GenerateGid(cno, created, sno, gno);
+                int vGno = XIdManager.Instance.ExtractGnoFromSid(sid);
+                gid = XIdManager.Instance.GenerateGid(cno, created, sno, vGno);
             }
             
             gid = XIdManager.Instance.Normalize(gid);

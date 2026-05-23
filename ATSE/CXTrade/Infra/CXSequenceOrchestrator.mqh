@@ -109,18 +109,18 @@ private:
     void InitSessionMap() {
         string dsl[] = {
             // 1. Entry Pipeline (v11.5: Hyper-Atomized)
-            "0|Composite:Step_Entry_Logic:TASK_E_L_REDIRECT,TASK_E_L_IDENTITY,TASK_E_L_RISK,TASK_E_L_PRICE,TASK_E_G_SPREAD,TASK_E_G_VOLATILITY,TASK_E_P_INTENT,TASK_E_R_ORDER|1|99|300|0|10=10,20=20",
-            "1|Composite:Step_Entry_Transit:TASK_A_INTENT_WATCH,TASK_E_V_ERROR,TASK_E_V_TICKET,TASK_E_V_REAL|2|99|60|0|20=20",
-            "2|Composite:Step_Entry_Verify:TASK_E_V_DOUBLECHECK,TASK_E_P_FINALIZE|10|99|30|0|20=20",
+            "0|Composite:Step_Entry_Logic:TASK_A_INTENT_WATCH,TASK_E_L_REDIRECT,TASK_E_L_IDENTITY,TASK_E_L_RISK,TASK_E_L_PRICE,TASK_E_G_SPREAD,TASK_E_G_VOLATILITY,TASK_E_P_INTENT,TASK_E_R_ORDER|1|99|300|0|10=10,20=20,23=23",
+            "1|Composite:Step_Entry_Transit:TASK_A_INTENT_WATCH,TASK_E_V_ERROR,TASK_E_V_TICKET,TASK_E_V_REAL|2|99|60|0|20=20,23=23",
+            "2|Composite:Step_Entry_Verify:TASK_A_INTENT_WATCH,TASK_E_V_DOUBLECHECK,TASK_E_P_FINALIZE|10|99|30|0|20=20,23=23",
             
             // 2. Pending Pipeline
-            "5|Composite:Step_Pending:TASK_A_INTENT_WATCH,TASK_P_V_TERMINAL,TASK_P_P_ALIGN,TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0|20=20",
+            "5|Composite:Step_Pending:TASK_A_INTENT_WATCH,TASK_P_V_TERMINAL,TASK_P_P_ALIGN,TASK_P_V_SYNC,TASK_P_L_REBOUND,TASK_P_L_IMPROVE,TASK_P_R_APPLY|10|99|3600|0|20=20,23=23",
             
             // 3. Active Pipeline
-            "10|Composite:Step_Active:TASK_A_INTENT_WATCH,TASK_A_V_STATUS,TASK_A_V_STALE,TASK_A_V_TERMINAL,TASK_A_P_ALIGN,TASK_A_L_STATUS,TASK_A_ALPHA_CALC,TASK_A_ALPHA_APPLY|10|99|72000|0|20=20",
+            "10|Composite:Step_Active:TASK_A_INTENT_WATCH,TASK_A_V_STATUS,TASK_A_V_STALE,TASK_A_V_TERMINAL,TASK_A_P_ALIGN,TASK_A_L_STATUS,TASK_A_ALPHA_CALC,TASK_A_ALPHA_APPLY|10|99|72000|0|20=20,23=23",
             
-            // 4. Liquidation Pipeline
-            "20|Composite:Step_Exit_Logic:TASK_X_L_PREPARE,TASK_X_P_LOCK,TASK_X_R_ORDER|21|99|300|3",
+            // 4. Liquidation Pipeline (v14.5: Added Watcher for Manual Close)
+            "20|Composite:Step_Exit_Logic:TASK_A_INTENT_WATCH,TASK_X_L_PREPARE,TASK_X_P_LOCK,TASK_X_R_ORDER|21|99|300|3|23=23",
             "21|Composite:Step_Exit_Transit:TASK_X_V_ERROR,TASK_X_V_TERMINAL|23|99|60|0",
             "23|Composite:Step_Exit_Verify:TASK_X_P_FINALIZE|30|99|30|0"
         };

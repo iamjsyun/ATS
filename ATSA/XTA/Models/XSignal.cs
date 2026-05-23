@@ -3,7 +3,8 @@ using System;
 namespace XTA.Models
 {
     /// <summary>
-    /// XTA 전용 신호 모델 (Pure POCO 버전)
+    /// [v9.8 Schema] XTA 전용 신호 모델 (Pure POCO 버전)
+    /// [v8.2 ID Governance] ID 생성 및 검증 로직 준수.
     /// </summary>
     public class XSignal : XTA.XData.Models.XSignal
     {
@@ -13,6 +14,14 @@ namespace XTA.Models
 
         public string? sid_date { get; set; }
         
+        // [Logic Fields] 영속성 계층(41개 필드)에서 제외되었으나 비즈니스 로직 및 UI에서 필요한 필드들
+        public int gno { get; set; }
+        public int gap_min { get; set; }
+        public double limit_offset { get; set; }
+        public double stop_offset { get; set; }
+        public string cmd { get; set; } = string.Empty;
+        public string args { get; set; } = string.Empty;
+
         // [Refactor] UI 전용 필드는 ATSA 확장 클래스로 이동 예정이나, 
         // 하위 호환성을 위해 우선 남겨두되 바인딩 로직은 제거
         public bool isHighlight { get; set; }
@@ -73,8 +82,9 @@ namespace XTA.Models
             target.tag = source.tag;
             target.created = source.created;
             target.updated = source.updated;
-            target.cmd = source.cmd;
-            target.args = source.args;
+
+            // gno 추출 (SID 기반)
+            target.gno = XTA.XData.Models.XIdManager.Instance.ExtractGnoFromSid(source.sid);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace XTA.XData.Models
 {
     /// <summary>
-    /// [v8.2 Standard] SID 및 GID 생성, 검증, 중복 방지를 담당하는 단일 관리 클래스 (Singleton)
+    /// [v8.2 Standard Authority] SID 및 GID 생성, 검증, 중복 방지를 담당하는 단일 관리 클래스 (Singleton)
     /// Governance Rules 준수 및 메모리 기반 멱등성 가드 포함. 시스템 내 유일한 ID 권위자.
     /// </summary>
     public class XIdManager

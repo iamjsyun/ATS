@@ -15,7 +15,18 @@ public:
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
         IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
+
+        // [v14.3 Fast-Path] 터미널 수동 청산 감지 (좀비 세션 방지)
+        ulong ticket = (ulong)sig.GetTicket();
+        if(ticket > 0 && IS_VALID(invMgr)) {
+            if(!invMgr.IsAssetExists(ticket, sig.GetType())) {
+                XP_LOG_WARN(xp, StringFormat("[TASK-INTENT-WATCH] Physical Asset(%I64u) disappeared from terminal (Manual Close?). Force Finalizing.", ticket));
+                return STATE_EXIT_VERIFY; // 즉시 최종 단계(23)로 점프
+            }
+        }
 
         // [v14.1 Real-time Sync] DB에서 최신 신호 상태 재획득
         ICXSignal* fresh = repo.GetSignalBySid(sig.GetSid());
@@ -26,19 +37,12 @@ public:
                 XP_LOG_INFO(xp, "[TASK-INTENT-WATCH] OK: External Exit Intent (XA_ACTIVE=1) Synchronized from DB.");
             }
             
-            // 외부에서의 상태 강제 변경(예: DataManager에 의한 리셋) 감지
-            if(fresh.GetStatus() != sig.GetStatus()) {
-                XP_LOG_WARN(xp, StringFormat("[TASK-INTENT-WATCH] DB Status Mismatch Detected! (DB:%d, Session:%d). Forced Sync.", 
-                                             fresh.GetStatus(), sig.GetStatus()));
-                // 여기서 필요시 세션 강제 중단 또는 상태 동기화 로직 추가 지점
-            }
-            
             delete fresh;
         }
 
         // 동기화된 의도에 따라 전이 결정
         if(sig.GetXAExit() == XA_ACTIVE) {
-            return SESSION_LIQUIDATING;
+            return SESSION_LIQUIDATING; // 상태 20으로 전이
         }
 
         return TASK_CONTINUE;

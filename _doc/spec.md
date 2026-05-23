@@ -1,5 +1,5 @@
 # ATS Master Design Specification (SSOT)
-**Version**: v11.3 (Symbol & Performance Standard)
+**Version**: v11.5 (High-Priority Exit Standard)
 **Date**: 2026-05-19
 **Governance**: This document is the **Single Source of Truth (SSOT)** for the ATS/XTA system. All implementations must adhere to these specifications.
 
@@ -112,5 +112,20 @@ Every trading action must verify physical state in MT5 immediately after the req
 2.  **결과 로깅**: 브로커 리턴 코드와 응답 메시지를 반드시 기록한다.
 3.  **물리적 자산 재검색**: 함수 호출 직후 터미널의 실물 자산 존재 여부를 재확인한다.
 
+### 3.5 High-Priority Exit & Interrupt Protocol (v11.5)
+자산 보호와 시퀀스 무결성을 위해 청산(Exit) 의도는 모든 파이프라인에서 최우선 순위로 처리된다.
+
+#### 3.5.1 Priority Intent Discovery
+- **Watcher Mandate**: 신호 감지 단계(`Discovery`)에서 `xa_exit=1`인 신호를 최상단으로 정렬하여 로드하며, 활성 세션 풀에 즉시 인터럽트 신호를 전파한다.
+
+#### 3.5.2 Session Force-Transition (Interrupt)
+- **Immediate Jump**: 진입(Entry) 또는 활성(Active) 상태와 무관하게 청산 의도가 감지되면 즉시 `State 20 (Liquidation Pipeline)`으로 강제 전이한다.
+- **Idempotency Guard**: 인터럽트로 인한 중복 진입 시에도 실제 브로커 명령 송신 여부를 체크하여 중복 요청(`10027`)을 방지한다.
+
+#### 3.5.3 Manual-Close Fast-Path (Zombie Protection)
+- **L3 Detection**: 모든 상태의 인덱스 0번 태스크(`TASK_A_INTENT_WATCH`)는 매 틱마다 터미널 실물 티켓 소멸 여부를 감시한다.
+- **Direct Jump**: 사용자의 수동 청산 등으로 티켓이 소멸된 것이 확인되면, 청산 명령 단계를 건너뛰고 즉시 `State 23 (Finalize)`으로 도약하여 세션을 즉시 해제한다.
+- **Handshake Acceleration (Exception)**: 수동 청산 감지(`xe_status=24`) 시, EA는 예외적으로 `xa_exit=2 (COMP)`를 직접 마킹할 수 있다. 이는 App(ATSA)의 동기화 지연을 우회하여 즉시 '이관 대기(3)'로 전이하기 위한 최적화 경로이다.
+
 ---
-**Last Updated**: 2026-05-21
+**Last Updated**: 2026-05-23

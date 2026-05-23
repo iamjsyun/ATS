@@ -43,6 +43,7 @@ enum ENUM_CX_ORDER_TYPE {
 enum ENUM_XA_INTENT {
     XA_RAW           = 0,  // 초기 상태
     XA_ACTIVE        = 1,  // 활성화 (진입/청산 실행)
+    XA_CLOSED_COMPLETED = 2,  // [v9.8.11] 청산 완료 (Handshake Acceleration)
     XA_ARCHIVE_READY = 3   // 이관 대기 (App 마킹)
 };
 

@@ -40,8 +40,8 @@ public:
             return TASK_YIELD;
         }
 
-        XP_LOG_OK(xp, StringFormat("[EXIT-V-TERMINAL] SUCCESS: Physical Asset(%I64u) Absence Verified.", ticket));
-        return STATE_EXIT_VERIFY;
+        XP_LOG_OK(xp, StringFormat("[EXIT-V-TERMINAL] SUCCESS: Physical Asset(%I64u) Absence Verified. Moving to Finalize.", ticket));
+        return STATE_EXIT_VERIFY; // Always jump to 23
     }
 };
 

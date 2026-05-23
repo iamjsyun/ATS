@@ -17,7 +17,6 @@ namespace XTA.XData.Models
         public string gid { get => GetPropertyValue<string>(nameof(gid))!; set => SetPropertyValue(nameof(gid), value); }
         public int cno { get => GetPropertyValue<int>(nameof(cno)); set => SetPropertyValue(nameof(cno), value); }
         public int sno { get => GetPropertyValue<int>(nameof(sno)); set => SetPropertyValue(nameof(sno), value); }
-        public int gno { get => GetPropertyValue<int>(nameof(gno)); set => SetPropertyValue(nameof(gno), value); }
         public int msg_id { get => GetPropertyValue<int>(nameof(msg_id)); set => SetPropertyValue(nameof(msg_id), value); }
         public int raw_id { get => GetPropertyValue<int>(nameof(raw_id)); set => SetPropertyValue(nameof(raw_id), value); }
         public int xa_entry { get => GetPropertyValue<int>(nameof(xa_entry)); set => SetPropertyValue(nameof(xa_entry), value); }
@@ -39,7 +38,6 @@ namespace XTA.XData.Models
         public int te_interval { get => GetPropertyValue<int>(nameof(te_interval)); set => SetPropertyValue(nameof(te_interval), value); }
         public double ikte_start { get => GetPropertyValue<double>(nameof(ikte_start)); set => SetPropertyValue(nameof(ikte_start), value); }
         public double ikte_step { get => GetPropertyValue<double>(nameof(ikte_step)); set => SetPropertyValue(nameof(ikte_step), value); }
-        public int gap_min { get => GetPropertyValue<int>(nameof(gap_min)); set => SetPropertyValue(nameof(gap_min), value); }
         public double tp { get => GetPropertyValue<double>(nameof(tp)); set => SetPropertyValue(nameof(tp), value); }
         public double sl { get => GetPropertyValue<double>(nameof(sl)); set => SetPropertyValue(nameof(sl), value); }
         public int ts_start { get => GetPropertyValue<int>(nameof(ts_start)); set => SetPropertyValue(nameof(ts_start), value); }
@@ -61,8 +59,6 @@ namespace XTA.XData.Models
         public string tag { get => GetPropertyValue<string>(nameof(tag))!; set => SetPropertyValue(nameof(tag), value); }
         public DateTime created { get => GetPropertyValue<DateTime>(nameof(created)); set => SetPropertyValue(nameof(created), value); }
         public DateTime updated { get => GetPropertyValue<DateTime>(nameof(updated)); set => SetPropertyValue(nameof(updated), value); }
-        public double limit_offset { get => GetPropertyValue<double>(nameof(limit_offset)); set => SetPropertyValue(nameof(limit_offset), value); }
-        public double stop_offset { get => GetPropertyValue<double>(nameof(stop_offset)); set => SetPropertyValue(nameof(stop_offset), value); }
     }
 
     [Persistent("channel_options")]
@@ -122,7 +118,6 @@ namespace XTA.XData.Models
         [Size(20)] public string gid { get => GetPropertyValue<string>(nameof(gid))!; set => SetPropertyValue(nameof(gid), value); }
         public int cno { get => GetPropertyValue<int>(nameof(cno)); set => SetPropertyValue(nameof(cno), value); }
         public int sno { get => GetPropertyValue<int>(nameof(sno)); set => SetPropertyValue(nameof(sno), value); }
-        public int gno { get => GetPropertyValue<int>(nameof(gno)); set => SetPropertyValue(nameof(gno), value); }
         public int msg_id { get => GetPropertyValue<int>(nameof(msg_id)); set => SetPropertyValue(nameof(msg_id), value); }
         public int raw_id { get => GetPropertyValue<int>(nameof(raw_id)); set => SetPropertyValue(nameof(raw_id), value); }
         public int xa_entry { get => GetPropertyValue<int>(nameof(xa_entry)); set => SetPropertyValue(nameof(xa_entry), value); }
@@ -141,7 +136,6 @@ namespace XTA.XData.Models
         public int te_interval { get => GetPropertyValue<int>(nameof(te_interval)); set => SetPropertyValue(nameof(te_interval), value); }
         public double ikte_start { get => GetPropertyValue<double>(nameof(ikte_start)); set => SetPropertyValue(nameof(ikte_start), value); }
         public double ikte_step { get => GetPropertyValue<double>(nameof(ikte_step)); set => SetPropertyValue(nameof(ikte_step), value); }
-        public int gap_min { get => GetPropertyValue<int>(nameof(gap_min)); set => SetPropertyValue(nameof(gap_min), value); }
         public double tp { get => GetPropertyValue<double>(nameof(tp)); set => SetPropertyValue(nameof(tp), value); }
         public double sl { get => GetPropertyValue<double>(nameof(sl)); set => SetPropertyValue(nameof(sl), value); }
         public int ts_start { get => GetPropertyValue<int>(nameof(ts_start)); set => SetPropertyValue(nameof(ts_start), value); }
@@ -161,8 +155,6 @@ namespace XTA.XData.Models
         [Size(100)] public string tag { get => GetPropertyValue<string>(nameof(tag))!; set => SetPropertyValue(nameof(tag), value); }
         public DateTime created { get => GetPropertyValue<DateTime>(nameof(created)); set => SetPropertyValue(nameof(created), value); }
         public DateTime updated { get => GetPropertyValue<DateTime>(nameof(updated)); set => SetPropertyValue(nameof(updated), value); }
-        public double limit_offset { get => GetPropertyValue<double>(nameof(limit_offset)); set => SetPropertyValue(nameof(limit_offset), value); }
-        public double stop_offset { get => GetPropertyValue<double>(nameof(stop_offset)); set => SetPropertyValue(nameof(stop_offset), value); }
     }
 
     [Persistent("server_signals_raw")]
@@ -224,7 +216,6 @@ namespace XTA.XData.Models
         
         public double te_start { get => GetPropertyValue<double>(nameof(te_start)); set => SetPropertyValue(nameof(te_start), value); }
         public double te_step { get => GetPropertyValue<double>(nameof(te_step)); set => SetPropertyValue(nameof(te_step), value); }
-        public double limit_offset { get => GetPropertyValue<double>(nameof(limit_offset)); set => SetPropertyValue(nameof(limit_offset), value); }
         public double lot { get => GetPropertyValue<double>(nameof(lot)); set => SetPropertyValue(nameof(lot), value); }
 
         [Size(SizeAttribute.Unlimited)]

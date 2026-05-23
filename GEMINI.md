@@ -77,6 +77,7 @@
     - **신규 주입 (Save)**: `xa_entry=1`, `xa_exit=0`, `xe_status=0 (READY)`
     - **청산 요청 (Exit)**: `xa_exit=1 (ACTIVE)`
     - **청산 완료 (Comp)**: `xa_exit=2 (COMP)`, `xe_status=20 (CLOSED)`
+    - **수동 청산 패스트 트랙 (Manual-Close Fast-Track)**: 터미널 수동 종료 감지 시, ATSE가 직권으로 `xe_status=24` 및 `xa_exit=2`를 동시 마킹하여 즉시 종료 확정.
     - **이관 대기 (Arch)**: `xa_exit=3 (ARCH)`
     - **상세 실행 상태 (xe_status)**: 0(READY), 1(PENDING_REQ), 2(IN_TRANSIT), 5(PENDING_PLACED), 10(EXECUTED), 20(CLOSED_SIGNAL), 21(CLOSED_SL), 22(CLOSED_TP), 99(ERROR)
 
@@ -99,6 +100,11 @@
 - **Explicit Full-Path Mandate**: The `DatabaseFullPath` property in `ATSA.json` SHOULD contain the absolute path to the MetaTrader 5 Common Files folder for maximum visibility.
 - **Auto-Generation**: The system automatically generates `ATSA.json` with the current user's MT5 common path if missing.
 - **Reference Standard**: All modules MUST use `XConfig.GetConfigPath()` to access the unified settings.
+
+## Build Environment (MQL5)
+- **Compiler Path**: `D:\Program Files\XM Global MT5\MetaEditor64.exe` (Primary).
+- **Automated Build**: `ATSE\build.ps1` 스크립트를 사용하여 MQL5 코드를 빌드한다.
+- **Build Logs**: 빌드 결과는 `_log/` 디렉토리에 타임스탬프와 함께 저장되며, UTF-16 인코딩을 준수한다.
 
 ## UCXSignalView UI Standard (v9.6)
 - **Layout Architecture**: Strictly follow a **Two-Line Card-Hybrid** design.
