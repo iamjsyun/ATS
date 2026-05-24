@@ -10,6 +10,7 @@
 #include "..\Infra\CXSequenceOrchestrator.mqh"
 #include "..\Models\CXContext.mqh"
 #include "..\Infra\CXFluentSequence.mqh"
+#include "..\Infra\CXAuditFormatter.mqh"
 
 #include "..\Interfaces\IXEntryManager.mqh"
 #include "..\Interfaces\IXOrderManager.mqh"
@@ -105,7 +106,7 @@ public:
                 if(trans.order != sig.GetTicket() && trans.position != sig.GetTicket()) {
                     return;
                 }
-                XP_LOG_TRACE(xp, StringFormat("[SESSION-TX] Correlated Transaction Found for Ticket:%I64u", sig.GetTicket()));
+                XP_LOG_TRACE(xp, CXAuditFormatter::Build("SESSION-TX", xp, StringFormat("Correlated Transaction Found for Ticket:%I64u", sig.GetTicket())));
             }
         }
 
@@ -120,12 +121,9 @@ public:
                 errorDetail = xp.GetString(); 
                 if(errorDetail == "") errorDetail = "Unknown Sequence Interruption";
 
-                // [v10.33] 명시적 Circuit Breaker 메시지 생성
-                string finalMsg = StringFormat("[ERR-000] Circuit Breaker Tripped: %s. Session terminated for system safety.", errorDetail);
-                
-                XP_LOG_ERROR(xp, finalMsg);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("SESSION-ERROR", xp, errorDetail));
                 if(IS_VALID(sig)) {
-                    CXMessageProvider::UpdateStatus(sig, XE_ERROR, finalMsg);
+                    CXMessageProvider::UpdateStatus(sig, XE_ERROR, errorDetail);
                     if(IS_VALID(m_repo)) m_repo.UpdateStatus(sig);
                 }
                 m_isActive = false; // 세션 영구 비활성화 (좀비 방지)
@@ -187,8 +185,9 @@ public:
         // [v14.5 Guard] 이미 해당 상태거나 종료 상태면 무시
         if(m_sequence.State() == state || m_sequence.State() >= SESSION_CLOSED) return;
 
-        XP_LOG_WARN(NULL, StringFormat("[SESSION-INTERRUPT] Force Transition Triggered: %d -> %d for SID:%s", 
-                                       m_sequence.State(), state, m_sid));
+        CXParam tempXp; tempXp.SetSignal(m_signal);
+        XP_LOG_WARN(GetPointer(tempXp), CXAuditFormatter::Build("SESSION-INTERRUPT", GetPointer(tempXp), 
+                                       StringFormat("Force Transition: %d -> %d", m_sequence.State(), state)));
         m_sequence.ForceState(state);
     }
 
@@ -200,7 +199,8 @@ public:
             m_globalCtx.AddChild(m_sid, NULL); 
         }
 
-        XP_LOG_INFO(NULL, StringFormat("[SESSION-RESET] Releasing Session for SID:%s", m_sid));
+        CXParam tempXp; tempXp.SetSignal(m_signal);
+        XP_LOG_INFO(GetPointer(tempXp), CXAuditFormatter::Build("SESSION-RESET", GetPointer(tempXp)));
 
         m_isActive = false;
         m_sid = "";

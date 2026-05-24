@@ -8,6 +8,7 @@
 #include "..\..\Interfaces\CXMacros.mqh"
 #include "..\..\Interfaces\IXTrailingStrategy.mqh"
 #include "..\..\Interfaces\IXGuard.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXEntryManager
@@ -40,13 +41,13 @@ public:
         IXGuard* guard = CX_GET_OBJ(m_ctx, "guard", IXGuard);
         if(IS_VALID(guard)) {
             if(!guard.ValidateMagic(sig.GetMagic()) || !guard.ValidateSID(sig.GetSid())) {
-                XP_LOG_ERROR(xp, "[ENTRY-GUARD-BLOCK] " + guard.GetLastError());
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-GUARD-BLOCK", xp, guard.GetLastError()));
                 return;
             }
         }
 
         // 진입 전략 설정 조정 로직
-        XP_LOG_INFO(xp, StringFormat("[SANDBOX-ENTRY] Preparing Entry for SID: %s", sig.GetSid()));
+        XP_LOG_INFO(xp, CXAuditFormatter::Build("SANDBOX-ENTRY", xp));
     }
 };
 

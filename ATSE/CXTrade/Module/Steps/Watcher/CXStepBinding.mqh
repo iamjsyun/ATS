@@ -6,7 +6,8 @@
 #include "..\..\..\Interfaces\ICXTradingSession.mqh"
 #include "..\..\..\Models\CXSignal.mqh"
 #include "..\..\..\Models\CXParam.mqh"
-#include "..\..\CXLogDispatcher.mqh"
+#include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 #include <Arrays\ArrayObj.mqh>
 
 /**
@@ -28,7 +29,6 @@ public:
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
         CArrayObj* activeList = CX_GET_OBJ(ctx, "active_signals", CArrayObj);
         ICXTradingSessionPool* pool = CX_GET_OBJ(ctx, "session_pool", ICXTradingSessionPool);
-        ICXLogger* log = CX_GET_OBJ(ctx, "logger", ICXLogger);
 
         if(IS_INVALID(activeList) || IS_INVALID(pool)) return WATCHER_DISCOVERY;
 
@@ -41,31 +41,28 @@ public:
             ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
             if(IS_INVALID(sig)) continue;
 
+            xp.SetSignal(sig); // UAF 조립을 위해 임시 바인딩
             string sid = sig.GetSid();
 
             //-- 0. 중복 바인딩 방지 및 강제 개입 로직 (v14.3)
             ICXTradingSession* existing = pool.FindSessionBySid(sid);
             if(IS_VALID(existing)) {
-                // 이미 가동 중인데 청산 의도가 들어온 경우 -> 기존 세션에 강제 청산 명령 하달
                 if(sig.GetXAExit() == XA_ACTIVE) {
-                    if(IS_VALID(log)) log.Warn(xp, StringFormat("[WATCHER-BINDING] INTERRUPT: SID:%s is active. Forcing Liquidation.", sid));
-                    
-                    // 1. 기존 세션 상태 강제 전이
+                    XP_LOG_WARN(xp, CXAuditFormatter::Build("WATCHER-BINDING", xp, "INTERRUPT: SID is active. Forcing Liquidation."));
                     existing.ForceTransition(SESSION_LIQUIDATING);
                     
-                    // 2. DB 상태 즉시 업데이트 (ATSA 가시성 확보)
                     IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
                     if(IS_VALID(repo)) {
-                        sig.SetStatus(XE_CLOSED_SIGNAL); // 혹은 SESSION_LIQUIDATING
+                        sig.SetStatus(XE_CLOSED_SIGNAL); 
                         sig.SetStatusMsg("Liquidation Forced by Watcher");
                         repo.UpdateStatus(sig);
                     }
                     skipped++;
                 } else {
-                    if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] SKIP: SID:%s is already active.", sid));
+                    XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-BINDING", xp, "SKIP: SID is already active."));
                     skipped++;
                 }
-                SAFE_DELETE(sig); //-- [v10.7 Fix] Delete orphan signal object
+                SAFE_DELETE(sig); 
                 continue;
             }
 
@@ -85,17 +82,17 @@ public:
                 sp.SetSignal(sig);
                 session.Start(GetPointer(sp));
 
-                if(IS_VALID(log)) log.Ok(xp, StringFormat("[WATCHER-BINDING] SUCCESS: SID:%s bound to session.", sid));
+                XP_LOG_OK(xp, CXAuditFormatter::Build("WATCHER-BINDING", xp, "SUCCESS: Bound to session."));
                 success++;
             } else {
-                if(IS_VALID(log)) log.Error(xp, StringFormat("[WATCHER-BINDING] FAILED: No idle session for SID:%s", sid));
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("WATCHER-BINDING", xp, "FAILED: No idle session available."));
                 failed++;
-                SAFE_DELETE(sig); //-- [v10.7 Fix] Delete orphan signal object
+                SAFE_DELETE(sig); 
             }
         }
 
         if(total > 0) {
-            if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-BINDING] Complete. Success: %d, Skipped: %d, Failed: %d", success, skipped, failed));
+            XP_LOG_TRACE(xp, StringFormat("[WATCHER-BINDING] Complete. Total:%d, Success:%d, Skipped:%d, Failed:%d", total, success, skipped, failed));
         }
 
         // 3. 작업 완료 후 리스트 정리

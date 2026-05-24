@@ -18,35 +18,39 @@ public:
      * @param specData 클래스별 특화 데이터 (Block 4)
      */
     static string Build(string action, ICXParam* xp, string specData = "") {
-        if(IS_INVALID(xp)) return StringFormat("[%s] INVALID_PARAM", action);
+        if(IS_INVALID(xp)) return StringFormat("[FUNC:%s] INVALID_PARAM", action);
         
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) return StringFormat("[%s] INVALID_SIGNAL", action);
+        if(IS_INVALID(sig)) return StringFormat("[FUNC:%s] INVALID_SIGNAL", action);
 
-        // 1. [META] + [BASE] 조립 (TE, TS, SL, TP 포인트 필수 포함)
-        string metaBase = StringFormat("[%s] [%s] [%s, %.2f, %s, %s] [TE:%d,%d,%d TS:%d,%d SL:%d TP:%d]",
+        // [FUNC:Name] [SID] [Sym, Lot, Dir, Status]
+        string block1 = StringFormat("[FUNC:%s] [%s] [%s, %.2f, %s, %s]",
                                        action, 
                                        sig.GetSid(), 
                                        sig.GetSymbol(), 
                                        sig.GetLot(), 
-                                       EnumToString((ENUM_CX_DIRECTION)sig.GetDir()),
-                                       GetStatusName((ENUM_XE_STATUS)sig.GetStatus()),
-                                       (int)sig.GetTEStart(), (int)sig.GetTEStep(), (int)sig.GetTELimit(),
-                                       (int)sig.GetTSStart(), (int)sig.GetTSStep(),
-                                       (int)sig.GetSL(), (int)sig.GetTP());
+                                       GetDirName((ENUM_CX_DIRECTION)sig.GetDir()),
+                                       GetStatusName((ENUM_XE_STATUS)sig.GetStatus()));
 
-        // 2. [PRICE] 조립
+        // [TE:Pts TS:Pts SL:Pts TP:Pts]
+        string block2 = StringFormat("[TE:%d TS:%d SL:%d TP:%d]",
+                                       (int)sig.GetTEStart(),
+                                       (int)sig.GetTSStart(),
+                                       (int)sig.GetSL(), 
+                                       (int)sig.GetTP());
+
+        // [P:Open, SL:Price, TP:Price, Mkt:Price]
         string symbol = sig.GetSymbol();
         double mkt = SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
         
-        string prices = StringFormat("[P:%.5f, SL:%.5f, TP:%.5f, Mkt:%.5f]",
+        string block3 = StringFormat("[P:%.5f, SL:%.5f, TP:%.5f, Mkt:%.5f]",
                                      sig.GetPriceOpen(), 
                                      sig.GetPriceSL(), 
                                      sig.GetPriceTP(), 
                                      mkt);
 
-        // 3. 최종 결합 (SPEC 유무에 따라 처리)
-        string finalMsg = metaBase + " " + prices;
+        // 최종 결합 (SPEC 유무에 따라 처리)
+        string finalMsg = block1 + " " + block2 + " " + block3;
         if(specData != "") {
             finalMsg += " {" + specData + "}";
         }
@@ -55,6 +59,14 @@ public:
     }
 
 private:
+    static string GetDirName(ENUM_CX_DIRECTION dir) {
+        switch(dir) {
+            case CX_DIR_BUY:  return "BUY";
+            case CX_DIR_SELL: return "SELL";
+            default:          return "N/A";
+        }
+    }
+
     static string GetStatusName(ENUM_XE_STATUS status) {
         switch(status) {
             case XE_READY:          return "READY";

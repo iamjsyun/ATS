@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_V_Error
@@ -18,11 +19,11 @@ public:
 
         // 티켓이 없고 상태가 PENDING_REQ 이상인데 타임아웃이면 에러 처리
         if(sig.GetTicket() <= 0 && sig.GetStatus() == XE_PENDING_REQ) {
-            XP_LOG_TRACE(xp, "[ENTRY-V-ERROR] Monitoring Broker Rejection for PENDING_REQ...");
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-V-ERR", xp, "Monitoring Broker Rejection..."));
             if(IsTimedOut()) {
-                string err = "Broker Request Rejected/Ignored (Timeout)";
-                XP_LOG_ERROR(xp, "[ENTRY-V-ERROR] FAILED: " + err + ". Escalating to XE_ERROR.");
-                xp.SetString(err); //-- [v10.22] Propagate error detail
+                string err = "Broker Request Rejected (Timeout)";
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-V-ERR", xp, "FAILED: " + err));
+                xp.SetString("[ENTRY-V-ERR] " + err); 
                 CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
                 return SESSION_ERROR;
             }

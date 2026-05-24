@@ -72,7 +72,7 @@
     - **SID Format**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)` (Total 23 chars, including hyphens).
     - **GID Format**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)` (Total 19 chars).
 - **Communication Protocol**: Follow the v7.9 Archival Protocol (`xa_exit=3` for transfer).
-- **Market-Price Priority Mandate (v10.23)**: All price-related tasks (Entry, SL/TP, Trailing) MUST use real-time Market Price (Ask/Bid) as the baseline for point-to-price conversions, ignoring stale signal prices (`price_signal`).
+- **Market-Price Priority Mandate (v11.6)**: All price-related tasks (Entry, SL/TP, Trailing) MUST use real-time Market Price (Ask/Bid) as the baseline for point-to-price conversions, **strictly ignoring** stale signal prices (`price_signal`). This applies to TE, TS, SL, and TP calculation logic.
 - **DataManager State Transition Matrix (v9.8.11)**:
     - **신규 주입 (Save)**: `xa_entry=1`, `xa_exit=0`, `xe_status=0 (READY)`
     - **청산 요청 (Exit)**: `xa_exit=1 (ACTIVE)`

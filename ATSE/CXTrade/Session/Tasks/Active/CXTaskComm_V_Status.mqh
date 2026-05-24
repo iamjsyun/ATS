@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\ICXLogger.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskComm_V_Status
@@ -13,16 +14,14 @@ class CXTaskComm_V_Status : public IXTask {
 public:
     virtual string Name() override { return "Comm_V_Status"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
-        // CXRemoteLogger 등의 전역 상태 체크
         ICXLogger* logger = CX_GET_OBJ(ctx, "logger", ICXLogger);
         
-        XP_LOG_TRACE(xp, "[COMM-V-STATUS] Verifying Communication Infrastructure...");
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMM-V-STATUS", xp, "Verifying Infrastructure..."));
 
         if(IS_INVALID(logger)) {
-            // 로거 없어도 매매는 진행하되 경고
-            Print("[COMM-V-STATUS] WARNING: Global Logger is unavailable. System running in silent mode.");
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("COMM-V-STATUS", xp, "Global Logger unavailable. Silent mode."));
         } else {
-            XP_LOG_DEBUG(xp, "[COMM-V-STATUS] OK: Logger is connected.");
+            // [v14.17 Muted] XP_LOG_DEBUG(xp, CXAuditFormatter::Build("COMM-V-STATUS", xp, "OK: Logger connected."));
         }
 
         return TASK_CONTINUE;

@@ -40,14 +40,14 @@ public:
         double step   = IS_VALID(symMgr) ? symMgr.GetLotStep(symbol) : SymbolInfoDouble(symbol, SYMBOL_VOLUME_STEP);
 
         if(lot < minLot || lot > maxLot) {
-            XP_LOG_ERROR(xp, StringFormat("[RISK-MGR] Invalid Lot Size: %.2f (Min:%.2f, Max:%.2f)", lot, minLot, maxLot));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("RISK-LOT-INVALID", xp, StringFormat("Lot:%.2f (Min:%.2f, Max:%.2f)", lot, minLot, maxLot)));
             return false;
         }
 
         // 스텝 정렬 확인 (미세 오차 허용)
         double remain = MathMod(lot - minLot, step);
         if(remain > 0.0000001 && step - remain > 0.0000001) {
-             XP_LOG_WARN(xp, StringFormat("[RISK-MGR] Lot size %.2f does not match step %.2f. Suggest Normalizing.", lot, step));
+             XP_LOG_WARN(xp, CXAuditFormatter::Build("RISK-LOT-STEP", xp, StringFormat("Lot:%.2f, Step:%.2f", lot, step)));
         }
 
         return true;
@@ -87,17 +87,17 @@ public:
     virtual bool CheckMarginAvailability(ICXParam* xp, string symbol, int dir, double lot, double price) override {
         double required = CalculateRequiredMargin(symbol, dir, lot, price);
         if(required < 0) {
-            XP_LOG_ERROR(xp, "[RISK-MGR] Failed to calculate required margin.");
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("RISK-MARGIN-CALC-FAIL", xp));
             return false;
         }
 
         double freeMargin = AccountInfoDouble(ACCOUNT_MARGIN_FREE);
         if(freeMargin < required) {
-            XP_LOG_ERROR(xp, StringFormat("[RISK-MGR] NOT ENOUGH MONEY: FreeMargin(%.2f) < Required(%.2f)", freeMargin, required));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("RISK-NO-MONEY", xp, StringFormat("Free:%.2f, Req:%.2f", freeMargin, required)));
             return false;
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[RISK-MGR] Margin Check OK: Required %.2f / Free %.2f", required, freeMargin));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("RISK-MARGIN-OK", xp, StringFormat("Req:%.2f, Free:%.2f", required, freeMargin)));
         return true;
     }
 

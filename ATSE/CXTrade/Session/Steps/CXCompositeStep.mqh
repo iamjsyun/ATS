@@ -1,10 +1,11 @@
 #ifndef CXCOMPOSITESTEP_MQH
 #define CXCOMPOSITESTEP_MQH
 
-#include "..\..\Interfaces\IXStep.mqh"
 #include "..\..\Interfaces\IXTask.mqh"
 #include "..\..\Interfaces\CXMacros.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 #include <Arrays\ArrayObj.mqh>
+
 
 /**
  * @class CXCompositeStep
@@ -61,11 +62,14 @@ public:
                 // [v9.9.2] 타임아웃 검증
                 if(task.IsTimedOut()) {
                     string timeoutErr = StringFormat("[%s] Task Timeout. Moving to SESSION_ERROR.", task.Name());
-                    XP_LOG_ERROR(xp, timeoutErr);
+                    XP_LOG_ERROR(xp, CXAuditFormatter::Build("COMPOSITE-ERR", xp, timeoutErr));
                     if(IS_VALID(xp)) xp.SetString(timeoutErr);
                     if(IS_VALID(pIdx)) pIdx.SetInt(0);
                     return SESSION_ERROR;
                 }
+
+                // [v14.9 Tracing] 태스크 실행 전 트레이싱 로그 출력
+                XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMPOSITE-TRACE", xp, "Executing Task: " + task.Name()));
 
                 int res = task.Execute(xp, ctx);
                 
@@ -91,7 +95,7 @@ public:
                     task.IncrementRetry();
                     if(task.IsMaxRetriesExceeded()) {
                         string retryErr = StringFormat("[%s] Max Retries Exceeded. Moving to SESSION_ERROR.", task.Name());
-                        XP_LOG_ERROR(xp, retryErr);
+                        XP_LOG_ERROR(xp, CXAuditFormatter::Build("COMPOSITE-ERR", xp, retryErr));
                         if(IS_VALID(xp)) xp.SetString(retryErr);
                         pIdx.SetInt(0);
                         return SESSION_ERROR;

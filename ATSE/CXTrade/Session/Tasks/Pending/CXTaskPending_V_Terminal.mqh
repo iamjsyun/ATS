@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_V_Terminal
@@ -19,10 +20,9 @@ public:
         if(IS_INVALID(sig) || IS_INVALID(invMgr)) return TASK_BREAK;
 
         ulong ticket = (ulong)sig.GetTicket();
-        // 대기 주문이므로 IsOrderExists 사용
         bool exists = invMgr.IsOrderExists(ticket);
 
-        XP_LOG_TRACE(xp, StringFormat("[PENDING-V-TERMINAL] Checking Order:%I64u, Found:%d", ticket, exists));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("Checking Order:%I64u, Found:%d", ticket, exists)));
         xp.SetInt(exists ? 1 : 0); 
         return TASK_CONTINUE;
     }

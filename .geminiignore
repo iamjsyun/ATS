@@ -3,6 +3,8 @@
 *.ex4
 /Logs/
 *.log
+_log/
+**/_log/
 
 # C# 및 Visual Studio 임시/빌드 파일 제외
 .vs/
@@ -15,8 +17,13 @@
 # 기타 대형 데이터 및 환경변수 보호
 *.env
 *.csv
+*.db
+*.sqlite
 *.json
 !settings.json
+!ATSA.json
+!tasks.json
+!launch.json
 
 # Git internal data (Speed up search)
 .git/
@@ -29,9 +36,17 @@
 
 # C# / .NET build artifacts
 TestResults/
+[Tt]est[Rr]esults/
 packages/
 _ReSharper*/
 
 # OS noise
 .DS_Store
 Thumbs.db
+
+# Gemini CLI Local Noise & Security (Keep /memory/)
+_doc/gemini/history/
+_doc/gemini/tmp/
+_doc/gemini/extensions/
+_doc/gemini/google_accounts.json
+_doc/gemini/trustedFolders.json

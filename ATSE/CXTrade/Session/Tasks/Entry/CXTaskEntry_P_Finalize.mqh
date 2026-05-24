@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_P_Finalize
@@ -22,15 +23,15 @@ public:
         string msg = (targetStatus == XE_EXECUTED) ? "Entry Executed (Market)" : "Entry Pending Placed (Trailing)";
         int nextSessionState = (targetStatus == XE_EXECUTED) ? SESSION_ACTIVE : STATE_ENTRY_TRAILING;
 
-        XP_LOG_TRACE(xp, StringFormat("[ENTRY-P-FINALIZE] Committing Final State: %d (%s)...", targetStatus, msg));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-FINALIZE", xp, StringFormat("Committing Final State: %d (%s)", targetStatus, msg)));
 
         CXMessageProvider::UpdateStatus(sig, targetStatus, msg);
         if(repo.UpdateStatus(sig)) {
-            XP_LOG_OK(xp, StringFormat("[ENTRY-P-FINALIZE] SUCCESS: DB Updated. Moving Session to %d.", nextSessionState));
+            XP_LOG_OK(xp, CXAuditFormatter::Build("TASK-FINALIZE", xp, StringFormat("SUCCESS: DB Updated. Moving Session to %d.", nextSessionState)));
             return nextSessionState;
         }
 
-        XP_LOG_WARN(xp, "[ENTRY-P-FINALIZE] YIELD: DB Update Delayed. Retrying...");
+        XP_LOG_WARN(xp, CXAuditFormatter::Build("TASK-FINALIZE", xp, "YIELD: DB Update Delayed. Retrying..."));
         return TASK_YIELD;
     }
 };

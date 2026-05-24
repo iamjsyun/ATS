@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Interfaces\IXPositionManager.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskActive_P_Align
@@ -21,17 +22,17 @@ public:
         bool exists = (xp.GetInt() == 1);
         
         if(!exists && sig.GetStatus() < XE_CLOSED_SIGNAL) {
-            XP_LOG_WARN(xp, StringFormat("[ACTIVE-P-ALIGN] Mismatch: Position:%I64u not found but Status:%d. Triggering Align...", sig.GetTicket(), sig.GetStatus()));
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("ACTIVE-P-ALIGN", xp, "Mismatch: Position not found. Triggering Align."));
             
             IXPositionManager* posMgr = CX_GET_OBJ(ctx, "pos_mgr", IXPositionManager);
             if(IS_VALID(posMgr)) {
                 posMgr.Pulse(xp);
             }
             if(repo.UpdateStatus(sig)) {
-                XP_LOG_OK(xp, StringFormat("[ACTIVE-P-ALIGN] SUCCESS: DB Aligned to %d.", sig.GetStatus()));
+                XP_LOG_OK(xp, CXAuditFormatter::Build("ACTIVE-P-ALIGN", xp, "SUCCESS: DB Aligned."));
             }
         } else {
-            XP_LOG_DEBUG(xp, "[ACTIVE-P-ALIGN] OK: Terminal and DB in sync.");
+            // [v14.16 Muted] XP_LOG_TRACE(xp, CXAuditFormatter::Build("ACTIVE-P-ALIGN", xp, "OK: Terminal and DB in sync."));
         }
 
         return TASK_CONTINUE;

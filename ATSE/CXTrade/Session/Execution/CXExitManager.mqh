@@ -6,6 +6,7 @@
 #include "..\..\Interfaces\ICXParam.mqh"
 #include "..\..\Interfaces\CXDefine.mqh"
 #include "..\..\Interfaces\CXMacros.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 #include <Trade\Trade.mqh>
 
 /**
@@ -37,16 +38,17 @@ public:
         if(PositionSelectByTicket(ticket)) {
             // [v14.0 Strict SID/Ticket Verification]
             if(PositionGetString(POSITION_COMMENT) != sid) {
-                XP_LOG_ERROR(xp, StringFormat("[POS-CLOSE] ABORT: SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
-                                              ticket, PositionGetString(POSITION_COMMENT), sid));
+                string mismatchErr = StringFormat("SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
+                                              ticket, PositionGetString(POSITION_COMMENT), sid);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-CLOSE-ABORT", xp, mismatchErr));
                 return false;
             }
 
-            XP_LOG_INFO(xp, StringFormat("[POS-CLOSE] Sending Request: [Ticket:%I64u]", ticket));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("POS-CLOSE-SEND", xp, StringFormat("Requesting Close: [Ticket:%I64u]", ticket)));
             if(m_trade.PositionClose(ticket)) {
                 // 재확인: 포지션 소멸 확인
                 if(!PositionSelectByTicket(ticket)) {
-                    XP_LOG_OK(xp, StringFormat("[POS-CLOSE] SUCCESS: Ticket %I64u Closed.", ticket));
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("POS-CLOSE-SUCCESS", xp, StringFormat("Ticket %I64u Closed.", ticket)));
                     res = true;
                 }
             }
@@ -55,26 +57,27 @@ public:
                 string retMsg = m_trade.ResultRetcodeDescription();
                 uint retCode = m_trade.ResultRetcode();
                 int sysErr = GetLastError();
-                string err_msg = StringFormat("[POS-CLOSE-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
+                string err_msg = StringFormat("Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
                                                 retCode, retMsg, sysErr, ticket);
-                XP_LOG_ERROR(xp, err_msg);
-                if(IS_VALID(xp)) xp.SetString(err_msg);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-CLOSE-FAIL", xp, err_msg));
+                if(IS_VALID(xp)) xp.SetString("[POS-CLOSE-FAIL] " + err_msg);
                 ResetLastError();
             }
         }
         else if(OrderSelect(ticket)) {
             // [v14.0 Strict SID/Ticket Verification]
             if(OrderGetString(ORDER_COMMENT) != sid) {
-                XP_LOG_ERROR(xp, StringFormat("[ORDER-DELETE] ABORT: SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
-                                              ticket, OrderGetString(ORDER_COMMENT), sid));
+                string mismatchErr = StringFormat("SID Mismatch. Ticket:%I64u belongs to %s, not %s", 
+                                              ticket, OrderGetString(ORDER_COMMENT), sid);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ORDER-DELETE-ABORT", xp, mismatchErr));
                 return false;
             }
 
-            XP_LOG_INFO(xp, StringFormat("[ORDER-DELETE] Sending Request: [Ticket:%I64u]", ticket));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("ORDER-DELETE-SEND", xp, StringFormat("Requesting Delete: [Ticket:%I64u]", ticket)));
             if(m_trade.OrderDelete(ticket)) {
                 // 재확인: 주문 소멸 확인
                 if(!OrderSelect(ticket)) {
-                    XP_LOG_OK(xp, StringFormat("[ORDER-DELETE] SUCCESS: Ticket %I64u Deleted.", ticket));
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("ORDER-DELETE-SUCCESS", xp, StringFormat("Ticket %I64u Deleted.", ticket)));
                     res = true;
                 }
             }
@@ -83,10 +86,10 @@ public:
                 string retMsg = m_trade.ResultRetcodeDescription();
                 uint retCode = m_trade.ResultRetcode();
                 int sysErr = GetLastError();
-                string err_msg = StringFormat("[ORDER-DELETE-FAIL] Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
+                string err_msg = StringFormat("Broker Code:%u(%s), SysErr:%d. Ticket:%I64u", 
                                                 retCode, retMsg, sysErr, ticket);
-                XP_LOG_ERROR(xp, err_msg);
-                if(IS_VALID(xp)) xp.SetString(err_msg);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ORDER-DELETE-FAIL", xp, err_msg));
+                if(IS_VALID(xp)) xp.SetString("[ORDER-DELETE-FAIL] " + err_msg);
                 ResetLastError();
             }
         }
@@ -102,19 +105,19 @@ public:
      */
     virtual bool SweepBySid(ICXParam* xp, string sid) override {
         bool all_cleared = true;
-        XP_LOG_WARN(xp, StringFormat("[EXIT-SWEEP] Starting Fallback Sweep for SID:%s", sid));
+        XP_LOG_WARN(xp, CXAuditFormatter::Build("EXIT-SWEEP-START", xp, "Starting Fallback Sweep for SID:" + sid));
         
         //-- 포지션 스윕
         for(int i = PositionsTotal() - 1; i >= 0; i--) {
             ulong t = PositionGetTicket(i);
             if(PositionSelectByTicket(t)) {
                 if(PositionGetInteger(POSITION_MAGIC) == (long)m_magic && PositionGetString(POSITION_COMMENT) == sid) {
-                    XP_LOG_INFO(xp, StringFormat("[POS-CLOSE] SWEEP: Sending Request [Ticket:%I64u]", t));
+                    XP_LOG_INFO(xp, CXAuditFormatter::Build("POS-CLOSE-SWEEP", xp, StringFormat("Sending Request [Ticket:%I64u]", t)));
                     if(!m_trade.PositionClose(t)) {
                         all_cleared = false;
-                        string err_msg = StringFormat("[POS-CLOSE-FAIL] SWEEP FAILED for Ticket:%I64u", t);
-                        XP_LOG_ERROR(xp, err_msg);
-                        if(IS_VALID(xp)) xp.SetString(err_msg);
+                        string err_msg = StringFormat("SWEEP FAILED for Ticket:%I64u", t);
+                        XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-CLOSE-FAIL", xp, err_msg));
+                        if(IS_VALID(xp)) xp.SetString("[POS-CLOSE-FAIL] " + err_msg);
                     }
                 }
             }
@@ -124,12 +127,12 @@ public:
             ulong t = OrderGetTicket(i);
             if(OrderSelect(t)) {
                 if(OrderGetInteger(ORDER_MAGIC) == (long)m_magic && OrderGetString(ORDER_COMMENT) == sid) {
-                    XP_LOG_INFO(xp, StringFormat("[ORDER-DELETE] SWEEP: Sending Request [Ticket:%I64u]", t));
+                    XP_LOG_INFO(xp, CXAuditFormatter::Build("ORDER-DELETE-SWEEP", xp, StringFormat("Sending Request [Ticket:%I64u]", t)));
                     if(!m_trade.OrderDelete(t)) {
                         all_cleared = false;
-                        string err_msg = StringFormat("[ORDER-DELETE-FAIL] SWEEP FAILED for Ticket:%I64u", t);
-                        XP_LOG_ERROR(xp, err_msg);
-                        if(IS_VALID(xp)) xp.SetString(err_msg);
+                        string err_msg = StringFormat("SWEEP FAILED for Ticket:%I64u", t);
+                        XP_LOG_ERROR(xp, CXAuditFormatter::Build("ORDER-DELETE-FAIL", xp, err_msg));
+                        if(IS_VALID(xp)) xp.SetString("[ORDER-DELETE-FAIL] " + err_msg);
                     }
                 }
             }

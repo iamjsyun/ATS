@@ -69,7 +69,7 @@ public:
         //--- [v11.3 SSOC Resolution]
         ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
         if(IS_INVALID(invMgr)) {
-            XP_LOG_ERROR(xp, "[POS-MANAGER] CRITICAL: InventoryManager Missing.");
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "CRITICAL: InventoryManager Missing."));
             return;
         }
 
@@ -78,8 +78,9 @@ public:
             if(PositionGetString(POSITION_COMMENT) == sig.GetSid()) {
                 return; // 정상: 티켓과 SID 모두 일치
             } else {
-                XP_LOG_WARN(xp, StringFormat("[POS-MANAGER] SID Mismatch for Ticket:%I64u. (Found:%s, Expected:%s)", 
-                                             ticket, PositionGetString(POSITION_COMMENT), sig.GetSid()));
+                string mismatchMsg = StringFormat("SID Mismatch for Ticket:%I64u. (Found:%s, Expected:%s)", 
+                                             ticket, PositionGetString(POSITION_COMMENT), sig.GetSid());
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("POS-MANAGER", xp, mismatchMsg));
                 // SID가 다르면 내 자산이 아니므로 아래의 부재/히스토리 로직으로 진행
             }
         }
@@ -87,7 +88,7 @@ public:
         // 1.1 [v11.6] 포지션은 없으나 '대기 오더'로 살아있는지 확인
         if(OrderSelect(ticket)) {
             if(OrderGetString(ORDER_COMMENT) == sig.GetSid()) {
-                XP_LOG_TRACE(xp, StringFormat("[POS-MANAGER] OK: Position missing but Order:%I64u still active.", ticket));
+                XP_LOG_TRACE(xp, CXAuditFormatter::Build("POS-MANAGER", xp, StringFormat("OK: Position missing but Order:%I64u still active.", ticket)));
                 return; 
             }
         }
@@ -98,7 +99,7 @@ public:
 
         if(status != XE_UNKNOWN) {
             CXMessageProvider::UpdateStatus(sig, status, reason);
-            XP_LOG_INFO(xp, StringFormat("[POS-MANAGER] Asset closed/canceled by broker. Reason: %s", reason));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "Asset closed by broker: " + reason));
             return;
         }
         
@@ -116,13 +117,13 @@ public:
             pRetry.SetInt(retryCount + 1);
             m_ctx.Set(retryKey, pRetry);
             
-            XP_LOG_DEBUG(xp, StringFormat("[POS-MANAGER] Closure not in history yet. Sync Latency? (Retry:%d/5). Yielding...", retryCount + 1));
+            XP_LOG_DEBUG(xp, CXAuditFormatter::Build("POS-MANAGER-RETRY", xp, StringFormat("Retry:%d/5", retryCount + 1)));
             return; // 다음 틱에서 재시도
         }
 
         // 5회 이상 실패 시 보수적으로 청산 처리
         CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, "Position Missing & History Timeout");
-        XP_LOG_WARN(xp, "[POS-MANAGER] History timeout. Forced closing session.");
+        XP_LOG_WARN(xp, CXAuditFormatter::Build("POS-MANAGER-TIMEOUT", xp));
     }
 
     /**
@@ -139,8 +140,9 @@ public:
             string retMsg = m_trade.ResultRetcodeDescription();
             uint retCode = m_trade.ResultRetcode();
             int sysErr = GetLastError();
-            string err_msg = StringFormat("[POS-MODIFY-FAIL] Broker Code:%u(%s), SysErr:%d. %s", 
-                                            retCode, retMsg, sysErr, GetAuditString(xp));
+            string spec = StringFormat("Broker Code:%u(%s), SysErr:%d", retCode, retMsg, sysErr);
+            string err_msg = CXAuditFormatter::Build("POS-MODIFY-FAIL", xp, spec);
+            
             XP_LOG_ERROR(xp, err_msg);
             if(IS_VALID(xp)) xp.SetString(err_msg);
             ResetLastError();
@@ -158,7 +160,7 @@ public:
             }
         }
         
-        string vErr = StringFormat("[POS-MODIFY-FAIL] VERIFY FAILED for ticket:%I64u", ticket);
+        string vErr = CXAuditFormatter::Build("POS-MODIFY-VERIFY-FAIL", xp, StringFormat("ticket:%I64u", ticket));
         XP_LOG_ERROR(xp, vErr);
         if(IS_VALID(xp)) xp.SetString(vErr);
         return false;

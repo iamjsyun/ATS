@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\IXPriceTracker.mqh"
 #include "..\..\..\Interfaces\IXPositionManager.mqh"
 #include "..\..\..\Models\CXSignal.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXStepExitTrailing
@@ -52,15 +53,16 @@ public:
                 // [v7.9] 포지션 수정 전 브로커 StopsLevel 검증 필수 수행
                 IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
                 if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), currentPrice, newSL)) {
-                    XP_LOG_WARN(xp, "[TS-MODIFY] StopsLevel Validation Failed! Modification deferred.");
+                    XP_LOG_WARN(xp, CXAuditFormatter::Build("TS-MODIFY-VLD-FAIL", xp, "StopsLevel Validation Failed"));
                     return STATE_UNCHANGED;
                 }
 
                 // 3. 브로커 포지션 수정 실행
                 if(posMgr.ModifyPosition(xp, (ulong)sig.GetTicket(), newSL, sig.GetTP())) {
+                    double oldSL = sig.GetSL();
                     sig.SetSL(newSL);
                     sig.SetStatusMsg(MSG_EXIT_TS_MODIFIED);
-                    XP_LOG_INFO(xp, StringFormat("[TS-MODIFY] Ticket:%lld, SL:%.5f -> %.5f", sig.GetTicket(), sig.GetSL(), newSL));
+                    XP_LOG_INFO(xp, CXAuditFormatter::Build("TS-MODIFY-OK", xp, StringFormat("SL:%.5f->%.5f", oldSL, newSL)));
                 }
             }
         }

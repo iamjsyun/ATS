@@ -7,6 +7,7 @@
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Interfaces\IXGuard.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_R_Apply
@@ -24,31 +25,28 @@ public:
         int flag = xp.GetInt(); 
         
         if(flag == 10) {
-            XP_LOG_TRACE(xp, "[PENDING-R-APPLY] Processing Market Fallback due to rebound...");
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "Processing Market Fallback due to rebound..."));
             if(orderMgr.DeleteOrder(xp, (ulong)sig.GetTicket())) {
-                // [v13.9 Refactoring] limit_offset을 삭제했으므로 te_start를 te_limit값으로 교체하여 진입 유도
                 sig.SetTEStart(sig.GetTELimit());
                 if(orderMgr.ExecuteEntry(xp)) {
                     if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                    XP_LOG_OK(xp, "[PENDING-R-APPLY] SUCCESS: Fallback to Limit executed (Offset replaced).");
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "SUCCESS: Fallback to Limit executed."));
                     return SESSION_ACTIVE;
                 }
             }
             
             string lastErr = xp.GetString();
             if(lastErr == "") lastErr = "Market Fallback attempt failed";
-            string finalErr = StringFormat("[PENDING-R-APPLY] FAILED: %s", lastErr);
-            XP_LOG_ERROR(xp, finalErr);
-            xp.SetString(finalErr);
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + lastErr));
+            xp.SetString("[PEND-R-APPLY] " + lastErr);
             return SESSION_ERROR;
         }
 
         double newPrice = xp.GetDouble();
         if(newPrice > 0) {
-            XP_LOG_TRACE(xp, StringFormat("[PENDING-R-APPLY] Attempting Order Modify: %.5f -> %.5f", sig.GetPriceSignal(), newPrice));
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, StringFormat("Attempting Modify: %.5f", newPrice)));
             IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
             
-            //--- [v10.10 Fix] SL/TP Point-to-Price Calculation for Modification
             double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
             double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
             double finalSL = sig.GetPriceSL();
@@ -58,23 +56,23 @@ public:
             if(finalTP <= 0 && sig.GetTP() > 0) finalTP = NormalizeDouble(newPrice + (sig.GetTP() * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
 
             if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), newPrice, finalSL)) {
-                string guardErr = StringFormat("[PENDING-R-APPLY] FAILED: StopLevel Violation for Price Update. P:%.5f, SL:%.5f", newPrice, finalSL);
-                XP_LOG_WARN(xp, guardErr);
-                xp.SetString(guardErr);
+                string guardErr = StringFormat("StopLevel Violation. P:%.5f, SL:%.5f", newPrice, finalSL);
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + guardErr));
+                xp.SetString("[PEND-R-APPLY] " + guardErr);
                 return TASK_BREAK;
             }
 
             if(orderMgr.ModifyOrder(xp, (ulong)sig.GetTicket(), newPrice, finalSL, finalTP)) {
                 sig.UpdatePriceSignal(newPrice);
-                sig.SetSL(finalSL); // Update cached SL/TP prices if changed
+                sig.SetSL(finalSL);
                 sig.SetTP(finalTP);
                 CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), MSG_ENTRY_TRAILING_MODIFIED);
                 if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                XP_LOG_OK(xp, StringFormat("[PENDING-R-APPLY] SUCCESS: Order Modified to %.5f", newPrice));
+                XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, StringFormat("SUCCESS: Order Modified to %.5f", newPrice)));
             } else {
-                string modErr = StringFormat("[PENDING-R-APPLY] FAILED: Broker rejected price modification to %.5f", newPrice);
-                XP_LOG_ERROR(xp, modErr);
-                xp.SetString(modErr);
+                string modErr = StringFormat("Broker rejected price modification to %.5f", newPrice);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + modErr));
+                xp.SetString("[PEND-R-APPLY] " + modErr);
             }
         }
 

@@ -3,6 +3,7 @@
 
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_L_Prepare
@@ -15,20 +16,19 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
-        XP_LOG_TRACE(xp, StringFormat("[EXIT-L-PREPARE] Checking Liquidation Intent for SID:%s (Status:%d, XAExit:%d)", 
-                                      sig.GetSid(), sig.GetStatus(), sig.GetXAExit()));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-L-PREP", xp, "Checking Liquidation Intent"));
 
         if(sig.GetStatus() >= XE_CLOSED_SIGNAL) {
-            XP_LOG_DEBUG(xp, "[EXIT-L-PREPARE] SUCCESS: Already Closed. Moving to SESSION_CLOSED.");
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-L-PREP", xp, "Already Closed. Redirecting to CLOSED."));
             return SESSION_CLOSED;
         }
 
         if(sig.GetXAExit() != XA_ACTIVE) {
-            XP_LOG_DEBUG(xp, "[EXIT-L-PREPARE] CONTINUE: Waiting for Exit Intent (XA_ACTIVE).");
+            // [v14.19 Muted] XP_LOG_DEBUG(xp, CXAuditFormatter::Build("EXIT-L-PREP", xp, "Yield: Waiting for Exit Intent."));
             return TASK_CONTINUE; 
         }
 
-        XP_LOG_INFO(xp, "[EXIT-L-PREPARE] OK: Liquidation Intent Confirmed.");
+        XP_LOG_INFO(xp, CXAuditFormatter::Build("EXIT-L-PREP", xp, "Liquidation Intent Confirmed."));
         return TASK_CONTINUE;
     }
 };

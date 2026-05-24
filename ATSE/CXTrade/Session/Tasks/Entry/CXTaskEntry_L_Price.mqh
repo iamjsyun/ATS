@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\ICXPriceManager.mqh"
 #include "..\..\..\Interfaces\IXGuard.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_L_Price
@@ -40,11 +41,11 @@ public:
             double vBase = (sig.GetType() == ORDER_MARKET) ? priceMgr.GetLiquidationPrice(symbol, dir) : basePrice;
             
             if(finalSL > 0 && !guard.ValidateStopLevel(symbol, vBase, finalSL)) {
-                XP_LOG_WARN(xp, StringFormat("[ENTRY-L] SL too close (Base:%.5f, SL:%.5f). Resetting to 0.", vBase, finalSL));
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("TASK-PRICE", xp, StringFormat("SL too close (Base:%.5f, SL:%.5f). Resetting to 0.", vBase, finalSL)));
                 finalSL = 0;
             }
             if(finalTP > 0 && !guard.ValidateStopLevel(symbol, vBase, finalTP)) {
-                XP_LOG_WARN(xp, StringFormat("[ENTRY-L] TP too close (Base:%.5f, TP:%.5f). Resetting to 0.", vBase, finalTP));
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("TASK-PRICE", xp, StringFormat("TP too close (Base:%.5f, TP:%.5f). Resetting to 0.", vBase, finalTP)));
                 finalTP = 0;
             }
         }
@@ -54,7 +55,7 @@ public:
         sig.SetPriceSL(finalSL);
         sig.SetPriceTP(finalTP);
 
-        XP_LOG_TRACE(xp, StringFormat("[ENTRY-L] Price Calculated: [Exec:%.5f, SL:%.5f, TP:%.5f]", execPrice, finalSL, finalTP));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-L-PRICE", xp, "Price Calculation Success"));
 
         return TASK_CONTINUE;
     }

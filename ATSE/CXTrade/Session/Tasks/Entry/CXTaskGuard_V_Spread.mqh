@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\ICXSymbolManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskGuard_V_Spread
@@ -20,17 +21,23 @@ public:
 
         string symbol = sig.GetSymbol();
         int spread = symMgr.GetSpread(symbol);
-        int maxSpread = 100; // 가변 설정값 필요하나 현재 하드코딩
+        int maxSpread = 100; // 가변 설정값 필요
 
-        XP_LOG_TRACE(xp, StringFormat("[GUARD-V-SPREAD] Checking Spread for %s: Current:%d, Max:%d", 
-                                      symbol, spread, maxSpread));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, StringFormat("Checking Spread: %d (Max:%d)", spread, maxSpread)));
 
         if(spread > maxSpread) {
-            XP_LOG_WARN(xp, StringFormat("[GUARD-V-SPREAD] YIELD: High Spread Detected (%d > %d). Retrying...", spread, maxSpread));
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, StringFormat("YIELD: High Spread (%d > %d)", spread, maxSpread)));
+            
+            if(IsMaxRetriesExceeded()) {
+                string err = StringFormat("Spread remained high (%d) after max retries.", spread);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, "FAILED: " + err));
+                if(IS_VALID(xp)) xp.SetString("[GUARD-V-SPREAD] " + err);
+                return SESSION_ERROR;
+            }
             return TASK_YIELD;
         }
 
-        // [v12.4 Muted] XP_LOG_DEBUG(xp, "[GUARD-V-SPREAD] PASSED.");
+        ResetRetry();
         return TASK_CONTINUE;
     }
 };

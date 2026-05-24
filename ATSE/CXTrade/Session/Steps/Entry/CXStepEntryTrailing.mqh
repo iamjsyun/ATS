@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\IXPriceTracker.mqh"
 #include "..\..\..\Interfaces\IXOrderManager.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXStepEntryTrailing
@@ -32,7 +33,7 @@ public:
 
         //-- [추가] 외부 청산/취소 명령 확인 (L-01 대응)
         if(sig.GetXAExit() == XA_ACTIVE) {
-            XP_LOG_WARN(xp, "[TE-PROCESS] Exit command (XA_ACTIVE) detected during trailing. Moving to LIQUIDATING.");
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("TE-PROCESS-EXIT", xp, "Exit command detected during trailing"));
             return SESSION_LIQUIDATING;
         }
 
@@ -53,22 +54,22 @@ public:
                                                    : (currentPrice < sig.GetPriceSignal() - (sig.GetTEStep() * 1 * point));
 
         if(is_rebounded) {
-            XP_LOG_WARN(xp, "[TE-MODIFY] Price rebound detected. Switching to Market Entry.");
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("TE-MODIFY-REBOUND", xp));
             
             // 2.1 기존 대기 주문 취소 및 결과 확인
             if(orderMgr.DeleteOrder(xp, (ulong)sig.GetTicket())) {
-                XP_LOG_INFO(xp, "[TE-MODIFY] Pending order deleted successfully.");
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("TE-MODIFY-DEL-OK", xp));
                 
                 // 2.2 시장가 진입 실행
                 sig.SetType(ORDER_MARKET);
                 if(orderMgr.ExecuteEntry(xp)) {
                     return SESSION_ACTIVE; 
                 } else {
-                    XP_LOG_ERROR(xp, "[TE-MODIFY] Market entry failed after rebound. Moving to SESSION_ERROR.");
+                    XP_LOG_ERROR(xp, CXAuditFormatter::Build("TE-MODIFY-MKT-FAIL", xp));
                     return SESSION_ERROR;
                 }
             } else {
-                XP_LOG_ERROR(xp, "[TE-MODIFY] Failed to delete pending order. Aborting market entry.");
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("TE-MODIFY-DEL-FAIL", xp));
                 return SESSION_ERROR;
             }
         }
@@ -86,7 +87,7 @@ public:
             // [v7.9] 주문 수정 전 브로커 StopsLevel 검증 필수 수행
             IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
             if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), currentPrice, newPrice)) {
-                XP_LOG_WARN(xp, "[TE-MODIFY] StopsLevel Validation Failed! Modification deferred.");
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("TE-MODIFY-VLD-FAIL", xp, "StopsLevel Validation Failed"));
                 return STATE_UNCHANGED;
             }
 
@@ -95,7 +96,7 @@ public:
                 sig.UpdatePriceSignal(newPrice);
 
                 CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), MSG_ENTRY_TRAILING_MODIFIED);
-                XP_LOG_INFO(xp, StringFormat("[TE-MODIFY] Ticket:%lld, New Price:%.5f", sig.GetTicket(), newPrice));
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("TE-MODIFY-OK", xp, StringFormat("NewPrice:%.5f", newPrice)));
             }
         }
 

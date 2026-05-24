@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IXExitManager.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_R_Order
@@ -17,7 +18,7 @@ public:
         ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
         
         if(IS_INVALID(exitMgr) || IS_INVALID(invMgr)) {
-            XP_LOG_ERROR(xp, "[EXIT-R-ORDER] FAILED: Required context missing.");
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "FAILED: Required context missing."));
             return TASK_BREAK;
         }
 
@@ -26,29 +27,29 @@ public:
 
         // [v14.4 Idempotency Guard] 이미 요청이 나갔다면 중복 송신 차단
         if(xp.GetInt() == 3) {
-            XP_LOG_DEBUG(xp, "[EXIT-R-ORDER] SKIP: Liquidation already requested. Moving to Transit.");
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SKIP: Liquidation already requested."));
             return STATE_LIQUIDATING_TRANSIT;
         }
 
         // [v14.4 Physical Asset Guard] 티켓이 이미 없다면 송신할 필요 없음
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket > 0 && !invMgr.IsAssetExists(ticket, sig.GetType())) {
-            XP_LOG_WARN(xp, StringFormat("[EXIT-R-ORDER] Physical Asset(%I64u) already gone. Skipping Request.", ticket));
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("Physical Asset(%I64u) already gone. Skipping.", ticket)));
             return STATE_LIQUIDATING_TRANSIT; 
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[EXIT-R-ORDER] Sending Liquidation Order for Ticket:%I64u...", ticket));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("Sending Liquidation Order for Ticket:%I64u...", ticket)));
         if(exitMgr.CloseByTicket(xp, sig)) {
-            XP_LOG_OK(xp, "[EXIT-R-ORDER] SUCCESS: Liquidation Request Sent.");
+            XP_LOG_OK(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SUCCESS: Liquidation Request Sent."));
             xp.SetInt(3); // Mark as requested
             return STATE_LIQUIDATING_TRANSIT;
         }
 
         string lastErr = xp.GetString();
         if(lastErr == "") lastErr = "Broker Liquidation Request Rejected";
-        string finalErr = StringFormat("[EXIT-R-ORDER] FAILED: %s", lastErr);
-        XP_LOG_ERROR(xp, finalErr);
-        xp.SetString(finalErr);
+        string finalErr = "FAILED: " + lastErr;
+        XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, finalErr));
+        xp.SetString("[EXIT-R-ORDER] " + finalErr);
         return SESSION_ERROR;
     }
 };

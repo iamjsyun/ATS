@@ -36,7 +36,14 @@ public:
 
     virtual bool IsAssetExists(ulong ticket, int type) override {
         if(ticket <= 0) return false;
-        return (type == ORDER_MARKET) ? IsPositionExists(ticket) : IsOrderExists(ticket);
+        
+        // 1. 포지션이 존재하면 타입에 상관없이 실물 자산이 있는 것으로 간주 (진입 완료)
+        if(IsPositionExists(ticket)) return true;
+        
+        // 2. 대기 오더인 경우, 오더가 살아있는지 확인
+        if(type != ORDER_MARKET && IsOrderExists(ticket)) return true;
+        
+        return false;
     }
 
     /**

@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\ICXRiskManager.mqh"
 #include "..\..\..\Interfaces\ICXPriceManager.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_L_Risk
@@ -27,19 +28,19 @@ public:
 
         // 1. 최소/최대 로트 및 볼륨 스텝 검증
         if(!riskMgr.ValidateLot(xp, symbol, lot)) {
-            XP_LOG_ERROR(xp, StringFormat("[ENTRY-L] Risk Violation: Invalid Lot %.2f for %s", lot, symbol));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-L-RISK", xp, StringFormat("Lot Violation: %.2f for %s", lot, symbol)));
             return TASK_BREAK;
         }
 
         // 2. 가용 증거금(Margin) 검증
         if(!riskMgr.CheckMarginAvailability(xp, symbol, dir, lot, marketPrice)) {
-            XP_LOG_ERROR(xp, StringFormat("[ENTRY-L] Risk Violation: Insufficient Margin for %s %.2f lot", symbol, lot));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-L-RISK", xp, StringFormat("Insufficient Margin for %s %.2f lot", symbol, lot)));
             return TASK_BREAK;
         }
 
         // 3. 계좌 레벨 리스크 필터링
         if(!riskMgr.ValidateAccountRisk(xp)) {
-            XP_LOG_ERROR(xp, "[ENTRY-L] Risk Violation: Account level risk limit reached.");
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-L-RISK", xp, "Account level risk limit reached."));
             return TASK_BREAK;
         }
 

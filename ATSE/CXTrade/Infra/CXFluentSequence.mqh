@@ -208,9 +208,21 @@ private:
     void UpdateState(int next) {
         if(m_current_state == next) return;
         if(!ValidateTransition(m_current_state, next)) {
-            XP_LOG_SEQ_ERROR(m_ctx.GetParam(), StringFormat("[SEQ:%s] CRITICAL: Illegal Transition Blocked (%d -> %d)", m_name, m_current_state, next));
+            string illegalErr = StringFormat("[SEQ:%s] CRITICAL: Illegal Transition Blocked (%d -> %d)", m_name, m_current_state, next);
+            XP_LOG_SEQ_ERROR(m_ctx.GetParam(), illegalErr);
+            ICXParam* xp = m_ctx.GetParam();
+            if(IS_VALID(xp)) xp.SetString(illegalErr);
             return;
         }
+
+        // [v14.13 Fix] Ensure error message is set when moving to terminal error state
+        if(next == SESSION_ERROR) {
+            ICXParam* xp = m_ctx.GetParam();
+            if(IS_VALID(xp) && xp.GetString() == "") {
+                xp.SetString(StringFormat("[%s] Sequence reached terminal ERROR state from %d", m_name, m_current_state));
+            }
+        }
+
         TriggerOnExit(m_current_state);
         m_current_state = next;
         m_state_entered = TimeCurrent();
@@ -219,13 +231,34 @@ private:
 
     bool ValidateTransition(int from, int to) {
         if(to == SESSION_ERROR || to == 99) return true;
-        if(from == -1) return true;
+        if(from == -1 || from == to) return true;
         if(m_name != "SessionSeq") return true;
+
+        // [v14.7 Permissive Transition Matrix] 
+        // 하이퍼-원자적 태스크 간의 점프를 허용하여 유연성 확보
+        if(from == SESSION_READY) { // 0
+            return (to == STATE_ENTRY_TRANSIT || to == STATE_ENTRY_VERIFY || to == STATE_ENTRY_TRAILING || 
+                    to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
+        }
+        if(from == STATE_ENTRY_TRANSIT || from == STATE_ENTRY_VERIFY) { // 1, 2
+            return (to == STATE_ENTRY_VERIFY || to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
+        }
+        if(from == STATE_ENTRY_TRAILING) { // 5
+            return (to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
+        }
+        if(from == SESSION_ACTIVE) { // 10
+            return (to == SESSION_LIQUIDATING || to == STATE_EXIT_TRAILING || to == STATE_SYNC_ALIGN || to == STATE_EXIT_VERIFY);
+        }
+        if(from == SESSION_LIQUIDATING) { // 20
+            return (to == STATE_LIQUIDATING_TRANSIT || to == STATE_EXIT_SWEEP || to == STATE_EXIT_VERIFY || to == SESSION_CLOSED);
+        }
+        if(from == STATE_EXIT_VERIFY) { // 23
+            return (to == SESSION_CLOSED);
+        }
+
+        // 이미 종료된 세션에서의 전이는 원칙적 차단 (에러 제외)
         if(from == SESSION_CLOSED || from == SESSION_ERROR) return false;
-        if(from == SESSION_READY) return (to == STATE_ENTRY_TRAILING || to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == 3 || to == 4);
-        if(from == STATE_ENTRY_TRAILING) return (to == SESSION_ACTIVE || to == SESSION_LIQUIDATING);
-        if(from == SESSION_ACTIVE) return (to == SESSION_LIQUIDATING || to == STATE_EXIT_TRAILING || to == 12 || to == 15);
-        if(from == SESSION_LIQUIDATING) return (to == STATE_EXIT_SWEEP || to == STATE_EXIT_VERIFY || to == SESSION_CLOSED || to == 21 || to == 22 || to == 23);
+
         return true; 
     }
 

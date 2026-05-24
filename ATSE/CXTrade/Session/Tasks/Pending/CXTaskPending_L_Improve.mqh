@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IXPriceTracker.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_L_Improve
@@ -29,12 +30,11 @@ public:
         bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (target < sig.GetPriceSignal() - sig.GetTEStep() * point) 
                                                         : (target > sig.GetPriceSignal() + sig.GetTEStep() * point);
 
-        XP_LOG_TRACE(xp, StringFormat("[PENDING-L-IMPROVE] %s: Price:%.5f, Target:%.5f, Signal:%.5f, Improved:%d", 
-                                      sig.GetSymbol(), currentPrice, target, sig.GetPriceSignal(), is_improved));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, StringFormat("Price improvement check: Improved=%d", is_improved)));
 
         if(is_improved) {
             double newPrice = NormalizeDouble(target, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
-            XP_LOG_INFO(xp, StringFormat("[PENDING-L-IMPROVE] OK: Price improvement detected: %.5f -> %.5f", sig.GetPriceSignal(), newPrice));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, StringFormat("OK: Price Target improved to %.5f", newPrice)));
             xp.SetDouble(newPrice);
             xp.SetInt(1); 
         }

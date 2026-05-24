@@ -18,6 +18,7 @@ public:
     virtual string GetString() const = 0;
     virtual void SetString(string val) = 0;
     virtual ICXContext* GetContext() = 0;
+    virtual void Reset() = 0;
 
     virtual double GetDouble() const = 0;
     virtual void   SetDouble(double val) = 0;

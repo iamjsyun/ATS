@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_V_Terminal
@@ -20,27 +21,27 @@ public:
 
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket <= 0) {
-            XP_LOG_DEBUG(xp, "[EXIT-V-TERMINAL] SKIP: No ticket assigned.");
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, "SKIP: No ticket assigned."));
             return TASK_CONTINUE; 
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[EXIT-V-TERMINAL] Verifying Physical Asset(%I64u) Absence... (Retry:%d)", ticket, GetRetryCount()));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("Verifying Absence: [Ticket:%I64u]", ticket)));
 
         bool exists = invMgr.IsAssetExists(ticket, sig.GetType());
 
         if(exists) {
             IncrementRetry();
             if(GetRetryCount() > 5) {
-                string assetErr = StringFormat("[EXIT-V-TERMINAL] FAILED: Physical Asset(%I64u) still exists after 5 retries.", ticket);
-                XP_LOG_ERROR(xp, assetErr);
-                if(IS_VALID(xp)) xp.SetString(assetErr);
+                string assetErr = StringFormat("Physical Asset(%I64u) still exists after max retries.", ticket);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, "FAILED: " + assetErr));
+                if(IS_VALID(xp)) xp.SetString("[EXIT-V-TERM] " + assetErr);
                 return SESSION_ERROR;
             }
-            XP_LOG_DEBUG(xp, StringFormat("[EXIT-V-TERMINAL] YIELD: Asset(%I64u) still in terminal. Waiting...", ticket));
+            XP_LOG_DEBUG(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("Yield: Asset(%I64u) still active.", ticket)));
             return TASK_YIELD;
         }
 
-        XP_LOG_OK(xp, StringFormat("[EXIT-V-TERMINAL] SUCCESS: Physical Asset(%I64u) Absence Verified. Moving to Finalize.", ticket));
+        XP_LOG_OK(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("SUCCESS: Ticket(%I64u) Absence Verified.", ticket)));
         return STATE_EXIT_VERIFY; // Always jump to 23
     }
 };

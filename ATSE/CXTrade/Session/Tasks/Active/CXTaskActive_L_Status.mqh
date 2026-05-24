@@ -3,6 +3,7 @@
 
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskActive_L_Status
@@ -15,10 +16,10 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
-        XP_LOG_TRACE(xp, StringFormat("[ACTIVE-L-STATUS] Monitoring SID:%s (Status:%d)", sig.GetSid(), sig.GetStatus()));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ACTIVE-L-STATUS", xp, "Monitoring State"));
 
         if(sig.GetStatus() >= XE_CLOSED_SIGNAL) {
-            XP_LOG_INFO(xp, StringFormat("[ACTIVE-L-STATUS] OK: State %d is terminal. Transitioning to LIQUIDATING.", sig.GetStatus()));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("ACTIVE-L-STATUS", xp, "Terminal state detected. Redirecting to LIQUIDATING."));
             return SESSION_LIQUIDATING;
         }
 

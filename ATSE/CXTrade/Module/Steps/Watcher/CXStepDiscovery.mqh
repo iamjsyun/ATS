@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXStep.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Models\CXSignal.mqh"
+#include "..\..\..\Interfaces\CXMacros.mqh"
 
 #include <Arrays\ArrayObj.mqh>
 
@@ -13,13 +14,10 @@
  */
 class CXStepDiscovery : public IXStep {
 private:
-    int      m_noSignalCount;   // 연속 "신호 없음" 카운터
-    datetime m_lastLogTime;     // 마지막 로그 출력 시간
-    int      m_logInterval;     // 로그 출력 간격 (초)
     bool     m_isPulsed;        // 최초 1회 출력 여부
 
 public:
-    CXStepDiscovery() : m_noSignalCount(0), m_lastLogTime(0), m_logInterval(0), m_isPulsed(false) {}
+    CXStepDiscovery() : m_isPulsed(false) {}
     virtual ~CXStepDiscovery() {}
 
     virtual string Name() override { return "Step_Discovery"; }
@@ -30,11 +28,10 @@ public:
 
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
         IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
-        ICXLogger* log = CX_GET_OBJ(ctx, "logger", ICXLogger);
         if(IS_INVALID(repo)) return STATE_UNCHANGED;
 
-        if(IS_VALID(log) && !m_isPulsed) {
-            log.Trace(xp, "[WATCHER-DISCOVERY] Pulsing...");
+        if(!m_isPulsed) {
+            XP_LOG_TRACE(xp, "[WATCHER-DISCOVERY] Engine Pulsing: Listening for signals...");
             m_isPulsed = true;
         }
 
@@ -51,12 +48,12 @@ public:
                     if(sig.GetXAExit() == XA_ACTIVE)  exitCount++;
                 }
             }
-            if(IS_VALID(log)) log.Trace(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals (Entry:%d, Exit:%d).", found, entryCount, exitCount));
+            XP_LOG_TRACE(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals (Entry:%d, Exit:%d)", found, entryCount, exitCount));
             ctx.Set("active_signals", activeList);
             return WATCHER_VALIDATION;
         }
 
-        // [v11.0] Suppress "No signal" logs to keep context clean
+        // Suppress "No signal" logs to keep context clean
         SAFE_DELETE(activeList);
         return STATE_UNCHANGED;
     }

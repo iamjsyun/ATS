@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_P_Lock
@@ -19,19 +20,19 @@ public:
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 
         if(sig.GetStatus() >= XE_PENDING_REQ) {
-            XP_LOG_DEBUG(xp, StringFormat("[ENTRY-P] SKIP: Already Locked (Status:%d)", sig.GetStatus()));
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-P-LOCK", xp, "SKIP: Already Locked"));
             return TASK_CONTINUE;
         }
 
-        XP_LOG_TRACE(xp, "[ENTRY-P] Attempting to Write PENDING_REQ Lock to DB...");
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-P-LOCK", xp, "Writing PENDING_REQ Lock to DB..."));
         CXMessageProvider::UpdateStatus(sig, XE_PENDING_REQ, "Intent: Entry Requesting...");
         
         if(repo.UpdateStatus(sig)) {
-            XP_LOG_OK(xp, "[ENTRY-P] SUCCESS: Status Locked to XE_PENDING_REQ.");
+            XP_LOG_OK(xp, CXAuditFormatter::Build("ENTRY-P-LOCK", xp, "SUCCESS: Status Locked."));
             return TASK_CONTINUE;
         }
 
-        XP_LOG_ERROR(xp, "[ENTRY-P] FAILED: DB Update for PENDING_REQ Lock.");
+        XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-P-LOCK", xp, "FAILED: DB Update Error."));
         return TASK_BREAK; 
     }
 };

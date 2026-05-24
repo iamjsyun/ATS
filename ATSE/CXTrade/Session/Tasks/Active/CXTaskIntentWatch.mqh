@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskIntentWatch
@@ -23,7 +24,7 @@ public:
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket > 0 && IS_VALID(invMgr)) {
             if(!invMgr.IsAssetExists(ticket, sig.GetType())) {
-                XP_LOG_WARN(xp, StringFormat("[TASK-INTENT-WATCH] Physical Asset(%I64u) disappeared from terminal (Manual Close?). Force Finalizing.", ticket));
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("INTENT-WATCH", xp, StringFormat("Physical Asset(%I64u) disappeared (Manual Close). Finalizing.", ticket)));
                 return STATE_EXIT_VERIFY; // 즉시 최종 단계(23)로 점프
             }
         }
@@ -34,7 +35,7 @@ public:
             // 외부에서의 청산 의도 주입 확인
             if(fresh.GetXAExit() == XA_ACTIVE && sig.GetXAExit() != XA_ACTIVE) {
                 sig.SetXAExit(XA_ACTIVE);
-                XP_LOG_INFO(xp, "[TASK-INTENT-WATCH] OK: External Exit Intent (XA_ACTIVE=1) Synchronized from DB.");
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("INTENT-WATCH", xp, "External Exit Intent Synchronized from DB."));
             }
             
             delete fresh;

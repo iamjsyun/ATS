@@ -14,6 +14,7 @@ namespace XTA.XData.Models
         public string gid { get; set; } = string.Empty;
         public int cno { get; set; }
         public int sno { get; set; }
+        public int gno { get; set; }
 
         public int msg_id { get; set; }
         public int raw_id { get; set; }
@@ -75,18 +76,16 @@ namespace XTA.XData.Models
             // ID 생성 및 정규화 (거버넌스 규칙 준수: XIdManager 통합)
             if (string.IsNullOrEmpty(sid) || !XIdManager.Instance.IsValidSid(sid))
             {
-                // gno는 SID에 포함되지만 별도 필드가 아니므로, sid가 없을 경우 gno를 외부에서 주입받아야 함.
-                // 여기서는 sid가 유효하지 않을 때 최소한의 생성 시도를 함 (gno=0 기본값)
-                int vGno = XIdManager.Instance.ExtractGnoFromSid(sid);
-                sid = XIdManager.Instance.GenerateSid(cno, created, sno, vGno, dirVal, type);
+                // [v8.2] gno 필드를 직접 사용하여 SID 생성
+                sid = XIdManager.Instance.GenerateSid(cno, created, sno, gno, dirVal, type);
             }
             
             sid = XIdManager.Instance.Normalize(sid);
 
             if (string.IsNullOrEmpty(gid) || !XIdManager.Instance.IsValidGid(gid))
             {
-                int vGno = XIdManager.Instance.ExtractGnoFromSid(sid);
-                gid = XIdManager.Instance.GenerateGid(cno, created, sno, vGno);
+                // [v8.2] gno 필드를 직접 사용하여 GID 생성
+                gid = XIdManager.Instance.GenerateGid(cno, created, sno, gno);
             }
             
             gid = XIdManager.Instance.Normalize(gid);

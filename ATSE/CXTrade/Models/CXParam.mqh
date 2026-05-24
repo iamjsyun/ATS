@@ -42,6 +42,15 @@ public:
     virtual int    GetInt() const override { return m_val; }
     virtual void   SetInt(int val) override { m_val = val; }
 
+    virtual void   Reset() override {
+        m_sig = NULL;
+        m_val = 0;
+        m_long = 0;
+        m_double = 0.0;
+        m_str = "";
+        ZeroMemory(m_trans);
+    }
+    
     virtual long   GetLong() const { return m_long; }
     virtual void   SetLong(long val) { m_long = val; }
     

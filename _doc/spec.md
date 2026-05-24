@@ -1,6 +1,6 @@
 # ATS Master Design Specification (SSOT)
-**Version**: v11.5 (High-Priority Exit Standard)
-**Date**: 2026-05-19
+**Version**: v11.6 (Market-Price Priority Standard)
+**Date**: 2026-05-24
 **Governance**: This document is the **Single Source of Truth (SSOT)** for the ATS/XTA system. All implementations must adhere to these specifications.
 
 ---
@@ -10,6 +10,7 @@ The ATS system is a modern, object-oriented trading engine designed to replace c
 
 ### 1.1 Core Principles
 - **Intent-Execution Separation**: Decouple "What to do" (App Intent) from "How it's running" (EA Execution).
+- **Market-Price Priority Mandate (Mandatory)**: 모든 진입 및 포지션 관리 계산(TE, TS, SL, TP)은 주입된 신호 가격(`price_signal`)을 **완전히 무시**하고, 감지 시점의 **실시간 시장가(Ask/Bid)**를 유일한 기준선(Baseline)으로 사용한다. 이는 백테스트 및 실거래에서 발생할 수 있는 가격 지연(Stale Price) 에러를 원천 차단한다.
 - **Post-Action Verification Protocol**: All trading actions (Entry, Modification, Closure) MUST be followed by a terminal re-check (via `OrderSelect` or `PositionSelect`) to ensure logical success matches physical state.
 - **Responsibility Segregation**: Operations are strictly separated by domain: `OrderManager` for orders, `PositionManager` for active positions.
 - **Interface-First Mandate**: All domain logic must depend on IX* interfaces.

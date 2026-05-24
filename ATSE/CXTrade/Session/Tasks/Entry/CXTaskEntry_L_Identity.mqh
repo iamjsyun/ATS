@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IXGuard.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_L_Identity
@@ -17,15 +18,15 @@ public:
         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
 
         if(IS_INVALID(sig)) return TASK_BREAK;
-        if(IS_INVALID(guard)) return TASK_CONTINUE; // Guard 없으면 통과
+        if(IS_INVALID(guard)) return TASK_CONTINUE; 
 
         if(!guard.ValidateMagic(sig.GetMagic())) {
-            XP_LOG_ERROR(xp, StringFormat("[ENTRY-L] Identity Violation: Invalid Magic %I64u", sig.GetMagic()));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-L-ID", xp, StringFormat("Identity Violation: Invalid Magic %I64u", sig.GetMagic())));
             return TASK_BREAK;
         }
 
         if(!guard.ValidateSID(sig.GetSid())) {
-            XP_LOG_ERROR(xp, StringFormat("[ENTRY-L] Identity Violation: Invalid SID %s", sig.GetSid()));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-L-ID", xp, "Identity Violation: Invalid SID Format"));
             return TASK_BREAK;
         }
 

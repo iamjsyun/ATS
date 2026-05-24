@@ -78,7 +78,11 @@ public:
     virtual void Pulse(ICXParam* xp) override {
         for(int i = 0; i < m_active.Total(); i++) {
             ICXTradingSession* session = CX_CAST(ICXTradingSession, m_active.At(i));
-            if(IS_VALID(session)) session.Pulse(xp);
+            if(IS_VALID(session)) {
+                // [v14.12 Anti-Crosstalk] Reset shared param before each session pulse
+                if(IS_VALID(xp)) xp.Reset();
+                session.Pulse(xp);
+            }
         }
         PurgeClosed();
     }

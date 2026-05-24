@@ -31,20 +31,16 @@ public:
     CXOrderManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0), m_sid("") {}
     virtual ~CXOrderManager() override {}
 
-    /**
-     * @brief [v13.4 UAF] 통합 감사 로그 문자열 생성
-     */
     virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) return "[" + actionLabel + "] INVALID_SIGNAL";
+        if(IS_INVALID(sig)) return "[FUNC:" + actionLabel + "] INVALID_SIGNAL";
         
         string symbol = sig.GetSymbol();
-        ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
-        double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
+        double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
         double mkt   = SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
 
         string spec = StringFormat("TEPts:[%d,%d,%d], TEPri:[%.5f,%.5f,%.5f]",
-                                    sig.GetTEStart(), sig.GetTEStep(), sig.GetTELimit(),
+                                    (int)sig.GetTEStart(), (int)sig.GetTEStep(), (int)sig.GetTELimit(),
                                     mkt - (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?1:-1)),
                                     sig.GetTEStep() * point,
                                     mkt - (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?1:-1)));
@@ -65,7 +61,11 @@ public:
         ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
         if(IS_INVALID(invMgr)) return;
 
+        // 1. 오더가 아직 존재하면 정상 (대기 중)
         if(invMgr.IsOrderExists(ticket)) return;
+        
+        // 2. 오더가 없는데 포지션이 있으면 정상 (체결됨)
+        if(invMgr.IsPositionExists(ticket)) return;
 
         string reason = "";
         int status = invMgr.CheckHistoryClosure(ticket, reason);
@@ -74,7 +74,7 @@ public:
             IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
             CXMessageProvider::UpdateStatus(sig, status, reason);
             if(IS_VALID(repo)) repo.UpdateStatus(sig);
-            XP_LOG_INFO(xp, StringFormat("[ORDER-MANAGER] Pending Order closed. Reason: %s", reason));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("ORDER-MANAGER", xp, "Asset Closure Detected: " + reason));
             return;
         }
 
@@ -136,7 +136,8 @@ public:
         if(sig.GetType() != ORDER_MARKET && sig.GetTELimit() > 0) {
             double distPts = MathAbs(currentMkt - execPrice) / point;
             if(distPts > (double)sig.GetTELimit() + 2.0) {
-                string err = StringFormat("TE-LIMIT VIOLATION: Dist %.1f > Limit %d", distPts, sig.GetTELimit());
+                string err = StringFormat("TE-LIMIT VIOLATION: Dist %.1f > Limit %d (Mkt:%.5f, Exec:%.5f)", distPts, sig.GetTELimit(), currentMkt, execPrice);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXEC-ENTRY-FAIL", xp, err));
                 CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
                 IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
                 if(IS_VALID(repo)) repo.UpdateStatus(sig);
@@ -157,13 +158,13 @@ public:
             m_trade.OrderOpen(symbol, order_type, lot, 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, comment);
 
         uint retCode = m_trade.ResultRetcode();
-        string receptionMsg = StringFormat("[AUDIT-RECEPTION] %s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", retCode);
+        string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("%s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
 
         if(!success) {
-            string err = StringFormat("[EXEC-ENTRY-FAIL] %s. Code:%u(%s)", funcName, retCode, m_trade.ResultRetcodeDescription());
-            XP_LOG_ERROR(xp, err);
+            string err = StringFormat("%s FAIL. Code:%u(%s)", funcName, retCode, m_trade.ResultRetcodeDescription());
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXEC-ENTRY-FAIL", xp, err));
             CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
             if(IS_VALID(repo)) repo.UpdateStatus(sig);
             return false;
@@ -204,7 +205,7 @@ public:
         bool success = m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0);
         
         uint retCode = m_trade.ResultRetcode();
-        string receptionMsg = StringFormat("[AUDIT-RECEPTION] OrderModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("OrderModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
         
@@ -219,7 +220,7 @@ public:
         bool success = m_trade.PositionModify(ticket, sl, tp);
         
         uint retCode = m_trade.ResultRetcode();
-        string receptionMsg = StringFormat("[AUDIT-RECEPTION] PositionModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("PositionModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
         
@@ -234,7 +235,7 @@ public:
         bool success = m_trade.OrderDelete(ticket);
         
         uint retCode = m_trade.ResultRetcode();
-        string receptionMsg = StringFormat("[AUDIT-RECEPTION] OrderDelete Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode);
+        string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("OrderDelete Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
         

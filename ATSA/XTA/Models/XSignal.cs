@@ -15,7 +15,6 @@ namespace XTA.Models
         public string? sid_date { get; set; }
         
         // [Logic Fields] 영속성 계층(41개 필드)에서 제외되었으나 비즈니스 로직 및 UI에서 필요한 필드들
-        public int gno { get; set; }
         public int gap_min { get; set; }
         public double limit_offset { get; set; }
         public double stop_offset { get; set; }
@@ -82,9 +81,7 @@ namespace XTA.Models
             target.tag = source.tag;
             target.created = source.created;
             target.updated = source.updated;
-
-            // gno 추출 (SID 기반)
-            target.gno = XTA.XData.Models.XIdManager.Instance.ExtractGnoFromSid(source.sid);
+            target.gno = source.gno;
         }
     }
 }

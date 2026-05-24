@@ -8,6 +8,7 @@
 #include "..\..\Interfaces\IXPriceTracker.mqh"
 #include "..\..\Interfaces\IXGuard.mqh"
 #include "..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXStepMonitor
@@ -39,14 +40,14 @@ public:
 
         // 0. 이미 브로커 레벨에서 청산된 경우 (SL/TP 히트 등으로 xe_status 갱신 시)
         if(sig.GetStatus() >= XE_CLOSED_SIGNAL) {
-            XP_LOG_INFO(xp, "[STEP-MONITOR] Broker-level exit detected. Moving to LIQUIDATING.");
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("STEP-MONITOR", xp, "Broker-level exit detected. Moving to LIQUIDATING."));
             return SESSION_LIQUIDATING;
         }
 
         // Task M2: 외부 청산 의도 감시 (Intent)
         if(sig.GetXAExit() == XA_ACTIVE) {
             CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), MSG_EXIT_REQUESTED);
-            XP_LOG_INFO(xp, "[STEP-MONITOR] Exit Command (XA_ACTIVE) Detected. Moving to LIQUIDATING.");
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("STEP-MONITOR", xp, "Exit Command (XA_ACTIVE) Detected. Moving to LIQUIDATING."));
             return SESSION_LIQUIDATING;
         }
 
@@ -75,13 +76,13 @@ public:
                         // 브로커 StopsLevel 검증 필수 수행
                         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
                         if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), currentPrice, newSL)) {
-                            XP_LOG_WARN(xp, "[TS-MODIFY] StopsLevel Validation Failed! Modification deferred.");
+                            XP_LOG_WARN(xp, CXAuditFormatter::Build("TS-MODIFY", xp, "StopsLevel Validation Failed! Modification deferred."));
                         } else {
                             // 브로커 포지션 수정 실행
                             if(posMgr.ModifyPosition(xp, (ulong)sig.GetTicket(), newSL, sig.GetTP())) {
                                 sig.SetSL(newSL);
                                 sig.SetStatusMsg(MSG_EXIT_TS_MODIFIED);
-                                XP_LOG_INFO(xp, StringFormat("[TS-MODIFY] Ticket:%lld, SL:%.5f -> %.5f", sig.GetTicket(), sig.GetSL(), newSL));
+                                XP_LOG_INFO(xp, CXAuditFormatter::Build("TS-MODIFY", xp, StringFormat("SUCCESS: SL improved to %.5f", newSL)));
                             }
                         }
                     }

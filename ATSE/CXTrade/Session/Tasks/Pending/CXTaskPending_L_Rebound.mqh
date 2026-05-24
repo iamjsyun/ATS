@@ -3,6 +3,7 @@
 
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_L_Rebound
@@ -21,11 +22,10 @@ public:
         bool is_rebounded = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice > sig.GetPriceSignal() + (sig.GetTEStep() * 1 * point))
                                                          : (currentPrice < sig.GetPriceSignal() - (sig.GetTEStep() * 1 * point));
 
-        XP_LOG_TRACE(xp, StringFormat("[PENDING-L-REBOUND] %s: P:%.5f, Signal:%.5f, Rebounded:%d", 
-                                      sig.GetSymbol(), currentPrice, sig.GetPriceSignal(), is_rebounded));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, StringFormat("Price rebound check: Rebounded=%d", is_rebounded)));
 
         if(is_rebounded) {
-            XP_LOG_INFO(xp, "[PENDING-L-REBOUND] OK: Market Fallback Triggered due to price rebound.");
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, "Market Fallback Triggered."));
             xp.SetInt(10); 
         }
 

@@ -3,6 +3,7 @@
 
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_V_Sync
@@ -13,27 +14,41 @@ public:
     virtual string Name() override { return "Pending_V_Sync"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig)) return TASK_BREAK;
+        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+        
+        if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 
-        XP_LOG_TRACE(xp, StringFormat("[PENDING-V-SYNC] Monitoring SID:%s (Status:%d, XAExit:%d)", sig.GetSid(), sig.GetStatus(), sig.GetXAExit()));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Monitoring State"));
+
+        // 1. 상태 동기화 (오더 -> 포지션 전환 감지)
+        if(IS_VALID(invMgr)) {
+            ulong ticket = (ulong)sig.GetTicket();
+            if(ticket > 0 && invMgr.IsPositionExists(ticket)) {
+                XP_LOG_OK(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, StringFormat("Order filled! Ticket:%I64u is now a Position.", ticket)));
+                CXMessageProvider::UpdateStatus(sig, XE_EXECUTED, "Pending Order Filled");
+                repo.UpdateStatus(sig);
+                return SESSION_ACTIVE;
+            }
+        }
 
         if(sig.GetStatus() == XE_ERROR) {
-            XP_LOG_WARN(xp, "[PENDING-V-SYNC] ABORT: Signal is in XE_ERROR.");
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "ABORT: Signal is in XE_ERROR."));
             return SESSION_ERROR;
         }
 
         if(sig.GetXAExit() == XA_ACTIVE) {
-            XP_LOG_INFO(xp, "[PENDING-V-SYNC] OK: Exit command detected. Moving to LIQUIDATING.");
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Exit command detected. Moving to LIQUIDATING."));
             return SESSION_LIQUIDATING;
         }
 
         if(sig.GetStatus() >= XE_EXECUTED) {
-            XP_LOG_OK(xp, StringFormat("[PENDING-V-SYNC] OK: Signal executed (Status:%d). Moving to ACTIVE.", sig.GetStatus()));
+            XP_LOG_OK(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Signal executed. Moving to ACTIVE."));
             return SESSION_ACTIVE;
         }
         
         if(sig.GetTicket() <= 0) {
-            XP_LOG_DEBUG(xp, "[PENDING-V-SYNC] BREAK: No ticket yet. Yielding...");
+            // [v14.15 Muted] XP_LOG_TRACE(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Yield: No ticket yet."));
             return TASK_BREAK;
         }
 

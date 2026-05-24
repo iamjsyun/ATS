@@ -6,6 +6,7 @@
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IXOrderManager.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXStepEntry
@@ -37,7 +38,7 @@ public:
      * @brief 진입 로직 실행
      */
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
-        XP_LOG_INFO(xp, "[STEP-ENTRY] Executing Market/Trailing Entry...");
+        XP_LOG_INFO(xp, CXAuditFormatter::Build("STEP-ENTRY", xp, "Executing Market/Trailing Entry"));
         
         IXOrderManager* orderMgr = CX_GET_OBJ(ctx, "order_mgr", IXOrderManager);
         if(IS_VALID(orderMgr)) {
@@ -50,7 +51,7 @@ public:
             }
         }
 
-        XP_LOG_ERROR(xp, "[STEP-ENTRY] Entry execution failed. Transitioning to SESSION_ERROR.");
+        XP_LOG_ERROR(xp, CXAuditFormatter::Build("STEP-ENTRY-FAIL", xp));
         return SESSION_ERROR; // 실패 시 에러 상태로 전이하여 좀비 세션 방지
     }
 

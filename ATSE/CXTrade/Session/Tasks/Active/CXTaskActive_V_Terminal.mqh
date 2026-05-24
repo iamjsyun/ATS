@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskActive_V_Terminal
@@ -21,7 +22,7 @@ public:
         ulong ticket = (ulong)sig.GetTicket();
         bool exists = invMgr.IsPositionExists(ticket);
 
-        XP_LOG_TRACE(xp, StringFormat("[ACTIVE-V-TERMINAL] Checking Position:%I64u, Found:%d", ticket, exists));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ACTIVE-V-TERM", xp, StringFormat("Checking Position:%I64u, Found:%d", ticket, exists)));
         xp.SetInt(exists ? 1 : 0); 
         return TASK_CONTINUE;
     }

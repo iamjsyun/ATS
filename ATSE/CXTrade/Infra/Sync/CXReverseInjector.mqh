@@ -8,6 +8,7 @@
 #include "..\..\Interfaces\ICXTradingSession.mqh"
 #include "..\..\Models\CXSignal.mqh"
 #include "..\..\Models\CXTerminalAsset.mqh"
+#include "..\..\Infra\CXAuditFormatter.mqh"
 #include "CXTerminalScanner.mqh"
 
 /**
@@ -56,8 +57,6 @@ public:
             
             // [Tier 2] 좀비 판별 (DB에 없거나 이미 종료된 신호인데 터미널에 실물이 있는 경우)
             if(CheckPointer(sig) == POINTER_INVALID || sig.GetStatus() >= XE_CLOSED_SIGNAL) {
-                XP_LOG_WARN(xp, StringFormat("[REVERSE-INJECT] ZOMBIE DETECTED: SID:%s Ticket:%I64d. Forced Liquidation start.", sid, asset.ticket));
-                
                 // 가상 신호 생성 (청산 전용)
                 CXSignal* fakeSig = new CXSignal();
                 fakeSig.SetSid(sid);
@@ -68,6 +67,11 @@ public:
                 fakeSig.xe_status = XE_EXECUTED; 
                 fakeSig.xe_status_msg = "[ZOMBIE] Orphan Asset Recovery";
                 
+                ICXSignal* oldSig = xp.GetSignal();
+                xp.SetSignal(fakeSig);
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("REVERSE-ZOMBIE", xp, StringFormat("Ticket:%I64d. Forced Liquidation start.", asset.ticket)));
+                xp.SetSignal(oldSig);
+
                 // DB에 기록 후 세션 기동
                 m_repo.SaveSignal(fakeSig);
                 if(CheckPointer(sig) != POINTER_INVALID) delete sig;
@@ -77,10 +81,18 @@ public:
             // 2. 세션 풀에서 세션 빌려와서 주입
             ICXTradingSession* session = m_pool.BorrowSession();
             if(CheckPointer(session) != POINTER_INVALID) {
-                XP_LOG_INFO(xp, StringFormat("[REVERSE-INJECT] Restoring session for SID: %s (Status: %d)", sid, sig.GetStatus()));
+                ICXSignal* oldSig = xp.GetSignal();
+                xp.SetSignal(sig);
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("REVERSE-RESTORE", xp));
+                xp.SetSignal(oldSig);
+
                 session.InjectState(dynamic_cast<CXSignal*>(sig));
             } else {
-                XP_LOG_ERROR(xp, StringFormat("[REVERSE-INJECT] Failed to borrow session for recovery of SID: %s", sid));
+                ICXSignal* oldSig = xp.GetSignal();
+                xp.SetSignal(sig);
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("REVERSE-FAIL", xp, "Failed to borrow session"));
+                xp.SetSignal(oldSig);
+
                 if(CheckPointer(sig) != POINTER_INVALID) delete sig;
             }
         }

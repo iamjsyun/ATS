@@ -5,6 +5,7 @@
 #include "..\..\..\Interfaces\IXExitManager.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
 #include "..\..\..\Infra\CXMessageProvider.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXStepExitVerify
@@ -39,9 +40,9 @@ public:
                 return SESSION_CLOSED; 
             } else {
                 m_failCount++;
-                XP_LOG_WARN(xp, StringFormat("[EXIT-L3] Verification Failed! Count:%d", m_failCount));
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("STEP-EXIT-VERIFY", xp, StringFormat("Verification Failed! Count:%d", m_failCount)));
                 if(m_failCount >= 3) {
-                    XP_LOG_ERROR(xp, "[EXIT-L3] Circuit Breaker Tripped! Emergency Error.");
+                    XP_LOG_ERROR(xp, CXAuditFormatter::Build("STEP-EXIT-VERIFY", xp, "Circuit Breaker Tripped! Emergency Error."));
                     return SESSION_ERROR;
                 }
             }

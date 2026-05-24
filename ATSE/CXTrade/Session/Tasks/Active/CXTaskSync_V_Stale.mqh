@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IRepository.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskSync_V_Stale
@@ -19,13 +20,13 @@ public:
 
         // XE_PENDING_REQ 상태로 5분 이상 방치된 데이터는 좀비로 간주
         if(sig.GetStatus() == XE_PENDING_REQ) {
-            XP_LOG_TRACE(xp, StringFormat("[SYNC-V-STALE] Monitoring PENDING_REQ for SID:%s...", sig.GetSid()));
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("SYNC-V-STALE", xp, "Monitoring PENDING_REQ timeout"));
             if(IsTimedOut()) { 
-                XP_LOG_WARN(xp, "[SYNC-V-STALE] ALERT: Stale PENDING_REQ detected. Rolling back to XE_READY.");
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("SYNC-V-STALE", xp, "ALERT: Stale PENDING_REQ. Rolling back."));
                 sig.SetStatus(XE_READY);
                 sig.SetStatusMsg("Stale Request Rolled Back");
                 if(repo.UpdateStatus(sig)) {
-                    XP_LOG_OK(xp, "[SYNC-V-STALE] SUCCESS: Zombie record cleaned.");
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("SYNC-V-STALE", xp, "SUCCESS: Zombie cleaned."));
                 }
                 return TASK_BREAK; 
             }

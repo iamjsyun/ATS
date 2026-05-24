@@ -4,6 +4,7 @@
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
 #include "..\..\..\Interfaces\IXPriceTracker.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskAlphaCalc
@@ -28,8 +29,7 @@ public:
         double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
         double profit = (currentPrice - sig.GetPriceOpen()) * dir_sign;
 
-        XP_LOG_TRACE(xp, StringFormat("[TASK-ALPHA-CALC] Tracking %s: P:%.5f, Peak:%.5f, Profit:%.0f pts", 
-                                      sig.GetSymbol(), currentPrice, tracker.GetHighest(), profit / point));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, StringFormat("Tracking: Profit %.0f pts", profit / point)));
 
         if(profit >= sig.GetTSStart() * point) {
             double peak = (sig.GetDir() == CX_DIR_BUY) ? tracker.GetHighest() : tracker.GetLowest();
@@ -40,7 +40,7 @@ public:
 
             if(is_improved) {
                 double newSL = NormalizeDouble(target, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
-                XP_LOG_INFO(xp, StringFormat("[TASK-ALPHA-CALC] OK: SL Improvement Target: %.5f -> %.5f", sig.GetSL(), newSL));
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, StringFormat("OK: SL Target improved to %.5f", newSL)));
                 xp.SetDouble(newSL);
                 return TASK_CONTINUE;
             }

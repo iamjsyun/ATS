@@ -3,6 +3,7 @@
 
 #include "..\..\..\Interfaces\IXTask.mqh"
 #include "..\..\..\Interfaces\CXMacros.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskFinalize_V_DoubleCheck
@@ -18,15 +19,15 @@ public:
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket <= 0) return TASK_BREAK;
 
-        XP_LOG_TRACE(xp, StringFormat("[FINAL-V-CHECK] Performing Double-Check for Physical Ticket:%I64u...", ticket));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("FINAL-V-CHECK", xp, StringFormat("Double-Checking Ticket:%I64u", ticket)));
 
         // 최종 확정 전 실물 티켓과 매칭되는지 최종 확인
         if(!PositionSelectByTicket(ticket) && !OrderSelect(ticket)) {
-            XP_LOG_ERROR(xp, StringFormat("[FINAL-V-CHECK] FAILED: Phantom Ticket Detected (%I64u). Ticket is not found in terminal.", ticket));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("FINAL-V-CHECK", xp, StringFormat("FAILED: Phantom Ticket:%I64u", ticket)));
             return TASK_BREAK;
         }
 
-        XP_LOG_OK(xp, "[FINAL-V-CHECK] SUCCESS: Ticket verified in terminal. Finalizing...");
+        XP_LOG_OK(xp, CXAuditFormatter::Build("FINAL-V-CHECK", xp, "SUCCESS: Ticket verified."));
         return TASK_CONTINUE;
     }
 };

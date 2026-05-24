@@ -171,6 +171,10 @@ public:
         xp.SetEvent(event);
         
         if(IS_VALID(m_watcher)) m_watcher.Pulse(GetPointer(xp));
+        
+        // [v14.11 Anti-Crosstalk] Reset transient data before polling sessions
+        xp.Reset();
+
         if(IS_VALID(m_sessionPool)) m_sessionPool.Pulse(GetPointer(xp));
 
         //-- [추가] 주기적 역동기화 감시 (예: 100틱마다)

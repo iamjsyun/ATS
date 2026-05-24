@@ -6,6 +6,7 @@
 #include "..\..\..\Interfaces\IXGuard.mqh"
 #include "..\..\..\Interfaces\ICXRiskManager.mqh"
 #include "..\..\..\Interfaces\ICXPriceManager.mqh"
+#include "..\..\..\Infra\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_L_Validate
@@ -21,20 +22,23 @@ public:
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
 
         if(IS_INVALID(sig) || IS_INVALID(riskMgr) || IS_INVALID(priceMgr)) {
-            XP_LOG_ERROR(xp, "[ENTRY-L] FAILED: Required services missing.");
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "FAILED: Required services missing."));
             return TASK_BREAK;
         }
 
-        XP_LOG_TRACE(xp, StringFormat("[ENTRY-L] Starting Validation for SID:%s (Sym:%s, Lot:%.2f, Status:%d, XAExit:%d)", 
-                                      sig.GetSid(), sig.GetSymbol(), sig.GetLot(), sig.GetStatus(), sig.GetXAExit()));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "Starting Validation"));
 
         //--- [v10.24 Fix] Error-State Liquidation Bypass
         if(sig.GetXAExit() == XA_ACTIVE) {
-            XP_LOG_INFO(xp, "[ENTRY-L] OK: Exit intent detected. Redirecting to LIQUIDATING.");
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "OK: Exit intent detected. Redirecting to LIQUIDATING."));
             return SESSION_LIQUIDATING;
         }
 
-        if(sig.GetStatus() == XE_ERROR) return SESSION_ERROR;
+        if(sig.GetStatus() == XE_ERROR) {
+            string err = CXAuditFormatter::Build("TASK-VALIDATE", xp, "Aborting: Signal is in ERROR state.");
+            if(IS_VALID(xp)) xp.SetString(err);
+            return SESSION_ERROR;
+        }
         
         if(sig.GetXAEntry() != XA_ACTIVE || sig.GetStatus() >= XE_EXECUTED) return TASK_BREAK;
 
