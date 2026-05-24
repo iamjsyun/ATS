@@ -1,17 +1,22 @@
-# ATS Master Design Specification (SSOT)
-**Version**: v11.6 (Market-Price Priority Standard)
-**Date**: 2026-05-24
-**Governance**: This document is the **Single Source of Truth (SSOT)** for the ATS/XTA system. All implementations must adhere to these specifications.
+### **[ UAF v14.4 Standardized Nomenclature with Ticket & Magic ]**
+> `[FUNC:Name] [SID] [TK:Value, M:Magic] [Sym, Lot, Dir, Status] [ESTART:d, ESTEP:d, ELIMIT:d, ESPRI:f, ELPRI:f SSTART:d, SSTEP:d SL:d TP:d] [P:f, SL:f, TP:f, Mkt:f] {SPEC:Extra}`
 
 ---
 
-## 1. Overview & Philosophy
-The ATS system is a modern, object-oriented trading engine designed to replace complex procedural logic with **Declarative Orchestration** and **Reactive State Management**.
+**Version**: v11.12 (Intelligent Trailing Entry Standard)
+**Date**: 2026-05-24
 
-### 1.1 Core Principles
-- **Intent-Execution Separation**: Decouple "What to do" (App Intent) from "How it's running" (EA Execution).
-- **Market-Price Priority Mandate (Mandatory)**: 모든 진입 및 포지션 관리 계산(TE, TS, SL, TP)은 주입된 신호 가격(`price_signal`)을 **완전히 무시**하고, 감지 시점의 **실시간 시장가(Ask/Bid)**를 유일한 기준선(Baseline)으로 사용한다. 이는 백테스트 및 실거래에서 발생할 수 있는 가격 지연(Stale Price) 에러를 원천 차단한다.
-- **Post-Action Verification Protocol**: All trading actions (Entry, Modification, Closure) MUST be followed by a terminal re-check (via `OrderSelect` or `PositionSelect`) to ensure logical success matches physical state.
+---
+
+## 1. Core Principles
+- **Intelligent Trailing Entry (Mandatory Case Scenario)**: 진입 파이프라인은 다음 3단계의 정밀 시퀀스를 준수해야 한다.
+    1. **Initial Placement**: 신규 신호 바인딩 시, 시장가로부터 **`ELIMIT`** 거리만큼 떨어진 지점에 최초 대기 오더를 접수한다.
+    2. **Trailing Activation**: 시장가가 최초 진입 시점 대비 **`ESTART`** 포인트 이상 하락(Buy 기준)할 때 비로소 추격(Trailing)을 시작한다.
+    3. **Rebound Execution**: 시장이 바닥을 찍고 **`ESTEP`** 포인트 이상 반등하는 순간, 대기 오더를 즉시 취소하고 **시장가(Market)**로 진입한다.
+- **>= Evaluation Mandate (Critical)**: 모든 트레일링 파라미터(ESTART, ESTEP, ELIMIT, SSTART, SSTEP)는 대입 시에는 `=`를 사용하되, 코드 내의 조건문에서 평가될 때는 반드시 **`>=` (크거나 같다)** 연산자를 사용해야 한다.
+- **Mandatory Pre-Call Audit (Critical)**: 브로커 통신 함수 호출 **직전**에, 해당 함수에 전달되는 모든 로우(Raw) 파라미터를 포함한 감사 로그를 반드시 기록해야 한다. 
+- **Mandatory Ticket Guard (Liquidation)**: 청산 프로세스(Step 20~23)는 반드시 유효한 물리적 티켓(`Ticket > 0`)이 존재하는 경우에만 트리거될 수 있다.
+
 - **Responsibility Segregation**: Operations are strictly separated by domain: `OrderManager` for orders, `PositionManager` for active positions.
 - **Interface-First Mandate**: All domain logic must depend on IX* interfaces.
 - **DataManager State Governance (v9.8.11)**: The management UI governs the signal lifecycle through an authoritative state transition matrix.
@@ -129,4 +134,4 @@ Every trading action must verify physical state in MT5 immediately after the req
 - **Handshake Acceleration (Exception)**: 수동 청산 감지(`xe_status=24`) 시, EA는 예외적으로 `xa_exit=2 (COMP)`를 직접 마킹할 수 있다. 이는 App(ATSA)의 동기화 지연을 우회하여 즉시 '이관 대기(3)'로 전이하기 위한 최적화 경로이다.
 
 ---
-**Last Updated**: 2026-05-23
+**Last Updated**: 2026-05-24

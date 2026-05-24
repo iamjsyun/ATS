@@ -1,11 +1,11 @@
 #ifndef TEST_INTEGRITY_SIMULATION_MQH
 #define TEST_INTEGRITY_SIMULATION_MQH
 
-#include "..\..\CXTrade\Infra\CXSequenceOrchestrator.mqh"
-#include "..\..\CXTrade\Infra\CXFluentSequence.mqh"
-#include "..\..\CXTrade\Models\CXContext.mqh"
-#include "..\..\CXTrade\Models\CXParam.mqh"
-#include "..\..\CXTrade\Interfaces\IXStep.mqh"
+#include "..\..\CXTrade\Session\Sequence\CXSequenceOrchestrator.mqh"
+#include "..\..\CXTrade\Session\Sequence\CXFluentSequence.mqh"
+#include "..\..\CXTrade\Session\CXContext.mqh"
+#include "..\..\CXTrade\Core\Models\CXParam.mqh"
+#include "..\..\CXTrade\Core\Interfaces\IXStep.mqh"
 
 /**
  * @class MockYieldStep

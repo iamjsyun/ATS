@@ -1,27 +1,27 @@
 #ifndef CXTRADINGSESSION_MQH
 #define CXTRADINGSESSION_MQH
 
-#include "..\Interfaces\IRepository.mqh"
-#include "..\Interfaces\ICXContext.mqh"
-#include "..\Interfaces\ICXFluentSequence.mqh"
-#include "..\Interfaces\ICXTradingSession.mqh"
-#include "..\Module\CXLogDispatcher.mqh"
-#include "..\Infra\CXFileLogger.mqh"
-#include "..\Infra\CXSequenceOrchestrator.mqh"
-#include "..\Models\CXContext.mqh"
-#include "..\Infra\CXFluentSequence.mqh"
-#include "..\Infra\CXAuditFormatter.mqh"
+#include "..\Core\Interfaces\IRepository.mqh"
+#include "..\Core\Interfaces\ICXContext.mqh"
+#include "..\Core\Interfaces\ICXFluentSequence.mqh"
+#include "..\Core\Interfaces\ICXTradingSession.mqh"
+#include "..\Shared\Logging\CXLogDispatcher.mqh"
+#include "..\Shared\Logging\CXFileLogger.mqh"
+#include "Sequence\CXSequenceOrchestrator.mqh"
+#include "CXContext.mqh"
+#include "Sequence\CXFluentSequence.mqh"
+#include "..\Shared\Logging\CXAuditFormatter.mqh"
 
-#include "..\Interfaces\IXEntryManager.mqh"
-#include "..\Interfaces\IXOrderManager.mqh"
-#include "..\Interfaces\IXPositionManager.mqh"
-#include "..\Interfaces\IXExitManager.mqh"
-#include "..\Interfaces\IXPriceTracker.mqh"
-#include "..\Interfaces\ICXPriceManager.mqh"
-#include "..\Interfaces\ICXRiskManager.mqh"
-#include "..\Interfaces\ICXSymbolManager.mqh"
-#include "..\Interfaces\ICXInventoryManager.mqh"
-#include "..\Interfaces\ICXServiceFactory.mqh"
+#include "..\Core\Interfaces\IXEntryManager.mqh"
+#include "..\Core\Interfaces\IXOrderManager.mqh"
+#include "..\Core\Interfaces\IXPositionManager.mqh"
+#include "..\Core\Interfaces\IXExitManager.mqh"
+#include "..\Core\Interfaces\IXPriceTracker.mqh"
+#include "..\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\Core\Interfaces\ICXRiskManager.mqh"
+#include "..\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\Core\Interfaces\ICXServiceFactory.mqh"
 
 /**
  * @class CXTradingSession
@@ -35,6 +35,7 @@ private:
     ICXFluentSequence*  m_sequence;
     ICXContext*         m_globalCtx;
     ICXSignal*          m_signal; //-- [v10.6] Persisted Signal Reference
+    ICXServiceFactory*  m_factory; // [v14.46] Store factory for dynamic logger creation
     bool                m_isActive;
     string              m_sid;
 
@@ -51,8 +52,8 @@ private:
 
 public:
     CXTradingSession(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
-        : m_repo(repo), m_globalCtx(globalCtx), m_isActive(false), m_signal(NULL) {
-        Bootstrap(factory);
+        : m_repo(repo), m_globalCtx(globalCtx), m_isActive(false), m_signal(NULL), m_factory(factory) {
+        Bootstrap(m_factory);
     }
 
     ~CXTradingSession() {
@@ -66,6 +67,7 @@ public:
         SAFE_DELETE(m_sequence); SAFE_DELETE(m_logger);
         SAFE_DELETE(m_ctx);
         SAFE_DELETE(m_signal); //-- [v10.7 Fix] Cleanup signal on destruction
+        m_factory = NULL; // Factory is owned by AppService
     }
 
     /**
@@ -110,15 +112,17 @@ public:
             }
         }
 
+        // [v14.27 Core Integrity] Provide the param to the context before sequence execution
+        if(IS_VALID(m_ctx)) m_ctx.SetParam(xp);
+
         // 3. 시퀀스 엔진 구동
         if(IS_VALID(m_sequence)) {
             m_sequence.Pulse(xp);
             
             // [v7.9 Error Recovery] 회로 차단기 및 치명적 에러 발생 시 처리
             if(m_sequence.State() == SESSION_ERROR) {
-                string errorDetail = ""; 
-                // 시퀀스 내에서 발생한 마지막 에러 메시지 추출 시도
-                errorDetail = xp.GetString(); 
+                string errorDetail = xp.GetString(); 
+                if(errorDetail == "" && IS_VALID(sig)) errorDetail = sig.GetStatusMsg(); // [v14.22 Fallback]
                 if(errorDetail == "") errorDetail = "Unknown Sequence Interruption";
 
                 XP_LOG_ERROR(xp, CXAuditFormatter::Build("SESSION-ERROR", xp, errorDetail));
@@ -131,21 +135,6 @@ public:
         }
     }
 
-    void Start(ICXParam* xp, ICXServiceFactory* factory) {
-        m_isActive = true;
-        m_signal = (IS_VALID(xp)) ? xp.GetSignal() : NULL;
-        m_sid = (IS_VALID(m_signal)) ? m_signal.GetSid() : "";
-        
-        //--- [SSOC] 글로벌 트리에 등록
-        if(m_sid != "" && IS_VALID(m_globalCtx)) {
-            m_globalCtx.AddChild(m_sid, m_ctx);
-        }
-
-        InitLogger(m_sid, factory);
-        xp.SetEvent(EVENT_START);
-        Pulse(xp);
-    }
-
     void Start(ICXParam* xp) {
         m_isActive = true;
         m_signal = (IS_VALID(xp)) ? xp.GetSignal() : NULL;
@@ -156,6 +145,8 @@ public:
             m_globalCtx.AddChild(m_sid, m_ctx);
         }
 
+        InitLogger(m_sid, m_factory);
+        if(IS_VALID(m_sequence)) m_sequence.ResetState(); // [v14.28] Restart state machine timers
         xp.SetEvent(EVENT_START);
         Pulse(xp);
     }
@@ -165,11 +156,20 @@ public:
         m_signal = sig;
         m_sid = IS_VALID(sig) ? sig.GetSid() : "";
 
+        // [v14.38 Mandate Sync] Propagate Magic Number to all managers
+        if(IS_VALID(m_signal)) {
+            ulong magic = (ulong)m_signal.GetMagic();
+            if(IS_VALID(m_orderMgr)) m_orderMgr.SetMagic(magic);
+            if(IS_VALID(m_posMgr))   m_posMgr.SetMagic(magic);
+            if(IS_VALID(m_exitMgr))  m_exitMgr.SetMagic(magic);
+        }
+
         //--- [SSOC] 글로벌 트리에 등록
         if(m_sid != "" && IS_VALID(m_globalCtx)) {
             m_globalCtx.AddChild(m_sid, m_ctx);
         }
 
+        InitLogger(m_sid, m_factory);
         CXParam xp;
         xp.SetSignal(sig);
         xp.SetEvent(EVENT_INJECT);
@@ -189,23 +189,6 @@ public:
         XP_LOG_WARN(GetPointer(tempXp), CXAuditFormatter::Build("SESSION-INTERRUPT", GetPointer(tempXp), 
                                        StringFormat("Force Transition: %d -> %d", m_sequence.State(), state)));
         m_sequence.ForceState(state);
-    }
-
-    void Reset() {
-        if(!m_isActive && m_sid == "") return;
-
-        //--- [SSOC] 글로벌 트리에서 제거
-        if(m_sid != "" && IS_VALID(m_globalCtx)) {
-            m_globalCtx.AddChild(m_sid, NULL); 
-        }
-
-        CXParam tempXp; tempXp.SetSignal(m_signal);
-        XP_LOG_INFO(GetPointer(tempXp), CXAuditFormatter::Build("SESSION-RESET", GetPointer(tempXp)));
-
-        m_isActive = false;
-        m_sid = "";
-        SAFE_DELETE(m_signal); 
-        if(IS_VALID(m_sequence)) m_sequence.ForceState(SESSION_READY);
     }
 
     bool IsActive() const { return m_isActive; }

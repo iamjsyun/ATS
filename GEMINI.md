@@ -1,5 +1,6 @@
 <!-- Import: C:\Users\hsnote\.gemini\extensions\oh-my-gemini-cli\GEMINI.md -->
-## Cross-PC Synchronization & Modular Memory (v2.0)
+## Cross-PC Synchronization & Modular Memory (v2.1)
+- **Log Persistence Mandate (Critical)**: 모든 EA(ATSE) 및 App(ATSA) 기동 시 기존 로그 파일을 초기화(Truncate)하거나 삭제하는 것을 엄격히 금지한다. 모든 로그는 반드시 **Append-Only (추가 기록)** 방식으로 운영되어야 하며, 데이터 연속성을 보장해야 한다.
 - **Symbolic Link Mandate (Recommended)**: To ensure real-time synchronization of **Global Memory** and **Settings**, run the following in Administrator PowerShell:
   ```powershell
   Remove-Item -Path "$env:USERPROFILE\.gemini" -Recurse -Force
@@ -21,20 +22,20 @@
 모든 트레이딩 함수 호출 시 다음의 로깅 프리픽스와 형식을 엄격히 준수해야 한다. 모든 로그는 시스템 로그(Experts/Global)와 개별 세션 로그(File/Remote)에 동시에 기록되어야 한다.
 
 1.  **주문 진입 (OrderOpen)**
-    - **성공 로그**: `[EXEC-ENTRY] Sending Order: [Sym:{symbol}, Type:{type}, Lot:{lot}, Price:{price}, SL:{sl}, TP:{tp}, Mkt:{marketPrice}, TELimPts:{teLimPts}, TELimP:{teLimPrice}, TESta:{teStart}, TESte:{teStep}, SID:{sid}]`
-    - **실패 로그**: `[EXEC-ENTRY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Original Raw Params: [Sym:{symbol}, Type:{type}, Lot:{lot}, P:{price}, SL:{sl}, TP:{tp}, SID:{sid}]`
+    - **성공 로그**: `[EXEC-ENTRY] Sending Order: [Sym:{symbol}, Type:{type}, Lot:{lot}, Price:{price}, SL:{sl}, TP:{tp}, Mkt:{marketPrice}, M:{magic}, SID:{sid}]`
+    - **실패 로그**: `[EXEC-ENTRY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Raw: [Sym:{symbol}, Lot:{lot}, P:{price}, SL:{sl}, TP:{tp}, M:{magic}, SID:{sid}]`
 
 2.  **주문 수정 (OrderModify)**
-    - **성공 로그**: `[ORDER-MODIFY] Sending Request: [Ticket:{ticket}, Price:{price}, SL:{sl}, TP:{tp}]`
-    - **실패 로그**: `[ORDER-MODIFY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Original Raw Params: [Ticket:{ticket}, Price:{price}, SL:{sl}, TP:{tp}]`
+    - **성공 로그**: `[ORDER-MODIFY] Sending Request: [Ticket:{ticket}, M:{magic}, Price:{price}, SL:{sl}, TP:{tp}]`
+    - **실패 로그**: `[ORDER-MODIFY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Raw: [Ticket:{ticket}, M:{magic}, Price:{price}, SL:{sl}, TP:{tp}]`
 
 3.  **포지션 수정 (PositionModify)**
-    - **성공 로그**: `[POS-MODIFY] Sending Request: [Ticket:{ticket}, SL:{sl}, TP:{tp}]`
-    - **실패 로그**: `[POS-MODIFY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Original Raw Params: [Ticket:{ticket}, SL:{sl}, TP:{tp}]`
+    - **성공 로그**: `[POS-MODIFY] Sending Request: [Ticket:{ticket}, M:{magic}, SL:{sl}, TP:{tp}]`
+    - **실패 로그**: `[POS-MODIFY-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Raw: [Ticket:{ticket}, M:{magic}, SL:{sl}, TP:{tp}]`
 
 4.  **주문 삭제 (OrderDelete)**
-    - **성공 로그**: `[ORDER-DELETE] Sending Request: [Ticket:{ticket}]`
-    - **실패 로그**: `[ORDER-DELETE-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Original Raw Params: [Ticket:{ticket}]`
+    - **성공 로그**: `[ORDER-DELETE] Sending Request: [Ticket:{ticket}, M:{magic}]`
+    - **실패 로그**: `[ORDER-DELETE-FAIL] Broker Code:{ret_code}({description}), SysErr:{err}. Raw: [Ticket:{ticket}, M:{magic}]`
 
 ## Trading Process Standard (v11.3 - Mandatory)
 모든 트레이딩 신호 처리 및 감시 작업은 다음의 **SSOC(Single Source of Calculation)** 원칙을 엄격히 준수해야 한다.
@@ -72,7 +73,7 @@
     - **SID Format**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)` (Total 23 chars, including hyphens).
     - **GID Format**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)` (Total 19 chars).
 - **Communication Protocol**: Follow the v7.9 Archival Protocol (`xa_exit=3` for transfer).
-- **Market-Price Priority Mandate (v11.6)**: All price-related tasks (Entry, SL/TP, Trailing) MUST use real-time Market Price (Ask/Bid) as the baseline for point-to-price conversions, **strictly ignoring** stale signal prices (`price_signal`). This applies to TE, TS, SL, and TP calculation logic.
+- **>= Evaluation Mandate (v11.11)**: While '=' is used for assignment, ALL logical evaluations involving Trailing parameters (ESTART, ESTEP, ELIMIT, SSTART, SSTEP) MUST use the `>=` operator to ensure inclusive and robust execution.
 - **DataManager State Transition Matrix (v9.8.11)**:
     - **신규 주입 (Save)**: `xa_entry=1`, `xa_exit=0`, `xe_status=0 (READY)`
     - **청산 요청 (Exit)**: `xa_exit=1 (ACTIVE)`

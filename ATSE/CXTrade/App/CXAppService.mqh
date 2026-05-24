@@ -1,200 +1,143 @@
 #ifndef CXAPPSERVICE_MQH
 #define CXAPPSERVICE_MQH
 
-#include "..\Interfaces\ICXAppService.mqh"
-#include "..\Interfaces\ICXConfig.mqh"
-#include "..\Interfaces\IDatabase.mqh"
-#include "..\Interfaces\IRepository.mqh"
-#include "..\Interfaces\ICXSignalWatcher.mqh"
-#include "..\Interfaces\ICXTradingSessionPool.mqh"
-#include "..\Interfaces\IXGuard.mqh"
+#include "..\Core\Interfaces\ICXAppService.mqh"
+#include "..\Core\Interfaces\ICXConfig.mqh"
+#include "..\Core\Interfaces\IDatabase.mqh"
+#include "..\Core\Interfaces\IRepository.mqh"
+#include "..\Core\Interfaces\ICXSessionManager.mqh"
+#include "..\Core\Interfaces\ICXServiceFactory.mqh"
+#include "..\Core\Interfaces\ICXSignalWatcher.mqh"
+#include "Infra\CXSessionManager.mqh"
+#include "Logic\CXSignalWatcher.mqh"
+#include "Logic\CXTerminalScanner.mqh"
+#include "Logic\CXReverseInjector.mqh"
+#include "..\Core\Models\CXParam.mqh"
+#include "..\Shared\Guard\CXGuard.mqh"
+#include "..\Session\Sequence\CXSequenceOrchestrator.mqh"
+#include "..\Core\Interfaces\IXGuard.mqh"
+#include "..\Session\Sequence\CXStepFactory.mqh"
+#include "..\Session\Sequence\CXTaskFactory.mqh"
+#include "..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\Shared\Logging\CXMessageProvider.mqh"
+#include "Infra\CXServiceFactory.mqh"
+#include "..\Core\Models\CXConfig.mqh"
 
-// Forward includes for implementation
-#include "..\Infra\CXDatabase.mqh"
-#include "..\Infra\CXSignalRepository.mqh"
-#include "..\Infra\CXGuard.mqh"
-#include "..\Module\CXSignalWatcher.mqh"
-#include "..\Session\CXTradingSession.mqh"
-#include "CXTradingSessionPool.mqh"
-#include "CXServiceFactory.mqh"
-#include "..\Models\CXContext.mqh"
-#include "..\Infra\Sync\CXReverseInjector.mqh"
-
-#include "..\Infra\CXSequenceOrchestrator.mqh"
-
+/**
+ * @class CXAppService
+ * @brief EA의 전체 생명주기 및 의존성 주입을 총괄하는 서비스 (v14.47 Dynamic Session)
+ */
 class CXAppService : public ICXAppService {
 private:
     ICXConfig*            m_config;
     IDatabase*            m_db;
     IRepository*          m_repo;
-    ICXSignalWatcher*     m_watcher;
-    ICXTradingSessionPool* m_sessionPool;
-    CXReverseInjector*    m_injector;
-    ICXContext*           m_globalContext;
-    IXGuard*              m_guard;
-    CXSequenceOrchestrator* m_orchestrator;
+    ICXSessionManager*    m_sessionManager;
     ICXServiceFactory*    m_factory;
-    ICXLogger*            m_logger; // 시스템 통합 로거
+    ICXSignalWatcher*     m_watcher;
+    ICXLogger*            m_logger;
+    ICXContext*           m_globalContext;
+    
     CXTerminalScanner*    m_scanner;
-    
+    CXReverseInjector*    m_injector;
+
 public:
-    CXAppService(ICXConfig* config) : m_config(config), m_db(NULL), m_repo(NULL), 
-                                      m_watcher(NULL), m_sessionPool(NULL), 
-                                      m_injector(NULL), m_globalContext(NULL), 
-                                      m_guard(NULL), m_orchestrator(NULL), m_factory(NULL), m_logger(NULL), m_scanner(NULL) {}
-    
-    virtual ~CXAppService() {
-        SAFE_DELETE(m_db);
-        SAFE_DELETE(m_repo);
+    CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_sessionManager(NULL), 
+                    m_factory(NULL), m_watcher(NULL), m_logger(NULL), m_globalContext(NULL),
+                    m_scanner(NULL), m_injector(NULL) {}
+
+    virtual ~CXAppService() override {
         SAFE_DELETE(m_watcher);
-        SAFE_DELETE(m_injector);
-        SAFE_DELETE(m_sessionPool);
-        SAFE_DELETE(m_guard);
-        SAFE_DELETE(m_orchestrator);
+        SAFE_DELETE(m_sessionManager);
+        SAFE_DELETE(m_repo);
+        SAFE_DELETE(m_db);
+        SAFE_DELETE(m_config);
         SAFE_DELETE(m_globalContext);
-        SAFE_DELETE(m_factory);
         SAFE_DELETE(m_logger);
         SAFE_DELETE(m_scanner);
+        SAFE_DELETE(m_injector);
     }
 
-    /**
-     * @brief Two-phase Initialization
-     */
-    virtual bool Initialize(int poolSize = 50) override {
-        // 1. 서비스 팩토리 및 전역 컨텍스트 조기 생성
-        m_factory = new CXServiceFactory();
-        if(IS_INVALID(m_factory)) return false;
+    virtual bool Initialize(ICXConfig* config, ICXServiceFactory* factory) override {
+        m_config = config;
+        m_factory = factory;
+        if(IS_INVALID(m_config) || IS_INVALID(m_factory)) return false;
 
-        m_globalContext = new CXContext("Global");
+        // 1. 글로벌 컨텍스트 구축
+        m_globalContext = m_factory.CreateContext();
         if(IS_INVALID(m_globalContext)) return false;
+
+        // 2. 핵심 인프라 서비스 초기화
+        m_logger = m_factory.CreateLogger("System", m_config);
+        m_globalContext.Register("logger", m_logger);
         m_globalContext.Register("config", m_config);
+        m_globalContext.Register("orchestrator", new CXSequenceOrchestrator());
+        m_globalContext.Register("guard", new CXGuard(m_globalContext));
 
-        // 1.1 시퀀스 오케스트레이터 초기화 (모든 시퀀스 조립의 근간)
-        m_orchestrator = new CXSequenceOrchestrator();
-        if(IS_INVALID(m_orchestrator)) return false;
-        m_globalContext.Register("orchestrator", m_orchestrator);
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Core Services Initialized.");
 
-        // 2. 시스템 통합 로거 초기화 (SID: System)
-        if(m_config.IsBootLogEnabled()) {
-            m_logger = m_factory.CreateLogger("System", m_config);
-            if(IS_VALID(m_logger)) {
-                m_globalContext.Register("logger", m_logger);
-                m_logger.Log(LOG_LVL_INFO, ">>> ATSE Framework Initializing (System SID) <<<");
-            }
-        }
+        // 3. DB & Repository 연결
+        m_db = m_factory.CreateDatabase();
+        if(IS_INVALID(m_db) || !m_db.Open(m_config.GetDatabaseName(), m_config.IsDatabaseCommon())) return false;
         
-        CXParam xp;
-        xp.SetContext(m_globalContext);
-
-        // 3. 가드 시스템 기동
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Initializing Guard System...");
-        m_guard = new CXGuard(m_globalContext);
-        if(IS_INVALID(m_guard)) return false;
-        m_globalContext.Register("guard", m_guard);
-
-        // 4. 인프라 서비스 (DB)
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 2/6] Connecting to Database & Repository...");
-        m_db = new CXDatabase();
-        if(IS_INVALID(m_db)) return false;
-        
-        CXDatabase* db = dynamic_cast<CXDatabase*>(m_db);
-        if(IS_VALID(db)) {
-            if(!db.OpenByConfig(m_config)) {
-                if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_ERROR, "Database open failed.");
-                return false;
-            }
-        } else {
-            if(!m_db.Open()) return false;
-        }
-        
-        m_repo = new CXSignalRepository(m_db);
+        m_repo = m_factory.CreateRepository(m_db);
         if(IS_INVALID(m_repo)) return false;
-        m_globalContext.Register("repo", m_repo);
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 2/6] Database Connected.");
 
-        // 5. 세션 풀 (Session Pool)
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, StringFormat("[STEP 3/6] Initializing Session Pool (Size: %d)...", poolSize));
-        m_sessionPool = new CXTradingSessionPool(poolSize);
-        if(IS_INVALID(m_sessionPool)) return false;
-        
-        m_sessionPool.Initialize(m_repo, m_globalContext, m_factory);
-        m_globalContext.Register("session_pool", m_sessionPool);
+        // 4. 세션 매니저 초기화 (동적 인스턴스 방식)
+        m_sessionManager = new CXSessionManager();
+        m_sessionManager.Initialize(m_repo, m_globalContext, m_factory);
+        m_globalContext.Register("session_pool", m_sessionManager); // Interface legacy naming maintained for context mapping
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 3/6] Session Manager Initialized.");
+
+        // 5. 신호 감시자 (Watcher) 초기화
+        m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionManager, m_globalContext);
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 4/6] Signal Watcher Initialized.");
 
         // 6. 역주입 엔진 (Sync Engine) 실행
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 4/6] Running Cold-Boot Synchronization...");
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 5/6] Initializing Recovery Engine...");
         m_scanner = new CXTerminalScanner();
-        m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionPool);
+        m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager);
+        
+        // [v14.39 Paused] Temporarily disabled Zombie Recovery Sequence
+        /*
         if(IS_VALID(m_injector)) {
+            CXParam xp;
             m_injector.Pulse(GetPointer(xp));
         }
+        */
 
-        // 7. 감시 엔진 (Watcher) 활성화
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 5/6] Activating Signal Watcher...");
-        m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionPool, m_globalContext);
-        if(IS_INVALID(m_watcher)) return false;
-        
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_INFO, ">>> ATSE Framework Initialization Complete <<<");
-        
-        ExportSchema(); // [SSOT Bridge]
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 6/6] System Bootstrap Complete.");
         return true;
     }
-    
-    /**
-     * @brief [SSOT Bridge] MQL5 매크로 스키마를 JSON으로 익스포트
-     */
-    void ExportSchema() {
-        string json = "{\n  \"fields\": [\n";
-        #define X(type, name, dbType, getter) \
-            json += StringFormat("    { \"name\": \"%s\", \"type\": \"%s\", \"dbType\": \"%s\", \"getter\": \"%s\" },\n", \
-                                 #name, typename(type), #dbType, #getter);
-        SIGNAL_SCHEMA_FIELDS
-        #undef X
-        
-        // 마지막 쉼표 제거
-        if(StringLen(json) > 3) json = StringSubstr(json, 0, StringLen(json)-2) + "\n";
-        json += "  ]\n}";
 
-        int h = FileOpen("SCHEMA.json", FILE_WRITE|FILE_TXT|FILE_COMMON|FILE_ANSI);
-        if(h != INVALID_HANDLE) {
-            FileWriteString(h, json);
-            FileClose(h);
-            if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_DEBUG, "[BRIDGE] Schema metadata exported to Common\\Files\\SCHEMA.json");
-        }
-    }
-    
     virtual void Pulse() override {
-        Pulse(EVENT_TICK);
-    }
-
-    virtual void Pulse(ENUM_CX_EVENT event) {
-        CXParam xp; 
-        xp.SetContext(m_globalContext);
-        xp.SetEvent(event);
+        CXParam xp;
         
+        //-- 1. 신호 감시 (Discovery & Binding)
         if(IS_VALID(m_watcher)) m_watcher.Pulse(GetPointer(xp));
         
-        // [v14.11 Anti-Crosstalk] Reset transient data before polling sessions
-        xp.Reset();
-
-        if(IS_VALID(m_sessionPool)) m_sessionPool.Pulse(GetPointer(xp));
+        //-- 2. 활성 세션 구동 및 GC (Execution & Cleanup)
+        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
 
         //-- [추가] 주기적 역동기화 감시 (예: 100틱마다)
+        // [v14.39 Paused] Temporarily disabled Zombie Recovery Sequence
+        /*
         static int tick_count = 0;
         if(++tick_count % 100 == 0 && IS_VALID(m_injector)) {
             m_injector.Pulse(GetPointer(xp));
         }
+        */
     }
 
-    virtual void OnTradeTransaction(const MqlTradeTransaction& trans, const MqlTradeRequest& request, const MqlTradeResult& result) override {
+    virtual void OnTradeTransaction(const MqlTradeTransaction& trans,
+                                    const MqlTradeRequest& request,
+                                    const MqlTradeResult& result) override {
         CXParam xp;
-        xp.SetContext(m_globalContext);
         xp.SetEvent(EVENT_TRANSACTION);
-        xp.SetTransaction(trans);
+        xp.SetTransaction(trans); // Assuming CXParam has this or use raw access if needed
         
-        if(IS_VALID(m_sessionPool)) m_sessionPool.Pulse(GetPointer(xp));
-    }
-
-    CXTradingSession* StartSession(ICXParam* param) {
-        return (IS_VALID(m_sessionPool)) ? m_sessionPool.BorrowSession() : NULL;
+        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
     }
 };
 

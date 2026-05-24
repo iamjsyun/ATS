@@ -10,7 +10,8 @@
 
 //--- Include core service
 #include "App\CXAppService.mqh"
-#include "Models\CXConfig.mqh"
+#include "App\Infra\CXServiceFactory.mqh"
+#include "Core\Models\CXConfig.mqh"
 
 //--- [Group: Basic Configuration]
 input string         InpTargetMagics    = "1001,1002,3001,3002"; // Target Magic Numbers (CSV)
@@ -79,8 +80,9 @@ int OnInit() {
     if(IS_INVALID(g_config)) return INIT_FAILED;
 
     // 2. 앱 서비스 초기화 및 기동
-    g_app = new CXAppService(g_config);
-    if(IS_INVALID(g_app) || !g_app.Initialize(50)) {
+    CXServiceFactory* factory = new CXServiceFactory();
+    g_app = new CXAppService();
+    if(IS_INVALID(g_app) || !g_app.Initialize(g_config, factory)) {
         Print("App Service initialization failed.");
         return INIT_FAILED;
     }
@@ -111,7 +113,7 @@ void OnTick() {
 //| Expert timer function                                            |
 //+------------------------------------------------------------------+
 void OnTimer() {
-    if(IS_VALID(g_app)) g_app.Pulse(EVENT_TIMER);
+    if(IS_VALID(g_app)) g_app.Pulse();
 }
 
 //+------------------------------------------------------------------+

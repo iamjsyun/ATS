@@ -9,11 +9,11 @@
 #property strict
 
 #include "Scenarios\CXScenarioLoader.mqh"
-#include "..\CXTrade\Infra\CXDatabase.mqh"
-#include "..\CXTrade\Infra\CXSignalRepository.mqh"
-#include "..\CXTrade\Models\CXSignal.mqh"
-#include "..\CXTrade\Interfaces\CXDefine.mqh"
-#include "..\CXTrade\Infra\Sync\CXTerminalScanner.mqh"
+#include "..\CXTrade\Shared\Database\CXDatabase.mqh"
+#include "..\CXTrade\Shared\Database\CXSignalRepository.mqh"
+#include "..\CXTrade\Core\Models\CXSignal.mqh"
+#include "..\CXTrade\Core\Defines\CXDefine.mqh"
+#include "..\CXTrade\App\CXTerminalScanner.mqh"
 
 //--- [Inputs]
 input string InpScenarioFile = "ATSE\\scenario_sample.csv"; // CSV Filename (MQL5/Files)

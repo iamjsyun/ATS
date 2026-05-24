@@ -1,10 +1,10 @@
 #ifndef TEST_REDIRECT_RECOVERY_MQH
 #define TEST_REDIRECT_RECOVERY_MQH
 
-#include "..\..\CXTrade\Session\Tasks\Entry\CXTaskEntry_L_Redirect.mqh"
-#include "..\..\CXTrade\Models\CXContext.mqh"
-#include "..\..\CXTrade\Models\CXParam.mqh"
-#include "..\..\CXTrade\Models\CXSignal.mqh"
+#include "..\..\CXTrade\Session\Workflow\Entry\CXTaskEntry_L_Redirect.mqh"
+#include "..\..\CXTrade\Session\CXContext.mqh"
+#include "..\..\CXTrade\Core\Models\CXParam.mqh"
+#include "..\..\CXTrade\Core\Models\CXSignal.mqh"
 
 class TestRedirectRecovery {
 public:

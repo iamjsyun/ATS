@@ -41,6 +41,10 @@ namespace XTA.Services
             var closedSignals = await repo.GetClosedSignalsAsync();
             foreach (var s in closedSignals)
             {
+                // [v14.24 Fix] Error 상태(99)인 경우 자동 청산 핸드셰이크(xa_exit=2)에서 제외.
+                // 오직 실제 청산 상태(20~25)인 경우에만 완료 처리 진행.
+                if (s.xe_status == 99) continue;
+
                 // [v9.8.11] Matrix Alignment:
                 // xe_status >= 20 (CLOSED) 인데 xa_exit가 아직 0(READY) 또는 1(ACTIVE)인 경우
                 if (s.xa_exit == XCode.XA_RAW || s.xa_exit == XCode.XA_ACTIVE)

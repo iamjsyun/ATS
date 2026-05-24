@@ -1,7 +1,7 @@
 #ifndef MOCKGUARD_MQH
 #define MOCKGUARD_MQH
 
-#include "..\..\CXTrade\Interfaces\IXGuard.mqh"
+#include "..\..\CXTrade\Core\Interfaces\IXGuard.mqh"
 
 /**
  * @class MockGuard
