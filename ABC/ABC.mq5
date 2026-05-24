@@ -1,16 +1,16 @@
 //+------------------------------------------------------------------+
 //|                                                          ABC.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v1.4] MeetAlgo Indicator Monitor - Symbol Targeted Version      |
+//| [v1.5] MeetAlgo Indicator Monitor - Dynamic Symbol Version        |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2026, Gemini CLI"
 #property link      "https://github.com/google-gemini/gemini-cli"
-#property version   "1.40"
+#property version   "1.50"
 #property strict
 
 //--- CONFIGURATIONS ---
 input group             "--- Target Settings ---"
-input string            InpTargetSymbol         = "BTCUSD#"; // Target Symbol (Empty = Current Chart)
+input string            InpTargetSymbol         = "";        // Target Symbol (Empty = Current Chart)
 input ENUM_TIMEFRAMES   InpTargetPeriod         = PERIOD_CURRENT; // Target Period
 
 input group             "--- Connection Settings ---"
@@ -106,9 +106,9 @@ void OnTick() {
     //--- UI 출력 ---
     string uiMsg = "\n";
     uiMsg += "========================================\n";
-    uiMsg += " [ABC] Indicator Monitor (v1.4)\n";
+    uiMsg += " [ABC] Indicator Monitor (v1.5)\n";
     uiMsg += "----------------------------------------\n";
-    uiMsg += " Target : " + active_sym + " (" + EnumToString((ENUM_TIMEFRAMES)SeriesInfoInteger(active_sym, _Period, SERIES_LASTBAR_DATE) == 0 ? _Period : _Period) + ")\n";
+    uiMsg += " Target : " + active_sym + " (" + EnumToString(_Period) + ")\n";
     uiMsg += " Path   : " + actual_path + "\n";
     uiMsg += "----------------------------------------\n";
     uiMsg += StringFormat(" Middle : %s\n", GetValStr(middle));
@@ -126,8 +126,8 @@ void OnTick() {
     uiMsg += "========================================\n";
 
     if(middle == 0 || middle == EMPTY_VALUE) {
-        uiMsg += "\n [!] Status: SYNCING BTC DATA...";
-        uiMsg += "\n [!] Ensure BTCUSD# is in Market Watch.";
+        uiMsg += "\n [!] Status: SYNCING DATA...";
+        uiMsg += "\n [!] Ensure " + active_sym + " is in Market Watch.";
     }
 
     Comment(uiMsg);
