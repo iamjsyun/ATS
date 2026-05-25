@@ -137,8 +137,8 @@ namespace XTA.XData.Models
         public double sl { get; set; }
         public double te_start { get; set; }
         public double te_step { get; set; }
-        public int ts_start { get; set; } = 500;
-        public int ts_step { get; set; } = 100;
+        public int ts_start { get; set; }
+        public int ts_step { get; set; }
         public double ikte_start { get; set; }
         public double ikte_step { get; set; }
         public int gap_min { get; set; } = 200;

@@ -16,6 +16,9 @@ public:
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || sig.GetStatus() == XE_ERROR) return TASK_BREAK;
+        
+        // [v16.4 Scenario C] Quarantine Hold: 알파 계산 중단
+        if(sig.GetStatus() == XE_QUARANTINED) return TASK_BREAK;
 
         if(0 >= sig.GetTSStart()) return TASK_BREAK;
 

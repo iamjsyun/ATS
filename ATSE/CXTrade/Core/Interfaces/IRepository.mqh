@@ -13,6 +13,7 @@ public:
     virtual void LoadParam(ICXParam* param) = 0;
     virtual int  GetStatusBySid(const string sid) = 0;
     virtual bool UpdateStatus(ICXSignal* signal) = 0;
+    virtual bool ForceUpdateIntent(ICXSignal* signal) = 0; // [v16.19] Explicit Intent Override
     virtual int  LoadActiveSignals(CArrayObj* list) = 0;
     virtual ICXSignal* GetSignalBySid(const string sid) = 0;
     virtual bool DeleteBySid(const string sid) = 0;

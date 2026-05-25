@@ -79,14 +79,14 @@ namespace ATSA.UI.Models
         public new int type { get => base.type; set { if (base.type != value) { base.type = value; UpdateSid(); RaisePropertyChanged(nameof(type)); RaisePropertyChanged(nameof(SelectedType)); } } }
         public string SelectedType 
         { 
-            get => base.type switch { 1 => "1:TRL", 2 => "2:LIMIT", 3 => "3:STOP", 9 => "9:MARKET", _ => $"{base.type}:UNK" };
+            get => base.type switch { 1 => "1:TRL (추적 진입)", 2 => "2:LIMIT (지정가)", 3 => "3:STOP (역지정가)", 9 => "9:MARKET (시장가)", _ => $"{base.type}:UNK" };
             set { if (!string.IsNullOrEmpty(value) && int.TryParse(value.Split(':')[0], out int t)) { this.type = t; } }
         }
 
         public int lot_type { get; set; } = 1; // Default: Fixed Lot
         public string SelectedLotType 
         { 
-            get => lot_type switch { 1 => "1:FIXED", 2 => "2:MULT", _ => $"{lot_type}:UNK" };
+            get => lot_type switch { 1 => "1:고정 로트", 2 => "2:배수 로트", _ => $"{lot_type}:UNK" };
             set { if (!string.IsNullOrEmpty(value) && int.TryParse(value.Split(':')[0], out int v)) { lot_type = v; RaisePropertyChanged(nameof(lot_type)); RaisePropertyChanged(nameof(SelectedLotType)); } } 
         }
 
@@ -97,7 +97,7 @@ namespace ATSA.UI.Models
         public new int xa_entry { get => base.xa_entry; set { if (base.xa_entry != value) { base.xa_entry = value; RaisePropertyChanged(nameof(xa_entry)); RaisePropertyChanged(nameof(SelectedXAEntry)); } } }
         public string SelectedXAEntry
         {
-            get => base.xa_entry switch { 0 => "0:RAW", 1 => "1:ACTIVE", _ => $"{base.xa_entry}:UNK" };
+            get => base.xa_entry switch { 0 => "0:RAW", 1 => "1:ACTIVE", 2 => "2:CONFIRMED", _ => $"{base.xa_entry}:UNK" };
             set { if (!string.IsNullOrEmpty(value) && int.TryParse(value.Split(':')[0], out int v)) { this.xa_entry = v; } }
         }
 
@@ -134,6 +134,9 @@ namespace ATSA.UI.Models
         public new int ts_step { get => base.ts_step; set { if (base.ts_step != value) { base.ts_step = value; RaisePropertyChanged(nameof(ts_step)); } } }
         public new double sl { get => base.sl; set { if (base.sl != value) { base.sl = value; RaisePropertyChanged(nameof(sl)); } } }
         public new double tp { get => base.tp; set { if (base.tp != value) { base.tp = value; RaisePropertyChanged(nameof(tp)); } } }
+
+        public new double ikte_start { get => base.ikte_start; set { if (base.ikte_start != value) { base.ikte_start = value; RaisePropertyChanged(nameof(ikte_start)); } } }
+        public new double ikte_step { get => base.ikte_step; set { if (base.ikte_step != value) { base.ikte_step = value; RaisePropertyChanged(nameof(ikte_step)); } } }
 
         // --- Status & UI ---
         public new string xe_status_msg { get => base.xe_status_msg; set { if (base.xe_status_msg != value) { base.xe_status_msg = value; RaisePropertyChanged(nameof(xe_status_msg)); } } }

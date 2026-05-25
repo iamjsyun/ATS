@@ -7,6 +7,7 @@
 #include "..\..\..\Core\Models\CXSignal.mqh"
 #include "..\..\..\Core\Defines\CXIdManager.mqh"
 #include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Engine\Inventory\CXInventoryManager.mqh"
 
 /**
  * @class CXStepValidation
@@ -82,6 +83,22 @@ public:
                     failed++;
                     continue;
                 }
+                
+                // [v16.10 Physical Asset Bypass] 터미널에 자산이 없는 경우 즉시 강제 청산 처리 (상태 20 마킹)
+                CXInventoryManager invMgr;
+                ulong ticket = (ulong)sig.GetTicket();
+                if(ticket > 0 && !invMgr.IsAssetExists(ticket, sig.GetType())) {
+                    string bypassMsg = StringFormat("Auto-Closed: Physical Asset(%I64u) not found in Terminal.", ticket);
+                    XP_LOG_WARN(xp, CXAuditFormatter::Build("WATCHER-VALIDATION", xp, bypassMsg));
+                    
+                    IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+                    CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, bypassMsg);
+                    if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                    
+                    activeList.Delete(i);
+                    continue;
+                }
+                
                 if(isStatusChanged) XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-VALID-EXIT", xp, "EXIT-PRIORITY PASS"));
                 sig.SetLastStatus(sig.GetStatus());
                 continue; 

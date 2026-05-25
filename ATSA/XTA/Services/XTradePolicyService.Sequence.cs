@@ -75,7 +75,8 @@ namespace XTA.Services
                 .ConfigureState("ApplySinglePolicy")
                     .OnEntry(() => {
                         var s = ctx.MasterSignal.Clone();
-                        ApplyDirectionPolicy(s, ctx.Policy!);
+                        bool isManual = ctx.Xdo.CMD == "DM_INJECTION" || ctx.Xdo.CMD == "TEST_INJECTION";
+                        ApplyDirectionPolicy(s, ctx.Policy!, isManual);
                         s.Validate();
                         ctx.ResultSignals.Add(s);
                         seq.SetState("End");
@@ -83,6 +84,7 @@ namespace XTA.Services
                 .ConfigureState("ApplyGridPolicy")
                     .OnEntry(() => {
                         if (ctx.Profiles == null) return;
+                        bool isManual = ctx.Xdo.CMD == "DM_INJECTION" || ctx.Xdo.CMD == "TEST_INJECTION";
                         foreach (var profile in ctx.Profiles)
                         {
                             var s = ctx.MasterSignal.Clone();
@@ -92,17 +94,21 @@ namespace XTA.Services
                             if (profile.lot_type == 2) s.lot = Math.Round(ctx.MasterSignal.lot * profile.lot, 2);
                             else s.lot = profile.lot;
 
-                            ApplyDirectionPolicy(s, ctx.Policy!);
+                            ApplyDirectionPolicy(s, ctx.Policy!, isManual);
 
-                            s.te_limit = profile.offset;
+                            // [v14.42] Conditional Override Logic: Only overwrite if profile has non-zero value
+                            s.te_limit = (profile.offset > 0) ? profile.offset : s.te_limit;
                             s.limit_offset = profile.offset;
                             s.stop_offset = profile.offset;
-                            s.te_start = profile.te_start;
-                            s.te_step = profile.te_step;
-                            s.ts_start = profile.ts_start; 
-                            s.ts_step = profile.ts_step;
-                            s.tp = profile.tp;
-                            s.sl = profile.sl;
+
+                            if (profile.te_start > 0) s.te_start = profile.te_start;
+                            if (profile.te_step > 0) s.te_step = profile.te_step;
+                            if (profile.ts_start > 0) s.ts_start = profile.ts_start;
+                            if (profile.ts_step > 0) s.ts_step = profile.ts_step;
+                            if (profile.tp > 0) s.tp = profile.tp;
+                            if (profile.sl > 0) s.sl = profile.sl;
+                            if (profile.ikte_start > 0) s.ikte_start = profile.ikte_start;
+                            if (profile.ikte_step > 0) s.ikte_step = profile.ikte_step;
 
                             if (s.type == XCode.TYPE_MARKET) s.price_signal = 0;
                             else

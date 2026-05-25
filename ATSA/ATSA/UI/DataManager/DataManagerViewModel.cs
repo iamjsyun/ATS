@@ -395,11 +395,20 @@ namespace ATSA.UI.DataManager
                 baseSignal.gno = SelectedSignal.gno;
                 
                 // [v9.9.1] Manual override from UI (Important for DataManager)
+                // Ensure ALL editable UI fields are copied to the baseSignal before processing
+                baseSignal.symbol = SelectedSignal.symbol;
+                baseSignal.dir = SelectedSignal.dir;
+                baseSignal.type = SelectedSignal.type;
+                baseSignal.price_signal = SelectedSignal.price_signal;
+                baseSignal.lot = SelectedSignal.lot;
+
                 baseSignal.te_limit = SelectedSignal.te_limit;
                 baseSignal.te_start = SelectedSignal.te_start;
                 baseSignal.te_step = SelectedSignal.te_step;
                 baseSignal.ts_start = SelectedSignal.ts_start;
                 baseSignal.ts_step = SelectedSignal.ts_step;
+                baseSignal.ikte_start = SelectedSignal.ikte_start;
+                baseSignal.ikte_step = SelectedSignal.ikte_step;
                 baseSignal.sl = SelectedSignal.sl;
                 baseSignal.tp = SelectedSignal.tp;
 
@@ -484,33 +493,13 @@ namespace ATSA.UI.DataManager
 
         private BindableXSignal CreateDraft()
         {
-            var current = SelectedSignal;
             DateTime now = DateTime.Now;
             string yy = now.ToString("yyMMddHH");
             var draft = new BindableXSignal();
 
-            if (current != null)
-            {
-                draft.cno = current.cno;
-                draft.sno = current.sno;
-                draft.gno = current.gno;
-                draft.symbol = current.symbol;
-                draft.dir = current.dir; // Directly transfer the numeric direction
-                draft.type = current.type;
-                draft.lot = current.lot;
-                draft.price_signal = current.price_signal;
-                draft.SelectedDir = current.SelectedDir; 
-                draft.SelectedType = current.SelectedType;
-                draft.SelectedLotType = current.SelectedLotType;
-                draft.xa_entry = current.xa_entry;
-                draft.SelectedXAEntry = current.SelectedXAEntry;
-            }
-            else
-            {
-                UpdateToDefaults(draft, yy);
-            }
+            // [v10.4.2] Always initialize with index 0 defaults for a clean slate
+            UpdateToDefaults(draft, yy);
 
-            draft.yymmddhh = yy;
             draft.updated = now;
             return draft;
         }
@@ -609,14 +598,18 @@ namespace ATSA.UI.DataManager
         private void UpdateToDefaults(BindableXSignal sig, string yy)
         {
             sig.yymmddhh = yy;
+            
+            // [v10.4.2] Explicit index 0 initialization for all ComboBoxes
             if (CnoList.Any()) sig.cno = CnoList[0];
             if (SnoList.Any()) sig.sno = SnoList[0];
             if (GnoList.Any()) sig.gno = GnoList[0];
-            sig.SelectedDir = DirList.FirstOrDefault() ?? "1:BUY";
             
-            // [v10.4.1] Standardize to 0-th index initialization
-            sig.SelectedType = TypeList.FirstOrDefault() ?? "1:TRL (추적 진입)";
-            sig.SelectedLotType = LotTypeList.FirstOrDefault() ?? "1:고정 로트";
+            sig.SelectedDir = DirList.ElementAtOrDefault(0) ?? "1:BUY";
+            sig.SelectedType = TypeList.ElementAtOrDefault(0) ?? "1:TRL (추적 진입)";
+            sig.SelectedLotType = LotTypeList.ElementAtOrDefault(0) ?? "1:고정 로트";
+            sig.SelectedXAEntry = XAEntryList.ElementAtOrDefault(0) ?? "0:READY";
+            sig.SelectedXAExit = XAExitList.ElementAtOrDefault(0) ?? "0:READY";
+            sig.SelectedXEStatus = XEStatusList.ElementAtOrDefault(0) ?? "0:READY";
             
             sig.symbol = "GOLD#";
             sig.price_signal = 0.00;
@@ -626,12 +619,11 @@ namespace ATSA.UI.DataManager
             sig.te_step = 100;
             sig.ts_start = 500;
             sig.ts_step = 100;
-            sig.SelectedXAEntry = "1:ACTIVE"; // [v10.33] Default to ACTIVE (1)
-            sig.SelectedXAExit = "0:READY";
-            sig.SelectedXEStatus = "0:READY";
-            sig.xa_entry = 1;
+            
+            sig.xa_entry = 0;
             sig.xa_exit = 0;
             sig.xe_status = 0;
+            
             sig.updated = DateTime.Now;
             sig.RefreshAll();
         }

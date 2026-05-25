@@ -24,7 +24,7 @@ namespace XTA.Infrastructure.Audio
                     if (voice.VoiceInfo.Culture.Name.Contains("ko")) { _synth.SelectVoice(voice.VoiceInfo.Name); break; }
                 }
                 _synth.Rate = 1;
-                _synth.Volume = 100;
+                _synth.Volume = Math.Clamp(param.Config.System.TtsVolume, 0, 100);
             }
             catch { }
 

@@ -26,11 +26,17 @@ public:
         
         if(flag == 10) {
             XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "Processing Market Fallback due to rebound..."));
-            if(orderMgr.DeleteOrder(xp, (ulong)sig.GetTicket())) {
+            ulong oldTicket = (ulong)sig.GetTicket();
+            
+            if(orderMgr.DeleteOrder(xp, oldTicket)) {
                 sig.SetTEStart(sig.GetTELimit());
                 if(orderMgr.ExecuteEntry(xp)) {
+                    // [v16.26 Mandate] 포지션 진입 후 SID, Ticker 재맵핑
+                    ulong newTicket = (ulong)sig.GetTicket();
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-REMAP", xp, 
+                        StringFormat("Market Fallback SUCCESS. Remapping Ticket: %I64u -> %I64u", oldTicket, newTicket)));
+
                     if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                    XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "SUCCESS: Fallback to Limit executed."));
                     return SESSION_ACTIVE;
                 }
             }
@@ -60,6 +66,14 @@ public:
                 XP_LOG_WARN(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + guardErr));
                 xp.SetString("[PEND-R-APPLY] " + guardErr);
                 return TASK_BREAK;
+            }
+
+            // [v16.21 Anti-Jitter Mandate]
+            // 현재 실제 오더 가격(PriceOpen)과 새로운 타겟 가격의 차이가 TEStep 이상일 때만 브로커 요청 송신
+            double currentOrderPrice = sig.GetPriceOpen();
+            if(MathAbs(newPrice - currentOrderPrice) < sig.GetTEStep() * point) {
+                // 변화량이 너무 적으므로 수정 생략 (챠트 라인 떨림 방지)
+                return TASK_CONTINUE;
             }
 
             if(orderMgr.ModifyOrder(xp, (ulong)sig.GetTicket(), newPrice, finalSL, finalTP)) {

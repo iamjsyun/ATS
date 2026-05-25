@@ -54,16 +54,22 @@ namespace XTA.Services
                         _ctx.PendingMessages = new XPCollection<XpoTgMessage>(uow, criteria).ToList();
                         
                         // [Fix] 메시지가 없어도 모니터링은 수행해야 함
-                        if (_ctx.PendingMessages.Count == 0) _syncSeq.SetState("MonitorClose");
+                        if (_ctx.PendingMessages.Count == 0) _syncSeq.SetState("MonitorEntry");
                         else _syncSeq.SetState("Recover");
                     })
 
                 .ConfigureState("Recover")
                     .OnEntry(async () => {
-                        if (_ctx.DbService == null || _ctx.PendingMessages.Count == 0) { _syncSeq.SetState("MonitorClose"); return; }
+                        if (_ctx.DbService == null || _ctx.PendingMessages.Count == 0) { _syncSeq.SetState("MonitorEntry"); return; }
 
                         nlog.Info($"[SyncWorker] Found {_ctx.PendingMessages.Count} unprocessed messages. Recovering...");
                         await ProcessRecoveryAsync();
+                        _syncSeq.SetState("MonitorEntry");
+                    })
+
+                .ConfigureState("MonitorEntry")
+                    .OnEntry(async () => {
+                        await ProcessEntryMonitoringAsync();
                         _syncSeq.SetState("MonitorClose");
                     })
 

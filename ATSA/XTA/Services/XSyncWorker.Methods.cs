@@ -69,6 +69,41 @@ namespace XTA.Services
             }
         }
 
+        /// <summary>
+        /// [v14.40] 진입 상태(xe_status=10) 및 중간 상태 모니터링 및 TTS 출력
+        /// </summary>
+        private async Task ProcessEntryMonitoringAsync()
+        {
+            var repo = XContext.Instance.SignalRepo;
+            if (repo == null) return;
+
+            var activeSignals = await repo.GetAllActiveSignalsAsync();
+            foreach (var s in activeSignals)
+            {
+                // 1. 주문 접수 (xe_status=5)
+                if (s.xe_status == (int)XCode.EaStatus.PendingPlaced)
+                {
+                    XContext.Instance.Sound?.PlaySound(s as Models.XSignal ?? Models.XSignal.FromBase(s), "ORDER_PLACED");
+                }
+                // 2. 진입 완료 (xe_status=10) && 아직 알림 안함 (xa_entry=1)
+                else if (s.xe_status == (int)XCode.EaStatus.Executed && s.xa_entry == XCode.XA_ACTIVE)
+                {
+                    var domainSignal = s as Models.XSignal ?? Models.XSignal.FromBase(s);
+                    nlog.Info(s.ToAuditString("SYNC-ENTRY", "Position Entry Detected. Triggering TTS."));
+                    XContext.Instance.Sound?.PlaySound(domainSignal, "POSITION_ENTERED");
+                    XContext.Instance.Gateway?.Log($"[{s.cno}] {s.sno}회차 포지션 진입 확인 (xa_entry 1->2)");
+
+                    // xa_entry를 2(Confirmed)로 업데이트하여 중복 출력 방지
+                    await repo.UpdateXaEntryAsync(s.sid, 2);
+                }
+                // 3. 진입 추적 가동 (xe_status=15)
+                else if (s.xe_status == (int)XCode.EaStatus.IkTeStarted)
+                {
+                    XContext.Instance.Sound?.PlaySound(s as Models.XSignal ?? Models.XSignal.FromBase(s), "TE_TRIGGERED");
+                }
+            }
+        }
+
         private async Task ProcessRecoveryAsync()
         {
             if (_ctx.DbService == null) return;

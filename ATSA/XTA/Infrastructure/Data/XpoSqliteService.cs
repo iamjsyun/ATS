@@ -193,6 +193,18 @@ namespace XTA.Infrastructure.Data
                 await uow.CommitChangesAsync(); 
             } 
         }
+
+        public async Task UpdateXaEntryAsync(string sid, int xaEntry)
+        {
+            using var uow = new UnitOfWork(GetLayer());
+            var xpo = await uow.FindObjectAsync<XpoSignal>(CriteriaOperator.Parse("sid = ?", sid));
+            if (xpo != null)
+            {
+                xpo.xa_entry = xaEntry;
+                xpo.updated = DateTime.Now;
+                await uow.CommitChangesAsync();
+            }
+        }
         public async Task<int> SaveRawSignalAsync(XTA.XData.Models.XSignal signal, string rawText) { using var uow = new UnitOfWork(GetLayer()); var raw = new XpoSignalRaw(uow) { symbol = signal.symbol, dir = signal.dir, type = signal.type, price = signal.price_signal, lot = signal.lot, sno = signal.sno, raw_text = rawText ?? string.Empty, created_at = DateTime.Now }; await uow.CommitChangesAsync(); return raw.Oid; }
         public async Task DeleteSignalAsync(string sid) { using var uow = new UnitOfWork(GetLayer()); var xpo = await uow.FindObjectAsync<XpoSignal>(CriteriaOperator.Parse("sid = ?", sid)); if (xpo != null) { xpo.Delete(); await uow.CommitChangesAsync(); } }
         public async Task DeleteAllSignalsAsync() { using var uow = new UnitOfWork(GetLayer()); try { await uow.ExecuteNonQueryAsync("DELETE FROM signals"); await uow.CommitChangesAsync(); } catch (Exception ex) { nlog.Error(ex, "[DB] Failed to delete all signals."); throw; } }

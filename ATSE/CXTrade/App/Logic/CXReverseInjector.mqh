@@ -69,13 +69,25 @@ public:
                 fakeSig.SetDir((asset.type == (int)ORDER_TYPE_BUY || asset.type == (int)ORDER_TYPE_BUY_LIMIT || asset.type == (int)ORDER_TYPE_BUY_STOP) ? CX_DIR_BUY : CX_DIR_SELL);
                 fakeSig.SetType((ENUM_CX_ORDER_TYPE)asset.type);
                 
-                fakeSig.xa_exit = XA_ACTIVE; // 즉시 청산 의도 주입
-                fakeSig.SetStatus(XE_EXECUTED); 
-                fakeSig.SetStatusMsg("[ZOMBIE] Orphan Asset Recovered. Pending Liquidation.");
+                // [v16.12 Asset Info Synchronization (Positions vs Orders)]
+                if(PositionSelectByTicket(asset.ticket)) {
+                    fakeSig.SetPriceOpen(PositionGetDouble(POSITION_PRICE_OPEN));
+                    fakeSig.SetSL(PositionGetDouble(POSITION_SL));
+                    fakeSig.SetTP(PositionGetDouble(POSITION_TP));
+                } else if(OrderSelect(asset.ticket)) {
+                    fakeSig.UpdatePriceSignal(OrderGetDouble(ORDER_PRICE_OPEN));
+                    fakeSig.SetSL(OrderGetDouble(ORDER_SL));
+                    fakeSig.SetTP(OrderGetDouble(ORDER_TP));
+                }
+                
+                fakeSig.SetXAEntry(XA_ACTIVE); // 1
+                fakeSig.SetXAExit(XA_RAW);     // 0
+                fakeSig.SetStatus(XE_QUARANTINED); 
+                fakeSig.SetStatusMsg("[ZOMBIE] Orphan Asset Quarantined. User Approval Required.");
                 
                 ICXSignal* oldSig = xp.GetSignal();
                 xp.SetSignal(fakeSig);
-                XP_LOG_WARN(xp, CXAuditFormatter::Build("REVERSE-ZOMBIE", xp, StringFormat("Ticket:%I64d. Orphan asset found. Forced Liquidation initiated.", asset.ticket)));
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("REVERSE-ZOMBIE", xp, StringFormat("Ticket:%I64d. Orphan asset found. Quarantined for safety.", asset.ticket)));
                 xp.SetSignal(oldSig);
 
                 // DB에 기록 후 세션 기동
@@ -96,9 +108,10 @@ public:
 
                 session.InjectState(CX_CAST(CXSignal, sig));
                 
-                // [v14.36 Direct Jump] Prevent sequence mismatch by forcing target state
-                // If it's a zombie, jump directly to Liquidation pipeline (State 20)
-                if(sig.GetXAExit() == XA_ACTIVE) {
+                // [v16.4 Scenario C] Jump to ACTIVE state but keep it in Hold (XE_QUARANTINED)
+                if(sig.GetStatus() == XE_QUARANTINED) {
+                    session.ForceTransition(SESSION_ACTIVE);
+                } else if(sig.GetXAExit() == XA_ACTIVE) {
                     session.ForceTransition(SESSION_LIQUIDATING);
                 } else if(sig.GetStatus() == XE_EXECUTED) {
                     session.ForceTransition(SESSION_ACTIVE);

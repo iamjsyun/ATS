@@ -17,6 +17,7 @@ namespace XTA.Infrastructure.Audio
     {
         private readonly object _spamLock = new();
         private readonly object _seqLock = new(); // [v9.0] 시퀀스 처리용 락
+        private readonly System.Collections.Generic.HashSet<string> _playedCache = new(); // [v14.41] 세션 기반 중복 방지 캐시
         private string _lastSid = string.Empty;
         private string _lastEvent = string.Empty;
         private DateTime _lastPlayTime = DateTime.MinValue;
@@ -46,6 +47,8 @@ namespace XTA.Infrastructure.Audio
                 .ConfigureState(XSoundState.Suppressed)
                     .TriggeredBy(() => _currentXdo?.Signal != null && IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD))
                         .WhenInState(XSoundState.RequestReceived)
+                    .TriggeredBy(() => IsAlreadyPlayed(_currentXdo?.Signal?.sid, _currentXdo?.CMD))
+                        .WhenInState(XSoundState.RequestReceived)
                     .TriggeredBy(() => _currentXdo?.Signal != null && !IsTargetChannel(_currentXdo.Signal.cno))
                         .WhenInState(XSoundState.RequestReceived)
                     .TriggeredBy(() => _currentXdo?.Signal?.xe_status == (int)XCode.EaStatus.InTransit)
@@ -54,6 +57,8 @@ namespace XTA.Infrastructure.Audio
                         if (_currentXdo?.Signal != null) {
                             if (IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD))
                                 nlog.Debug($"[Sound:SUPPRESSED] Anti-Spam blocked SID:{_currentXdo.Signal.sid} Cmd:{_currentXdo.CMD}");
+                            else if (IsAlreadyPlayed(_currentXdo.Signal.sid, _currentXdo.CMD))
+                                nlog.Debug($"[Sound:SUPPRESSED] Already played in this session: SID:{_currentXdo.Signal.sid} Cmd:{_currentXdo.CMD}");
                             else if (!IsTargetChannel(_currentXdo.Signal.cno))
                                 nlog.Debug($"[Sound:SUPPRESSED] Channel {_currentXdo.Signal.cno} has Sound Disabled or not registered.");
                             else if (_currentXdo.Signal.xe_status == (int)XCode.EaStatus.InTransit)
@@ -73,6 +78,10 @@ namespace XTA.Infrastructure.Audio
                         {
                             nlog.Debug($"[Sound:EXECUTE] TTS Output: {msgToSpeak}");
                             XContext.Instance.GetService<ITtsService>()?.Speak(msgToSpeak);
+                            
+                            // [v14.41] 성공적으로 출력 대기열에 추가된 경우 캐시에 기록
+                            if (_currentXdo?.Signal != null && !string.IsNullOrEmpty(_currentXdo.CMD))
+                                MarkAsPlayed(_currentXdo.Signal.sid, _currentXdo.CMD);
                         }
                     })
 
@@ -167,6 +176,17 @@ namespace XTA.Infrastructure.Audio
         {
             var channel = param.GetChannelByCno(cno);
             return channel != null && channel.IsSoundEnabled;
+        }
+
+        private bool IsAlreadyPlayed(string? sid, string? cmd)
+        {
+            if (string.IsNullOrEmpty(sid) || string.IsNullOrEmpty(cmd)) return false;
+            lock (_playedCache) { return _playedCache.Contains($"{sid}:{cmd}"); }
+        }
+
+        private void MarkAsPlayed(string sid, string cmd)
+        {
+            lock (_playedCache) { _playedCache.Add($"{sid}:{cmd}"); }
         }
     }
 }

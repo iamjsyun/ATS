@@ -136,10 +136,12 @@ namespace XTA.Models
         public string DatabaseFullPath { get; set; } = "ATS.db";
         public string LoggingLevel { get; set; } = "Info";
         public int RefreshIntervalMs { get; set; } = 1000;
-        
+        public int TtsVolume { get; set; } = 100; // [v14.43] TTS Volume control (0-100)
+
         /// <summary>
         /// [v10.0] Global Signal Source Type (Telegram, YouTube, Simulator)
         /// </summary>
+
         public string SourceType { get; set; } = "Telegram";
     }
 

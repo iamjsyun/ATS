@@ -13,6 +13,7 @@ namespace XTA.XData.Interfaces
         Task SaveSignalImmediateAsync(XSignal signal, bool force = false);
         Task UpdateSignalStatusAsync(string sid, int xeStatus, string xeStatusMsg);
         Task UpdateXaStatusAsync(string sid, int xaStatus);
+        Task UpdateXaEntryAsync(string sid, int xaEntry);
         Task<int> SaveRawSignalAsync(XSignal signal, string rawText);
         Task DeleteSignalAsync(string sid);
         Task DeleteAllSignalsAsync();

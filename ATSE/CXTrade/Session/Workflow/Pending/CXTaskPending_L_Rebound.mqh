@@ -16,23 +16,27 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTEStart()) return TASK_CONTINUE;
 
-        IXPriceTracker* tracker = CX_GET_OBJ(ctx, "price_tracker", IXPriceTracker);
-        if(IS_INVALID(tracker)) return TASK_BREAK;
-
         double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
         double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
-        tracker.Update(currentPrice);
+        
+        // [v16.26 Mandate] 극점(Extreme) 대비 TE_STEP 만큼 반등 시 시장가 진입
+        string extKey = "LastEntryExtremity_" + sig.GetSid();
+        ICXParam* pExt = ctx.GetParam(extKey);
+        if(IS_INVALID(pExt)) return TASK_CONTINUE; // 아직 극점이 확보되지 않음
+        
+        double extreme = pExt.GetDouble();
+        if(extreme <= 0) return TASK_CONTINUE;
 
-        // [v14.31 Spec Sync] Rebound is calculated from the extreme point (Bottom/Peak)
-        double extreme = (sig.GetDir() == CX_DIR_BUY) ? tracker.GetLowest() : tracker.GetHighest();
         bool is_rebounded = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice >= extreme + (sig.GetTEStep() * point))
-                                                         : (extreme - (sig.GetTEStep() * point) >= currentPrice);
-
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, StringFormat("Price rebound check: Extreme=%.5f, Rebounded=%d", extreme, is_rebounded)));
+                                                         : (currentPrice <= extreme - (sig.GetTEStep() * point));
 
         if(is_rebounded) {
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, "Market Fallback Triggered."));
-            xp.SetInt(10); 
+            XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, 
+                StringFormat("TE-STEP Rebound Triggered! Mkt:%.5f, Extreme:%.5f, Step:%d", 
+                currentPrice, extreme, sig.GetTEStep())));
+            
+            xp.SetInt(10); // 시장가 전환 트리거 (Market Fallback)
+            CXChartVisualizer::RemoveTEStart(sig); // 라인 제거
         }
 
         return TASK_CONTINUE;

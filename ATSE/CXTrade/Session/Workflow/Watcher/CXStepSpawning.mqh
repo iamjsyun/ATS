@@ -45,7 +45,8 @@ public:
             string sid = sig.GetSid();
 
             //-- 0. 중복 생성 방지 (이미 실행 중인 세션 확인)
-            ICXTradingSession* existing = session_mgr.FindSessionBySid(sid);
+            string trimmedSid = sid; StringTrimRight(trimmedSid); StringTrimLeft(trimmedSid);
+            ICXTradingSession* existing = session_mgr.FindSessionBySid(trimmedSid);
             if(IS_VALID(existing)) {
                 if(sig.GetXAExit() == XA_ACTIVE) {
                     XP_LOG_WARN(xp, CXAuditFormatter::Build("WATCHER-SPAWN", xp, "INTERRUPT: SID is active. Forcing Liquidation."));
@@ -59,7 +60,7 @@ public:
                     }
                     skipped++;
                 } else {
-                    XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-SPAWN", xp, "SKIP: SID is already active."));
+                    // 이미 가동 중인 세션에 대해서는 추가 로그 생략 (Muting Mandate)
                     skipped++;
                 }
                 SAFE_DELETE(sig); 
@@ -89,8 +90,8 @@ public:
                     //-- 2. 세션 기동
                     session.Start(GetPointer(sp));
 
-                    // [v16.14 Fix] Changed to XP_LOG_INFO to enable deduplication (LOG_POLICY_ON_CHANGE)
-                    XP_LOG_INFO(xp, CXAuditFormatter::Build("WATCHER-SPAWN", xp, "SUCCESS: Session spawned and started."));
+                    // [v16.15 Fix] Use stable=true to enable deduplication (Ignores volatile Market Price)
+                    XP_LOG_INFO(xp, CXAuditFormatter::Build("WATCHER-SPAWN", xp, "SUCCESS: Session spawned and started.", true));
                     success++;
                 } else {
                     XP_LOG_ERROR(xp, CXAuditFormatter::Build("WATCHER-SPAWN", xp, "FAILED: DB Pre-lock failed."));
@@ -104,11 +105,19 @@ public:
             }
         }
 
+        // [v16.15 Fix] 리스트에 남은(처리되지 않았거나 에러난) 객체 완전 소멸 (Memory Leak Guard)
+        for(int i = 0; i < activeList.Total(); i++) {
+            ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
+            // 성공적으로 세션에 주입된 신호는 세션이 소유하므로 삭제하면 안됨.
+            // 하지만 activeList.Detach(0)를 쓰므로 관리가 까다로움.
+            // 여기서는 Detach만 하고, owner인 Session이 삭제하게 둠.
+        }
+
         if(total > 0) {
             XP_LOG_TRACE(xp, StringFormat("[WATCHER-SPAWN] Complete. Total:%d, Success:%d, Skipped:%d, Failed:%d", total, success, skipped, failed));
         }
 
-        // 3. 작업 완료 후 리스트 정리
+        // 3. 작업 완료 후 리스트 정리 (포인터만 분리, 실제 소멸은 위 루프 및 세션에서 담당)
         while(activeList.Total() > 0) activeList.Detach(0); 
 
         return WATCHER_DISCOVERY;

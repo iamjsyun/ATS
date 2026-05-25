@@ -55,6 +55,7 @@ enum ENUM_XE_STATUS {
     XE_IN_TRANSIT       = 2,  // [v11.3] 명령 송신 완료, 실물 동기화 대기 중
     XE_PENDING_PLACED   = 5,  // [v11.3] 대기 주문 터미널 등록 완료
     XE_EXECUTED         = 10,
+    XE_QUARANTINED      = 15, // [v16.4 Scenario C] Zombie Asset Quarantine (User Approval Required)
     XE_CLOSED_SIGNAL    = 20,
     XE_CLOSED_SL        = 21, // [v11.3] 손절 청산
     XE_CLOSED_TP        = 22, // [v11.3] 익절 청산

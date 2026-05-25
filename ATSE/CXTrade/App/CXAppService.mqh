@@ -101,7 +101,7 @@ public:
         m_scanner = new CXTerminalScanner();
         m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager, m_config);
         
-        // [v14.39 Paused] Temporarily disabled Zombie Recovery Sequence
+        // [v16.18 Paused] 역주입 기능 사용 중지 (User Request)
         /*
         if(IS_VALID(m_injector)) {
             CXParam xp;
@@ -123,7 +123,7 @@ public:
         if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
 
         //-- [추가] 주기적 역동기화 감시 (예: 100틱마다)
-        // [v14.39 Paused] Temporarily disabled Zombie Recovery Sequence
+        // [v16.18 Paused] 역주입 기능 사용 중지 (User Request)
         /*
         static int tick_count = 0;
         if(++tick_count % 100 == 0 && IS_VALID(m_injector)) {

@@ -6,6 +6,7 @@
 #include "..\..\..\Core\Interfaces\IRepository.mqh"
 #include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
 #include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Shared\Graphics\CXChartVisualizer.mqh"
 
 /**
  * @class CXTaskEntry_P_Finalize
@@ -27,6 +28,18 @@ public:
 
         CXMessageProvider::UpdateStatus(sig, targetStatus, msg);
         if(repo.UpdateStatus(sig)) {
+            // [v16.23 Initial Visual] 대기 오더 접수 직후 트리거 라인 즉시 생성
+            if(targetStatus == XE_PENDING_PLACED && sig.GetTEStart() > 0) {
+                double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+                double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
+                double orderPrice = sig.GetPriceOpen();
+                
+                if(orderPrice > 0) {
+                    double triggerLine = orderPrice + (sig.GetTEStart() * point * dir_sign);
+                    CXChartVisualizer::DrawTEStart(sig, triggerLine);
+                }
+            }
+
             XP_LOG_OK(xp, CXAuditFormatter::Build("TASK-FINALIZE", xp, StringFormat("SUCCESS: DB Updated. Result: %d", nextSessionPhase)));
             return nextSessionPhase;
         }

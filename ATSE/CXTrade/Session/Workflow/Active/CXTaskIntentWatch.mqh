@@ -20,12 +20,22 @@ public:
         
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 
-        // [v14.3 Fast-Path] 터미널 수동 청산 감지 (좀비 세션 방지)
+        // [v14.3 Fast-Path] 터미널 수동 청산 감지 (좀비 세션 방지) -> [v16.11 Fast-Track Mandate]
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket > 0 && IS_VALID(invMgr)) {
             if(!invMgr.IsAssetExists(ticket, sig.GetType())) {
-                XP_LOG_WARN(xp, CXAuditFormatter::Build("INTENT-WATCH", xp, StringFormat("Physical Asset(%I64u) disappeared (Manual Close). Finalizing.", ticket)));
-                return STATE_EXIT_VERIFY; // 즉시 최종 단계(23)로 점프
+                string manualCloseMsg = StringFormat("Manual Close Detected: Physical Asset(%I64u) disappeared.", ticket);
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("INTENT-WATCH", xp, manualCloseMsg));
+                
+                // 직권으로 xe_status=24 및 xa_exit=2 동시 마킹하여 즉시 종료 확정
+                sig.SetStatus(XE_CLOSED_MANUAL);
+                sig.SetXAExit(XA_CLOSED_COMPLETED);
+                sig.SetStatusMsg(manualCloseMsg);
+                
+                // [v16.19] Use ForceUpdateIntent to explicitly override DB values (Bypass MAX guard)
+                if(IS_VALID(repo)) repo.ForceUpdateIntent(sig);
+                
+                return SESSION_CLOSED; // 즉시 세션 완전 종료 (SESSION_CLOSED)
             }
         }
 
