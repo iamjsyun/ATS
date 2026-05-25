@@ -2,13 +2,13 @@
 #define CX_TASK_PENDING_V_TERMINAL_MQH
 
 #include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_V_Terminal
- * @brief [Verify] 대기 주문 실물 상태 확인 (수동 삭제 대응)
+ * @brief [Verify] 터미널 내 대기 오더 존재 여부 검증 (v17.6)
  */
 class CXTaskPending_V_Terminal : public IXTask {
 public:
@@ -20,11 +20,19 @@ public:
         if(IS_INVALID(sig) || IS_INVALID(invMgr)) return TASK_BREAK;
 
         ulong ticket = (ulong)sig.GetTicket();
-        bool exists = invMgr.IsOrderExists(ticket);
+        if(ticket <= 0) return TASK_BREAK;
 
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("Checking Order:%I64u, Found:%d", ticket, exists)));
-        xp.SetInt(exists ? 1 : 0); 
-        return TASK_CONTINUE;
+        // 터미널에 오더가 존재하는지 확인
+        bool exists = invMgr.IsOrderExists(ticket);
+        
+        if(exists) {
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("OK: Order %I64u found in Terminal.", ticket)));
+            return TASK_CONTINUE;
+        }
+
+        // 지연 가능성을 고려하여 Yield (Watcher에서 Retry 처리됨)
+        XP_LOG_WARN(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("WAIT: Order %I64u not yet visible in Terminal.", ticket)));
+        return TASK_YIELD;
     }
 };
 

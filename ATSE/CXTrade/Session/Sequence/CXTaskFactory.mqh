@@ -16,8 +16,8 @@
 #include "..\Workflow\Entry\CXTaskEntry_P_Lock.mqh"
 #include "..\Workflow\Entry\CXTaskEntry_R_Order.mqh"
 #include "..\Workflow\Entry\CXTaskEntry_V_Error.mqh"
-#include "..\Workflow\Entry\CXTaskEntry_V_Ticket.mqh"
-#include "..\Workflow\Entry\CXTaskEntry_V_Real.mqh"
+#include "..\Workflow\Entry\CXTaskEntry_V_TICKET.mqh"
+#include "..\Workflow\Entry\CXTaskEntry_V_REAL.mqh"
 #include "..\Workflow\Entry\CXTaskFinalize_V_DoubleCheck.mqh"
 #include "..\Workflow\Entry\CXTaskEntry_P_Finalize.mqh"
 
@@ -27,6 +27,7 @@
 #include "..\Workflow\Pending\CXTaskPending_P_Align.mqh"
 #include "..\Workflow\Pending\CXTaskPending_L_Rebound.mqh"
 #include "..\Workflow\Pending\CXTaskPending_L_Improve.mqh"
+#include "..\Workflow\Pending\CXTaskPending_L_Extreme.mqh"
 #include "..\Workflow\Pending\CXTaskPending_R_Apply.mqh"
 
 // Active Tasks
@@ -38,6 +39,8 @@
 #include "..\Workflow\Active\CXTaskActive_L_Status.mqh"
 #include "..\Workflow\Active\CXTaskAlphaCalc.mqh"
 #include "..\Workflow\Active\CXTaskAlphaApply.mqh"
+#include "..\Workflow\Active\CXTaskActive_TS_TriggerWatch.mqh"
+#include "..\Workflow\Active\CXTaskActive_Closed.mqh"
 
 // Exit Tasks
 #include "..\Workflow\Exit\CXTaskExit_L_Prepare.mqh"
@@ -49,12 +52,12 @@
 
 /**
  * @class CXTaskFactory
- * @brief [v16.6] 문자열 기반 IXTask 객체 생성을 담당 (Enum-less)
+ * @brief [v17.6] 문자열 기반 IXTask 객체 생성을 담당 (Hyper-Atomic)
  */
 class CXTaskFactory {
 public:
     /**
-     * @brief [v16.6] 문자열 이름을 기반으로 IXTask 객체 생성
+     * @brief [v17.6] 문자열 이름을 기반으로 IXTask 객체 생성
      */
     static IXTask* CreateTask(string name) {
         // Entry
@@ -74,23 +77,27 @@ public:
         if(name == "TASK_E_V_DOUBLECHECK") return new CXTaskFinalize_V_DoubleCheck();
         if(name == "TASK_E_P_FINALIZE")    return new CXTaskEntry_P_Finalize();
         
-        // Pending
+        // Pending & Trailing Entry
         if(name == "TASK_P_V_SYNC")        return new CXTaskPending_V_Sync();
         if(name == "TASK_P_V_TERMINAL")    return new CXTaskPending_V_Terminal();
         if(name == "TASK_P_P_ALIGN")       return new CXTaskPending_P_Align();
         if(name == "TASK_P_L_REBOUND")     return new CXTaskPending_L_Rebound();
         if(name == "TASK_P_L_IMPROVE")     return new CXTaskPending_L_Improve();
+        if(name == "TASK_P_L_EXTREME")     return new CXTaskPending_L_Extreme();
         if(name == "TASK_P_R_APPLY")       return new CXTaskPending_R_Apply();
         
-        // Active
-        if(name == "TASK_A_INTENT_WATCH")  return new CXTaskIntentWatch();
-        if(name == "TASK_A_V_STATUS")      return new CXTaskComm_V_Status();
-        if(name == "TASK_A_V_STALE")       return new CXTaskSync_V_Stale();
-        if(name == "TASK_A_V_TERMINAL")    return new CXTaskActive_V_Terminal();
-        if(name == "TASK_A_P_ALIGN")       return new CXTaskActive_P_Align();
-        if(name == "TASK_A_L_STATUS")      return new CXTaskActive_L_Status();
-        if(name == "TASK_A_ALPHA_CALC")    return new CXTaskAlphaCalc();
-        if(name == "TASK_A_ALPHA_APPLY")   return new CXTaskAlphaApply();
+        // Active & Trailing Stop
+        if(name == "TASK_A_INTENT_WATCH")      return new CXTaskIntentWatch();
+        if(name == "TASK_A_V_STATUS")          return new CXTaskComm_V_Status();
+        if(name == "TASK_A_V_STALE")           return new CXTaskSync_V_Stale();
+        if(name == "TASK_A_V_TERMINAL")        return new CXTaskActive_V_Terminal();
+        if(name == "TASK_A_P_ALIGN")           return new CXTaskActive_P_Align();
+        if(name == "TASK_A_L_STATUS")          return new CXTaskActive_L_Status();
+        if(name == "TASK_A_ALPHA_CALC")        return new CXTaskAlphaCalc();
+        if(name == "TASK_A_ALPHA_APPLY")       return new CXTaskAlphaApply();
+        if(name == "TASK_A_TS_TRIGGER_WATCH")  return new CXTaskActive_TS_TriggerWatch();
+        if(name == "TASK_E_P_FINALIZE")        return new CXTaskEntry_P_Finalize(); // Reuse for Step_Closed
+        if(name == "TASK_ACTIVE_CLOSED")       return new CXTaskActive_Closed(); // Specific cleanup
         
         // Exit
         if(name == "TASK_X_L_PREPARE")     return new CXTaskExit_L_Prepare();
@@ -104,7 +111,7 @@ public:
     }
 
     /**
-     * @brief [v16.6] 호환성 유지를 위한 구형 메서드 스텁 (향후 제거 예정)
+     * @brief [v16.6] 호환성 유지를 위한 구형 메서드 스텁
      */
     static bool Exists(string name) {
         IXTask* t = CreateTask(name);

@@ -19,6 +19,12 @@ public:
         
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 
+        //--- [v14.34 Fix] Error-State Liquidation Bypass
+        if(sig.GetXAExit() == XA_ACTIVE) {
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Exit command detected. Moving to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
+        }
+
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Monitoring State"));
 
         // 1. 상태 동기화 (오더 -> 포지션 전환 감지)
@@ -35,11 +41,6 @@ public:
         if(sig.GetStatus() == XE_ERROR) {
             XP_LOG_WARN(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "ABORT: Signal is in XE_ERROR."));
             return SESSION_ERROR;
-        }
-
-        if(sig.GetXAExit() == XA_ACTIVE) {
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Exit command detected. Moving to LIQUIDATING."));
-            return SESSION_LIQUIDATING;
         }
 
         if(sig.GetStatus() >= XE_EXECUTED) {

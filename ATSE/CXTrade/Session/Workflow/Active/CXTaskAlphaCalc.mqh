@@ -15,7 +15,15 @@ public:
     virtual string Name() override { return "Task_AlphaCalc"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig) || sig.GetStatus() == XE_ERROR) return TASK_BREAK;
+        if(IS_INVALID(sig)) return TASK_BREAK;
+
+        //--- [v14.34 Fix] Error-State Liquidation Bypass
+        if(sig.GetXAExit() == XA_ACTIVE) {
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, "Exit intent detected. Redirecting to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
+        }
+
+        if(sig.GetStatus() == XE_ERROR) return TASK_BREAK;
         
         // [v16.4 Scenario C] Quarantine Hold: 알파 계산 중단
         if(sig.GetStatus() == XE_QUARANTINED) return TASK_BREAK;

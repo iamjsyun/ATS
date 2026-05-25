@@ -67,18 +67,15 @@ enum ENUM_XE_STATUS {
 //--- 세션 상태 및 시퀀스 단계 정의 (Sequence States)
 enum ENUM_SESSION_STATE {
     SESSION_READY            = 0,
-    STATE_ENTRY_TRANSIT      = 1,  // [v11.3]
-    STATE_ENTRY_VERIFY       = 2,  // [v11.3]
-    STATE_ENTRY_TRAILING     = 5,  // [v11.3]
-    SESSION_ACTIVE           = 10,
-    STATE_SYNC_ALIGN         = 12, 
-    STATE_EXIT_TRAILING      = 15,
-    SESSION_LIQUIDATING      = 20,
-    STATE_LIQUIDATING_TRANSIT = 21,
-    STATE_EXIT_SWEEP         = 22,
-    STATE_EXIT_VERIFY        = 23,
-    SESSION_CLOSED           = 30,
-    SESSION_ERROR            = 99
+    SESSION_VALIDATING       = 1,  // [v17.6] 리스크 및 데이터 검증
+    SESSION_EXECUTING        = 2,  // [v17.6] 브로커 오더 송신 실행
+    SESSION_PENDING          = 3,  // [v17.6] 터미널 오더 안착 대기
+    SESSION_TRAILING_ENTRY   = 5,  // [v17.6] 진입 가격 추격 (Active TE)
+    SESSION_ACTIVE           = 10, // 포지션 진입 완료 및 감시
+    SESSION_TRAILING_STOP    = 15, // [v17.6] 수익 보존 추격 (Active TS/Alpha)
+    SESSION_LIQUIDATING      = 20, // 청산 실행
+    SESSION_CLOSED           = 30, // 세션 종료
+    SESSION_ERROR            = 99  // 에러 상태
 };
 
 //--- Watcher 상태 및 시퀀스 단계 정의 (Watcher Sequence States)
@@ -116,13 +113,13 @@ enum ENUM_STATE_ID {
     
     // Session States
     ST_S_READY              = SESSION_READY,
-    ST_S_ENTRY_TRANSIT      = STATE_ENTRY_TRANSIT,
-    ST_S_ENTRY_VERIFY       = STATE_ENTRY_VERIFY,
-    ST_S_ENTRY_TRAILING     = STATE_ENTRY_TRAILING,
+    ST_S_VALIDATING         = SESSION_VALIDATING,
+    ST_S_EXECUTING          = SESSION_EXECUTING,
+    ST_S_PENDING            = SESSION_PENDING,
+    ST_S_TRAILING_ENTRY     = SESSION_TRAILING_ENTRY,
     ST_S_ACTIVE             = SESSION_ACTIVE,
+    ST_S_TRAILING_STOP      = SESSION_TRAILING_STOP,
     ST_S_LIQUIDATING        = SESSION_LIQUIDATING,
-    ST_S_LIQUIDATING_TRANSIT = STATE_LIQUIDATING_TRANSIT,
-    ST_S_EXIT_VERIFY        = STATE_EXIT_VERIFY,
     ST_S_CLOSED             = SESSION_CLOSED,
     ST_S_ERROR              = SESSION_ERROR
 };
