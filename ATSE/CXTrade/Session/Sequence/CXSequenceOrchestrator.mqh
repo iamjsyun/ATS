@@ -67,7 +67,9 @@ public:
             string name = Clean(StringSubstr(s, 0, firstDelim));
             int id = ResolveId(name);
             
-            string logicPart = GetSegment(s, "|", "?!@*");
+            // [v18.7] Support both '|' (Pipe) and '>' (Terminator)
+            string delim = StringSubstr(s, firstDelim, 1);
+            string logicPart = GetSegment(s, delim, "?!@*");
             string stepParts[];
             StringSplit(logicPart, StringGetCharacter(":", 0), stepParts);
             

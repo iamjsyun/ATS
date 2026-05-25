@@ -1,5 +1,5 @@
-#ifndef CXSESSIONACTIVE_MQH
-#define CXSESSIONACTIVE_MQH
+#ifndef CXSESSIONPOSITIONED_MQH
+#define CXSESSIONPOSITIONED_MQH
 
 #include "CXTradingSessionBase.mqh"
 #include "..\Core\Interfaces\IXPositionManager.mqh"
@@ -8,10 +8,10 @@
 #include "..\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
- * @class CXSessionActive
- * @brief 포지션 운용 및 익절 트레일링(Active, TrailingStop) 단계를 전담하는 세션 클래스 (v18.0)
+ * @class CXSessionPositioned
+ * @brief 실물 포지션 확보 완료 및 운용(Active, TrailingStop) 단계를 전담하는 클래스 (v18.6)
  */
-class CXSessionActive : public CXTradingSessionBase {
+class CXSessionPositioned : public CXTradingSessionBase {
 private:
     IXPositionManager*   m_posMgr;
     ICXInventoryManager* m_inventoryManager;
@@ -19,12 +19,12 @@ private:
     ICXPriceManager*     m_priceManager;
 
 public:
-    CXSessionActive(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
+    CXSessionPositioned(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
         : CXTradingSessionBase(repo, globalCtx, factory) {
         Bootstrap(factory);
     }
 
-    virtual ~CXSessionActive() {
+    virtual ~CXSessionPositioned() {
         SAFE_DELETE(m_posMgr);
         SAFE_DELETE(m_inventoryManager);
         SAFE_DELETE(m_priceTracker);
@@ -46,7 +46,7 @@ private:
         m_ctx.Register("price_tracker", m_priceTracker);
         m_ctx.Register("price_mgr",     m_priceManager);
         
-        XP_LOG_DEBUG(NULL, "[SESSION-ACTIVE] Bootstrap Complete. Managers initialized.");
+        XP_LOG_DEBUG(NULL, "[SESSION-POSITIONED] Bootstrap Complete. Managers initialized.");
     }
 };
 

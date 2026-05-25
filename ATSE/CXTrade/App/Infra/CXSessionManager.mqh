@@ -5,15 +5,16 @@
 #include "..\..\Core\Interfaces\ICXSessionManager.mqh"
 #include "..\..\Core\Macros\CXMacros.mqh"
 
-// [v18.0] State-Pattern Session Headers
+// [v18.6] State-Pattern Session Headers (Hyper-Atomic)
 #include "..\..\Session\CXSessionEntry.mqh"
 #include "..\..\Session\CXSessionPending.mqh"
-#include "..\..\Session\CXSessionActive.mqh"
+#include "..\..\Session\CXSessionTrailingEntry.mqh"
+#include "..\..\Session\CXSessionPositioned.mqh"
 #include "..\..\Session\CXSessionExit.mqh"
 
 /**
  * @class CXSessionManager
- * @brief 신호 상태별 최적화된 세션 생성 및 GC를 담당하는 관리자 (v18.0)
+ * @brief 신호 상태별 최적화된 세션 생성 및 GC를 담당하는 관리자 (v18.6)
  */
 class CXSessionManager : public ICXSessionManager {
 private:
@@ -38,7 +39,7 @@ public:
     }
 
     /**
-     * @brief [v18.0] 신호의 현재 상태에 가장 적합한 세션 클래스를 동적으로 생성
+     * @brief [v18.6] 신호의 현재 상태에 가장 적합한 세션 클래스를 동적으로 생성
      */
     virtual ICXTradingSession* CreateSession(ICXParam* xp) override {
         if(IS_INVALID(m_factory) || IS_INVALID(xp)) return NULL;
@@ -49,17 +50,24 @@ public:
         int status = sig.GetStatus();
         ICXTradingSession* session = NULL;
 
-        // 상태별 최적화된 클래스 인스턴스화
+        // [v18.6 Refinement] 물리적 자산 상태에 따른 정밀 매핑
         if(status < XE_PENDING_PLACED) {
             session = new CXSessionEntry(m_globalRepo, m_globalContext, m_factory);
         }
-        else if(status < XE_EXECUTED) {
+        else if(status == XE_PENDING_PLACED) {
+            // 터미널 오더는 있으나 아직 추격을 시작하지 않은 '접수' 상태
             session = new CXSessionPending(m_globalRepo, m_globalContext, m_factory);
         }
+        else if(status < XE_EXECUTED) {
+            // 적극적으로 가격을 추격 중인 상태
+            session = new CXSessionTrailingEntry(m_globalRepo, m_globalContext, m_factory);
+        }
         else if(status < XE_CLOSED_SIGNAL) {
-            session = new CXSessionActive(m_globalRepo, m_globalContext, m_factory);
+            // 체결 완료되어 포지션을 보유 중인 상태
+            session = new CXSessionPositioned(m_globalRepo, m_globalContext, m_factory);
         }
         else {
+            // 청산 절차 진행 중
             session = new CXSessionExit(m_globalRepo, m_globalContext, m_factory);
         }
 
@@ -85,9 +93,6 @@ public:
             if(IS_VALID(session)) {
                 if(IS_VALID(xp)) xp.Reset();
                 session.Pulse(xp);
-                
-                // [v18.0 Optimization] 여기서 상태 전이에 따른 클래스 교체(Swapping) 로직을 추가할 수 있음
-                // 현재는 시퀀스가 단일 세션 객체 내에서 동작하므로, 세션 재기동 시에만 최적화된 클래스가 생성됨.
             }
         }
         PurgeInactive();
