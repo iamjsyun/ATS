@@ -68,16 +68,16 @@ private:
         m_watcher_map.Add(new CXSequenceStep(ST_BINDING,    STEP_BINDING,    ST_DISCOVERY,  ST_DISCOVERY,  T_NONE));
     }
 
-    void InitSessionMap() {
-        m_session_map = new CArrayObj();
-        m_session_map.Add(new CXSequenceStep(ST_ENTRY_LOGIC, STEP_ENTRY_LOGIC, ST_ENTRY_ORDER, ST_ERROR, T_SHORT));
-        // ... (전체 세션 파이프라인 매핑)
-    }
+    void InitPendingMap() { /* Phase 1 mapping */ }
+    void InitActiveMap()  { /* Phase 2 mapping */ }
+    void InitExitMap()    { /* Phase 3 mapping */ }
 
 public:
     CXSequenceOrchestrator() {
         InitWatcherMap();
-        InitSessionMap();
+        InitPendingMap();
+        InitActiveMap();
+        InitExitMap();
     }
     ~CXSequenceOrchestrator() { /* 메모리 정리 */ }
 

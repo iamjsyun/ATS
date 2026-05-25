@@ -18,6 +18,7 @@ public:
     virtual string GetString() const = 0;
     virtual void SetString(string val) = 0;
     virtual ICXContext* GetContext() = 0;
+    virtual void SetContext(ICXContext* ctx) = 0;
     virtual void Reset() = 0;
 
     virtual double GetDouble() const = 0;
@@ -25,4 +26,10 @@ public:
 
     virtual int    GetInt() const = 0;
     virtual void   SetInt(int val) = 0;
+    
+    virtual long   GetLong() const = 0;
+    virtual void   SetLong(long val) = 0;
+    
+    //--- Factory (v15.2)
+    virtual ICXParam* CreateEmptyParam() = 0;
 };#endif

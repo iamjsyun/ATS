@@ -48,7 +48,7 @@ public:
                     if(sig.GetXAExit() == XA_ACTIVE)  exitCount++;
                 }
             }
-            XP_LOG_TRACE(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals (Entry:%d, Exit:%d)", found, entryCount, exitCount));
+            XP_LOG_OK(xp, StringFormat("[WATCHER-DISCOVERY] Found %d active signals (Entry:%d, Exit:%d)", found, entryCount, exitCount));
             ctx.Set("active_signals", activeList);
             return WATCHER_VALIDATION;
         }

@@ -14,14 +14,21 @@
 class CXCompositeStep : public IXStep {
 private:
     string      m_name;
-    CArrayObj   m_tasks;
-    int         m_currentTaskIndex; // [Refinement 1] Resume Pointer
+    IXTask*     m_taskPtrs[];       // [v15.2] Typed Pointer Array
+    int         m_taskCount;
+    int         m_currentTaskIndex; 
     bool        m_hasConditionFunc;
 
 public:
-    CXCompositeStep(string name) : m_name(name), m_currentTaskIndex(0), m_hasConditionFunc(false) {}
+    CXCompositeStep(string name) : m_name(name), m_taskCount(0), m_currentTaskIndex(0), m_hasConditionFunc(false) {
+        ArrayResize(m_taskPtrs, 0, 10);
+    }
+
     virtual ~CXCompositeStep() {
-        m_tasks.Clear();
+        for(int i=0; i<m_taskCount; i++) {
+            SAFE_DELETE(m_taskPtrs[i]);
+        }
+        ArrayResize(m_taskPtrs, 0);
     }
 
     virtual string Name() override { return m_name; }
@@ -31,7 +38,9 @@ public:
      */
     CXCompositeStep* AddTask(IXTask* task) {
         if(IS_VALID(task)) {
-            m_tasks.Add(task);
+            m_taskCount++;
+            ArrayResize(m_taskPtrs, m_taskCount);
+            m_taskPtrs[m_taskCount-1] = task;
         }
         return GetPointer(this);
     }
@@ -47,17 +56,17 @@ public:
      * @brief 등록된 태스크들을 순차적으로 실행
      */
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
-        // [v11.9 Fix] Persist current index across ticks by retrieving it from Context
+        // [v15.2 Typed Accessor] Eliminate dynamic_cast
         string indexKey = StringFormat("CompositeIndex_%s", m_name);
-        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        ICXParam* pIdx = ctx.GetParam(indexKey);
         int startIndex = IS_VALID(pIdx) ? pIdx.GetInt() : 0;
         
-        for(int i = 0; i < m_tasks.Total(); i++) {
+        for(int i = 0; i < m_taskCount; i++) {
             // [v14.3 Priority Execution] 
             // 인덱스 0번 태스크(보통 IntentWatch)는 이전의 Yield 지점과 상관없이 "매 틱 무조건 실행"
             if(i > 0 && i < startIndex) continue; 
 
-            IXTask* task = dynamic_cast<IXTask*>(m_tasks.At(i));
+            IXTask* task = m_taskPtrs[i];
             if(IS_VALID(task)) {
                 // [v9.9.2] 타임아웃 검증
                 if(task.IsTimedOut()) {
@@ -92,7 +101,7 @@ public:
                 // 3. 비차단 대기(Yield) 시 인덱스 유지하고 다음 틱 대기
                 else if(res == TASK_YIELD) {
                     if(IS_INVALID(pIdx)) {
-                        pIdx = new CXParam();
+                        pIdx = xp.CreateEmptyParam(); // [v15.2] Create via param factory if needed
                         ctx.Set(indexKey, pIdx);
                     }
                     pIdx.SetInt(i); // 현재 지점 저장
@@ -121,18 +130,19 @@ public:
 
     virtual void OnEnter(ICXContext* ctx) override {
         string indexKey = StringFormat("CompositeIndex_%s", m_name);
-        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        ICXParam* pIdx = ctx.GetParam(indexKey);
         if(IS_INVALID(pIdx)) {
-            pIdx = new CXParam();
-            ctx.Set(indexKey, pIdx);
+            // Need a way to create param without knowing concrete type
+            // For now, if null, it will be created in OnProcess
+        } else {
+            pIdx.SetInt(0);
         }
-        pIdx.SetInt(0);
-        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Entered (%d tasks)", m_name, m_tasks.Total()));
+        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Entered (%d tasks)", m_name, m_taskCount));
     }
     
     virtual void OnExit(ICXContext* ctx) override {
         string indexKey = StringFormat("CompositeIndex_%s", m_name);
-        ICXParam* pIdx = dynamic_cast<ICXParam*>(ctx.Get(indexKey));
+        ICXParam* pIdx = ctx.GetParam(indexKey);
         if(IS_VALID(pIdx)) pIdx.SetInt(0);
         XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Exited", m_name));
     }

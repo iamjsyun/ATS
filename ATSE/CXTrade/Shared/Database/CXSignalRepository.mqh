@@ -78,7 +78,7 @@ public:
 
    virtual void SaveSignal(ICXSignal* signal) override {
       if(IS_INVALID(signal) || IS_INVALID(m_db)) return;
-      CXSignal* sig = dynamic_cast<CXSignal*>(signal);
+      CXSignal* sig = CX_CAST(CXSignal, signal);
       if(IS_INVALID(sig)) return;
 
       string columns = "";
@@ -162,9 +162,9 @@ public:
    virtual int LoadActiveSignals(CArrayObj* list) override {
       if (IS_INVALID(m_db) || IS_INVALID(list)) return 0;
 
-      // [v14.25 Fix] ERROR(99) 상태를 명시적으로 제외하여 중복 바인딩 루프 차단
-      string sql = StringFormat("SELECT * FROM signals WHERE ((xa_entry > %d OR xa_exit > %d) AND xe_status < %d AND xe_status <> %d)", 
-                                XA_RAW, XA_RAW, XE_CLOSED_SIGNAL, XE_ERROR);
+      // [v14.34 Fix] EXIT-FIRST Priority Mandate: xa_exit=1은 XE_ERROR(99)를 우회하여 로드
+      string sql = StringFormat("SELECT * FROM signals WHERE ((xa_entry > %d OR xa_exit > %d) AND xe_status < %d AND xe_status <> %d) OR (xa_exit = %d AND xe_status = %d)", 
+                                XA_RAW, XA_RAW, XE_CLOSED_SIGNAL, XE_ERROR, XA_ACTIVE, XE_ERROR);
 
       int hQuery = DatabasePrepare(m_db.GetHandle(), sql);
       if(hQuery == INVALID_HANDLE) return 0;

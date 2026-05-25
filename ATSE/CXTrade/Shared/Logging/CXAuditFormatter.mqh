@@ -23,11 +23,12 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return StringFormat("[FUNC:%s] INVALID_SIGNAL", action);
 
-        // [FUNC:Name] [SID] [TK:Value] [Sym, Lot, Dir, Status]
-        string block1 = StringFormat("[FUNC:%s] [%s] [TK:%I64u] [%s, %.2f, %s, %s]",
+        // [v14.4 Magic Number Mandate] [FUNC:Name] [SID] [TK:Value, M:Magic] [Sym, Lot, Dir, Status]
+        string block1 = StringFormat("[FUNC:%s] [%s] [TK:%I64u, M:%I64d] [%s, %.2f, %s, %s]",
                                        action, 
                                        sig.GetSid(), 
                                        sig.GetTicket(),
+                                       sig.GetMagic(),
                                        sig.GetSymbol(), 
                                        sig.GetLot(), 
                                        GetDirName((ENUM_CX_DIRECTION)sig.GetDir()),
@@ -37,14 +38,14 @@ public:
         string symbol = sig.GetSymbol();
         double mkt = SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
 
-        // [v14.4 UAF Expanded] [TK] block added, labels ESPRI/ELPRI
+        // [v14.4 UAF Expanded] [TK, M] blocks added, standardized labels
         double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
         double dirSign = (sig.GetDir() == CX_DIR_BUY) ? -1.0 : 1.0; 
         // TE Estimate
         double tesp = (sig.GetTEStart() >= 1) ? mkt + (sig.GetTEStart() * point * dirSign) : 0.0;
         double telp = (sig.GetTELimit() >= 1) ? mkt + (sig.GetTELimit() * point * dirSign) : 0.0;
 
-        string block2 = StringFormat("[ESTART:%d, ESTEP:%d, ELIMIT:%d, ESPRI:%.2f, ELPRI:%.2f SSTART:%d, SSTEP:%d SL:%d TP:%d]",
+        string block2 = StringFormat("[ESTART:%d, ESTEP:%d, ELIMIT:%d, ESTART_PRICE:%.2f, ELIMIT_PRICE:%.2f SSTART:%d, SSTEP:%d SL:%d TP:%d]",
                                        (int)sig.GetTEStart(),
                                        (int)sig.GetTEStep(),
                                        (int)sig.GetTELimit(),

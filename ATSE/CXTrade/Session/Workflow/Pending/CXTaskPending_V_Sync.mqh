@@ -38,16 +38,8 @@ public:
         }
 
         if(sig.GetXAExit() == XA_ACTIVE) {
-            ulong t = (ulong)sig.GetTicket();
-            if(t > 0) {
-                XP_LOG_INFO(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Exit command detected. Moving to LIQUIDATING."));
-                return SESSION_LIQUIDATING;
-            } else {
-                string abortMsg = "ABORT: Exit intent received before order placement (Ticket=0).";
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, abortMsg));
-                if(IS_VALID(xp)) xp.SetString("[PENDING-V-SYNC] " + abortMsg);
-                return SESSION_ERROR;
-            }
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Exit command detected. Moving to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
         }
 
         if(sig.GetStatus() >= XE_EXECUTED) {

@@ -239,25 +239,17 @@ private:
         if(from == -1 || from == to) return true;
         if(m_name != "SessionSeq") return true;
 
-        // [v14.7 Permissive Transition Matrix] 
-        // 하이퍼-원자적 태스크 간의 점프를 허용하여 유연성 확보
-        if(from == SESSION_READY) { // 0
-            return (to == STATE_ENTRY_TRANSIT || to == STATE_ENTRY_VERIFY || to == STATE_ENTRY_TRAILING || 
-                    to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
+        // [v15.0 Phase-Centric Transition Matrix] 
+        // Phase 1: PENDING (0)
+        if(from == SESSION_READY) { 
+            return (to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == SESSION_CLOSED);
         }
-        if(from == STATE_ENTRY_TRANSIT || from == STATE_ENTRY_VERIFY) { // 1, 2
-            return (to == STATE_ENTRY_VERIFY || to == STATE_ENTRY_TRAILING || to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
+        // Phase 2: ACTIVE (10)
+        if(from == SESSION_ACTIVE) { 
+            return (to == SESSION_LIQUIDATING || to == SESSION_CLOSED);
         }
-        if(from == STATE_ENTRY_TRAILING) { // 5
-            return (to == SESSION_ACTIVE || to == SESSION_LIQUIDATING || to == STATE_EXIT_VERIFY);
-        }
-        if(from == SESSION_ACTIVE) { // 10
-            return (to == SESSION_LIQUIDATING || to == STATE_EXIT_TRAILING || to == STATE_SYNC_ALIGN || to == STATE_EXIT_VERIFY);
-        }
-        if(from == SESSION_LIQUIDATING) { // 20
-            return (to == STATE_LIQUIDATING_TRANSIT || to == STATE_EXIT_SWEEP || to == STATE_EXIT_VERIFY || to == SESSION_CLOSED);
-        }
-        if(from == STATE_EXIT_VERIFY) { // 23
+        // Phase 3: EXIT (20)
+        if(from == SESSION_LIQUIDATING) { 
             return (to == SESSION_CLOSED);
         }
 

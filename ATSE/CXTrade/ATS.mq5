@@ -24,7 +24,7 @@ input bool           InpUseCommonPath   = true;                // DB: Use Termin
 input bool           InpLog_UseUI       = true;                // UI: Dashboard Log Enabled
 input bool           InpLog_UseRemote   = true;                // Remote: Global Remote Toggle
 input string         InpLog_FilterCnos  = "*";                 // Filter: Target CNO List (CSV / *:All)
-input ENUM_LOG_LEVEL InpLog_Level       = LOG_LVL_INFO;        // Log Level
+input ENUM_LOG_LEVEL InpLog_Level       = LOG_LVL_TRACE;        // Log Level
 
 //--- [Group: Signal Watcher Log]
 input bool           InpWatcher_UseFile   = true;              // Watcher: File Log Enabled

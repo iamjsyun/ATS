@@ -30,53 +30,56 @@ public:
         // 1분봉 마감 시마다 최소 간격(ELIMIT) 유지 여부 체크
         string barKey = "LastBufferCheckBar_" + sig.GetSymbol();
         datetime lastBar = 0;
-        CObject* objBar = ctx.Get(barKey);
-        if(IS_VALID(objBar)) {
-            CXParam* pBar = dynamic_cast<CXParam*>(objBar);
-            if(IS_VALID(pBar)) lastBar = (datetime)pBar.GetLong();
-        }
+        ICXParam* pBar = ctx.GetParam(barKey);
+        if(IS_VALID(pBar)) lastBar = (datetime)pBar.GetLong();
 
-        datetime currentBar = iTime(sig.GetSymbol(), PERIOD_M1, 0);
-        if(currentBar > lastBar) {
-            double currentDist = MathAbs(currentPrice - sig.GetPriceSignal()) / point;
+        double currentBar = (double)iTime(sig.GetSymbol(), PERIOD_M1, 0); // Cast to double for precision if needed, but datetime is long
+        
+        // Use GetPriceOpen() to compare against the ACTUAL current pending order price, not the original signal price
+        double orderPrice = sig.GetPriceOpen(); 
+        
+        if((datetime)currentBar > lastBar) {
+            double currentDist = MathAbs(currentPrice - orderPrice) / point;
+            
+            // ELIMIT(te_limit) 간격보다 좁아진 경우 (주문가가 현재가에 너무 가까움)
             if((double)sig.GetTELimit() >= currentDist) {
                 double newTarget = currentPrice + (sig.GetTELimit() * point * dir_sign);
                 double normTarget = NormalizeDouble(newTarget, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
                 
-                XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-BUFF", xp, StringFormat("Buffer Guard: Dist %.1f < Limit %d. Pushing back to %.5f", currentDist, sig.GetTELimit(), normTarget)));
+                XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-BUFF", xp, StringFormat("Buffer Guard: Dist %.1f <= Limit %d. Pushing back to %.5f", currentDist, sig.GetTELimit(), normTarget)));
                 xp.SetDouble(normTarget);
                 xp.SetInt(1); // Trigger Modification
                 
-                // Update last bar time to prevent multiple triggers in same bar
                 CXParam* pNewBar = new CXParam();
                 pNewBar.SetLong((long)currentBar);
                 ctx.Set(barKey, pNewBar);
+                
+                // Buffer Guard가 작동하여 주문을 후퇴시켰으므로, 이번 틱에서는 기존 Trailing(전진) 로직 생략
                 return TASK_CONTINUE;
             }
             
-            // Just update bar time if no violation
             CXParam* pNewBar = new CXParam();
             pNewBar.SetLong((long)currentBar);
             ctx.Set(barKey, pNewBar);
         }
 
-        // --- [기존 Trailing Logic] ---
-        // [v14.31 Spec Sync] Trailing threshold check.
-        // Price must improve by at least ESTART before moving the order.
+        // --- [기존 Trailing Logic (Jint)] ---
+        // ESTART(te_start) 간격 이상으로 유리해졌을 때만 주문가를 전진시킴
         double target = currentPrice + (sig.GetTEStart() * point * dir_sign);
         
-        bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (sig.GetPriceSignal() - sig.GetTEStart() * point >= target) 
-                                                        : (target >= sig.GetPriceSignal() + sig.GetTEStart() * point);
+        // 매수(Buy Limit): 타겟 가격이 현재 주문 가격보다 더 낮아졌는가? (더 싸게 살 수 있는가)
+        // 매도(Sell Limit): 타겟 가격이 현재 주문 가격보다 더 높아졌는가? (더 비싸게 팔 수 있는가)
+        bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (target < orderPrice - (sig.GetTEStep() * point)) 
+                                                        : (target > orderPrice + (sig.GetTEStep() * point));
 
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, StringFormat("Price improvement check: Improved=%d", is_improved)));
+        // 너무 잦은 로그 억제
+        // XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, StringFormat("Price improvement check: Improved=%d", is_improved)));
 
         if(is_improved) {
             double newPrice = NormalizeDouble(target, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
             
-            // [v14.33 Event Log] Record Trailing Activation
-            XP_LOG_OK(xp, CXAuditFormatter::Build("ESTART-ACTIVE", xp, StringFormat("Trailing activated at %.5f (ESTART:%d pts reached)", currentPrice, (int)sig.GetTEStart())));
+            XP_LOG_OK(xp, CXAuditFormatter::Build("ESTART-ACTIVE", xp, StringFormat("Trailing activated at %.5f (ESTART:%d pts reached). Moving from %.5f to %.5f", currentPrice, (int)sig.GetTEStart(), orderPrice, newPrice)));
             
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, StringFormat("OK: Price Target improved to %.5f", newPrice)));
             xp.SetDouble(newPrice);
             xp.SetInt(1); 
         }

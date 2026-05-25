@@ -2,13 +2,14 @@
 #define CXSEQUENCEREGISTRY_MQH
 
 #include <Arrays\ArrayObj.mqh>
+#include <Arrays\ArrayString.mqh>
 #include "CXFluentSequence.mqh"
 #include "CXSequenceStep.mqh"
 #include "CXStepFactory.mqh"
 
 /**
  * @class CXSequenceRegistry
- * @brief CXSequenceStep 리스트를 기반으로 CXFluentSequence를 조립
+ * @brief [v16.6] CXSequenceStep 리스트를 기반으로 CXFluentSequence를 조립 (Enum-less)
  */
 class CXSequenceRegistry {
 public:
@@ -16,10 +17,11 @@ public:
         if(IS_INVALID(seq) || IS_INVALID(map)) return;
 
         for(int i = 0; i < map.Total(); i++) {
-            CXSequenceStep* cfg = dynamic_cast<CXSequenceStep*>(map.At(i));
+            CXSequenceStep* cfg = CX_CAST(CXSequenceStep, map.At(i));
             if(IS_INVALID(cfg)) continue;
 
-            IXStep* step = CXStepFactory::CreateStep(cfg.GetStepType(), cfg.GetName(), cfg.GetTasks());
+            // [v16.6] StepFactory에 문자열 명칭을 직접 전달
+            IXStep* step = CXStepFactory::CreateStep(cfg.GetStepTypeStr(), cfg.GetName(), cfg.GetTasks());
             if(IS_VALID(step)) {
                 seq.From(cfg.GetStateId())
                    .Execute(step)

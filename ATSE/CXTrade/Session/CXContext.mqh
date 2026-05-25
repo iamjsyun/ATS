@@ -46,17 +46,38 @@ public:
 
     virtual void Remove(string key) override {
         if(m_resources.ContainsKey(key)) {
-            CObject* obj = NULL;
-            m_resources.TryGetValue(key, obj);
             m_resources.Remove(key);
-            if(CheckPointer(obj) == POINTER_DYNAMIC) delete obj;
+            // [v16.2 Fix] Ownership Policy: Context is a lookup service, not an owner.
+            // Do NOT delete objects here. Let the creator (AppService/Session) handle cleanup.
         }
+    }
+
+    //--- Typed Accessors (v15.2 Implementation)
+    virtual ICXParam* GetParam(string key) override {
+        CObject* obj = Get(key);
+        return (obj != NULL) ? (ICXParam*)obj : NULL;
+    }
+
+    virtual ICXConfig* GetConfig() override {
+        CObject* obj = Get("config");
+        return (obj != NULL) ? (ICXConfig*)obj : NULL;
+    }
+
+    virtual ICXLogger* GetLogger() override {
+        CObject* obj = Get("logger");
+        return (obj != NULL) ? (ICXLogger*)obj : NULL;
     }
 
     //--- Hierarchy Support
     virtual void AddChild(string name, ICXContext* child) override {
         if(m_children.ContainsKey(name)) m_children.Remove(name);
         if(IS_VALID(child)) m_children.Add(name, child);
+    }
+
+    virtual void RemoveChild(string name) override {
+        if(m_children.ContainsKey(name)) {
+            m_children.Remove(name);
+        }
     }
 
     virtual ICXContext* GetChild(string name) override {

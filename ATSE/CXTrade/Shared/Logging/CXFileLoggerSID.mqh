@@ -22,13 +22,13 @@ public:
     /**
      * @brief SID를 기반으로 파일 핸들 초기화
      */
-    bool Init(string sid) {
+    bool Init(string sid, bool initOnStart = false) {
         m_sid = sid;
         MqlDateTime dt;
         TimeCurrent(dt);
         m_lastHour = dt.hour;
 
-        return OpenByTime(dt);
+        return OpenByTime(dt, initOnStart);
     }
 
     virtual void Log(ENUM_LOG_LEVEL level, string msg) override {
@@ -39,7 +39,7 @@ public:
         TimeCurrent(dt);
         if(dt.hour != m_lastHour) {
             m_lastHour = dt.hour;
-            OpenByTime(dt);
+            OpenByTime(dt, false); // Rotation is always append
         }
 
         if(m_handle == INVALID_HANDLE) return;
@@ -54,25 +54,38 @@ private:
     /**
      * @brief {sid}-{yymmdd-HH}0000.log 형식으로 물리적 파일 오픈
      */
-    bool OpenByTime(MqlDateTime &dt) {
+    bool OpenByTime(MqlDateTime &dt, bool truncate) {
         Close();
 
         if(!FolderCreate("ATSE", FILE_COMMON)) {
             int err = GetLastError();
-            if(err != 0 && err != 5019) PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d", err);
+            if(err != 0 && err != 5019) {
+                PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d. Aborting logger init.", err);
+                return false; 
+            }
         }
 
         string timestamp = StringFormat("%02d%02d%02d-%02d0000", dt.year % 100, dt.mon, dt.day, dt.hour);
         m_filename = StringFormat("ATSE\\%s-%s.log", m_sid, timestamp);
         
-        // 1. 기존 파일 추가(Append) 시도
-        int flags = FILE_TXT|FILE_SHARE_READ|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
-        m_handle = FileOpen(m_filename, flags);
-
-        // 2. 실패 시 신규 생성
-        if(m_handle == INVALID_HANDLE) {
-            flags = FILE_TXT|FILE_SHARE_READ|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
+        // [v15.9] Robust Shared Flags (FILE_SHARE_READ|FILE_SHARE_WRITE)
+        int sharedFlags = FILE_SHARE_READ|FILE_SHARE_WRITE;
+        
+        // 1. Initialization Logic (Truncate)
+        if(truncate) {
+            int flags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
             m_handle = FileOpen(m_filename, flags);
+            if(m_handle != INVALID_HANDLE) return true;
+        }
+
+        // 2. Default: Robust Append Mode
+        int appendFlags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
+        m_handle = FileOpen(m_filename, appendFlags);
+
+        // 3. Fallback: Create new if not exists
+        if(m_handle == INVALID_HANDLE) {
+            int createFlags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
+            m_handle = FileOpen(m_filename, createFlags);
         }
 
         if(m_handle != INVALID_HANDLE) {

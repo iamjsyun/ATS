@@ -15,10 +15,10 @@ public:
         CXContext ctx;
         CXFluentSequence seq(GetPointer(ctx), "TestSeq");
 
-        // Test Case 1: Session Sequence Build from DSL (Implicitly calls InitSessionMap)
+        // Test Case 1: Session Sequence Build from DSL (Implicitly calls InitPendingMap, InitActiveMap, InitExitMap)
         orchestrator.BuildSessionSequence(GetPointer(seq));
         
-        // Check node count (Should match the number of nodes in InitSessionMap)
+        // Check node count (Should match the total number of nodes in session maps)
         // Entry(3) + Pending(1) + Active(1) + Exit(3) = 8 nodes
         if (seq.GetNodeCount() == 8) {
             Print("  [PASS] Session sequence built with 8 nodes.");

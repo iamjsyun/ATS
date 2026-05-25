@@ -20,26 +20,26 @@ private:
     CXTerminalScanner*      m_scanner;
     IRepository*            m_repo;
     ICXSessionManager*      m_manager;
+    ICXConfig*              m_config; // [v16.2] Explicit dependency
 
 public:
-    CXReverseInjector(CXTerminalScanner* scanner, IRepository* repo, ICXSessionManager* manager) 
-        : m_scanner(scanner), m_repo(repo), m_manager(manager) {}
+    CXReverseInjector(CXTerminalScanner* scanner, IRepository* repo, ICXSessionManager* manager, ICXConfig* config) 
+        : m_scanner(scanner), m_repo(repo), m_manager(manager), m_config(config) {}
 
     /**
      * @brief 스캔 및 역주입 실행 (Zombie Recovery)
      */
     void Pulse(ICXParam* xp) {
         if(CheckPointer(m_scanner) == POINTER_INVALID || CheckPointer(m_repo) == POINTER_INVALID || CheckPointer(m_manager) == POINTER_INVALID) return;
-        
-        // [v11.7] 타겟 매직넘버 정보 획득 (격리 원칙)
-        ICXConfig* config = NULL;
-        if(CheckPointer(xp) != POINTER_INVALID) config = dynamic_cast<ICXConfig*>(xp.GetContext().Get("config"));
+
+        // [v16.2] Use explicitly injected config instead of context lookup
+        ICXConfig* config = m_config;
         
         CArrayObj terminalAssets;
         if(m_scanner.ScanAll(GetPointer(terminalAssets)) <= 0) return;
 
         for(int i = 0; i < terminalAssets.Total(); i++) {
-            CXTerminalAsset* asset = dynamic_cast<CXTerminalAsset*>(terminalAssets.At(i));
+            CXTerminalAsset* asset = CX_CAST(CXTerminalAsset, terminalAssets.At(i));
             if(CheckPointer(asset) == POINTER_INVALID) continue;
 
             string sid = asset.sid;
@@ -84,15 +84,17 @@ public:
                 sig = fakeSig;
             }
 
-            // 2. 세션 동적 생성 및 주입
-            ICXTradingSession* session = m_manager.CreateSession();
+            // 2. 세션 동적 생성 및 주입 (v15.9)
+            CXParam sp;
+            sp.SetSignal(sig);
+            ICXTradingSession* session = m_manager.CreateSession(GetPointer(sp));
             if(CheckPointer(session) != POINTER_INVALID) {
                 ICXSignal* oldSig = xp.GetSignal();
                 xp.SetSignal(sig);
                 XP_LOG_INFO(xp, CXAuditFormatter::Build("REVERSE-RESTORE", xp));
                 xp.SetSignal(oldSig);
 
-                session.InjectState(dynamic_cast<CXSignal*>(sig));
+                session.InjectState(CX_CAST(CXSignal, sig));
                 
                 // [v14.36 Direct Jump] Prevent sequence mismatch by forcing target state
                 // If it's a zombie, jump directly to Liquidation pipeline (State 20)

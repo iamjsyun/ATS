@@ -57,6 +57,11 @@ public:
     }
 
     ~CXTradingSession() {
+        // [v16.2 Fix] Hierarchy Cleanup: Remove self from global tree before destruction
+        if(m_sid != "" && IS_VALID(m_globalCtx)) {
+            m_globalCtx.RemoveChild(m_sid);
+        }
+
         SAFE_DELETE(m_entryMgr); SAFE_DELETE(m_orderMgr);
         SAFE_DELETE(m_posMgr);   SAFE_DELETE(m_exitMgr);
         SAFE_DELETE(m_priceTracker);
@@ -101,7 +106,7 @@ public:
 
         // 2.1 [v10.7 Fix] Transaction Filtering (Anti Cross-talk)
         if(xp.GetEvent() == EVENT_TRANSACTION) {
-            CXParam* px = dynamic_cast<CXParam*>(xp);
+            CXParam* px = CX_CAST(CXParam, xp);
             if(IS_VALID(px) && IS_VALID(sig)) {
                 MqlTradeTransaction trans = px.GetTransaction();
                 //-- 본인 티켓과 관련 없는 트랜잭션은 무시
@@ -113,23 +118,34 @@ public:
         }
 
         // [v14.27 Core Integrity] Provide the param to the context before sequence execution
-        if(IS_VALID(m_ctx)) m_ctx.SetParam(xp);
+        if(IS_VALID(m_ctx)) {
+            xp.SetContext(m_ctx); // [v15.9] Context Injection for isolated logging
+            m_ctx.SetParam(xp);
+        }
 
         // 3. 시퀀스 엔진 구동
         if(IS_VALID(m_sequence)) {
             m_sequence.Pulse(xp);
             
-            // [v7.9 Error Recovery] 회로 차단기 및 치명적 에러 발생 시 처리
+            // [v7.9 Error Recovery] 회로 차단기 및 치명적 에러 발생 시 처리 (The Circuit Breaker)
             if(m_sequence.State() == SESSION_ERROR) {
+                // 1. 에러 상세 내용 추출 및 보강
                 string errorDetail = xp.GetString(); 
                 if(errorDetail == "" && IS_VALID(sig)) errorDetail = sig.GetStatusMsg(); // [v14.22 Fallback]
                 if(errorDetail == "") errorDetail = "Unknown Sequence Interruption";
+                
+                string enhancedError = StringFormat("Circuit Breaker Activated. Reason: %s", errorDetail);
 
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("SESSION-ERROR", xp, errorDetail));
+                // 2. 로그 기록 (UAF 표준)
+                XP_LOG_ERROR(xp, CXAuditFormatter::Build("SESSION-ERROR", xp, enhancedError));
+                
+                // 3. DB 동기화 (최종 상태 99 마킹)
                 if(IS_VALID(sig)) {
-                    CXMessageProvider::UpdateStatus(sig, XE_ERROR, errorDetail);
-                    if(IS_VALID(m_repo)) m_repo.UpdateStatus(sig);
+                    CXMessageProvider::UpdateStatus(sig, XE_ERROR, enhancedError);
+                    if(IS_VALID(m_repo)) m_repo.UpdateStatus(sig); // DB에 "에러로 중단됨" 기록
                 }
+                
+                // 4. 회로 차단 (중요!)
                 m_isActive = false; // 세션 영구 비활성화 (좀비 방지)
             }
         }
@@ -137,15 +153,13 @@ public:
 
     void Start(ICXParam* xp) {
         m_isActive = true;
-        m_signal = (IS_VALID(xp)) ? xp.GetSignal() : NULL;
-        m_sid = (IS_VALID(m_signal)) ? m_signal.GetSid() : "";
+        // m_signal and m_sid already set via constructor v15.9
 
         //--- [SSOC] 글로벌 트리에 등록
         if(m_sid != "" && IS_VALID(m_globalCtx)) {
             m_globalCtx.AddChild(m_sid, m_ctx);
         }
 
-        InitLogger(m_sid, m_factory);
         if(IS_VALID(m_sequence)) m_sequence.ResetState(); // [v14.28] Restart state machine timers
         xp.SetEvent(EVENT_START);
         Pulse(xp);
@@ -153,8 +167,7 @@ public:
 
     void InjectState(CXSignal* sig) {
         m_isActive = true;
-        m_signal = sig;
-        m_sid = IS_VALID(sig) ? sig.GetSid() : "";
+        // m_signal and m_sid already set via constructor v15.9
 
         // [v14.38 Mandate Sync] Propagate Magic Number to all managers
         if(IS_VALID(m_signal)) {
@@ -169,7 +182,6 @@ public:
             m_globalCtx.AddChild(m_sid, m_ctx);
         }
 
-        InitLogger(m_sid, m_factory);
         CXParam xp;
         xp.SetSignal(sig);
         xp.SetEvent(EVENT_INJECT);
@@ -211,33 +223,22 @@ private:
 
         m_ctx.Register("repo", m_repo);
 
+        // [v15.9 Restoration] Mandatory Manager Integrity Check
         m_entryMgr = factory.CreateEntryManager(m_ctx);
-        if(IS_INVALID(m_entryMgr)) return;
-
         m_orderMgr = factory.CreateOrderManager(m_ctx);
-        if(IS_INVALID(m_orderMgr)) return;
-
         m_posMgr   = factory.CreatePositionManager(m_ctx);
-        if(IS_INVALID(m_posMgr)) return;
-
         m_exitMgr  = factory.CreateExitManager(m_ctx);
-        if(IS_INVALID(m_exitMgr)) return;
-
         m_priceTracker = factory.CreatePriceTracker(m_ctx);
-        if(IS_INVALID(m_priceTracker)) return;
-
         m_priceManager = factory.CreatePriceManager(m_ctx);
-        if(IS_INVALID(m_priceManager)) return;
-
         m_riskManager = factory.CreateRiskManager(m_ctx);
-        if(IS_INVALID(m_riskManager)) return;
-
         m_symbolManager = factory.CreateSymbolManager(m_ctx);
-        if(IS_INVALID(m_symbolManager)) return;
-
         m_inventoryManager = factory.CreateInventoryManager(m_ctx);
-        if(IS_INVALID(m_inventoryManager)) return;
         
+        if(IS_INVALID(m_entryMgr) || IS_INVALID(m_orderMgr) || IS_INVALID(m_posMgr) || IS_INVALID(m_exitMgr)) {
+             Print("[SESSION-BOOT] [CRITICAL] Failed to create essential managers.");
+             return;
+        }
+
         m_ctx.Register("entry_mgr", m_entryMgr); 
         m_ctx.Register("order_mgr", m_orderMgr);
         m_ctx.Register("pos_mgr", m_posMgr);     
@@ -249,9 +250,9 @@ private:
         m_ctx.Register("inventory_mgr", m_inventoryManager);
 
         m_sequence = factory.CreateSequence(m_ctx, "SessionSeq");
-        if(IS_INVALID(m_sequence)) return;
-
-        InitSequence();
+        if(IS_VALID(m_sequence)) {
+            InitSequence();
+        }
         
         m_isActive = true; 
     }
@@ -260,16 +261,16 @@ private:
         if(IS_INVALID(factory)) return;
         
         ICXConfig* config = NULL;
-        if(IS_VALID(m_ctx)) config = dynamic_cast<ICXConfig*>(m_ctx.Get("config"));
+        if(IS_VALID(m_ctx)) config = m_ctx.GetConfig();
         
-        m_logger = dynamic_cast<CXLogDispatcher*>(factory.CreateLogger(sid, config));
+        m_logger = CX_CAST(CXLogDispatcher, factory.CreateLogger(sid, config));
         if(IS_VALID(m_logger)) {
             m_ctx.Register("logger", m_logger);
         }
     }
 
     void InitSequence() {
-        CXFluentSequence* seq = dynamic_cast<CXFluentSequence*>(m_sequence);
+        CXFluentSequence* seq = CX_CAST(CXFluentSequence, m_sequence);
         if(IS_INVALID(seq)) return;
 
         //--- [Orchestration] 시퀀스 조립 위임
@@ -286,5 +287,4 @@ private:
         if(IS_VALID(log)) log.Info(NULL, info);
     }
 };
-
 #endif

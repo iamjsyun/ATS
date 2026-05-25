@@ -28,8 +28,8 @@
 #define IS_NULL(p)      (IS_INVALID(p))
 
 //--- 타입 안전성 강화를 위한 명시적 캐스팅 매크로
-#define CX_CAST(type, obj)      dynamic_cast<type*>(obj)
-#define CX_SAFE_CAST(type, obj) (IS_VALID(obj) ? dynamic_cast<type*>(obj) : NULL)
+#define CX_CAST(type, obj)      (type*)(obj)
+#define CX_SAFE_CAST(type, obj) (IS_VALID(obj) ? (type*)(obj) : NULL)
 
 //--- 가드 클로저 (Guard Clauses)
 #define XP_ASSERT(xp)           if(CheckPointer(xp) == POINTER_INVALID) return
@@ -37,7 +37,7 @@
 #define XP_ASSERT_NULL(xp)      if(CheckPointer(xp) == POINTER_INVALID) return NULL
 
 //--- 서비스 및 객체 획득 매크로 (Surgical Resolve)
-#define CX_GET_OBJ(ctx, key, type) (IS_VALID(ctx) ? dynamic_cast<type*>(ctx.Get(key)) : NULL)
+#define CX_GET_OBJ(ctx, key, type) (IS_VALID(ctx) ? (type*)(ctx.Get(key)) : NULL)
 
 //--- 로깅 헬퍼 함수
 inline ICXLogger* GetLoggerSafe(ICXParam* xp, ENUM_LOG_LEVEL level, bool is_sequence) {
@@ -45,7 +45,7 @@ inline ICXLogger* GetLoggerSafe(ICXParam* xp, ENUM_LOG_LEVEL level, bool is_sequ
     ICXContext* ctx = xp.GetContext();
     if(CheckPointer(ctx) == POINTER_INVALID) return NULL;
     
-    ICXConfig* config = dynamic_cast<ICXConfig*>(ctx.Get("config"));
+    ICXConfig* config = ctx.GetConfig();
     if(CheckPointer(config) == POINTER_INVALID) return NULL;
 
     // 0. Log Level 필터링 (선택된 레벨 이상만 출력)
@@ -61,7 +61,7 @@ inline ICXLogger* GetLoggerSafe(ICXParam* xp, ENUM_LOG_LEVEL level, bool is_sequ
         if(!config.IsSequenceLogEnabled(cno)) return NULL;
     }
 
-    return dynamic_cast<ICXLogger*>(ctx.Get("logger"));
+    return ctx.GetLogger();
 }
 
 //--- 로깅 매크로 (CXParam/Context 기반) - On-Change Deduplication Enabled

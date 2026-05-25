@@ -80,11 +80,8 @@ public:
 
         string retryKey = StringFormat("OrdHistRetry_%I64u", ticket);
         int retryCount = 0;
-        CObject* obj = m_ctx.Get(retryKey);
-        if(IS_VALID(obj)) {
-            CXParam* pOld = dynamic_cast<CXParam*>(obj);
-            if(IS_VALID(pOld)) retryCount = pOld.GetInt();
-        }
+        ICXParam* pOld = m_ctx.GetParam(retryKey);
+        if(IS_VALID(pOld)) retryCount = pOld.GetInt();
 
         if(retryCount < 5) {
             CXParam* pRetry = new CXParam();
@@ -143,10 +140,9 @@ public:
         // [v14.40 Throttled Retry]
         // If we recently failed with Market Closed, wait at least 60 seconds before trying again.
         string retryTimerKey = "EntryRetryTimer_" + sid;
-        CObject* objTimer = m_ctx.Get(retryTimerKey);
-        if(IS_VALID(objTimer)) {
-            CXParam* pTimer = dynamic_cast<CXParam*>(objTimer);
-            if(IS_VALID(pTimer) && (TimeCurrent() < (datetime)pTimer.GetLong())) {
+        ICXParam* pTimer = m_ctx.GetParam(retryTimerKey);
+        if(IS_VALID(pTimer)) {
+            if(TimeCurrent() < (datetime)pTimer.GetLong()) {
                 xp.SetString("WAIT_MARKET_OPEN"); // Stay in wait state
                 return false;
             }
@@ -176,8 +172,17 @@ public:
         double minDistance = (stopsLevel + 1) * point;
         
         if(sig.GetType() != ORDER_MARKET) {
-            if(dir == CX_DIR_BUY && execPrice > currentMkt - minDistance) execPrice = currentMkt - minDistance;
-            else if (dir == CX_DIR_SELL && execPrice < currentMkt + minDistance) execPrice = currentMkt + minDistance;
+            // [v16.12 Fix] Exact Limit Order Price Clamping based on StopsLevel
+            // For BUY LIMIT, the limit price must be <= (Current Ask - StopsLevel)
+            // For SELL LIMIT, the limit price must be >= (Current Bid + StopsLevel)
+            if(dir == CX_DIR_BUY && execPrice > currentMkt - minDistance) {
+                execPrice = currentMkt - minDistance;
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("EXEC-ENTRY-ADJ", xp, StringFormat("Buy Limit price adjusted down to %.5f due to StopsLevel", execPrice)));
+            }
+            else if (dir == CX_DIR_SELL && execPrice < currentMkt + minDistance) {
+                execPrice = currentMkt + minDistance;
+                XP_LOG_WARN(xp, CXAuditFormatter::Build("EXEC-ENTRY-ADJ", xp, StringFormat("Sell Limit price adjusted up to %.5f due to StopsLevel", execPrice)));
+            }
         }
 
         string funcName = (sig.GetType() == ORDER_MARKET) ? "PositionOpen" : "OrderOpen";

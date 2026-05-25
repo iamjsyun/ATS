@@ -9,6 +9,7 @@
 #include "..\Core\Interfaces\ICXServiceFactory.mqh"
 #include "..\Core\Interfaces\ICXSignalWatcher.mqh"
 #include "Infra\CXSessionManager.mqh"
+#include "Infra\AppOrchestrator.mqh"
 #include "Logic\CXSignalWatcher.mqh"
 #include "Logic\CXTerminalScanner.mqh"
 #include "Logic\CXReverseInjector.mqh"
@@ -71,7 +72,7 @@ public:
         m_logger = m_factory.CreateLogger("System", m_config);
         m_globalContext.Register("logger", m_logger);
         m_globalContext.Register("config", m_config);
-        m_globalContext.Register("orchestrator", new CXSequenceOrchestrator());
+        m_globalContext.Register("orchestrator", new AppOrchestrator());
         m_globalContext.Register("guard", new CXGuard(m_globalContext));
 
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Core Services Initialized.");
@@ -82,22 +83,23 @@ public:
         
         m_repo = m_factory.CreateRepository(m_db);
         if(IS_INVALID(m_repo)) return false;
+        m_globalContext.Register("repo", m_repo); // [v15.6 Fix] Watcher Discovery & Spawning dependency
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 2/6] Database Connected.");
 
         // 4. 세션 매니저 초기화 (동적 인스턴스 방식)
         m_sessionManager = new CXSessionManager();
         m_sessionManager.Initialize(m_repo, m_globalContext, m_factory);
-        m_globalContext.Register("session_pool", m_sessionManager); // Interface legacy naming maintained for context mapping
+        m_globalContext.Register("session_mgr", m_sessionManager);
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 3/6] Session Manager Initialized.");
 
         // 5. 신호 감시자 (Watcher) 초기화
-        m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionManager, m_globalContext);
+        m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionManager, m_globalContext, m_factory);
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 4/6] Signal Watcher Initialized.");
 
         // 6. 역주입 엔진 (Sync Engine) 실행
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 5/6] Initializing Recovery Engine...");
         m_scanner = new CXTerminalScanner();
-        m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager);
+        m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager, m_config);
         
         // [v14.39 Paused] Temporarily disabled Zombie Recovery Sequence
         /*

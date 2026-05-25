@@ -51,15 +51,17 @@ public:
         ZeroMemory(m_trans);
     }
     
-    virtual long   GetLong() const { return m_long; }
-    virtual void   SetLong(long val) { m_long = val; }
+    virtual long   GetLong() const override { return m_long; }
+    virtual void   SetLong(long val) override { m_long = val; }
     
     //-- Getters & Setters
     virtual void SetSignal(ICXSignal* sig) override { m_sig = sig; }
-    void SetContext(ICXContext* ctx) { m_ctx = ctx; }
+    virtual void SetContext(ICXContext* ctx) override { m_ctx = ctx; }
 
     void SetTransaction(const MqlTradeTransaction& trans) { m_trans = trans; }
     MqlTradeTransaction GetTransaction() const { return m_trans; }
+
+    virtual ICXParam* CreateEmptyParam() override { return new CXParam(); }
 };
 
 #endif

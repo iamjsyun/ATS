@@ -122,7 +122,7 @@ public:
         int passed = activeList.Total();
         if(passed > 0) {
             XP_LOG_TRACE(xp, StringFormat("[WATCHER-VALIDATION] Complete. Passed:%d, Failed:%d", passed, failed));
-            return WATCHER_BINDING;
+            return WATCHER_SPAWNING;
         }
 
         XP_LOG_WARN(xp, StringFormat("[WATCHER-VALIDATION] All %d signals failed validation.", total));

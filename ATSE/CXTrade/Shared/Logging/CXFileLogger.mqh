@@ -22,13 +22,13 @@ public:
     /**
      * @brief {sid}-{yymmdd-HH}.log 형식으로 파일 초기화 (시간 단위 생성)
      */
-    bool Init(string sid) {
+    bool Init(string sid, bool initOnStart = false) {
         m_sid = sid;
         MqlDateTime dt;
         TimeCurrent(dt);
         m_lastHour = dt.hour;
 
-        return OpenByTime(dt);
+        return OpenByTime(dt, initOnStart);
     }
 
     virtual void Log(ENUM_LOG_LEVEL level, string msg) override {
@@ -39,7 +39,7 @@ public:
         TimeCurrent(dt);
         if(dt.hour != m_lastHour) {
             m_lastHour = dt.hour;
-            OpenByTime(dt);
+            OpenByTime(dt, false); // Rotation is always append
         }
 
         if(m_handle == INVALID_HANDLE) return;
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    bool OpenByTime(MqlDateTime &dt) {
+    bool OpenByTime(MqlDateTime &dt, bool truncate) {
         Close();
 
         //-- [v14.42] Ensure directory exists
@@ -68,14 +68,22 @@ private:
 
         m_filename = StringFormat("ATSE\\%s-%s.log", m_sid, timestamp);
         
-        //-- [v14.44 Robust Open] 
+        // [v15.9] Initialization Logic
+        if(truncate) {
+            // Truncate existing file by opening with FILE_WRITE only
+            int flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
+            m_handle = FileOpen(m_filename, flags);
+            if(m_handle != INVALID_HANDLE) return true;
+        }
+
+        //-- Default: Robust Append Mode
         // 1. First attempt: Open for Read/Write (Append mode)
-        int flags = FILE_TXT|FILE_SHARE_READ|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
+        int flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
         m_handle = FileOpen(m_filename, flags);
 
         // 2. Second attempt: Create new if not exists
         if(m_handle == INVALID_HANDLE) {
-            flags = FILE_TXT|FILE_SHARE_READ|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
+            flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
             m_handle = FileOpen(m_filename, flags);
         }
 

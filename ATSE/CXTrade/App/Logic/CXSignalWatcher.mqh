@@ -7,12 +7,13 @@
 #include "..\..\Core\Interfaces\ICXFluentSequence.mqh"
 #include "..\..\Core\Interfaces\ICXSessionManager.mqh"
 #include "..\..\Core\Interfaces\ICXContext.mqh"
+#include "..\..\Core\Interfaces\ICXServiceFactory.mqh"
 #include "..\..\Core\Macros\CXMacros.mqh"
 #include "..\..\Session\Sequence\CXSequenceOrchestrator.mqh"
 
 /**
  * @class CXSignalWatcher
- * @brief DB 신호 테이블을 감시하고 적절한 세션에 할당하는 모듈
+ * @brief DB 신호 테이블을 감시하고 적절한 세션에 할당하는 모듈 (독립 로그 지원)
  */
 class CXSignalWatcher : public ICXSignalWatcher {
 private:
@@ -20,15 +21,37 @@ private:
     ICXConfig*              m_config;
     ICXSessionManager*      m_sessionManager;
     ICXContext*             m_globalContext;
+    ICXContext*             m_watcherContext; // [v15.8] Watcher Scoped Context
+    ICXLogger*              m_watcherLogger;  // [v15.8] Dedicated Watcher Logger
     ICXFluentSequence*      m_sequence;
     CXSequenceOrchestrator* m_orchestrator;
 
 public:
-    CXSignalWatcher(IRepository* repo, ICXConfig* cfg, ICXSessionManager* pool, ICXContext* globalCtx) 
+    CXSignalWatcher(IRepository* repo, ICXConfig* cfg, ICXSessionManager* pool, ICXContext* globalCtx, ICXServiceFactory* factory) 
         : m_repo(repo), m_config(cfg), m_sessionManager(pool), m_globalContext(globalCtx) {
-        m_orchestrator = new CXSequenceOrchestrator();
-        m_sequence = new CXFluentSequence(m_globalContext, "WatcherSeq");
+        
+        // 1. Watcher 전용 독립 로거 생성
+        m_watcherLogger = factory.CreateLogger("Watcher", cfg);
+
+        // 2. Watcher 전용 컨텍스트 구축 (전역 컨텍스트 상속)
+        m_watcherContext = factory.CreateContext();
+        if(IS_VALID(m_watcherContext)) {
+            m_watcherContext.Register("repo", repo);
+            m_watcherContext.Register("config", cfg);
+            m_watcherContext.Register("session_mgr", pool);
+            m_watcherContext.Register("orchestrator", globalCtx.Get("orchestrator"));
+            m_watcherContext.Register("guard", globalCtx.Get("guard"));
+            m_watcherContext.Register("logger", m_watcherLogger); // 독립 로거 주입
+        }
+
+        m_sequence = new CXFluentSequence(m_watcherContext, "WatcherSeq");
+        
+        // [v16.10] Dependency Injection Fix: Retrieve the correct AppOrchestrator from context
+        // instead of creating a raw base CXSequenceOrchestrator.
+        m_orchestrator = CX_GET_OBJ(m_globalContext, "orchestrator", CXSequenceOrchestrator);
+        
         if(IS_VALID(m_orchestrator) && IS_VALID(m_sequence)) {
+            // [v16.2] Dependency Injection refinement
             m_orchestrator.BuildWatcherSequence(m_sequence);
             m_sequence.Build();
         }
@@ -36,13 +59,32 @@ public:
 
     virtual ~CXSignalWatcher() override {
         SAFE_DELETE(m_sequence);
-        SAFE_DELETE(m_orchestrator);
+        // m_orchestrator is owned by CXAppService/GlobalContext, do not delete here.
+        SAFE_DELETE(m_watcherContext);
+        SAFE_DELETE(m_watcherLogger);
     }
 
     virtual void Pulse(ICXParam* xp) override {
         if(IS_INVALID(m_sequence)) return;
-        if(IS_VALID(xp)) xp.SetSignal(NULL);
+        
+        // [v15.9] Inject scoped context into param for isolated logging
+        if(IS_VALID(xp)) {
+            xp.SetContext(m_watcherContext);
+            xp.SetSignal(NULL);
+        }
+        
         m_sequence.Pulse(xp);
+
+        // [v15.5] Watcher Circuit Breaker: 시퀀스 에러 발생 시 상세 로깅
+        if(m_sequence.State() == WATCHER_ERROR) {
+            string errorDetail = (IS_VALID(xp)) ? xp.GetString() : "Unknown Watcher Error";
+            string enhancedError = StringFormat("[WATCHER-FATAL] Circuit Breaker Activated. Reason: %s", errorDetail);
+            
+            // [v15.8] Use the scoped context's logger for fatality reporting
+            ICXLogger* log = m_watcherContext.GetLogger();
+            if(IS_VALID(log)) log.Error(xp, enhancedError);
+            Print(enhancedError);
+        }
     }
 };
 

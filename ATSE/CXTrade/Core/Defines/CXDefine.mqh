@@ -84,7 +84,7 @@ enum ENUM_SESSION_STATE {
 enum ENUM_WATCHER_STATE {
     WATCHER_DISCOVERY      = 0,
     WATCHER_VALIDATION     = 1,
-    WATCHER_BINDING        = 2,
+    WATCHER_SPAWNING       = 2,
     WATCHER_ERROR          = 99
 };
 
@@ -106,68 +106,12 @@ enum ENUM_CALC_RESULT {
     CALC_MODIFIED  = 1
 };
 
-//--- 시퀀스 단계 유형 (StepFactory 용)
-enum ENUM_STEP_TYPE {
-    STEP_NONE = 0,
-    //--- Watcher Steps
-    STEP_W_DISCOVERY,
-    STEP_W_VALIDATION,
-    STEP_W_BINDING,
-    //--- Session Steps
-    STEP_S_COMPOSITE, // Task 기반 복합 단계
-    STEP_S_MONITOR
-};
-
-//--- 개별 태스크 유형 (TaskFactory 용)
-enum ENUM_TASK_TYPE {
-    TASK_NONE = 0,
-    // Entry
-    TASK_E_L_REDIRECT,      // [v11.5] State & Intent Redirect
-    TASK_E_L_IDENTITY,      // [v11.5] SID & Magic Validation
-    TASK_E_L_RISK,          // [v11.5] Lot & Margin Validation
-    TASK_E_L_PRICE,         // [v11.5] Price, SL, TP Calculation
-    TASK_E_P_INTENT,        // [v11.5] DB Intent Locking & Price Sync
-    TASK_E_L_VALIDATE,
-    TASK_E_G_SPREAD,
-    TASK_E_G_VOLATILITY,
-    TASK_E_P_LOCK,
-    TASK_E_R_ORDER,
-    TASK_E_V_ERROR,
-    TASK_E_V_TICKET,
-    TASK_E_V_REAL,
-    TASK_E_V_DOUBLECHECK,
-    TASK_E_P_FINALIZE,
-    // Pending
-    TASK_P_V_SYNC,
-    TASK_P_V_TERMINAL,
-    TASK_P_P_ALIGN,
-    TASK_P_L_REBOUND,
-    TASK_P_L_IMPROVE,
-    TASK_P_R_APPLY,
-    // Active
-    TASK_A_INTENT_WATCH,
-    TASK_A_V_STATUS,
-    TASK_A_V_STALE,
-    TASK_A_V_TERMINAL,
-    TASK_A_P_ALIGN,
-    TASK_A_L_STATUS,
-    TASK_A_ALPHA_CALC,
-    TASK_A_ALPHA_APPLY,
-    // Exit
-    TASK_X_L_PREPARE,
-    TASK_X_P_LOCK,
-    TASK_X_R_ORDER,
-    TASK_X_V_ERROR,
-    TASK_X_V_TERMINAL,
-    TASK_X_P_FINALIZE
-};
-
 //--- 시퀀스 내 고정 상태 주소 (ST_ 접두사로 통일)
 enum ENUM_STATE_ID {
     // Watcher States
     ST_W_DISCOVERY  = WATCHER_DISCOVERY,
     ST_W_VALIDATION = WATCHER_VALIDATION,
-    ST_W_BINDING    = WATCHER_BINDING,
+    ST_W_SPAWNING   = WATCHER_SPAWNING,
     
     // Session States
     ST_S_READY              = SESSION_READY,

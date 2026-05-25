@@ -60,16 +60,17 @@ public:
 
             // 2. File Logger (Pair)
             if(config.IsFileLogEnabled(category)) {
+                bool initOnStart = config.IsLogInitOnStart(category);
                 if(category == "Session") {
                     CXFileLoggerSID* fileLog = new CXFileLoggerSID();
-                    if(IS_VALID(fileLog) && fileLog.Init(sid)) {
+                    if(IS_VALID(fileLog) && fileLog.Init(sid, initOnStart)) {
                         logger.SetFileLogger(fileLog);
                     } else {
                         SAFE_DELETE(fileLog);
                     }
                 } else {
                     CXFileLogger* fileLog = new CXFileLogger();
-                    if(IS_VALID(fileLog) && fileLog.Init(sid)) {
+                    if(IS_VALID(fileLog) && fileLog.Init(sid, initOnStart)) {
                         logger.SetFileLogger(fileLog);
                     } else {
                         SAFE_DELETE(fileLog);

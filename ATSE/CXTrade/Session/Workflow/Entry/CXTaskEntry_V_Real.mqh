@@ -22,18 +22,10 @@ public:
             return TASK_BREAK;
         }
 
-        // [v14.0 Exit-First Priority]
+        // [v14.34 Exit-First Priority]
         if(sig.GetXAExit() == XA_ACTIVE) {
-            ulong t = (ulong)sig.GetTicket();
-            if(t > 0) {
-                XP_LOG_WARN(xp, CXAuditFormatter::Build("ENTRY-V-REAL", xp, "ABORT: Exit intent detected. Redirecting to LIQUIDATING."));
-                return SESSION_LIQUIDATING;
-            } else {
-                string abortMsg = "ABORT: Exit intent received before order placement (Ticket=0).";
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-V-REAL", xp, abortMsg));
-                if(IS_VALID(xp)) xp.SetString("[ENTRY-V-REAL] " + abortMsg);
-                return SESSION_ERROR;
-            }
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("ENTRY-V-REAL", xp, "ABORT: Exit intent detected. Redirecting to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
         }
 
         ulong ticket = (ulong)sig.GetTicket();
@@ -42,11 +34,8 @@ public:
         if(!exists) {
             string retryKey = StringFormat("VRealRetry_%I64u", ticket);
             int retryCount = 0;
-            CObject* obj = ctx.Get(retryKey);
-            if(IS_VALID(obj)) {
-                CXParam* pOld = dynamic_cast<CXParam*>(obj);
-                if(IS_VALID(pOld)) retryCount = pOld.GetInt();
-            }
+            ICXParam* pOld = ctx.GetParam(retryKey);
+            if(IS_VALID(pOld)) retryCount = pOld.GetInt();
 
             string reason = "";
             int histStatus = invMgr.CheckHistoryClosure(ticket, reason);
@@ -80,7 +69,7 @@ public:
         invMgr.SyncToSignal(sig);
         XP_LOG_OK(xp, CXAuditFormatter::Build("ENTRY-V-REAL", xp, StringFormat("SUCCESS: Ticket(%I64u) Confirmed.", ticket)));
 
-        return STATE_ENTRY_VERIFY;
+        return TASK_CONTINUE;
     }
 };
 

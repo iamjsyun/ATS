@@ -98,11 +98,8 @@ public:
         // 3. 딜(Deal) 히스토리에서도 찾지 못한 경우 (동기화 지연 대비 Retry)
         string retryKey = StringFormat("HistRetry_%I64u", ticket);
         int retryCount = 0;
-        CObject* obj = m_ctx.Get(retryKey);
-        if(IS_VALID(obj)) {
-            CXParam* pOld = dynamic_cast<CXParam*>(obj);
-            if(IS_VALID(pOld)) retryCount = pOld.GetInt();
-        }
+        ICXParam* pOld = m_ctx.GetParam(retryKey);
+        if(IS_VALID(pOld)) retryCount = pOld.GetInt();
 
         if(retryCount < 5) {
             CXParam* pRetry = new CXParam();

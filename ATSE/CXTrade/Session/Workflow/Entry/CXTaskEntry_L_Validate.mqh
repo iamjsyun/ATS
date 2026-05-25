@@ -28,17 +28,10 @@ public:
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "Starting Validation"));
 
-        //--- [v10.24 Fix] Error-State Liquidation Bypass
+        //--- [v14.34 Fix] Error-State Liquidation Bypass
         if(sig.GetXAExit() == XA_ACTIVE) {
-            if(sig.GetTicket() > 0) {
-                XP_LOG_INFO(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "OK: Exit intent detected. Redirecting to LIQUIDATING."));
-                return SESSION_LIQUIDATING;
-            } else {
-                string abortMsg = "ABORT: Exit intent received before order placement (Ticket=0).";
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, abortMsg));
-                if(IS_VALID(xp)) xp.SetString("[TASK-VALIDATE] " + abortMsg);
-                return SESSION_ERROR;
-            }
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "OK: Exit intent detected. Redirecting to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
         }
 
         if(sig.GetStatus() == XE_ERROR) {

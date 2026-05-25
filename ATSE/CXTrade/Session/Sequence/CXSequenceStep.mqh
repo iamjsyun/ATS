@@ -3,31 +3,30 @@
 
 #include <Object.mqh>
 #include <Generic\HashMap.mqh>
+#include <Arrays\ArrayString.mqh>
 #include "..\..\Core\Defines\CXDefine.mqh"
-
-#include <Arrays\ArrayInt.mqh>
 
 /**
  * @class CXSequenceStep
- * @brief 시퀀스 구성을 위한 노드 데이터 클래스 (분기 및 태스크 리스트 지원)
+ * @brief [v16.6] 시퀀스 구성을 위한 노드 데이터 클래스 (Enum-less 문자열 기반)
  */
 class CXSequenceStep : public CObject {
 private:
     int                 m_state_id;
-    ENUM_STEP_TYPE      m_step_type;
+    string              m_step_type_str;    // [v16.6] Enum 대신 문자열 저장
     int                 m_next_id;
     int                 m_fail_id;
     int                 m_timeout;
     int                 m_retries;
     string              m_name;
     CHashMap<int, int>* m_branches;
-    CArrayInt*          m_tasks;
+    CArrayString*       m_tasks;            // [v16.6] 태스크 리스트를 문자열 배열로 관리
 
 public:
-    CXSequenceStep(int id, ENUM_STEP_TYPE type, int next, int fail, int timeout = 0, int retries = 0, string name = "") 
-        : m_state_id(id), m_step_type(type), m_next_id(next), m_fail_id(fail), m_timeout(timeout), m_retries(retries), m_name(name) {
+    CXSequenceStep(int id, string typeStr, int next, int fail, int timeout = 0, int retries = 0, string name = "") 
+        : m_state_id(id), m_step_type_str(typeStr), m_next_id(next), m_fail_id(fail), m_timeout(timeout), m_retries(retries), m_name(name) {
         m_branches = new CHashMap<int, int>();
-        m_tasks = new CArrayInt();
+        m_tasks = new CArrayString();
     }
 
     ~CXSequenceStep() {
@@ -40,21 +39,21 @@ public:
         return GetPointer(this);
     }
 
-    CXSequenceStep* AddTask(ENUM_TASK_TYPE task) {
-        if(IS_VALID(m_tasks)) m_tasks.Add((int)task);
+    CXSequenceStep* AddTask(string taskName) {
+        if(IS_VALID(m_tasks)) m_tasks.Add(taskName);
         return GetPointer(this);
     }
 
-    int             GetStateId()  const { return m_state_id; }
-    ENUM_STEP_TYPE  GetStepType() const { return m_step_type; }
-    int             GetNextId()   const { return m_next_id; }
-    int             GetFailId()   const { return m_fail_id; }
-    int             GetTimeout()  const { return m_timeout; }
-    int             GetRetries()  const { return m_retries; }
-    string          GetName()     const { return m_name; }
+    int             GetStateId()     const { return m_state_id; }
+    string          GetStepTypeStr() const { return m_step_type_str; }
+    int             GetNextId()      const { return m_next_id; }
+    int             GetFailId()      const { return m_fail_id; }
+    int             GetTimeout()     const { return m_timeout; }
+    int             GetRetries()     const { return m_retries; }
+    string          GetName()        const { return m_name; }
     
     CHashMap<int, int>* GetBranches() const { return m_branches; }
-    CArrayInt*          GetTasks()    const { return m_tasks; }
+    CArrayString*       GetTasks()    const { return m_tasks; }
 };
 
 #endif

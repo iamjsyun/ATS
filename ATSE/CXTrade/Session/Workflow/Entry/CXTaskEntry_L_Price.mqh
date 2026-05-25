@@ -16,6 +16,12 @@ public:
     virtual string Name() override { return "Entry_L_Price"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
+        
+        // [v16.16 Fix] Initial Entry Price Protection
+        // 진입 가격이 이미 계산되어 있다면 (0이 아니면) 재계산하지 않고 유지한다.
+        // 이를 통해 SL/TP가 시장가에 따라 매 틱 변하는 오류를 방지한다.
+        if(IS_VALID(sig) && sig.GetPriceOpen() > 0) return TASK_CONTINUE;
+
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
 

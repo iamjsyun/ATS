@@ -23,13 +23,13 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_VALID(sig) && (sig.GetTicket() > 0 || sig.GetStatus() >= XE_IN_TRANSIT)) {
             XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-R-ORDER", xp, "SKIP: Asset already in transit"));
-            return STATE_ENTRY_TRANSIT;
+            return TASK_CONTINUE;
         }
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("ENTRY-R-ORDER", xp, "Sending Physical Order to Broker..."));
         if(orderMgr.ExecuteEntry(xp)) {
             XP_LOG_OK(xp, CXAuditFormatter::Build("ENTRY-R-ORDER", xp, "SUCCESS: Order Request Sent."));
-            return STATE_ENTRY_TRANSIT;
+            return TASK_CONTINUE;
         }
 
         string lastErr = xp.GetString();

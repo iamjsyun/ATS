@@ -37,9 +37,9 @@ public:
     }
 
     /**
-     * @brief 신규 세션 동적 생성
+     * @brief 신규 세션 동적 생성 (v15.9 Param-injected)
      */
-    virtual ICXTradingSession* CreateSession() override {
+    virtual ICXTradingSession* CreateSession(ICXParam* xp) override {
         if(IS_INVALID(m_factory)) return NULL;
         
         // 매번 새로운 인스턴스 생성 (상태 오염 방지)

@@ -17,18 +17,10 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return TASK_BREAK;
 
-        // [v14.0 Exit-First Priority]
+        // [v14.34 Exit-First Priority]
         if(sig.GetXAExit() == XA_ACTIVE) {
-            ulong t = (ulong)sig.GetTicket();
-            if(t > 0) {
-                XP_LOG_WARN(xp, CXAuditFormatter::Build("ENTRY-V-TICKET", xp, "ABORT: Exit intent detected. Redirecting to LIQUIDATING."));
-                return SESSION_LIQUIDATING;
-            } else {
-                string abortMsg = "ABORT: Exit intent received before order placement (Ticket=0).";
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("ENTRY-V-TICKET", xp, abortMsg));
-                if(IS_VALID(xp)) xp.SetString("[ENTRY-V-TICKET] " + abortMsg);
-                return SESSION_ERROR;
-            }
+            XP_LOG_WARN(xp, CXAuditFormatter::Build("ENTRY-V-TICKET", xp, "ABORT: Exit intent detected. Redirecting to LIQUIDATING."));
+            return SESSION_LIQUIDATING;
         }
 
         ulong ticket = sig.GetTicket();

@@ -19,8 +19,8 @@ public:
     virtual void              Initialize(IRepository* repo, ICXContext* ctx, ICXServiceFactory* factory) = 0;
     virtual void              Pulse(ICXParam* xp) = 0;
     
-    // [v14.47] Create new session instance on demand
-    virtual ICXTradingSession* CreateSession() = 0;
+    // [v15.9] Create new session instance with signal context
+    virtual ICXTradingSession* CreateSession(ICXParam* xp) = 0;
     virtual ICXTradingSession* FindSessionBySid(const string sid) = 0;
 };
 
