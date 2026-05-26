@@ -36,6 +36,10 @@ public:
         string sid = sig.GetSid();
         ENUM_ORDER_TYPE order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
 
+        // [v11.10 Pre-Call Audit] Log all raw parameters before broker call
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] PositionOpen(Sym:%s, Type:%d, Lot:%.2f, Price:%.5f, SL:%.5f, TP:%.5f, Magic:%I64u, SID:%s)",
+                                      symbol, order_type, lot, price, sl, tp, magic, sid));
+
         m_trade.SetExpertMagicNumber(magic);
         
         double currentMkt = SymbolInfoDouble(symbol, (dir == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
@@ -66,6 +70,10 @@ public:
         string sid = sig.GetSid();
         ENUM_ORDER_TYPE order_type = (dir == CX_DIR_BUY) ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT;
 
+        // [v11.10 Pre-Call Audit] Log all raw parameters before broker call
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] OrderOpen(Sym:%s, Type:%d, Lot:%.2f, Price:%.5f, SL:%.5f, TP:%.5f, Magic:%I64u, SID:%s)",
+                                      symbol, order_type, lot, price, sl, tp, magic, sid));
+
         m_trade.SetExpertMagicNumber(magic);
         
         double currentMkt = SymbolInfoDouble(symbol, (dir == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
@@ -90,6 +98,11 @@ public:
     virtual bool PositionModify(ICXParam* xp, ulong ticket, double sl, double tp) override {
         long magic = 0;
         if(PositionSelectByTicket(ticket)) magic = PositionGetInteger(POSITION_MAGIC);
+
+        // [v11.10 Pre-Call Audit] 
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] PositionModify(Ticket:%I64u, SL:%.5f, TP:%.5f, Magic:%I64d)",
+                                      ticket, sl, tp, magic));
+
         m_trade.SetExpertMagicNumber(magic);
 
         bool res = m_trade.PositionModify(ticket, sl, tp);
@@ -112,6 +125,11 @@ public:
     virtual bool OrderModify(ICXParam* xp, ulong ticket, double price, double sl, double tp) override {
         long magic = 0;
         if(OrderSelect(ticket)) magic = OrderGetInteger(ORDER_MAGIC);
+
+        // [v11.10 Pre-Call Audit] 
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] OrderModify(Ticket:%I64u, Price:%.5f, SL:%.5f, TP:%.5f, Magic:%I64d)",
+                                      ticket, price, sl, tp, magic));
+
         m_trade.SetExpertMagicNumber(magic);
 
         bool res = m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0);
@@ -134,6 +152,11 @@ public:
     virtual bool PositionClose(ICXParam* xp, ulong ticket) override {
         long magic = 0;
         if(PositionSelectByTicket(ticket)) magic = PositionGetInteger(POSITION_MAGIC);
+
+        // [v11.10 Pre-Call Audit] 
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] PositionClose(Ticket:%I64u, Magic:%I64d)",
+                                      ticket, magic));
+
         m_trade.SetExpertMagicNumber(magic);
 
         bool res = m_trade.PositionClose(ticket);
@@ -155,6 +178,11 @@ public:
     virtual bool OrderDelete(ICXParam* xp, ulong ticket) override {
         long magic = 0;
         if(OrderSelect(ticket)) magic = OrderGetInteger(ORDER_MAGIC);
+
+        // [v11.10 Pre-Call Audit] 
+        XP_LOG_INFO(xp, StringFormat("[BROKER-CALL] OrderDelete(Ticket:%I64u, Magic:%I64d)",
+                                      ticket, magic));
+
         m_trade.SetExpertMagicNumber(magic);
 
         bool res = m_trade.OrderDelete(ticket);

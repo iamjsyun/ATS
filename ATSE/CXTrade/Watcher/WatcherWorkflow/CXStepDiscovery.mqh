@@ -1,4 +1,4 @@
-﻿#ifndef CXSTEPDISCOVERY_MQH
+#ifndef CXSTEPDISCOVERY_MQH
 #define CXSTEPDISCOVERY_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXStep.mqh"
@@ -31,7 +31,6 @@ public:
         if(IS_INVALID(repo)) return STATE_UNCHANGED;
 
         if(!m_isPulsed) {
-            XP_LOG_TRACE(xp, "[WATCHER-DISCOVERY] Engine Pulsing: Listening for signals...");
             m_isPulsed = true;
         }
 

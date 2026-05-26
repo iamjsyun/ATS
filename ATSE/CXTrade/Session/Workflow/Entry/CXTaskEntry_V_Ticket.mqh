@@ -36,7 +36,14 @@ public:
         }
 
         XP_LOG_OK(xp, CXAuditFormatter::Build("ENTRY-V-TICKET", xp, StringFormat("SUCCESS: Ticket %I64u Obtained.", ticket)));
-        CXMessageProvider::UpdateStatus(sig, XE_IN_TRANSIT, StringFormat("Ticket Obtained: %I64u. Verifying Asset...", ticket));
+        
+        // [v18.17 Status Sync] 티켓 획득 즉시 XE_EXECUTED(10) 상태로 업데이트
+        CXMessageProvider::UpdateStatus(sig, XE_EXECUTED, StringFormat("Ticket %I64u Obtained. Sequence Active.", ticket));
+        
+        // [v18.16 Persistence Fix] 획득된 티켓 번호를 DB에 즉시 동기화
+        IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+        if(IS_VALID(repo)) repo.UpdateStatus(sig);
+        
         return TASK_CONTINUE;
     }
 };

@@ -80,9 +80,36 @@ public:
 
     virtual ICXTradingSession* FindSessionBySid(const string sid) override {
         if(sid == "") return NULL;
+        string trimmed = sid; StringTrimLeft(trimmed); StringTrimRight(trimmed);
         for(int i = 0; i < m_active.Total(); i++) {
             ICXTradingSession* session = CX_CAST(ICXTradingSession, m_active.At(i));
-            if(IS_VALID(session) && session.GetSid() == sid) return session;
+            if(IS_VALID(session) && session.GetSid() == trimmed) return session;
+        }
+        return NULL;
+    }
+
+    /**
+     * @brief [v18.15] SID 또는 (CNO+SNO) 조합으로 활성 세션을 검색
+     */
+    ICXTradingSession* FindSessionByIdentity(ICXSignal* sig) {
+        if(IS_INVALID(sig)) return NULL;
+        
+        string sid = sig.GetSid(); StringTrimLeft(sid); StringTrimRight(sid);
+        int cno = sig.GetCno();
+        int sno = sig.GetSno();
+
+        for(int i = 0; i < m_active.Total(); i++) {
+            ICXTradingSession* session = CX_CAST(ICXTradingSession, m_active.At(i));
+            if(!IS_VALID(session)) continue;
+
+            // 1. SID 일치 확인
+            if(sid != "" && session.GetSid() == sid) return session;
+
+            // 2. CNO+SNO 일치 확인 (SID가 없거나 바뀐 경우 대비)
+            ICXSignal* s_sig = session.GetSignal();
+            if(IS_VALID(s_sig)) {
+                if(s_sig.GetCno() == cno && s_sig.GetSno() == sno) return session;
+            }
         }
         return NULL;
     }

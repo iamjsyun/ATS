@@ -58,16 +58,16 @@ int OnInit() {
     EventSetMillisecondTimer(500);
     
     //--- Show Version Label
-    string ver_name = "ATSE_Version_Label";
-    ObjectDelete(0, ver_name);
-    if(ObjectCreate(0, ver_name, OBJ_LABEL, 0, 0, 0)) {
-        ObjectSetInteger(0, ver_name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
-        ObjectSetInteger(0, ver_name, OBJPROP_XDISTANCE, 20);
-        ObjectSetInteger(0, ver_name, OBJPROP_YDISTANCE, 40);
-        ObjectSetInteger(0, ver_name, OBJPROP_COLOR, clrWhite);
-        ObjectSetInteger(0, ver_name, OBJPROP_FONTSIZE, 10);
-        ObjectSetString(0, ver_name, OBJPROP_TEXT, "ATSE Core v10.27 (STABLE)");
-    }
+    //string ver_name = "ATSE_Version_Label";
+    //ObjectDelete(0, ver_name);
+    //if(ObjectCreate(0, ver_name, OBJ_LABEL, 0, 0, 0)) {
+    //    ObjectSetInteger(0, ver_name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
+    //    ObjectSetInteger(0, ver_name, OBJPROP_XDISTANCE, 20);
+    //    ObjectSetInteger(0, ver_name, OBJPROP_YDISTANCE, 40);
+    //    ObjectSetInteger(0, ver_name, OBJPROP_COLOR, clrWhite);
+    //    ObjectSetInteger(0, ver_name, OBJPROP_FONTSIZE, 10);
+    //    ObjectSetString(0, ver_name, OBJPROP_TEXT, "ATSE Core v10.27 (STABLE)");
+    //}
 
     // 1. Configuration 객체 생성 (v10.27)
     g_config = new CXConfig(InpTargetMagics, InpTimerInterval, InpRemoteAddr, 

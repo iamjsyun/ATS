@@ -12,6 +12,7 @@
 class IXExitManager : public CObject {
 public:
     virtual void SetMagic(ulong magic) = 0;
+    virtual bool ExecuteExit(ICXParam* xp) = 0;
     virtual bool CloseByTicket(ICXParam* xp, ICXSignal* sig) = 0;
     virtual bool SweepBySid(ICXParam* xp, string sid) = 0;
     virtual bool VerifyPhysicalAbsence(string sid) = 0;

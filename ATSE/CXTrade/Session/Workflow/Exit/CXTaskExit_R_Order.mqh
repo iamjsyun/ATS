@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_EXIT_R_ORDER_MQH
+#ifndef CX_TASK_EXIT_R_ORDER_MQH
 #define CX_TASK_EXIT_R_ORDER_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -29,6 +29,11 @@ public:
         if(xp.GetInt() == 3) {
             XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SKIP: Liquidation already requested."));
             return TASK_CONTINUE;
+        }
+
+        // [v18.19 Pre-Close Shadowing Sync] 청산 전 최신 터미널 실물 데이터 동기화
+        if(IS_VALID(invMgr)) {
+            invMgr.SyncToSignal(sig);
         }
 
         // [v14.4 Physical Asset Guard] 티켓이 이미 없다면 송신할 필요 없음

@@ -41,6 +41,8 @@ public:
             m_watcherContext.Register("session_mgr", pool);
             m_watcherContext.Register("orchestrator", globalCtx.Get("orchestrator"));
             m_watcherContext.Register("guard", globalCtx.Get("guard"));
+            m_watcherContext.Register("exit_mgr", globalCtx.Get("exit_mgr"));
+            m_watcherContext.Register("terminal_platform", globalCtx.Get("terminal_platform"));
             m_watcherContext.Register("logger", m_watcherLogger); // 독립 로거 주입
         }
 

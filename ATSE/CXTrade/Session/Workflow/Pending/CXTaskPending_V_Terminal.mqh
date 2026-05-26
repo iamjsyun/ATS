@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_PENDING_V_TERMINAL_MQH
+#ifndef CX_TASK_PENDING_V_TERMINAL_MQH
 #define CX_TASK_PENDING_V_TERMINAL_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -26,12 +26,9 @@ public:
         bool exists = invMgr.IsOrderExists(ticket);
         
         if(exists) {
-            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("OK: Order %I64u found in Terminal.", ticket)));
             return TASK_CONTINUE;
         }
 
-        // 지연 가능성을 고려하여 Yield (Watcher에서 Retry 처리됨)
-        XP_LOG_WARN(xp, CXAuditFormatter::Build("PEND-V-TERM", xp, StringFormat("WAIT: Order %I64u not yet visible in Terminal.", ticket)));
         return TASK_YIELD;
     }
 };

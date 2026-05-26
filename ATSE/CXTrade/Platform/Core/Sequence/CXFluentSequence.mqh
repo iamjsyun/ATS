@@ -114,66 +114,65 @@ public:
     }
 
     virtual void Pulse(ICXParam* xp) override {
-        CXStepNode* node = NULL;
-        if(!m_map.TryGetValue(m_current_state, node) || IS_INVALID(node)) {
-            return;
-        }
+        if(m_current_state == -1) return;
 
-        if(IS_VALID(node.guard) && !node.guard.Check(xp, m_ctx)) return;
+        // [v18.15 Immediate Transition Loop]
+        // 전이 발생 시 대기 없이 즉시 새로운 상태의 태스크를 실행 (최대 3회 전이까지 허용하여 무한루프 방지)
+        for(int loop = 0; loop < 3; loop++) {
+            CXStepNode* node = NULL;
+            if(!m_map.TryGetValue(m_current_state, node) || IS_INVALID(node)) return;
 
-        if(node.timeout_sec > 0 && (TimeCurrent() - m_state_entered > node.timeout_sec)) {
-            int next = (node.if_false != -1) ? node.if_false : SESSION_ERROR;
-            XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] State %d Timeout (%d sec). Moving to %d", m_name, m_current_state, node.timeout_sec, next));
-            UpdateState(next);
-            return;
-        }
+            if(IS_VALID(node.guard) && !node.guard.Check(xp, m_ctx)) return;
 
-        if(node.step.OnCondition(xp, m_ctx, m_current_state)) {
-            int next_state = node.step.OnProcess(xp, m_ctx);
-            
-            // [v18.8] Map STEP_SUCCESS to DSL's ? (if_true) path
-            if (next_state == STEP_SUCCESS) {
-                next_state = node.if_true;
+            if(node.timeout_sec > 0 && (TimeCurrent() - m_state_entered > node.timeout_sec)) {
+                int next = (node.if_false != -1) ? node.if_false : SESSION_ERROR;
+                XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] State %d Timeout (%d sec). Moving to %d", m_name, m_current_state, node.timeout_sec, next));
+                UpdateState(next);
+                continue; 
             }
 
-            if(next_state == m_current_state || next_state == -1) {
-                return;
-            }
-
-            if(next_state == node.if_false && node.max_retries > 0) {
-                node.current_retries++;
-                if(node.current_retries <= node.max_retries) {
-                    XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] Step '%s' failed. Retry %d/%d...", 
-                        m_name, node.step.Name(), node.current_retries, node.max_retries));
-                    return;
-                } else {
-                    XP_LOG_SEQ_ERROR(xp, StringFormat("[SEQ:%s] Step '%s' exhausted retries. Moving to terminal fail state %d.", 
-                        m_name, node.step.Name(), node.if_false));
-                    node.current_retries = 0;
-                    UpdateState(node.if_false);
-                    return;
-                }
-            }
-
-            int branch_state = -1;
-            if(node.branches.TryGetValue(next_state, branch_state)) {
-                XP_LOG_SEQ_DEBUG(xp, StringFormat("[SEQ:%s] Branch match: %d -> %d", m_name, next_state, branch_state));
-                node.current_retries = 0;
-                UpdateState(branch_state);
-                return;
-            }
-
-            if(next_state != m_current_state && next_state != -1) {
-                // [v11.0] Duplicate Transition Log Suppression
-                if(m_current_state != m_last_log_from || next_state != m_last_log_to) {
-                    XP_LOG_SEQ_TRACE(xp, StringFormat("[SEQ:%s] Transition: %d -> %d (Step: %s)", m_name, m_current_state, next_state, node.step.Name()));
-                    m_last_log_from = m_current_state;
-                    m_last_log_to = next_state;
-                }
+            if(node.step.OnCondition(xp, m_ctx, m_current_state)) {
+                int next_state = node.step.OnProcess(xp, m_ctx);
                 
-                node.current_retries = 0;
-                UpdateState(next_state);
+                // [v18.8] Map STEP_SUCCESS to DSL's ? (if_true) path
+                if (next_state == STEP_SUCCESS) {
+                    next_state = node.if_true;
+                }
+
+                if(next_state == m_current_state || next_state == -1) {
+                    return; // 현재 상태 유지 또는 Yield 시 루프 종료
+                }
+
+                if(next_state == node.if_false && node.max_retries > 0) {
+                    node.current_retries++;
+                    if(node.current_retries <= node.max_retries) {
+                        XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] Step '%s' failed. Retry %d/%d...", 
+                            m_name, node.step.Name(), node.current_retries, node.max_retries));
+                        return;
+                    } else {
+                        XP_LOG_SEQ_ERROR(xp, StringFormat("[SEQ:%s] Step '%s' exhausted retries. Moving to terminal fail state %d.", 
+                            m_name, node.step.Name(), node.if_false));
+                        node.current_retries = 0;
+                        UpdateState(node.if_false);
+                        continue;
+                    }
+                }
+
+                int branch_state = -1;
+                if(node.branches.TryGetValue(next_state, branch_state)) {
+                    XP_LOG_SEQ_DEBUG(xp, StringFormat("[SEQ:%s] Branch match: %d -> %d", m_name, next_state, branch_state));
+                    node.current_retries = 0;
+                    UpdateState(branch_state);
+                    continue; // 새로운 상태로 즉시 루프 재시작
+                }
+
+                if(next_state != m_current_state && next_state != -1) {
+                    node.current_retries = 0;
+                    UpdateState(next_state);
+                    continue; // 새로운 상태로 즉시 루프 재시작
+                }
             }
+            break; // 조건 미충족 시 루프 종료
         }
     }
 

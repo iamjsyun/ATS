@@ -98,6 +98,7 @@ public:
 
     virtual bool IsActive() const override { return m_isActive; }
     virtual string GetSid() const override { return m_sid; }
+    virtual ICXSignal* GetSignal() const override { return m_signal; }
 
 protected:
     virtual void HandleSequenceResult(ICXParam* xp, ICXSignal* sig) {

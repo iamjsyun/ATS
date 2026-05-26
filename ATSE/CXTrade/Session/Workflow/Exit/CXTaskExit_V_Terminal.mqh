@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_EXIT_V_TERMINAL_MQH
+#ifndef CX_TASK_EXIT_V_TERMINAL_MQH
 #define CX_TASK_EXIT_V_TERMINAL_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -21,11 +21,8 @@ public:
 
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket <= 0) {
-            XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, "SKIP: No ticket assigned."));
             return TASK_CONTINUE; 
         }
-
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("Verifying Absence: [Ticket:%I64u]", ticket)));
 
         bool exists = invMgr.IsAssetExists(ticket, sig.GetType());
 
@@ -37,7 +34,6 @@ public:
                 if(IS_VALID(xp)) xp.SetString("[EXIT-V-TERM] " + assetErr);
                 return SESSION_ERROR;
             }
-            XP_LOG_DEBUG(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("Yield: Asset(%I64u) still active.", ticket)));
             return TASK_YIELD;
         }
 

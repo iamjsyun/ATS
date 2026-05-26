@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_PENDING_L_EXTREME_MQH
+#ifndef CX_TASK_PENDING_L_EXTREME_MQH
 #define CX_TASK_PENDING_L_EXTREME_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -35,7 +35,6 @@ public:
                 ctx.Set(extKey, pExt);
             }
             pExt.SetDouble(currentPrice);
-            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-EXTR", xp, StringFormat("New Extreme Tracked: %.5f", currentPrice)));
         }
 
         return TASK_CONTINUE;

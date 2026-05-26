@@ -27,6 +27,14 @@ public:
 
     virtual void SetMagic(ulong magic) override { m_magic = magic; m_terminal.SetMagic(magic); }
 
+    virtual bool ExecuteExit(ICXParam* xp) override {
+        ICXSignal* sig = xp.GetSignal();
+        if(IS_INVALID(sig)) return false;
+        
+        // [v18.15 Unified Liquidation] Handle both Positions and Pending Orders
+        return CloseByTicket(xp, sig);
+    }
+
     /**
      * @brief Layer 1: 티켓 기반 정밀 청산 및 사후 검증
      */

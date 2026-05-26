@@ -24,6 +24,8 @@
 #include "Infra\CXServiceFactory.mqh"
 #include "..\Platform\Core\Models\CXConfig.mqh"
 
+#include "..\Platform\UI\CXUI.mqh"
+
 /**
  * @class CXAppService
  * @brief EA의 전체 생명주기 및 의존성 주입을 총괄하는 서비스 (v14.47 Dynamic Session)
@@ -46,14 +48,19 @@ private:
     CXSequenceOrchestrator* m_orchestrator;
     IXGuard*              m_guard;
     IXTerminalPlatform*   m_terminalPlatform;
+    ICXPriceManager*      m_priceManager;
+    IXExitManager*        m_exitManager;
+    CXUI*                 m_ui;
 
 public:
     CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_sessionManager(NULL), 
                     m_factory(NULL), m_watcher(NULL), m_logger(NULL), m_globalContext(NULL),
                     m_scanner(NULL), m_injector(NULL),
-                    m_orchestrator(NULL), m_guard(NULL), m_terminalPlatform(NULL) {}
+                    m_orchestrator(NULL), m_guard(NULL), m_terminalPlatform(NULL),
+                    m_priceManager(NULL), m_exitManager(NULL), m_ui(NULL) {}
 
     virtual ~CXAppService() override {
+        SAFE_DELETE(m_ui);
         SAFE_DELETE(m_watcher);
         SAFE_DELETE(m_sessionManager);
         SAFE_DELETE(m_repo);
@@ -66,6 +73,8 @@ public:
         SAFE_DELETE(m_orchestrator);
         SAFE_DELETE(m_guard);
         SAFE_DELETE(m_terminalPlatform);
+        SAFE_DELETE(m_priceManager);
+        SAFE_DELETE(m_exitManager);
     }
 
     virtual bool Initialize(ICXConfig* config, ICXServiceFactory* factory) override {
@@ -82,12 +91,16 @@ public:
         m_orchestrator = new AppOrchestrator();
         m_guard = new CXGuard(m_globalContext);
         m_terminalPlatform = m_factory.CreateTerminalPlatform(m_globalContext);
+        m_priceManager = m_factory.CreatePriceManager(m_globalContext);
+        m_exitManager = m_factory.CreateExitManager(m_globalContext);
 
         m_globalContext.Register("logger", m_logger);
         m_globalContext.Register("config", m_config);
         m_globalContext.Register("orchestrator", m_orchestrator);
         m_globalContext.Register("guard", m_guard);
         m_globalContext.Register("terminal_platform", m_terminalPlatform);
+        m_globalContext.Register("price_mgr", m_priceManager);
+        m_globalContext.Register("exit_mgr", m_exitManager);
 
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Core Services Initialized.");
 
@@ -110,19 +123,15 @@ public:
         m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionManager, m_globalContext, m_factory);
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 4/6] Signal Watcher Initialized.");
 
-        // 6. 역주입 엔진 (Sync Engine) 실행
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 5/6] Initializing Recovery Engine...");
+        // 6. 대시보드 (UI) 초기화
+        m_ui = new CXUI(m_globalContext);
+        if(IS_VALID(m_ui)) m_ui.Initialize();
+        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 5/6] Dashboard Initialized.");
+
+        // 7. 역주입 엔진 (Sync Engine) 실행
         m_scanner = new CXTerminalScanner();
         m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager, m_config);
         
-        // [v16.18 Paused] 역주입 기능 사용 중지 (User Request)
-        /*
-        if(IS_VALID(m_injector)) {
-            CXParam xp;
-            m_injector.Pulse(GetPointer(xp));
-        }
-        */
-
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 6/6] System Bootstrap Complete.");
         return true;
     }
@@ -135,6 +144,9 @@ public:
         
         //-- 2. 활성 세션 구동 및 GC (Execution & Cleanup)
         if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
+
+        //-- 3. 대시보드 갱신
+        if(IS_VALID(m_ui)) m_ui.Refresh();
 
         //-- [추가] 주기적 역동기화 감시 (예: 100틱마다)
         // [v16.18 Paused] 역주입 기능 사용 중지 (User Request)

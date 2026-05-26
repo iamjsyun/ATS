@@ -1,4 +1,4 @@
-﻿#ifndef CXSTEPVALIDATION_MQH
+#ifndef CXSTEPVALIDATION_MQH
 #define CXSTEPVALIDATION_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXStep.mqh"
@@ -28,11 +28,13 @@ public:
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
         CArrayObj* activeList = CX_GET_OBJ(ctx, "active_signals", CArrayObj);
         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
+        CXSessionManager* session_mgr = CX_GET_OBJ(ctx, "session_mgr", CXSessionManager);
         
         if(IS_INVALID(activeList)) return WATCHER_DISCOVERY;
 
         int total = activeList.Total();
         int failed = 0;
+        int handled_by_fastpass = 0;
 
         for(int i = total - 1; i >= 0; i--) {
             ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
@@ -41,69 +43,81 @@ public:
                 continue;
             }
 
-            xp.SetSignal(sig); // 0값 출력 및 UAF 조립을 위해 임시 바인딩
             string sid = sig.GetSid();
+            StringTrimLeft(sid); StringTrimRight(sid);
+            sig.SetSid(sid);
+
+            xp.SetSignal(sig); 
+            string sid_val = sig.GetSid();
             bool isStatusChanged = (sig.GetStatus() != sig.GetLastStatus());
+            bool isExitIntent = (sig.GetXAExit() == XA_ACTIVE);
 
-            // [v14.5 SID Structure Validation] 필수 검증
-            if(!CXIdManager::ValidateSID(sid)) {
-                string sidErr = StringFormat("Invalid SID Format: %s", sid);
-                if(isStatusChanged) XP_LOG_ERROR(xp, CXAuditFormatter::Build("WATCHER-REJECT", xp, sidErr));
-                
-                IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
-                CXMessageProvider::UpdateStatus(sig, XE_ERROR, sidErr);
-                if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                
-                activeList.Delete(i);
-                failed++;
-                continue;
-            }
-
-            // [v14.5 Parameter Recovery from SID]
-            if(sig.GetDir() == CX_DIR_NONE) {
-                int recoveredDir = CXIdManager::ExtractDir(sid);
-                if(recoveredDir > 0) {
-                    sig.SetDir(recoveredDir);
-                    XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-RECOVERY", xp, StringFormat("Recovered Dir:%d", recoveredDir)));
-                }
-            }
-            if(sig.GetType() == 0) {
-                int recoveredType = CXIdManager::ExtractType(sid);
-                if(recoveredType > 0) {
-                    sig.SetType(recoveredType);
-                    XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-RECOVERY", xp, StringFormat("Recovered Type:%d", recoveredType)));
-                }
-            }
-
-            // [v14.0 Exit-Priority Bypass] 청산 의도가 있는 경우 SID만 검증하고 즉시 통과
-            if(sig.GetXAExit() == XA_ACTIVE) {
-                if(IS_VALID(guard) && !guard.ValidateSID(sig.GetSid())) {
-                    if(isStatusChanged) XP_LOG_ERROR(xp, CXAuditFormatter::Build("WATCHER-REJECT", xp, "EXIT REJECTED: Invalid SID"));
-                    activeList.Delete(i);
-                    failed++;
-                    continue;
-                }
-                
-                // [v16.10 Physical Asset Bypass] 터미널에 자산이 없는 경우 즉시 강제 청산 처리 (상태 20 마킹)
-                ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+            // [v18.20 Watcher-First Liquidation]
+            // 청산 의도가 발견되면 세션 존재 여부와 관계없이 감지기가 즉시 집행 (Master Executioner)
+            if(isExitIntent) {
                 ulong ticket = (ulong)sig.GetTicket();
-                if(ticket > 0 && IS_VALID(invMgr) && !invMgr.IsAssetExists(ticket, sig.GetType())) {
-                    string bypassMsg = StringFormat("Auto-Closed: Physical Asset(%I64u) not found in Terminal.", ticket);
-                    XP_LOG_WARN(xp, CXAuditFormatter::Build("WATCHER-VALIDATION", xp, bypassMsg));
+                IXExitManager* exitMgr = CX_GET_OBJ(ctx, "exit_mgr", IXExitManager);
+                IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
+                
+                // [v18.15 Terminal Double-Check]
+                if(ticket <= 0) {
+                    IXTerminalPlatform* terminal = CX_GET_OBJ(ctx, "terminal_platform", IXTerminalPlatform);
+                    if(IS_VALID(terminal)) {
+                        ticket = terminal.GetTicketBySid(sig.GetMagic(), sig.GetSid());
+                        if(ticket > 0) sig.SetTicket(ticket);
+                    }
+                }
+                
+                // [v18.18 Direct-Execution] 감지기 단계에서 즉시 청산 집행
+                if(IS_VALID(exitMgr) && ticket > 0) {
+                    XP_LOG_INFO(xp, CXAuditFormatter::Build("WATCHER-DIRECT-EXIT", xp, StringFormat("Executing Watcher-Priority Liquidation for Ticket:%I64u", ticket)));
                     
-                    IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
-                    CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, bypassMsg);
-                    if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                    if(exitMgr.ExecuteExit(xp)) {
+                        string successMsg = StringFormat("Direct-Liquidation SUCCESS. Ticket %I64u Removed.", ticket);
+                        XP_LOG_OK(xp, CXAuditFormatter::Build("WATCHER-DIRECT-EXIT", xp, successMsg));
+                        
+                        if(IS_VALID(repo)) {
+                            CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, successMsg);
+                            repo.UpdateStatus(sig);
+                        }
+                        
+                        activeList.Delete(i);
+                        handled_by_fastpass++;
+                        continue;
+                    }
+                }
+
+                // [v18.10 Fast-Pass] 물리 티켓이 아예 없는 경우 (이미 삭제됨) DB만 정리
+                if(ticket <= 0) {
+                    string skipMsg = "Auto-Closed: No physical asset generated yet. Fast-tracking exit.";
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("WATCHER-EXIT-FAST", xp, skipMsg));
+                    
+                    if(IS_VALID(repo)) {
+                        CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, skipMsg);
+                        repo.UpdateStatus(sig);
+                    }
                     
                     activeList.Delete(i);
+                    handled_by_fastpass++;
                     continue;
                 }
                 
-                if(isStatusChanged) XP_LOG_TRACE(xp, CXAuditFormatter::Build("WATCHER-VALID-EXIT", xp, "EXIT-PRIORITY PASS"));
-                sig.SetLastStatus(sig.GetStatus());
+                // 청산 시퀀스가 진행 중인 경우 더 이상의 검증 없이 통과
                 continue; 
             }
 
+            // [v18.15 Session Conflict Guard] (Entry 신호 전용)
+            // 이미 실행 중인 세션이 있다면 Watcher는 신규 세션을 스폰하지 않음
+            if(IS_VALID(session_mgr) && IS_VALID(session_mgr.FindSessionByIdentity(sig))) {
+                activeList.Delete(i);
+                continue;
+            }
+
+            // [v18.12 Exit-Identity Standard]
+            // 진입 신호 식별자 검증
+            bool hasValidIdentity = CXIdManager::ValidateSID(sid) || (sig.GetCno() > 0 && sig.GetSno() > 0);
+
+            //--- [Entry Specific Validation] ---
             // ATSA UI 및 수동 입력 데이터 보정
             if(sig.GetType() != ORDER_MARKET) {
                 if(sig.GetTEStart() >= 1 && 0 >= sig.GetTELimit()) sig.SetTELimit(sig.GetTEStart());
@@ -136,13 +150,20 @@ public:
             }
         }
         
-        int passed = activeList.Total();
-        if(passed > 0) {
-            XP_LOG_TRACE(xp, StringFormat("[WATCHER-VALIDATION] Complete. Passed:%d, Failed:%d", passed, failed));
+        int remaining = activeList.Total();
+        
+        // [v18.12 Flow Control Fix]
+        // 모든 신호가 Fast-Pass 또는 Reject되어 남은 것이 없다면 Discovery로 돌아가되, 
+        // Fast-Pass에 의한 정리는 실패(Warning)로 간주하지 않음.
+        if(remaining > 0) {
+            XP_LOG_TRACE(xp, StringFormat("[WATCHER-VALIDATION] Complete. To Spawn:%d, Failed:%d, FastPass:%d", remaining, failed, handled_by_fastpass));
             return WATCHER_SPAWNING;
         }
 
-        XP_LOG_WARN(xp, StringFormat("[WATCHER-VALIDATION] All %d signals failed validation.", total));
+        if(failed > 0) {
+             XP_LOG_WARN(xp, StringFormat("[WATCHER-VALIDATION] Handled %d signals. (Failed:%d, FastPass:%d). Back to Discovery.", total, failed, handled_by_fastpass));
+        }
+        
         return WATCHER_DISCOVERY;
     }
 

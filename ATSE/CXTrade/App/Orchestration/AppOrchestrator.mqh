@@ -20,7 +20,7 @@ protected:
      * @brief [v18.8] 표준 명칭과 실제 상수값 매핑
      */
     virtual void RegisterStandardNames() override {
-        // Hyper-Atomic State Mapping
+        // Hyper-Atomic State Mapping 
         m_registry.Add("SESSION_READY",           (int)SESSION_READY);
         m_registry.Add("SESSION_VALIDATING",      (int)SESSION_VALIDATING);
         m_registry.Add("SESSION_EXECUTING",       (int)SESSION_EXECUTING);
@@ -78,7 +78,7 @@ protected:
 
             "SESSION_EXECUTING                                                             "
             "> Composite:Step_Executing                                                    "
-            "  : TASK_E_R_ORDER, TASK_E_V_ERROR, TASK_E_V_TICKET                           "
+            "  : TASK_A_INTENT_WATCH, TASK_E_R_ORDER, TASK_E_V_ERROR, TASK_E_V_TICKET      "
             "? SESSION_PENDING                                                             "
             "! SESSION_ERROR                                                               "
             "@ 60s, 3x"

@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_PENDING_V_SYNC_MQH
+#ifndef CX_TASK_PENDING_V_SYNC_MQH
 #define CX_TASK_PENDING_V_SYNC_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -25,7 +25,7 @@ public:
             return SESSION_LIQUIDATING;
         }
 
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("PENDING-V-SYNC", xp, "Monitoring State"));
+
 
         // 1. 상태 동기화 (오더 -> 포지션 전환 감지)
         if(IS_VALID(invMgr)) {

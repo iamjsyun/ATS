@@ -123,9 +123,10 @@ public:
 
       // [v16.19 Race-Condition Safeguard]
       // ATSE의 상태 보고가 App의 의도(1)를 덮어쓰지 않도록 MAX 함수를 사용 (Regression 방지)
+      // [v18.15 Fix] ticket 필드 누락 수정: 티켓 번호 할당 시 DB에 즉시 반영되어야 함
       string sql = StringFormat(
-                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', xa_entry=MAX(xa_entry, %d), xa_exit=MAX(xa_exit, %d), updated=datetime('now','localtime') WHERE sid='%s'",
-                      signal.GetStatus(), sMsg, signal.GetXAEntry(), signal.GetXAExit(), signal.GetSid()
+                      "UPDATE signals SET xe_status=%d, xe_status_msg='%s', ticket=%I64u, xa_entry=MAX(xa_entry, %d), xa_exit=MAX(xa_exit, %d), updated=datetime('now','localtime') WHERE sid='%s'",
+                      signal.GetStatus(), sMsg, signal.GetTicket(), signal.GetXAEntry(), signal.GetXAExit(), signal.GetSid()
                    );
       return m_db.Execute(sql);
    }
