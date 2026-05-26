@@ -1,11 +1,12 @@
-﻿#ifndef CXSTEPFACTORY_MQH
+#ifndef CXSTEPFACTORY_MQH
 #define CXSTEPFACTORY_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXStep.mqh"
 #include "..\..\Platform\Core\Macros\CXMacros.mqh"
-#include "..\..\Watcher\WatcherWorkflow\CXStepDiscovery.mqh"
-#include "..\..\Watcher\WatcherWorkflow\CXStepValidation.mqh"
-#include "..\..\Watcher\WatcherWorkflow\CXStepSpawning.mqh"
+#include "..\..\Watcher\WatcherWorkflow\CXStepEntryDiscovery.mqh"
+#include "..\..\Watcher\WatcherWorkflow\CXStepEntryExecute.mqh"
+#include "..\..\Watcher\WatcherWorkflow\CXStepExitDiscovery.mqh"
+#include "..\..\Watcher\WatcherWorkflow\CXStepExitExecute.mqh"
 
 #include "CXTaskFactory.mqh"
 #include "..\..\Session\Workflow\CXCompositeStep.mqh"
@@ -21,10 +22,12 @@ public:
      * @brief [v16.6] 스텝 이름의 존재 여부를 확인
      */
     static bool Exists(string name) {
-        if(name == "Discovery")  return true;
-        if(name == "Validation") return true;
-        if(name == "Spawning")   return true;
-        if(name == "Composite")  return true;
+        if(name == "EntryDiscovery") return true;
+        if(name == "EntryExecute")   return true;
+        if(name == "ExitDiscovery")  return true;
+        if(name == "ExitExecute")    return true;
+        if(name == "Composite")      return true;
+        if(StringFind(name, "Step_") == 0) return true;
         return false;
     }
 
@@ -32,10 +35,13 @@ public:
      * @brief [v16.6] 문자열 이름을 기반으로 IXStep 객체 생성
      */
     static IXStep* CreateStep(string typeName, string alias = "", CArrayString* taskNames = NULL) {
-        if(typeName == "Discovery")  return new CXStepDiscovery();
-        if(typeName == "Validation") return new CXStepValidation();
-        if(typeName == "Spawning")   return new CXStepSpawning();
-        if(typeName == "Composite")  return CreateCompositeStep(alias == "" ? typeName : alias, taskNames);
+        if(typeName == "EntryDiscovery") return new CXStepEntryDiscovery();
+        if(typeName == "EntryExecute")   return new CXStepEntryExecute();
+        if(typeName == "ExitDiscovery")  return new CXStepExitDiscovery();
+        if(typeName == "ExitExecute")    return new CXStepExitExecute();
+        if(typeName == "Composite" || StringFind(typeName, "Step_") == 0) {
+            return CreateCompositeStep(alias == "" ? typeName : alias, taskNames);
+        }
         return NULL;
     }
 

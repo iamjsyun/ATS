@@ -1,9 +1,10 @@
-﻿#ifndef CXREVERSEINJECTOR_MQH
+#ifndef CXREVERSEINJECTOR_MQH
 #define CXREVERSEINJECTOR_MQH
 
 #include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
 #include "..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\Platform\Core\Interfaces\IDatabase.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXSessionManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXTradingSession.mqh"
 #include "..\..\Platform\Core\Models\CXSignal.mqh"
@@ -21,10 +22,81 @@ private:
     IRepository*            m_repo;
     ICXSessionManager*      m_manager;
     ICXConfig*              m_config; // [v16.2] Explicit dependency
+    IDatabase*              m_db;     // SQLite database handle
 
 public:
-    CXReverseInjector(CXTerminalScanner* scanner, IRepository* repo, ICXSessionManager* manager, ICXConfig* config) 
-        : m_scanner(scanner), m_repo(repo), m_manager(manager), m_config(config) {}
+    CXReverseInjector(CXTerminalScanner* scanner, IRepository* repo, ICXSessionManager* manager, ICXConfig* config, IDatabase* db) 
+        : m_scanner(scanner), m_repo(repo), m_manager(manager), m_config(config), m_db(db) {}
+
+    /**
+     * @brief [v11.3 / GEMINI.md] Apply options from SQLite database `channel_options` table
+     */
+    void ApplyChannelOptions(CXSignal* sig, int cno, int dir, bool isOrder) {
+        if(CheckPointer(m_db) == POINTER_INVALID || CheckPointer(sig) == POINTER_INVALID) return;
+
+        string sql = StringFormat("SELECT buy_entry_offset, sell_entry_offset, tp_points, sl_points, ts_trigger, ts_step, ikte_start, ikte_step FROM channel_options WHERE cno=%d", cno);
+        int handle = m_db.GetHandle();
+        int req = DatabasePrepare(handle, sql);
+        
+        bool found = false;
+        double buy_entry_offset = 0;
+        double sell_entry_offset = 0;
+        double tp_points = 0;
+        double sl_points = 0;
+        int ts_trigger = 0;
+        int ts_step = 0;
+        double ikte_start = 0;
+        double ikte_step = 0;
+
+        if(req != INVALID_HANDLE) {
+            if(DatabaseRead(req)) {
+                found = true;
+                DatabaseColumnDouble(req, 0, buy_entry_offset);
+                DatabaseColumnDouble(req, 1, sell_entry_offset);
+                DatabaseColumnDouble(req, 2, tp_points);
+                DatabaseColumnDouble(req, 3, sl_points);
+                DatabaseColumnInteger(req, 4, ts_trigger);
+                DatabaseColumnInteger(req, 5, ts_step);
+                DatabaseColumnDouble(req, 6, ikte_start);
+                DatabaseColumnDouble(req, 7, ikte_step);
+            }
+            DatabaseFinalize(req);
+        } else {
+            PrintFormat("[REVERSE-INJECTOR] Failed to prepare SQL for channel %d", cno);
+        }
+
+        if(found) {
+            sig.SetCno(cno);
+            sig.SetDir(dir);
+            if(isOrder) {
+                // Pending order rules: apply both entry and exit options
+                double offset = (dir == CX_DIR_BUY) ? buy_entry_offset : sell_entry_offset;
+                sig.SetTEStart(offset);
+                sig.SetTEStep(100.0);
+                sig.SetTELimit(1000.0);
+                sig.SetTEInterval(1);
+                
+                sig.SetIkTeStart(0.0);
+                sig.SetIkTeStep(0.0);
+            } else {
+                // Active position rules: disable TE (entry), apply exit options only
+                sig.SetTEStart(0.0);
+                sig.SetTEStep(0.0);
+                sig.SetTELimit(0.0);
+                sig.SetTEInterval(0);
+                
+                sig.SetIkTeStart(ikte_start);
+                sig.SetIkTeStep(ikte_step);
+            }
+            
+            sig.SetTP(tp_points);
+            sig.SetSL(sl_points);
+            sig.SetTSStart(ts_trigger);
+            sig.SetTSStep(ts_step);
+        } else {
+            PrintFormat("[REVERSE-INJECTOR] Channel options for cno=%d not found in DB. Keeping defaults.", cno);
+        }
+    }
 
     /**
      * @brief 스캔 및 역주입 실행 (Zombie Recovery)
@@ -66,19 +138,33 @@ public:
                 fakeSig.lot = asset.lot;
                 
                 // Map broker order type to CX direction
-                fakeSig.SetDir((asset.type == (int)ORDER_TYPE_BUY || asset.type == (int)ORDER_TYPE_BUY_LIMIT || asset.type == (int)ORDER_TYPE_BUY_STOP) ? CX_DIR_BUY : CX_DIR_SELL);
+                int dir = (asset.type == (int)ORDER_TYPE_BUY || asset.type == (int)ORDER_TYPE_BUY_LIMIT || asset.type == (int)ORDER_TYPE_BUY_STOP) ? CX_DIR_BUY : CX_DIR_SELL;
+                fakeSig.SetDir(dir);
                 fakeSig.SetType((ENUM_CX_ORDER_TYPE)asset.type);
                 
+                bool isOrder = true;
                 // [v16.12 Asset Info Synchronization (Positions vs Orders)]
                 if(PositionSelectByTicket(asset.ticket)) {
                     fakeSig.SetPriceOpen(PositionGetDouble(POSITION_PRICE_OPEN));
                     fakeSig.SetSL(PositionGetDouble(POSITION_SL));
                     fakeSig.SetTP(PositionGetDouble(POSITION_TP));
+                    isOrder = false;
                 } else if(OrderSelect(asset.ticket)) {
                     fakeSig.UpdatePriceSignal(OrderGetDouble(ORDER_PRICE_OPEN));
                     fakeSig.SetSL(OrderGetDouble(ORDER_SL));
                     fakeSig.SetTP(OrderGetDouble(ORDER_TP));
+                    isOrder = true;
                 }
+                
+                // Parse CNO from SID (format: CNO(4)-YYMMDDHH(8)-...)
+                string parts[];
+                int cno = 0;
+                if(StringSplit(sid, '-', parts) >= 1) {
+                    cno = (int)StringToInteger(parts[0]);
+                }
+                
+                // Apply options from DB
+                ApplyChannelOptions(fakeSig, cno, dir, isOrder);
                 
                 fakeSig.SetXAEntry(XA_ACTIVE); // 1
                 fakeSig.SetXAExit(XA_RAW);     // 0

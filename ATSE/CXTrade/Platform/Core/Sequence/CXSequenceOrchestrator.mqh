@@ -12,7 +12,8 @@
  */
 class CXSequenceOrchestrator : public CObject {
 protected:
-    CArrayObj*             m_watcher_map;
+    CArrayObj*             m_watcher_map;       // Entry Watcher Map
+    CArrayObj*             m_watcher_exit_map;  // Exit Watcher Map
     CArrayObj*             m_session_map;
     CHashMap<string, int>* m_registry;
     int                    m_auto_id_counter;
@@ -20,6 +21,7 @@ protected:
 public:
     CXSequenceOrchestrator() {
         m_watcher_map = new CArrayObj();
+        m_watcher_exit_map = new CArrayObj();
         m_session_map = new CArrayObj();
         m_registry = new CHashMap<string, int>();
         m_auto_id_counter = 1000;
@@ -27,6 +29,7 @@ public:
 
     virtual ~CXSequenceOrchestrator() {
         SAFE_DELETE(m_watcher_map);
+        SAFE_DELETE(m_watcher_exit_map);
         SAFE_DELETE(m_session_map);
         SAFE_DELETE(m_registry);
     }
@@ -44,8 +47,30 @@ public:
         CXSequenceRegistry::BuildSequence(seq, m_watcher_map);
     }
 
+    void BuildWatcherEntrySequence(CXFluentSequence* seq) {
+        CXSequenceRegistry::BuildSequence(seq, m_watcher_map);
+    }
+
+    void BuildWatcherExitSequence(CXFluentSequence* seq) {
+        CXSequenceRegistry::BuildSequence(seq, m_watcher_exit_map);
+    }
+
     void BuildSessionSequence(CXFluentSequence* seq) {
         CXSequenceRegistry::BuildSequence(seq, m_session_map);
+    }
+
+    /**
+     * @brief [v16.7] 명칭 기반 ID 확인 (Public Access)
+     */
+    int ResolveId(string value) {
+        string val = Clean(value);
+        if(val == "") return -1;
+        if(IsDigit(val)) return (int)StringToInteger(val);
+        int id;
+        if(m_registry.TryGetValue(val, id)) return id;
+        RegisterStateName(val);
+        m_registry.TryGetValue(val, id);
+        return id;
     }
 
     /**
@@ -114,17 +139,6 @@ protected:
     virtual void RegisterStandardNames() {}
     virtual void InitWatcherMap() {}
     virtual void InitSessionMap() {}
-
-    int ResolveId(string value) {
-        string val = Clean(value);
-        if(val == "") return -1;
-        if(IsDigit(val)) return (int)StringToInteger(val);
-        int id;
-        if(m_registry.TryGetValue(val, id)) return id;
-        RegisterStateName(val);
-        m_registry.TryGetValue(val, id);
-        return id;
-    }
 
     void RegisterStateName(string name) {
         if(name == "" || IsDigit(name)) return;

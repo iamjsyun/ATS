@@ -1,4 +1,4 @@
-﻿#ifndef CXSIGNALWATCHER_MQH
+#ifndef CXSIGNALWATCHER_MQH
 #define CXSIGNALWATCHER_MQH
 
 #include "..\Platform\Core\Interfaces\IRepository.mqh"
@@ -25,13 +25,14 @@ private:
     ICXLogger*              m_watcherLogger;  // [v15.8] Dedicated Watcher Logger
     ICXFluentSequence*      m_sequence;
     CXSequenceOrchestrator* m_orchestrator;
+    string                  m_mode;
 
 public:
-    CXSignalWatcher(IRepository* repo, ICXConfig* cfg, ICXSessionManager* pool, ICXContext* globalCtx, ICXServiceFactory* factory) 
-        : m_repo(repo), m_config(cfg), m_sessionManager(pool), m_globalContext(globalCtx) {
+    CXSignalWatcher(IRepository* repo, ICXConfig* cfg, ICXSessionManager* pool, ICXContext* globalCtx, ICXServiceFactory* factory, string mode = "Entry") 
+        : m_repo(repo), m_config(cfg), m_sessionManager(pool), m_globalContext(globalCtx), m_mode(mode) {
         
         // 1. Watcher 전용 독립 로거 생성
-        m_watcherLogger = factory.CreateLogger("Watcher", cfg);
+        m_watcherLogger = factory.CreateLogger("Watcher_" + m_mode, cfg);
 
         // 2. Watcher 전용 컨텍스트 구축 (전역 컨텍스트 상속)
         m_watcherContext = factory.CreateContext();
@@ -44,9 +45,10 @@ public:
             m_watcherContext.Register("exit_mgr", globalCtx.Get("exit_mgr"));
             m_watcherContext.Register("terminal_platform", globalCtx.Get("terminal_platform"));
             m_watcherContext.Register("logger", m_watcherLogger); // 독립 로거 주입
+            m_watcherContext.Register("factory", factory); // [v18.25] Register factory for dynamic steps
         }
 
-        m_sequence = new CXFluentSequence(m_watcherContext, "WatcherSeq");
+        m_sequence = new CXFluentSequence(m_watcherContext, "Watcher" + m_mode + "Seq");
         
         // [v16.10] Dependency Injection Fix: Retrieve the correct AppOrchestrator from context
         // instead of creating a raw base CXSequenceOrchestrator.
@@ -54,7 +56,11 @@ public:
         
         if(IS_VALID(m_orchestrator) && IS_VALID(m_sequence)) {
             // [v16.2] Dependency Injection refinement
-            m_orchestrator.BuildWatcherSequence(m_sequence);
+            if(m_mode == "Exit") {
+                m_orchestrator.BuildWatcherExitSequence(m_sequence);
+            } else {
+                m_orchestrator.BuildWatcherEntrySequence(m_sequence);
+            }
             m_sequence.Build();
         }
     }

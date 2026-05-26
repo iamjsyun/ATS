@@ -1,4 +1,4 @@
-﻿#ifndef CXSESSIONMANAGER_MQH
+#ifndef CXSESSIONMANAGER_MQH
 #define CXSESSIONMANAGER_MQH
 
 #include <Arrays\ArrayObj.mqh>
@@ -11,6 +11,8 @@
 #include "CXSessionTrailingEntry.mqh"
 #include "CXSessionPositioned.mqh"
 #include "CXSessionExit.mqh"
+#include "..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\Platform\Core\Interfaces\IXPositionManager.mqh"
 
 /**
  * @class CXSessionManager
@@ -22,20 +24,26 @@ private:
     IRepository*        m_globalRepo;
     ICXContext*         m_globalContext;
     ICXServiceFactory*  m_factory;
+    IXOrderManager*     m_orderMgr;
+    IXPositionManager*   m_posMgr;
 
 public:
-    CXSessionManager() : m_globalRepo(NULL), m_globalContext(NULL), m_factory(NULL) {
+    CXSessionManager() : m_globalRepo(NULL), m_globalContext(NULL), m_factory(NULL), m_orderMgr(NULL), m_posMgr(NULL) {
         m_active = new CArrayObj();
     }
 
     virtual ~CXSessionManager() {
         SAFE_DELETE(m_active);
+        SAFE_DELETE(m_orderMgr);
+        SAFE_DELETE(m_posMgr);
     }
 
     virtual void Initialize(IRepository* repo, ICXContext* ctx, ICXServiceFactory* factory) override {
         m_globalRepo = repo;
         m_globalContext = ctx;
         m_factory = factory;
+        m_orderMgr = factory.CreateOrderManager(ctx);
+        m_posMgr = factory.CreatePositionManager(ctx);
     }
 
     /**
@@ -115,6 +123,10 @@ public:
     }
 
     virtual void Pulse(ICXParam* xp) override {
+        // [v18.25] Perform asset scan and binding before pulsing sessions
+        if(IS_VALID(m_orderMgr)) m_orderMgr.ScanAndBind(xp, GetPointer(this));
+        if(IS_VALID(m_posMgr))   m_posMgr.ScanAndBind(xp, GetPointer(this));
+
         for(int i = 0; i < m_active.Total(); i++) {
             ICXTradingSession* session = CX_CAST(ICXTradingSession, m_active.At(i));
             if(IS_VALID(session)) {

@@ -1,4 +1,4 @@
-﻿#ifndef CXPOSITIONMANAGER_MQH
+#ifndef CXPOSITIONMANAGER_MQH
 #define CXPOSITIONMANAGER_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXPositionManager.mqh"
@@ -156,6 +156,58 @@ public:
         XP_LOG_ERROR(xp, vErr);
         if(IS_VALID(xp)) xp.SetString(vErr);
         return false;
+    }
+
+    virtual void ScanAndBind(ICXParam* xp, CObject* sessionMgr) override {
+        ICXSessionManager* mgr = CX_CAST(ICXSessionManager, sessionMgr);
+        if(IS_INVALID(mgr)) return;
+
+        int total = m_terminal.GetPositionsTotal();
+        for(int i = 0; i < total; i++) {
+            // [v18.25] Scan by indexing terminal positions
+            if(!PositionGetTicket(i)) continue;
+            ulong ticket = PositionGetInteger(POSITION_TICKET);
+            if(ticket <= 0) continue;
+
+            long magic = PositionGetInteger(POSITION_MAGIC);
+            ICXConfig* cfg = CX_GET_OBJ(m_ctx, "config", ICXConfig);
+            if(IS_VALID(cfg) && !cfg.IsTargetMagic(magic)) continue;
+
+            string sid = PositionGetString(POSITION_COMMENT);
+            StringTrimLeft(sid); StringTrimRight(sid);
+            if(sid == "") continue;
+
+            // Check if active session already exists for this SID
+            ICXTradingSession* existing = mgr.FindSessionBySid(sid);
+            if(IS_INVALID(existing)) {
+                IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+                if(IS_INVALID(repo)) continue;
+
+                ICXSignal* sig = repo.GetSignalBySid(sid);
+                if(IS_INVALID(sig)) continue; // Orphan or Zombie asset, handled by ReverseInjector
+
+                if(sig.GetStatus() >= XE_CLOSED_SIGNAL) {
+                    SAFE_DELETE(sig);
+                    continue;
+                }
+
+                // Bind ticket and transition directly to XE_EXECUTED
+                sig.SetTicket(ticket);
+                sig.SetStatus(XE_EXECUTED);
+                sig.SetStatusMsg(StringFormat("Position Scanned and Bound. Ticket:%I64u", ticket));
+                repo.UpdateStatus(sig);
+
+                CXParam sp;
+                sp.SetSignal(sig);
+                ICXTradingSession* session = mgr.CreateSession(GetPointer(sp));
+                if(IS_VALID(session)) {
+                    session.Start(GetPointer(sp));
+                    XP_LOG_OK(xp, StringFormat("[POS-MANAGER-SCAN] Bound new active position to session. Ticket:%I64u, SID:%s", ticket, sid));
+                } else {
+                    SAFE_DELETE(sig);
+                }
+            }
+        }
     }
 };
 

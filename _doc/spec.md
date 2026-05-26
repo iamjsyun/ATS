@@ -1,10 +1,10 @@
 ### **[ UAF v14.4 Standardized Nomenclature with Ticket & Magic ]**
-> `[FUNC:Name] [SID] [TK:Value, M:Magic] [Sym, Lot, Dir, Status] [ESTART:d, ESTEP:d, ELIMIT:d, ESPRI:f, ELPRI:f SSTART:d, SSTEP:d SL:d TP:d] [P:f, SL:f, TP:f, Mkt:f] {SPEC:Extra}`
+> `[FUNC:Name] [SID] [TK:Value, M:Magic] [Sym, Lot, Dir, Status] [ESTART:d, ESTEP:d, ELIMIT:d, ESTART_PRICE:f, ELIMIT_PRICE:f SSTART:d, SSTEP:d SL:d TP:d] [P:f, SL:f, TP:f, Mkt:f] {SPEC:Extra}`
 
 ---
 
-**Version**: v11.14 (Final Synchronization & Memory Safety Standard)
-**Date**: 2026-05-25
+**Version**: v11.15 (UAF Nomenclature Sync & Exit-First Priority)
+**Date**: 2026-05-26
 
 ---
 
@@ -13,6 +13,7 @@
     1. **Initial Placement**: 신규 신호 바인딩 시, 시장가로부터 **`ELIMIT`** 거리만큼 떨어진 지점에 최초 대기 오더를 접수한다.
     2. **Trailing Activation**: 시장가가 최초 진입 시점 대비 **`ESTART`** 포인트 이상 하락(Buy 기준)할 때 비로소 추격(Trailing)을 시작한다.
     3. **Rebound Execution**: 시장이 바닥을 찍고 **`ESTEP`** 포인트 이상 반등하는 순간, 대기 오더를 즉시 취소하고 **시장가(Market)**로 진입한다.
+- **Exit-First Priority Mandate (Critical)**: 청산 의도(`xa_exit=1`)가 감지되면 시스템은 현재의 에러 상태(`xe_status=99`)나 진행 중인 진입 시퀀스를 즉시 우회하여 청산 파이프라인을 최우선으로 가동해야 한다. Watcher는 이를 위해 `xa_exit=1` 신호를 최상단으로 정렬하여 로드한다.
 - **>= Evaluation Mandate (Critical)**: 모든 트레일링 파라미터(ESTART, ESTEP, ELIMIT, SSTART, SSTEP)는 대입 시에는 `=`를 사용하되, 코드 내의 조건문에서 평가될 때는 반드시 **`>=` (크거나 같다)** 연산자를 사용해야 한다.
 - **Mandatory Pre-Call Audit (Critical)**: 브로커 통신 함수 호출 **직전**에, 해당 함수에 전달되는 모든 로우(Raw) 파라미터를 포함한 감사 로그를 반드시 기록해야 한다. 
 - **Mandatory Ticket Guard (Liquidation)**: 청산 프로세스(Step 20~23)는 반드시 유효한 물리적 티켓(`Ticket > 0`)이 존재하는 경우에만 트리거될 수 있다.
@@ -190,4 +191,4 @@ Every trading action must verify physical state in MT5 immediately after the req
 - **Reverse Injection (Exception)**: 터미널 스캔 중 DB에 없는 매직넘버 일치 자산 발견 시, EA는 예외적으로 `xa_entry=1`을 직접 마킹하여 좀비 자산을 복구한다.
 
 ---
-**Last Updated**: 2026-05-25
+**Last Updated**: 2026-05-26

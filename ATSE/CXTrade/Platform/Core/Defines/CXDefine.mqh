@@ -66,16 +66,16 @@ enum ENUM_XE_STATUS {
 
 //--- 세션 상태 및 시퀀스 단계 정의 (Sequence States)
 enum ENUM_SESSION_STATE {
-    SESSION_READY            = 0,
-    SESSION_VALIDATING       = 1,  // [v17.6] 리스크 및 데이터 검증
-    SESSION_EXECUTING        = 2,  // [v17.6] 브로커 오더 송신 실행
-    SESSION_PENDING          = 3,  // [v17.6] 터미널 오더 안착 대기
-    SESSION_TRAILING_ENTRY   = 5,  // [v17.6] 진입 가격 추격 (Active TE)
-    SESSION_ACTIVE           = 10, // 포지션 진입 완료 및 감시
-    SESSION_TRAILING_STOP    = 15, // [v17.6] 수익 보존 추격 (Active TS/Alpha)
-    SESSION_LIQUIDATING      = 20, // 청산 실행
-    SESSION_CLOSED           = 30, // 세션 종료
-    SESSION_ERROR            = 99  // 에러 상태
+    SESSION_READY            = 0,  ORD_READY            = 0,
+    SESSION_VALIDATING       = 1,  ORD_VALIDATING       = 1,  // [v17.6] 리스크 및 데이터 검증
+    SESSION_EXECUTING        = 2,  ORD_EXECUTING        = 2,  // [v17.6] 브로커 오더 송신 실행
+    SESSION_PENDING          = 3,  ORD_PENDING          = 3,  // [v17.6] 터미널 오더 안착 대기
+    SESSION_TRAILING_ENTRY   = 5,  ORD_TRAILING         = 5,  // [v17.6] 진입 가격 추격 (Active TE)
+    SESSION_ACTIVE           = 10, POS_ACTIVE           = 10, // 포지션 진입 완료 및 감시
+    SESSION_TRAILING_STOP    = 15, POS_TRAILING         = 15, // [v17.6] 수익 보존 추격 (Active TS/Alpha)
+    SESSION_LIQUIDATING      = 20, POS_LIQUIDATING      = 20, // 청산 실행
+    SESSION_CLOSED           = 30, SYS_CLOSED           = 30, // 세션 종료
+    SESSION_ERROR            = 99, SYS_ERROR            = 99  // 에러 상태
 };
 
 //--- Watcher 상태 및 시퀀스 단계 정의 (Watcher Sequence States)

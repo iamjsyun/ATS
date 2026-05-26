@@ -13,6 +13,7 @@ public:
     virtual void SetMagic(ulong magic) = 0;
     virtual void Pulse(ICXParam* xp) = 0;
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) = 0;
+    virtual void ScanAndBind(ICXParam* xp, CObject* sessionMgr) = 0;
     
     // [v13.4 UAF Standard]
     virtual string GetAuditString(ICXParam* xp, string actionLabel = "") = 0;

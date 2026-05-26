@@ -1,4 +1,4 @@
-﻿#ifndef CXORDERMANAGER_MQH
+#ifndef CXORDERMANAGER_MQH
 #define CXORDERMANAGER_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
@@ -45,7 +45,7 @@ public:
             double mkt   = IS_VALID(priceMgr) ? priceMgr.GetMarketPrice(symbol, sig.GetDir()) : SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
             double tesp = (sig.GetTEStart() >= 1) ? mkt + (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
             double telp = (sig.GetTELimit() >= 1) ? mkt + (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
-            spec = StringFormat("ESTART:%d, ESPRI:%.2f, ELPRI:%.2f", (int)sig.GetTEStart(), tesp, telp);
+            spec = StringFormat("ESTART:%d, ESTART_PRICE:%.2f, ELIMIT_PRICE:%.2f", (int)sig.GetTEStart(), tesp, telp);
         }
 
         return CXAuditFormatter::Build(actionLabel, xp, spec);
@@ -306,6 +306,58 @@ public:
         Print(receptionMsg);
         
         return success;
+    }
+
+    virtual void ScanAndBind(ICXParam* xp, CObject* sessionMgr) override {
+        ICXSessionManager* mgr = CX_CAST(ICXSessionManager, sessionMgr);
+        if(IS_INVALID(mgr)) return;
+
+        int total = m_terminal.GetOrdersTotal();
+        for(int i = 0; i < total; i++) {
+            // [v18.25] Scan by indexing terminal orders
+            if(!OrderGetTicket(i)) continue;
+            ulong ticket = OrderGetInteger(ORDER_TICKET);
+            if(ticket <= 0) continue;
+            
+            long magic = OrderGetInteger(ORDER_MAGIC);
+            ICXConfig* cfg = CX_GET_OBJ(m_ctx, "config", ICXConfig);
+            if(IS_VALID(cfg) && !cfg.IsTargetMagic(magic)) continue;
+
+            string sid = OrderGetString(ORDER_COMMENT);
+            StringTrimLeft(sid); StringTrimRight(sid);
+            if(sid == "") continue;
+
+            // Check if active session already exists for this SID
+            ICXTradingSession* existing = mgr.FindSessionBySid(sid);
+            if(IS_INVALID(existing)) {
+                IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+                if(IS_INVALID(repo)) continue;
+
+                ICXSignal* sig = repo.GetSignalBySid(sid);
+                if(IS_INVALID(sig)) continue; // Orphan or Zombie asset, handled by ReverseInjector
+
+                if(sig.GetStatus() >= XE_CLOSED_SIGNAL) {
+                    SAFE_DELETE(sig);
+                    continue;
+                }
+
+                // Bind ticket and transition to XE_PENDING_PLACED
+                sig.SetTicket(ticket);
+                sig.SetStatus(XE_PENDING_PLACED);
+                sig.SetStatusMsg(StringFormat("Order Scanned and Bound. Ticket:%I64u", ticket));
+                repo.UpdateStatus(sig);
+
+                CXParam sp;
+                sp.SetSignal(sig);
+                ICXTradingSession* session = mgr.CreateSession(GetPointer(sp));
+                if(IS_VALID(session)) {
+                    session.Start(GetPointer(sp));
+                    XP_LOG_OK(xp, StringFormat("[ORDER-MANAGER-SCAN] Bound new pending order to session. Ticket:%I64u, SID:%s", ticket, sid));
+                } else {
+                    SAFE_DELETE(sig);
+                }
+            }
+        }
     }
 };
 
