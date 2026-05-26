@@ -1,27 +1,28 @@
-#ifndef CXSERVICEFACTORY_MQH
+﻿#ifndef CXSERVICEFACTORY_MQH
 #define CXSERVICEFACTORY_MQH
-#include "..\..\Core\Interfaces\ICXServiceFactory.mqh"
-#include "..\..\Session\CXContext.mqh"
-#include "..\..\Shared\Logging\CXLogDispatcher.mqh"
-#include "..\..\Shared\Logging\CXFileLogger.mqh"
-#include "..\..\Shared\Logging\CXFileLoggerSID.mqh"
-#include "..\..\Shared\Logging\CXTabLogger.mqh"
-#include "..\..\Shared\Logging\CXRemoteLogger.mqh"
-#include "..\..\Session\Sequence\CXFluentSequence.mqh"
-#include "..\..\Shared\Database\CXDatabase.mqh"
-#include "..\..\Shared\Database\CXSignalRepository.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
+#include "..\..\Platform\Core\Models\CXContext.mqh"
+#include "..\..\Platform\Shared\Logging\CXLogDispatcher.mqh"
+#include "..\..\Platform\Shared\Logging\CXFileLogger.mqh"
+#include "..\..\Platform\Shared\Logging\CXFileLoggerSID.mqh"
+#include "..\..\Platform\Shared\Logging\CXTabLogger.mqh"
+#include "..\..\Platform\Shared\Logging\CXRemoteLogger.mqh"
+#include "..\..\Platform\Core\Sequence\CXFluentSequence.mqh"
+#include "..\..\Platform\Shared\Database\CXDatabase.mqh"
+#include "..\..\Execution\CXTerminalPlatform.mqh"
+#include "..\..\Platform\Shared\Database\CXSignalRepository.mqh"
 
 #include "..\..\Execution\Order\CXEntryManager.mqh"
 #include "..\..\Execution\Order\CXOrderManager.mqh"
 #include "..\..\Execution\Position\CXPositionManager.mqh"
 #include "..\..\Execution\Exit\CXExitManager.mqh"
 
-#include "..\..\Engine\Price\CXPriceTracker.mqh"
-#include "..\..\Engine\Price\CXPriceManager.mqh"
-#include "..\..\Engine\Risk\CXRiskManager.mqh"
-#include "..\..\Engine\Symbol\CXSymbolManager.mqh"
-#include "..\..\Engine\Inventory\CXInventoryManager.mqh"
-#include "..\..\Session\CXContext.mqh"
+#include "..\..\Platform\Engine\Price\CXPriceTracker.mqh"
+#include "..\..\Platform\Engine\Price\CXPriceManager.mqh"
+#include "..\..\Platform\Engine\Risk\CXRiskManager.mqh"
+#include "..\..\Platform\Engine\Symbol\CXSymbolManager.mqh"
+#include "..\..\Platform\Engine\Inventory\CXInventoryManager.mqh"
+#include "..\..\Platform\Core\Models\CXContext.mqh"
 
 /**
  * @class CXServiceFactory
@@ -111,6 +112,10 @@ public:
         return new CXSignalRepository(db);
     }
 
+    virtual IXTerminalPlatform* CreateTerminalPlatform(ICXContext* ctx) override {
+        return new CXTerminalPlatform(ctx);
+    }
+
     virtual IXEntryManager* CreateEntryManager(ICXContext* ctx) override {
         return new CXEntryManager(ctx);
     }
@@ -144,7 +149,7 @@ public:
     }
 
     virtual ICXInventoryManager* CreateInventoryManager(ICXContext* ctx) override {
-        return new CXInventoryManager();
+        return new CXInventoryManager(ctx);
     }
 };
 

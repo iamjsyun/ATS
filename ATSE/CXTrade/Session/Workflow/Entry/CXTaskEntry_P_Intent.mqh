@@ -1,11 +1,11 @@
-#ifndef CX_TASK_ENTRY_P_INTENT_MQH
+﻿#ifndef CX_TASK_ENTRY_P_INTENT_MQH
 #define CX_TASK_ENTRY_P_INTENT_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_P_Intent
@@ -22,7 +22,7 @@ public:
         // 계산된 가격 정보(Exec, SL, TP)의 영속성을 보장하기 위해 최초 1회는 무조건 저장
         string sessionLockKey = StringFormat("IntentPersisted_%s", sig.GetSid());
         if(IS_VALID(ctx.Get(sessionLockKey))) {
-            XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-INTENT", xp, "SKIP: Intent already persisted in this session."));
+            // [Muted] XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-INTENT", xp, "SKIP: Intent already persisted in this session."));
             return TASK_CONTINUE;
         }
 

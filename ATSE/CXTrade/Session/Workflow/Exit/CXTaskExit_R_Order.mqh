@@ -1,10 +1,10 @@
-#ifndef CX_TASK_EXIT_R_ORDER_MQH
+﻿#ifndef CX_TASK_EXIT_R_ORDER_MQH
 #define CX_TASK_EXIT_R_ORDER_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXExitManager.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXExitManager.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_R_Order
@@ -28,14 +28,14 @@ public:
         // [v14.4 Idempotency Guard] 이미 요청이 나갔다면 중복 송신 차단
         if(xp.GetInt() == 3) {
             XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SKIP: Liquidation already requested."));
-            return STATE_LIQUIDATING_TRANSIT;
+            return TASK_CONTINUE;
         }
 
         // [v14.4 Physical Asset Guard] 티켓이 이미 없다면 송신할 필요 없음
         ulong ticket = (ulong)sig.GetTicket();
         if(ticket > 0 && !invMgr.IsAssetExists(ticket, sig.GetType())) {
             XP_LOG_WARN(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("Physical Asset(%I64u) already gone. Skipping.", ticket)));
-            return STATE_LIQUIDATING_TRANSIT; 
+            return TASK_CONTINUE; 
         }
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("Sending Liquidation Order for Ticket:%I64u...", ticket)));
@@ -46,7 +46,7 @@ public:
         if(exitMgr.SweepBySid(xp, sig.GetSid())) {
             XP_LOG_OK(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SUCCESS: Massive SID Sweep executed."));
             xp.SetInt(3); // Mark as requested
-            return STATE_LIQUIDATING_TRANSIT;
+            return TASK_CONTINUE;
         }
 
         string lastErr = xp.GetString();

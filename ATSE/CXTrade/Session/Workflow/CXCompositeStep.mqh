@@ -1,9 +1,9 @@
-#ifndef CXCOMPOSITESTEP_MQH
+﻿#ifndef CXCOMPOSITESTEP_MQH
 #define CXCOMPOSITESTEP_MQH
 
-#include "..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 #include <Arrays\ArrayObj.mqh>
 
 
@@ -77,15 +77,15 @@ public:
                     return SESSION_ERROR;
                 }
 
-                // [v14.9 Tracing] 태스크 실행 전 트레이싱 로그 출력
-                XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMPOSITE-TRACE", xp, "Executing Task: " + task.Name()));
+                // [v14.9 Muted] 태스크 실행 전 트레이싱 로그 출력
+                // XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMPOSITE-TRACE", xp, "Executing Task: " + task.Name()));
 
                 int res = task.Execute(xp, ctx);
                 
-                // [v14.48 Tracing] Log task result
-                if(res != TASK_CONTINUE) {
-                    XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMPOSITE-TRACE", xp, StringFormat("Task %s returned result: %d", task.Name(), res)));
-                }
+                // [v14.48 Muted] Log task result
+                // if(res != TASK_CONTINUE) {
+                //     XP_LOG_TRACE(xp, CXAuditFormatter::Build("COMPOSITE-TRACE", xp, StringFormat("Task %s returned result: %d", task.Name(), res)));
+                // }
 
                 // 1. 특정 상태로 전이 지시 시 즉시 반환 (성공/상태변경)
                 if(res >= 0) {
@@ -125,7 +125,7 @@ public:
         }
         
         if(IS_VALID(pIdx)) pIdx.SetInt(0);
-        return STATE_UNCHANGED; 
+        return STEP_SUCCESS; 
     }
 
     virtual void OnEnter(ICXContext* ctx) override {

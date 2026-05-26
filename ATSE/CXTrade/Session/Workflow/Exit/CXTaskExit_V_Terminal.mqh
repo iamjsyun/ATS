@@ -1,10 +1,10 @@
-#ifndef CX_TASK_EXIT_V_TERMINAL_MQH
+﻿#ifndef CX_TASK_EXIT_V_TERMINAL_MQH
 #define CX_TASK_EXIT_V_TERMINAL_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_V_Terminal
@@ -42,7 +42,7 @@ public:
         }
 
         XP_LOG_OK(xp, CXAuditFormatter::Build("EXIT-V-TERM", xp, StringFormat("SUCCESS: Ticket(%I64u) Absence Verified.", ticket)));
-        return STATE_EXIT_VERIFY; // Always jump to 23
+        return TASK_CONTINUE;
     }
 };
 

@@ -1,9 +1,9 @@
-#ifndef CX_TASK_PENDING_V_SYNC_MQH
+﻿#ifndef CX_TASK_PENDING_V_SYNC_MQH
 #define CX_TASK_PENDING_V_SYNC_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_V_Sync

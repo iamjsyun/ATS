@@ -9,11 +9,11 @@
 #property strict
 
 #include "Scenarios\CXScenarioLoader.mqh"
-#include "..\CXTrade\Shared\Database\CXDatabase.mqh"
-#include "..\CXTrade\Shared\Database\CXSignalRepository.mqh"
-#include "..\CXTrade\Core\Models\CXSignal.mqh"
-#include "..\CXTrade\Core\Defines\CXDefine.mqh"
-#include "..\CXTrade\App\CXTerminalScanner.mqh"
+#include "..\CXTrade\Platform\Shared\Database\CXDatabase.mqh"
+#include "..\CXTrade\Platform\Shared\Database\CXSignalRepository.mqh"
+#include "..\CXTrade\Platform\Core\Models\CXSignal.mqh"
+#include "..\CXTrade\Platform\Core\Defines\CXDefine.mqh"
+#include "..\CXTrade\App\Logic\CXTerminalScanner.mqh"
 
 //--- [Inputs]
 input string InpScenarioFile = "ATSE\\scenario_sample.csv"; // CSV Filename (MQL5/Files)
@@ -39,7 +39,7 @@ int OnInit() {
     }
 
     g_db = new CXDatabase();
-    if(!g_db.OpenByParams(InpDatabaseName, InpUseCommonPath)) {
+    if(!g_db.Open(InpDatabaseName, InpUseCommonPath)) {
         Print("[RUNNER] ERROR: Failed to open database.");
         return INIT_FAILED;
     }
@@ -226,7 +226,7 @@ CXSignal* CreateSignalFromParam(CXScenarioParam* p) {
     sig.te_limit     = (double)p.te_limit; 
     
     sig.ts_start     = p.ts_start;
-    sig.ts_step      = (double)p.ts_step;
+    sig.ts_step      = p.ts_step;
     
     sig.xa_entry = XA_ACTIVE; 
     sig.xa_exit = 0;

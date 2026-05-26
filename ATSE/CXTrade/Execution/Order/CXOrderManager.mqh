@@ -1,20 +1,19 @@
-#ifndef CXORDERMANAGER_MQH
+﻿#ifndef CXORDERMANAGER_MQH
 #define CXORDERMANAGER_MQH
 
-#include "..\..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\..\Core\Interfaces\ICXContext.mqh"
-#include "..\..\Core\Interfaces\ICXParam.mqh"
-#include "..\..\Core\Interfaces\ICXPriceManager.mqh"
-#include "..\..\Core\Interfaces\ICXRiskManager.mqh"
-#include "..\..\Core\Interfaces\ICXSymbolManager.mqh"
-#include "..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\Core\Interfaces\ICXAuditProvider.mqh"
-#include "..\..\Core\Interfaces\IXGuard.mqh"
-#include "..\..\Core\Defines\CXDefine.mqh"
-#include "..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\Shared\Logging\CXAuditFormatter.mqh"
-#include <Trade\Trade.mqh>
+#include "..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXRiskManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXAuditProvider.mqh"
+#include "..\..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "..\..\Platform\Core\Defines\CXDefine.mqh"
+#include "..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\Platform\Core\Interfaces\IXTerminalPlatform.mqh"
 
 /**
  * @class CXOrderManager
@@ -22,13 +21,15 @@
  */
 class CXOrderManager : public IXOrderManager {
 private:
-    ulong           m_ticket;
-    string          m_sid;
-    CTrade          m_trade;
-    ICXContext*     m_ctx;
+    ulong               m_ticket;
+    string              m_sid;
+    IXTerminalPlatform* m_terminal;
+    ICXContext*         m_ctx;
 
 public:
-    CXOrderManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0), m_sid("") {}
+    CXOrderManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0), m_sid("") {
+        m_terminal = CX_GET_OBJ(m_ctx, "terminal_platform", IXTerminalPlatform);
+    }
     virtual ~CXOrderManager() override {}
 
     virtual string GetAuditString(ICXParam* xp, string actionLabel = "") override {
@@ -38,8 +39,10 @@ public:
         string spec = xp.GetString();
         if(spec == "") {
             string symbol = sig.GetSymbol();
-            double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
-            double mkt   = SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
+            ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
+            ICXPriceManager* priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
+            double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
+            double mkt   = IS_VALID(priceMgr) ? priceMgr.GetMarketPrice(symbol, sig.GetDir()) : SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
             double tesp = (sig.GetTEStart() >= 1) ? mkt + (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
             double telp = (sig.GetTELimit() >= 1) ? mkt + (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
             spec = StringFormat("ESTART:%d, ESPRI:%.2f, ELPRI:%.2f", (int)sig.GetTEStart(), tesp, telp);
@@ -48,7 +51,7 @@ public:
         return CXAuditFormatter::Build(actionLabel, xp, spec);
     }
 
-    virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
+    virtual void SetMagic(ulong magic) override { m_terminal.SetMagic(magic); }
 
     virtual void Pulse(ICXParam* xp) override {
         if(IS_INVALID(m_ctx) || IS_INVALID(xp)) return;
@@ -100,41 +103,14 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return false;
 
-        string sid = sig.GetSid();
+        string sid = sig.GetSid(); StringTrimLeft(sid); StringTrimRight(sid);
+        ulong magic = sig.GetMagic();
 
-        // [v14.40 Anti-Proliferation] Pre-flight Check:
-        // Before sending order, check if an asset with this SID already exists in terminal.
-        // This prevents creating multiple tickets during "Market Closed" retries or lag.
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-        if(IS_VALID(invMgr)) {
-            ulong existingTicket = 0;
-            // Scan positions and orders for this SID
-            for(int i = PositionsTotal() - 1; i >= 0; i--) {
-                if(PositionSelectByTicket(PositionGetTicket(i)) && PositionGetString(POSITION_COMMENT) == sid) {
-                    existingTicket = PositionGetInteger(POSITION_TICKET);
-                    break;
-                }
-            }
-            if(existingTicket == 0) {
-                for(int i = OrdersTotal() - 1; i >= 0; i--) {
-                    if(OrderSelect(OrderGetTicket(i)) && OrderGetString(ORDER_COMMENT) == sid) {
-                        existingTicket = OrderGetInteger(ORDER_TICKET);
-                        break;
-                    }
-                }
-            }
-
-            if(existingTicket > 0) {
-                XP_LOG_WARN(xp, CXAuditFormatter::Build("EXEC-ENTRY-BIND", xp, StringFormat("Proliferation Guard: Asset found with same SID (%I64u). Binding instead of sending.", existingTicket)));
-                sig.SetTicket(existingTicket);
-                
-                // [v14.43 Fix] Ensure DB state is updated after binding
-                CXMessageProvider::UpdateStatus(sig, XE_IN_TRANSIT, "Bound to existing asset: " + (string)existingTicket);
-                IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
-                if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                
-                return true; 
-            }
+        // [v18.8 Safety Guard] 
+        // Minimum check: If ticket already exists in the object, never send another order.
+        if(sig.GetTicket() > 0 || sig.GetStatus() >= XE_IN_TRANSIT) {
+             XP_LOG_WARN(xp, CXAuditFormatter::Build("EXEC-ENTRY-GUARD", xp, "ABORT: Signal already has a ticket or is in transit."));
+             return true; 
         }
 
         // [v14.40 Throttled Retry]
@@ -151,7 +127,6 @@ public:
         string symbol = sig.GetSymbol();
         int    dir    = sig.GetDir();
         double lot    = sig.GetLot();
-        long   magic  = sig.GetMagic();
         string comment = sid;
         m_sid = comment;
 
@@ -163,11 +138,12 @@ public:
                                      (dir == CX_DIR_BUY ? ORDER_TYPE_BUY : ORDER_TYPE_SELL) : 
                                      (dir == CX_DIR_BUY ? ORDER_TYPE_BUY_LIMIT : ORDER_TYPE_SELL_LIMIT);
 
-        m_trade.SetExpertMagicNumber(magic);
+        m_terminal.SetMagic(magic);
         ICXSymbolManager* symMgr = CX_GET_OBJ(m_ctx, "sym_mgr", ICXSymbolManager);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
+        
         double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
-
-        double currentMkt = SymbolInfoDouble(symbol, (dir == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
+        double currentMkt = IS_VALID(priceMgr) ? priceMgr.GetMarketPrice(symbol, dir) : SymbolInfoDouble(symbol, (dir == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
         int stopsLevel = IS_VALID(symMgr) ? symMgr.GetStopsLevel(symbol) : (int)SymbolInfoInteger(symbol, SYMBOL_TRADE_STOPS_LEVEL);
         double minDistance = (stopsLevel + 1) * point;
         
@@ -200,18 +176,17 @@ public:
         if(IS_VALID(repo)) repo.UpdateStatus(sig);
 
         bool success = (sig.GetType() == ORDER_MARKET) ?
-            m_trade.PositionOpen(symbol, order_type, lot, execPrice, finalSL, finalTP, comment) :
-            m_trade.OrderOpen(symbol, order_type, lot, 0, execPrice, finalSL, finalTP, ORDER_TIME_GTC, 0, comment);
+            m_terminal.PositionOpen(xp, sig, execPrice, finalSL, finalTP) :
+            m_terminal.OrderOpen(xp, sig, execPrice, finalSL, finalTP);
 
         xp.SetString(""); // Clear for next use
-        uint retCode = m_trade.ResultRetcode();
+        uint retCode = m_terminal.GetLastRetCode();
         string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("%s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
 
         if(!success) {
-            uint retCode = m_trade.ResultRetcode();
-            string errDescription = m_trade.ResultRetcodeDescription();
+            string errDescription = m_terminal.GetLastRetCodeDescription();
             string err = StringFormat("%s FAIL. Code:%u(%s)", funcName, retCode, errDescription);
 
             // [v14.32 Resilience] Market Closed (10018) is a transient state, not a fatal error.
@@ -235,8 +210,8 @@ public:
             return false;
         }
 
-        ulong ticket = (sig.GetType() == ORDER_MARKET) ? m_trade.ResultDeal() : m_trade.ResultOrder();
-        if(ticket == 0) ticket = m_trade.ResultOrder();
+        ulong ticket = (sig.GetType() == ORDER_MARKET) ? m_terminal.GetLastResultDeal() : m_terminal.GetLastResultOrder();
+        if(ticket == 0) ticket = m_terminal.GetLastResultOrder();
         sig.SetTicket(ticket);
         CXMessageProvider::UpdateStatus(sig, XE_IN_TRANSIT, "Order Placed: " + (string)ticket);
         if(IS_VALID(repo)) repo.UpdateStatus(sig);
@@ -248,10 +223,9 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return false;
         ulong ticket = (ulong)sig.GetTicket();
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
-        if(IS_INVALID(invMgr) || ticket <= 0) return false;
+        if(ticket <= 0) return false;
 
-        string funcName = invMgr.IsPositionExists(ticket) ? "PositionClose" : "OrderDelete";
+        string funcName = m_terminal.IsPositionExists(ticket) ? "PositionClose" : "OrderDelete";
         
         // [v11.10] Pre-Call Raw Parameter Audit
         string rawParams = StringFormat("Raw: [Ticket:%I64u, SID:%s]", ticket, sig.GetSid());
@@ -260,10 +234,10 @@ public:
         XP_LOG_INFO(xp, auditMsg);
         Print(auditMsg);
         
-        bool success = invMgr.IsPositionExists(ticket) ? m_trade.PositionClose(ticket) : m_trade.OrderDelete(ticket);
+        bool success = m_terminal.IsPositionExists(ticket) ? m_terminal.PositionClose(xp, ticket) : m_terminal.OrderDelete(xp, ticket);
         
         xp.SetString(""); // Clear for next use
-        PrintFormat("[AUDIT-RECEPTION] %s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", m_trade.ResultRetcode());
+        PrintFormat("[AUDIT-RECEPTION] %s Result: %s (Code:%u)", funcName, success?"SUCCESS":"FAILED", m_terminal.GetLastRetCode());
         return success;
     }
 
@@ -275,10 +249,10 @@ public:
         XP_LOG_INFO(xp, auditMsg);
         Print(auditMsg);
         
-        bool success = m_trade.OrderModify(ticket, price, sl, tp, ORDER_TIME_GTC, 0);
+        bool success = m_terminal.OrderModify(xp, ticket, price, sl, tp);
         
         xp.SetString(""); // Clear for next use
-        uint retCode = m_trade.ResultRetcode();
+        uint retCode = m_terminal.GetLastRetCode();
         string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("OrderModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
@@ -299,10 +273,10 @@ public:
         XP_LOG_INFO(xp, auditMsg);
         Print(auditMsg);
         
-        bool success = m_trade.PositionModify(ticket, sl, tp);
+        bool success = m_terminal.PositionModify(xp, ticket, sl, tp);
         
         xp.SetString(""); // Clear for next use
-        uint retCode = m_trade.ResultRetcode();
+        uint retCode = m_terminal.GetLastRetCode();
         string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("PositionModify Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);
@@ -323,10 +297,10 @@ public:
         XP_LOG_INFO(xp, auditMsg);
         Print(auditMsg);
         
-        bool success = m_trade.OrderDelete(ticket);
+        bool success = m_terminal.OrderDelete(xp, ticket);
         
         xp.SetString(""); // Clear for next use
-        uint retCode = m_trade.ResultRetcode();
+        uint retCode = m_terminal.GetLastRetCode();
         string receptionMsg = CXAuditFormatter::Build("AUDIT-RECEPTION", xp, StringFormat("OrderDelete Result: %s (Code:%u)", success?"SUCCESS":"FAILED", retCode));
         XP_LOG_INFO(xp, receptionMsg);
         Print(receptionMsg);

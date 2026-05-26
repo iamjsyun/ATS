@@ -1,10 +1,10 @@
-#ifndef CX_TASK_COMM_V_STATUS_MQH
+﻿#ifndef CX_TASK_COMM_V_STATUS_MQH
 #define CX_TASK_COMM_V_STATUS_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\ICXLogger.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXLogger.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskComm_V_Status

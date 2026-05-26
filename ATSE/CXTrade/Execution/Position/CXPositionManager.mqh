@@ -1,15 +1,15 @@
-#ifndef CXPOSITIONMANAGER_MQH
+﻿#ifndef CXPOSITIONMANAGER_MQH
 #define CXPOSITIONMANAGER_MQH
 
-#include "..\..\Core\Interfaces\IXPositionManager.mqh"
-#include "..\..\Core\Interfaces\ICXContext.mqh"
-#include "..\..\Core\Interfaces\ICXParam.mqh"
-#include "..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\Core\Defines\CXDefine.mqh"
-#include "..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\Shared\Logging\CXAuditFormatter.mqh"
-#include <Trade\Trade.mqh>
+#include "..\..\Platform\Core\Interfaces\IXPositionManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\Platform\Core\Defines\CXDefine.mqh"
+#include "..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\Platform\Core\Interfaces\IXTerminalPlatform.mqh"
 
 /**
  * @class CXPositionManager
@@ -19,13 +19,15 @@ class CXPositionManager : public IXPositionManager {
 private:
     ulong               m_ticket;
     ICXContext*         m_ctx;
-    CTrade              m_trade;
+    IXTerminalPlatform* m_terminal;
 
 public:
-    CXPositionManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0) {}
+    CXPositionManager(ICXContext* ctx) : m_ctx(ctx), m_ticket(0) {
+        m_terminal = CX_GET_OBJ(m_ctx, "terminal_platform", IXTerminalPlatform);
+    }
     virtual ~CXPositionManager() override {}
 
-    virtual void SetMagic(ulong magic) override { m_trade.SetExpertMagicNumber(magic); }
+    virtual void SetMagic(ulong magic) override { m_terminal.SetMagic(magic); }
 
     /**
      * @brief [v13.4 Audit] 포지션 감사 문자열 생성
@@ -38,9 +40,9 @@ public:
         double profit = 0;
         double currentSL = 0;
         
-        if(PositionSelectByTicket(ticket)) {
-            profit = PositionGetDouble(POSITION_PROFIT);
-            currentSL = PositionGetDouble(POSITION_SL);
+        if(m_terminal.IsPositionExists(ticket)) {
+            profit = m_terminal.GetPositionProfit(ticket);
+            currentSL = m_terminal.GetPositionSL(ticket);
         }
 
         string spec = StringFormat("Profit:%.2f, SL:%.5f", profit, currentSL);
@@ -66,20 +68,21 @@ public:
         }
 
         // 1. 터미널에 포지션이 살아있는지 확인 (SSOC) 및 SID 검증
-        if(PositionSelectByTicket(ticket)) {
-            if(PositionGetString(POSITION_COMMENT) == sig.GetSid()) {
+        if(m_terminal.IsPositionExists(ticket)) {
+            string posComment = m_terminal.GetPositionComment(ticket);
+            if(posComment == sig.GetSid()) {
                 return; // 정상: 티켓과 SID 모두 일치
             } else {
                 string mismatchMsg = StringFormat("SID Mismatch for Ticket:%I64u. (Found:%s, Expected:%s)", 
-                                             ticket, PositionGetString(POSITION_COMMENT), sig.GetSid());
+                                             ticket, posComment, sig.GetSid());
                 XP_LOG_WARN(xp, CXAuditFormatter::Build("POS-MANAGER", xp, mismatchMsg));
                 // SID가 다르면 내 자산이 아니므로 아래의 부재/히스토리 로직으로 진행
             }
         }
 
         // 1.1 [v11.6] 포지션은 없으나 '대기 오더'로 살아있는지 확인
-        if(OrderSelect(ticket)) {
-            if(OrderGetString(ORDER_COMMENT) == sig.GetSid()) {
+        if(m_terminal.IsOrderExists(ticket)) {
+            if(m_terminal.GetOrderComment(ticket) == sig.GetSid()) {
                 XP_LOG_TRACE(xp, CXAuditFormatter::Build("POS-MANAGER", xp, StringFormat("OK: Position missing but Order:%I64u still active.", ticket)));
                 return; 
             }
@@ -125,9 +128,9 @@ public:
         if(IS_INVALID(invMgr)) return false;
 
         // 1. 수정 시도
-        if(!m_trade.PositionModify(ticket, sl, tp)) {
-            string retMsg = m_trade.ResultRetcodeDescription();
-            uint retCode = m_trade.ResultRetcode();
+        if(!m_terminal.PositionModify(xp, ticket, sl, tp)) {
+            string retMsg = m_terminal.GetLastRetCodeDescription();
+            uint retCode = m_terminal.GetLastRetCode();
             int sysErr = GetLastError();
             string spec = StringFormat("Broker Code:%u(%s), SysErr:%d", retCode, retMsg, sysErr);
             string err_msg = CXAuditFormatter::Build("POS-MODIFY-FAIL", xp, spec);

@@ -1,10 +1,10 @@
-#ifndef CX_TASK_ENTRY_V_REAL_MQH
+﻿#ifndef CX_TASK_ENTRY_V_REAL_MQH
 #define CX_TASK_ENTRY_V_REAL_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_V_Real

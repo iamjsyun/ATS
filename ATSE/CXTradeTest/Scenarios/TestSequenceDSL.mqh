@@ -1,8 +1,8 @@
-#ifndef TEST_SEQUENCE_DSL_MQH
+﻿#ifndef TEST_SEQUENCE_DSL_MQH
 #define TEST_SEQUENCE_DSL_MQH
 
-#include "..\..\CXTrade\Session\Sequence\CXSequenceOrchestrator.mqh"
-#include "..\..\CXTrade\Session\Sequence\CXFluentSequence.mqh"
+#include "..\..\CXTrade\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
+#include "..\..\CXTrade\Platform\Core\Sequence\CXFluentSequence.mqh"
 #include "..\..\CXTrade\Session\CXContext.mqh"
 
 class TestSequenceDSL {

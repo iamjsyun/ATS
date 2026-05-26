@@ -1,10 +1,10 @@
-#ifndef CX_TASK_ENTRY_R_ORDER_MQH
+﻿#ifndef CX_TASK_ENTRY_R_ORDER_MQH
 #define CX_TASK_ENTRY_R_ORDER_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_R_Order

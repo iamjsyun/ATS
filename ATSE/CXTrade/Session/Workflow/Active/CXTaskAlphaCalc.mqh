@@ -1,10 +1,12 @@
-#ifndef CX_TASK_ALPHA_CALC_MQH
+﻿#ifndef CX_TASK_ALPHA_CALC_MQH
 #define CX_TASK_ALPHA_CALC_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXPriceTracker.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXPriceTracker.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskAlphaCalc
@@ -33,8 +35,11 @@ public:
         IXPriceTracker* tracker = CX_GET_OBJ(ctx, "price_tracker", IXPriceTracker);
         if(IS_INVALID(tracker)) return TASK_BREAK;
 
-        double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         tracker.Update(currentPrice);
 
         double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
@@ -46,11 +51,17 @@ public:
             double peak = (sig.GetDir() == CX_DIR_BUY) ? tracker.GetHighest() : tracker.GetLowest();
             double target = peak - (sig.GetTSStart() * point * dir_sign);
 
-            bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (target >= sig.GetSL() + sig.GetTSStep() * point)
-                                                            : (sig.GetSL() - sig.GetTSStep() * point >= target || sig.GetSL() == 0);
+            bool is_improved = false;
+            if(sig.GetSL() == 0) {
+                is_improved = true;
+            } else {
+                is_improved = (sig.GetDir() == CX_DIR_BUY) ? (target - sig.GetSL() >= sig.GetTSStep() * point)
+                                                           : (sig.GetSL() - target >= sig.GetTSStep() * point);
+            }
 
             if(is_improved) {
-                double newSL = NormalizeDouble(target, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+                int digits = IS_VALID(symMgr) ? symMgr.GetDigits(sig.GetSymbol()) : (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS);
+                double newSL = NormalizeDouble(target, digits);
                 XP_LOG_INFO(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, StringFormat("OK: SL Target improved to %.5f", newSL)));
                 xp.SetDouble(newSL);
                 return TASK_CONTINUE;

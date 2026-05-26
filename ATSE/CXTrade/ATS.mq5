@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                                          ATS.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
 //| [v13.5] Main ATS Engine - UAF & Resilience Standard              |
@@ -11,7 +11,7 @@
 //--- Include core service
 #include "App\CXAppService.mqh"
 #include "App\Infra\CXServiceFactory.mqh"
-#include "Core\Models\CXConfig.mqh"
+#include "Platform\Core\Models\CXConfig.mqh"
 
 //--- [Group: Basic Configuration]
 input string         InpTargetMagics    = "1001,1002,3001,3002"; // Target Magic Numbers (CSV)

@@ -1,10 +1,10 @@
-#ifndef CX_TASK_ACTIVE_V_TERMINAL_MQH
+﻿#ifndef CX_TASK_ACTIVE_V_TERMINAL_MQH
 #define CX_TASK_ACTIVE_V_TERMINAL_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskActive_V_Terminal

@@ -1,12 +1,13 @@
 #ifndef CX_TASK_ENTRY_P_FINALIZE_MQH
 #define CX_TASK_ENTRY_P_FINALIZE_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
-#include "..\..\..\Shared\Graphics\CXChartVisualizer.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Shared\Graphics\CXChartVisualizer.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
 
 /**
  * @class CXTaskEntry_P_Finalize
@@ -28,9 +29,10 @@ public:
 
         CXMessageProvider::UpdateStatus(sig, targetStatus, msg);
         if(repo.UpdateStatus(sig)) {
-            // [v16.23 Initial Visual] 대기 오더 접수 직후 트리거 라인 즉시 생성
-            if(targetStatus == XE_PENDING_PLACED && sig.GetTEStart() > 0) {
-                double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+            // [v16.23 Initial Visual] 대기 오더 접수 직후 트리거 라인 즉시 생성 [v11.11 >= Mandate Compliance]
+            if(targetStatus == XE_PENDING_PLACED && sig.GetTEStart() >= 1) {
+                ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+                double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
                 double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
                 double orderPrice = sig.GetPriceOpen();
                 

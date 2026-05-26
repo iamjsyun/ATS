@@ -1,10 +1,10 @@
-#ifndef CX_TASK_GUARD_V_SPREAD_MQH
+﻿#ifndef CX_TASK_GUARD_V_SPREAD_MQH
 #define CX_TASK_GUARD_V_SPREAD_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Interfaces\ICXSymbolManager.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskGuard_V_Spread
@@ -23,7 +23,7 @@ public:
         int spread = symMgr.GetSpread(symbol);
         int maxSpread = 100; // 가변 설정값 필요
 
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, StringFormat("Checking Spread: %d (Max:%d)", spread, maxSpread)));
+        // [Muted] XP_LOG_TRACE(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, StringFormat("Checking Spread: %d (Max:%d)", spread, maxSpread)));
 
         if(spread > maxSpread) {
             XP_LOG_WARN(xp, CXAuditFormatter::Build("GUARD-V-SPREAD", xp, StringFormat("YIELD: High Spread (%d > %d)", spread, maxSpread)));

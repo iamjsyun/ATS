@@ -1,9 +1,11 @@
-#ifndef CX_TASK_ACTIVE_TS_TRIGGER_WATCH_MQH
+﻿#ifndef CX_TASK_ACTIVE_TS_TRIGGER_WATCH_MQH
 #define CX_TASK_ACTIVE_TS_TRIGGER_WATCH_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskActive_TS_TriggerWatch
@@ -16,8 +18,11 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTSStart()) return TASK_BREAK;
 
-        double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
         double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
         double profit = (currentPrice - sig.GetPriceOpen()) * dir_sign;

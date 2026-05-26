@@ -1,10 +1,10 @@
-#ifndef CX_TASK_ACTIVE_CLOSED_MQH
+﻿#ifndef CX_TASK_ACTIVE_CLOSED_MQH
 #define CX_TASK_ACTIVE_CLOSED_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskActive_Closed

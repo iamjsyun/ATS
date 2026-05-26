@@ -1,11 +1,13 @@
-#ifndef CX_TASK_PENDING_L_IMPROVE_MQH
+﻿#ifndef CX_TASK_PENDING_L_IMPROVE_MQH
 #define CX_TASK_PENDING_L_IMPROVE_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXPriceTracker.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
-#include "..\..\..\Shared\Graphics\CXChartVisualizer.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXPriceTracker.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Shared\Graphics\CXChartVisualizer.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskPending_L_Improve
@@ -22,9 +24,12 @@ public:
             return TASK_CONTINUE;
         }
 
-        double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
         double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? -1.0 : 1.0;
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
         // [v16.27 Stability Fix] 이번 틱의 가격 수정 요청 초기화 (Timer 루프 누출 방지)
         xp.SetDouble(0.0);
@@ -40,8 +45,13 @@ public:
         ICXParam* pExt = ctx.GetParam(extKey);
         if(IS_VALID(pExt)) lastExt = pExt.GetDouble();
 
-        bool is_improved = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice < lastExt - (sig.GetTEStep() * point) || lastExt <= 0)
-                                                        : (currentPrice > lastExt + (sig.GetTEStep() * point) || lastExt <= 0);
+        bool is_improved = false;
+        if(lastExt <= 0) {
+            is_improved = true;
+        } else {
+            is_improved = (sig.GetDir() == CX_DIR_BUY) ? (lastExt - currentPrice >= sig.GetTEStep() * point)
+                                                       : (currentPrice - lastExt >= sig.GetTEStep() * point);
+        }
 
         if(is_improved) {
             // [v16.26 Mandate] 극점(lastExt) 갱신 및 트리거 라인(TE_START) 재계산
@@ -74,9 +84,10 @@ public:
             
             if(refPrice > 0) {
                 double currentGap = MathAbs(refPrice - orderPrice) / point;
-                if(currentGap < sig.GetTELimit()) {
+                if(sig.GetTELimit() - currentGap >= 0) {
                     double target = refPrice + (sig.GetTELimit() * point * dir_sign);
-                    double normTarget = NormalizeDouble(target, (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+                    int digits = IS_VALID(symMgr) ? symMgr.GetDigits(sig.GetSymbol()) : (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS);
+                    double normTarget = NormalizeDouble(target, digits);
 
                     if(MathAbs(normTarget - orderPrice) >= sig.GetTEStep() * point) {
                         XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-IMPR", xp, 

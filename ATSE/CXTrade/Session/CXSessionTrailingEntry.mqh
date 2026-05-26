@@ -1,10 +1,10 @@
-#ifndef CXSESSIONTRAILINGENTRY_MQH
+﻿#ifndef CXSESSIONTRAILINGENTRY_MQH
 #define CXSESSIONTRAILINGENTRY_MQH
 
 #include "CXTradingSessionBase.mqh"
-#include "..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\Core\Interfaces\ICXPriceManager.mqh"
-#include "..\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
 
 /**
  * @class CXSessionTrailingEntry

@@ -1,11 +1,11 @@
-#ifndef CX_TASK_ENTRY_L_PRICE_MQH
+﻿#ifndef CX_TASK_ENTRY_L_PRICE_MQH
 #define CX_TASK_ENTRY_L_PRICE_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\ICXPriceManager.mqh"
-#include "..\..\..\Core\Interfaces\IXGuard.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_L_Price

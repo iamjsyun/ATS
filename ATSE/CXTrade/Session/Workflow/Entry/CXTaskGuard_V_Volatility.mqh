@@ -1,8 +1,8 @@
-#ifndef CX_TASK_GUARD_V_VOLATILITY_MQH
+﻿#ifndef CX_TASK_GUARD_V_VOLATILITY_MQH
 #define CX_TASK_GUARD_V_VOLATILITY_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
 
 /**
  * @class CXTaskGuard_V_Volatility

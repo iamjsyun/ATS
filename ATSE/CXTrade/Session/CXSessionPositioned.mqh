@@ -1,11 +1,11 @@
-#ifndef CXSESSIONPOSITIONED_MQH
+﻿#ifndef CXSESSIONPOSITIONED_MQH
 #define CXSESSIONPOSITIONED_MQH
 
 #include "CXTradingSessionBase.mqh"
-#include "..\Core\Interfaces\IXPositionManager.mqh"
-#include "..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\Core\Interfaces\IXPriceTracker.mqh"
-#include "..\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\Platform\Core\Interfaces\IXPositionManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\Platform\Core\Interfaces\IXPriceTracker.mqh"
+#include "..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXSessionPositioned

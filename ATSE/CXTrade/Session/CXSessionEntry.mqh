@@ -2,10 +2,11 @@
 #define CXSESSIONENTRY_MQH
 
 #include "CXTradingSessionBase.mqh"
-#include "..\Core\Interfaces\IXEntryManager.mqh"
-#include "..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\Core\Interfaces\ICXPriceManager.mqh"
-#include "..\Core\Interfaces\ICXRiskManager.mqh"
+#include "..\Platform\Core\Interfaces\IXEntryManager.mqh"
+#include "..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXRiskManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
 
 /**
  * @class CXSessionEntry
@@ -13,10 +14,11 @@
  */
 class CXSessionEntry : public CXTradingSessionBase {
 private:
-    IXEntryManager*    m_entryMgr;
-    IXOrderManager*    m_orderMgr;
-    ICXPriceManager*   m_priceManager;
-    ICXRiskManager*    m_riskManager;
+    IXEntryManager*      m_entryMgr;
+    IXOrderManager*      m_orderMgr;
+    ICXPriceManager*     m_priceManager;
+    ICXRiskManager*      m_riskManager;
+    ICXInventoryManager* m_inventoryManager;
 
 public:
     CXSessionEntry(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
@@ -29,6 +31,7 @@ public:
         SAFE_DELETE(m_orderMgr);
         SAFE_DELETE(m_priceManager);
         SAFE_DELETE(m_riskManager);
+        SAFE_DELETE(m_inventoryManager);
     }
 
 private:
@@ -37,15 +40,17 @@ private:
         if(IS_INVALID(m_ctx)) return;
 
         // 진입 단계에 필요한 매니저만 생성 및 등록
-        m_entryMgr     = factory.CreateEntryManager(m_ctx);
-        m_orderMgr     = factory.CreateOrderManager(m_ctx);
-        m_priceManager = factory.CreatePriceManager(m_ctx);
-        m_riskManager  = factory.CreateRiskManager(m_ctx);
+        m_entryMgr         = factory.CreateEntryManager(m_ctx);
+        m_orderMgr         = factory.CreateOrderManager(m_ctx);
+        m_priceManager     = factory.CreatePriceManager(m_ctx);
+        m_riskManager      = factory.CreateRiskManager(m_ctx);
+        m_inventoryManager = factory.CreateInventoryManager(m_ctx);
 
-        m_ctx.Register("entry_mgr", m_entryMgr);
-        m_ctx.Register("order_mgr", m_orderMgr);
-        m_ctx.Register("price_mgr", m_priceManager);
-        m_ctx.Register("risk_mgr",  m_riskManager);
+        m_ctx.Register("entry_mgr",     m_entryMgr);
+        m_ctx.Register("order_mgr",     m_orderMgr);
+        m_ctx.Register("price_mgr",     m_priceManager);
+        m_ctx.Register("risk_mgr",      m_riskManager);
+        m_ctx.Register("inventory_mgr", m_inventoryManager);
         
         XP_LOG_DEBUG(NULL, "[SESSION-ENTRY] Bootstrap Complete. Managers initialized.");
     }

@@ -1,8 +1,8 @@
-#ifndef CXTERMINALSCANNER_MQH
+﻿#ifndef CXTERMINALSCANNER_MQH
 #define CXTERMINALSCANNER_MQH
 
 #include <Arrays\ArrayObj.mqh>
-#include "..\..\Core\Models\CXTerminalAsset.mqh"
+#include "..\..\Platform\Core\Models\CXTerminalAsset.mqh"
 
 /**
  * @class CXTerminalScanner

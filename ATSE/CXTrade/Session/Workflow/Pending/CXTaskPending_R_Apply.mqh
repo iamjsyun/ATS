@@ -1,13 +1,14 @@
 #ifndef CX_TASK_PENDING_R_APPLY_MQH
 #define CX_TASK_PENDING_R_APPLY_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\..\Core\Interfaces\IXGuard.mqh"
-#include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskPending_R_Apply
@@ -52,14 +53,23 @@ public:
         if(newPrice > 0) {
             XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, StringFormat("Attempting Modify: %.5f", newPrice)));
             IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
+            ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
             
-            double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+            ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+            double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+            int digits = IS_VALID(symMgr) ? symMgr.GetDigits(sig.GetSymbol()) : (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS);
             double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
             double finalSL = sig.GetPriceSL();
             double finalTP = sig.GetPriceTP();
 
-            if(finalSL <= 0 && sig.GetSL() > 0) finalSL = NormalizeDouble(newPrice - (sig.GetSL() * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
-            if(finalTP <= 0 && sig.GetTP() > 0) finalTP = NormalizeDouble(newPrice + (sig.GetTP() * point * dir_sign), (int)SymbolInfoInteger(sig.GetSymbol(), SYMBOL_DIGITS));
+            if(finalSL <= 0 && sig.GetSL() > 0) {
+                if(IS_VALID(priceMgr)) finalSL = priceMgr.CalculateSL(xp, sig.GetSymbol(), sig.GetDir(), newPrice, sig.GetSL());
+                else finalSL = NormalizeDouble(newPrice - (sig.GetSL() * point * dir_sign), digits);
+            }
+            if(finalTP <= 0 && sig.GetTP() > 0) {
+                if(IS_VALID(priceMgr)) finalTP = priceMgr.CalculateTP(xp, sig.GetSymbol(), sig.GetDir(), newPrice, sig.GetTP());
+                else finalTP = NormalizeDouble(newPrice + (sig.GetTP() * point * dir_sign), digits);
+            }
 
             if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), newPrice, finalSL)) {
                 string guardErr = StringFormat("StopLevel Violation. P:%.5f, SL:%.5f", newPrice, finalSL);
@@ -68,25 +78,25 @@ public:
                 return TASK_BREAK;
             }
 
-            // [v16.21 Anti-Jitter Mandate]
+            // [v16.21 Anti-Jitter Mandate] [v11.11 >= Mandate Compliance]
             // 현재 실제 오더 가격(PriceOpen)과 새로운 타겟 가격의 차이가 TEStep 이상일 때만 브로커 요청 송신
             double currentOrderPrice = sig.GetPriceOpen();
-            if(MathAbs(newPrice - currentOrderPrice) < sig.GetTEStep() * point) {
+            if(MathAbs(newPrice - currentOrderPrice) >= sig.GetTEStep() * point) {
+                if(orderMgr.ModifyOrder(xp, (ulong)sig.GetTicket(), newPrice, finalSL, finalTP)) {
+                    sig.UpdatePriceSignal(newPrice);
+                    sig.SetSL(finalSL);
+                    sig.SetTP(finalTP);
+                    CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), MSG_ENTRY_TRAILING_MODIFIED);
+                    if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                    XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, StringFormat("SUCCESS: Order Modified to %.5f", newPrice)));
+                } else {
+                    string modErr = StringFormat("Broker rejected price modification to %.5f", newPrice);
+                    XP_LOG_ERROR(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + modErr));
+                    xp.SetString("[PEND-R-APPLY] " + modErr);
+                }
+            } else {
                 // 변화량이 너무 적으므로 수정 생략 (챠트 라인 떨림 방지)
                 return TASK_CONTINUE;
-            }
-
-            if(orderMgr.ModifyOrder(xp, (ulong)sig.GetTicket(), newPrice, finalSL, finalTP)) {
-                sig.UpdatePriceSignal(newPrice);
-                sig.SetSL(finalSL);
-                sig.SetTP(finalTP);
-                CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), MSG_ENTRY_TRAILING_MODIFIED);
-                if(IS_VALID(repo)) repo.UpdateStatus(sig);
-                XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, StringFormat("SUCCESS: Order Modified to %.5f", newPrice)));
-            } else {
-                string modErr = StringFormat("Broker rejected price modification to %.5f", newPrice);
-                XP_LOG_ERROR(xp, CXAuditFormatter::Build("PEND-R-APPLY", xp, "FAILED: " + modErr));
-                xp.SetString("[PEND-R-APPLY] " + modErr);
             }
         }
 

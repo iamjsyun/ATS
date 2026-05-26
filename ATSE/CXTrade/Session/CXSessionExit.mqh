@@ -1,10 +1,10 @@
-#ifndef CXSESSIONEXIT_MQH
+﻿#ifndef CXSESSIONEXIT_MQH
 #define CXSESSIONEXIT_MQH
 
 #include "CXTradingSessionBase.mqh"
-#include "..\Core\Interfaces\IXExitManager.mqh"
-#include "..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\Core\Interfaces\IXOrderManager.mqh"
+#include "..\Platform\Core\Interfaces\IXExitManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\Platform\Core\Interfaces\IXOrderManager.mqh"
 
 /**
  * @class CXSessionExit

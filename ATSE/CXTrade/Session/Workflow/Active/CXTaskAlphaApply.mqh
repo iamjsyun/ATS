@@ -1,11 +1,12 @@
-#ifndef CX_TASK_ALPHA_APPLY_MQH
+﻿#ifndef CX_TASK_ALPHA_APPLY_MQH
 #define CX_TASK_ALPHA_APPLY_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXPositionManager.mqh"
-#include "..\..\..\Core\Interfaces\IXGuard.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXPositionManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskAlphaApply
@@ -36,7 +37,8 @@ public:
         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
         
         ulong ticket = (ulong)sig.GetTicket();
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
         if(IS_VALID(guard) && !guard.ValidateStopLevel(sig.GetSymbol(), currentPrice, newSL)) {
             XP_LOG_WARN(xp, CXAuditFormatter::Build("ALPHA-APPLY", xp, StringFormat("StopLevel Violation. Target:%.5f", newSL)));

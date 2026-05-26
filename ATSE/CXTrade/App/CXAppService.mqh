@@ -1,28 +1,28 @@
-#ifndef CXAPPSERVICE_MQH
+﻿#ifndef CXAPPSERVICE_MQH
 #define CXAPPSERVICE_MQH
 
-#include "..\Core\Interfaces\ICXAppService.mqh"
-#include "..\Core\Interfaces\ICXConfig.mqh"
-#include "..\Core\Interfaces\IDatabase.mqh"
-#include "..\Core\Interfaces\IRepository.mqh"
-#include "..\Core\Interfaces\ICXSessionManager.mqh"
-#include "..\Core\Interfaces\ICXServiceFactory.mqh"
-#include "..\Core\Interfaces\ICXSignalWatcher.mqh"
-#include "Infra\CXSessionManager.mqh"
-#include "Infra\AppOrchestrator.mqh"
-#include "Logic\CXSignalWatcher.mqh"
+#include "..\Platform\Core\Interfaces\ICXAppService.mqh"
+#include "..\Platform\Core\Interfaces\ICXConfig.mqh"
+#include "..\Platform\Core\Interfaces\IDatabase.mqh"
+#include "..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\Platform\Core\Interfaces\ICXSessionManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
+#include "..\Platform\Core\Interfaces\ICXSignalWatcher.mqh"
+#include "..\Session\CXSessionManager.mqh"
+#include "Orchestration\AppOrchestrator.mqh"
+#include "..\Watcher\CXSignalWatcher.mqh"
 #include "Logic\CXTerminalScanner.mqh"
 #include "Logic\CXReverseInjector.mqh"
-#include "..\Core\Models\CXParam.mqh"
-#include "..\Shared\Guard\CXGuard.mqh"
-#include "..\Session\Sequence\CXSequenceOrchestrator.mqh"
-#include "..\Core\Interfaces\IXGuard.mqh"
-#include "..\Session\Sequence\CXStepFactory.mqh"
-#include "..\Session\Sequence\CXTaskFactory.mqh"
-#include "..\Shared\Logging\CXAuditFormatter.mqh"
-#include "..\Shared\Logging\CXMessageProvider.mqh"
+#include "..\Platform\Core\Models\CXParam.mqh"
+#include "..\Platform\Shared\Guard\CXGuard.mqh"
+#include "..\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
+#include "..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "Orchestration\CXStepFactory.mqh"
+#include "Orchestration\CXTaskFactory.mqh"
+#include "..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\Platform\Shared\Logging\CXMessageProvider.mqh"
 #include "Infra\CXServiceFactory.mqh"
-#include "..\Core\Models\CXConfig.mqh"
+#include "..\Platform\Core\Models\CXConfig.mqh"
 
 /**
  * @class CXAppService
@@ -41,11 +41,17 @@ private:
     
     CXTerminalScanner*    m_scanner;
     CXReverseInjector*    m_injector;
+    
+    // Lifecycle-managed dependencies
+    CXSequenceOrchestrator* m_orchestrator;
+    IXGuard*              m_guard;
+    IXTerminalPlatform*   m_terminalPlatform;
 
 public:
     CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_sessionManager(NULL), 
                     m_factory(NULL), m_watcher(NULL), m_logger(NULL), m_globalContext(NULL),
-                    m_scanner(NULL), m_injector(NULL) {}
+                    m_scanner(NULL), m_injector(NULL),
+                    m_orchestrator(NULL), m_guard(NULL), m_terminalPlatform(NULL) {}
 
     virtual ~CXAppService() override {
         SAFE_DELETE(m_watcher);
@@ -57,6 +63,9 @@ public:
         SAFE_DELETE(m_logger);
         SAFE_DELETE(m_scanner);
         SAFE_DELETE(m_injector);
+        SAFE_DELETE(m_orchestrator);
+        SAFE_DELETE(m_guard);
+        SAFE_DELETE(m_terminalPlatform);
     }
 
     virtual bool Initialize(ICXConfig* config, ICXServiceFactory* factory) override {
@@ -70,10 +79,15 @@ public:
 
         // 2. 핵심 인프라 서비스 초기화
         m_logger = m_factory.CreateLogger("System", m_config);
+        m_orchestrator = new AppOrchestrator();
+        m_guard = new CXGuard(m_globalContext);
+        m_terminalPlatform = m_factory.CreateTerminalPlatform(m_globalContext);
+
         m_globalContext.Register("logger", m_logger);
         m_globalContext.Register("config", m_config);
-        m_globalContext.Register("orchestrator", new AppOrchestrator());
-        m_globalContext.Register("guard", new CXGuard(m_globalContext));
+        m_globalContext.Register("orchestrator", m_orchestrator);
+        m_globalContext.Register("guard", m_guard);
+        m_globalContext.Register("terminal_platform", m_terminalPlatform);
 
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 1/6] Core Services Initialized.");
 

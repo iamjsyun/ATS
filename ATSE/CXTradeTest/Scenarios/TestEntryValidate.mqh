@@ -1,10 +1,10 @@
-#ifndef TEST_ENTRY_VALIDATE_MQH
+﻿#ifndef TEST_ENTRY_VALIDATE_MQH
 #define TEST_ENTRY_VALIDATE_MQH
 
 #include "..\..\CXTrade\Session\Workflow\Entry\CXTaskEntry_L_Validate.mqh"
 #include "..\..\CXTrade\Session\CXContext.mqh"
-#include "..\..\CXTrade\Core\Models\CXParam.mqh"
-#include "..\..\CXTrade\Core\Models\CXSignal.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXParam.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXSignal.mqh"
 #include "..\Mocks\MockGuard.mqh"
 
 class TestEntryValidate {

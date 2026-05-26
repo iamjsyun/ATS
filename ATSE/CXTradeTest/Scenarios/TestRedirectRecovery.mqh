@@ -1,10 +1,10 @@
-#ifndef TEST_REDIRECT_RECOVERY_MQH
+﻿#ifndef TEST_REDIRECT_RECOVERY_MQH
 #define TEST_REDIRECT_RECOVERY_MQH
 
 #include "..\..\CXTrade\Session\Workflow\Entry\CXTaskEntry_L_Redirect.mqh"
 #include "..\..\CXTrade\Session\CXContext.mqh"
-#include "..\..\CXTrade\Core\Models\CXParam.mqh"
-#include "..\..\CXTrade\Core\Models\CXSignal.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXParam.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXSignal.mqh"
 
 class TestRedirectRecovery {
 public:
@@ -33,20 +33,20 @@ public:
         // Test Case 2: Status IN_TRANSIT (Recovery path)
         sig.SetStatus(XE_IN_TRANSIT);
         result = task.Execute(GetPointer(xp), GetPointer(ctx));
-        if (result == STATE_ENTRY_TRANSIT) {
-            Print("  [PASS] Status IN_TRANSIT returns STATE_ENTRY_TRANSIT.");
+        if (result == TASK_CONTINUE) {
+            Print("  [PASS] Status IN_TRANSIT returns TASK_CONTINUE.");
         } else {
-            PrintFormat("  [FAIL] Status IN_TRANSIT: Expected STATE_ENTRY_TRANSIT(%d), got %d", STATE_ENTRY_TRANSIT, result);
+            PrintFormat("  [FAIL] Status IN_TRANSIT: Expected TASK_CONTINUE(%d), got %d", TASK_CONTINUE, result);
             allPassed = false;
         }
 
         // Test Case 3: Status PENDING_PLACED (Recovery path)
         sig.SetStatus(XE_PENDING_PLACED);
         result = task.Execute(GetPointer(xp), GetPointer(ctx));
-        if (result == STATE_ENTRY_TRAILING) {
-            Print("  [PASS] Status PENDING_PLACED returns STATE_ENTRY_TRAILING.");
+        if (result == TASK_CONTINUE) {
+            Print("  [PASS] Status PENDING_PLACED returns TASK_CONTINUE.");
         } else {
-            PrintFormat("  [FAIL] Status PENDING_PLACED: Expected STATE_ENTRY_TRAILING(%d), got %d", STATE_ENTRY_TRAILING, result);
+            PrintFormat("  [FAIL] Status PENDING_PLACED: Expected TASK_CONTINUE(%d), got %d", TASK_CONTINUE, result);
             allPassed = false;
         }
 

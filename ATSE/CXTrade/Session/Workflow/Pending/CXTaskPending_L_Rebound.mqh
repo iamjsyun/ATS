@@ -1,9 +1,11 @@
-#ifndef CX_TASK_PENDING_L_REBOUND_MQH
+﻿#ifndef CX_TASK_PENDING_L_REBOUND_MQH
 #define CX_TASK_PENDING_L_REBOUND_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskPending_L_Rebound
@@ -16,8 +18,11 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTEStart()) return TASK_CONTINUE;
 
-        double point = SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
         // [v16.26 Mandate] 극점(Extreme) 대비 TE_STEP 만큼 반등 시 시장가 진입
         string extKey = "LastEntryExtremity_" + sig.GetSid();
@@ -27,8 +32,8 @@ public:
         double extreme = pExt.GetDouble();
         if(extreme <= 0) return TASK_CONTINUE;
 
-        bool is_rebounded = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice >= extreme + (sig.GetTEStep() * point))
-                                                         : (currentPrice <= extreme - (sig.GetTEStep() * point));
+        bool is_rebounded = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice - extreme >= sig.GetTEStep() * point)
+                                                         : (extreme - currentPrice >= sig.GetTEStep() * point);
 
         if(is_rebounded) {
             XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, 

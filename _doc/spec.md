@@ -58,7 +58,46 @@
 - **SID (Signal ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)` (총 23자)
 - **GID (Group ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)` (총 19자)
 
-### 2.4 DataManager State Transition Matrix (v9.8.11)
+### 2.4 AppOrchestrator Sequence-Class Mapping (v18.8)
+하이퍼-원자적 8-Phase 시퀀스의 각 단계별 DSL 명칭과 실제 실행되는 MQL5 구체 클래스의 전체 매칭 정보이다.
+
+| 시퀀스 상태 (State) | DSL 스텝 명칭 | 실행 태스크 (DSL Task Name) | 구체 클래스 (MQL5 Class) |
+| :--- | :--- | :--- | :--- |
+| **SESSION_READY** | `Step_Validating` | **TASK_E_L_VALIDATE** | `CXTaskEntry_L_Validate` |
+| | | `TASK_E_L_IDENTITY` | `CXTaskEntry_L_Identity` |
+| | | `TASK_E_L_RISK` | `CXTaskEntry_L_Risk` |
+| | | `TASK_E_L_PRICE` | `CXTaskEntry_L_Price` |
+| | | `TASK_E_G_SPREAD` | `CXTaskGuard_V_Spread` |
+| | | `TASK_E_P_INTENT` | `CXTaskEntry_P_Intent` |
+| **SESSION_EXECUTING** | `Step_Executing` | `TASK_E_R_ORDER` | `CXTaskEntry_R_Order` |
+| | | `TASK_E_V_ERROR` | `CXTaskEntry_V_Error` |
+| | | `TASK_E_V_TICKET` | `CXTaskEntry_V_Ticket` |
+| **SESSION_PENDING** | `Step_Pending` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_P_V_TERMINAL` | `CXTaskPending_V_Terminal` |
+| | | `TASK_P_V_SYNC` | `CXTaskPending_V_Sync` |
+| **SESSION_TRAILING_ENTRY**| `Step_TrailingEntry` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_P_L_EXTREME` | `CXTaskPending_L_Extreme` |
+| | | `TASK_P_L_REBOUND` | `CXTaskPending_L_Rebound` |
+| | | `TASK_P_L_IMPROVE` | `CXTaskPending_L_Improve` |
+| | | `TASK_P_R_APPLY` | `CXTaskPending_R_Apply` |
+| | | `TASK_P_V_SYNC` | `CXTaskPending_V_Sync` |
+| **SESSION_ACTIVE** | `Step_Active` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
+| | | `TASK_A_TS_TRIGGER_WATCH`| `CXTaskActive_TS_TriggerWatch` |
+| **SESSION_TRAILING_STOP** | `Step_TrailingStop` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_A_ALPHA_CALC` | `CXTaskAlphaCalc` |
+| | | `TASK_A_ALPHA_APPLY` | `CXTaskAlphaApply` |
+| | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
+| **SESSION_LIQUIDATING** | `Step_Exit` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_X_L_PREPARE` | `CXTaskExit_L_Prepare` |
+| | | `TASK_X_P_LOCK` | `CXTaskExit_P_Lock` |
+| | | `TASK_X_R_ORDER` | `CXTaskExit_R_Order` |
+| | | `TASK_X_V_ERROR` | `CXTaskExit_V_Error` |
+| | | `TASK_X_V_TERMINAL` | `CXTaskExit_V_Terminal` |
+| | | `TASK_X_P_FINALIZE` | `CXTaskExit_P_Finalize` |
+| **SESSION_CLOSED** | `Step_Closed` | `TASK_ACTIVE_CLOSED` | `CXTaskActive_Closed` |
+
+### 2.5 DataManager State Transition Matrix (v9.8.11)
 
 #### 2.3.1 Logical Intent Matrix (Governance)
 | 작업 명칭 | xa_entry | xa_exit | xe_status | 상세 설명 |

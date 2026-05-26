@@ -1,8 +1,8 @@
-#ifndef CXSESSIONPENDING_MQH
+﻿#ifndef CXSESSIONPENDING_MQH
 #define CXSESSIONPENDING_MQH
 
 #include "CXTradingSessionBase.mqh"
-#include "..\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
 
 /**
  * @class CXSessionPending

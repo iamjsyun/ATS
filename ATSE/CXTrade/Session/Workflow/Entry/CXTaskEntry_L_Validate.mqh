@@ -1,12 +1,14 @@
-#ifndef CX_TASK_ENTRY_L_VALIDATE_MQH
+﻿#ifndef CX_TASK_ENTRY_L_VALIDATE_MQH
 #define CX_TASK_ENTRY_L_VALIDATE_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IXGuard.mqh"
-#include "..\..\..\Core\Interfaces\ICXRiskManager.mqh"
-#include "..\..\..\Core\Interfaces\ICXPriceManager.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXGuard.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXRiskManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+
+#include "..\..\..\Platform\Core\Interfaces\IXEntryManager.mqh"
 
 /**
  * @class CXTaskEntry_L_Validate
@@ -20,6 +22,7 @@ public:
         IXGuard* guard = CX_GET_OBJ(ctx, "guard", IXGuard);
         ICXRiskManager* riskMgr = CX_GET_OBJ(ctx, "risk_mgr", ICXRiskManager);
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+        IXEntryManager* entryMgr = CX_GET_OBJ(ctx, "entry_mgr", IXEntryManager);
 
         if(IS_INVALID(sig) || IS_INVALID(riskMgr) || IS_INVALID(priceMgr)) {
             XP_LOG_ERROR(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "FAILED: Required services missing."));
@@ -27,6 +30,12 @@ public:
         }
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("TASK-VALIDATE", xp, "Starting Validation"));
+
+        // [v18.8] Proactive Terminal Binding Check
+        if(IS_VALID(entryMgr)) {
+            int fastTrack = entryMgr.ValidateTerminalIntegrity(xp);
+            if(fastTrack > 0) return fastTrack; // Jump to SESSION_PENDING
+        }
 
         //--- [v14.34 Fix] Error-State Liquidation Bypass
         if(sig.GetXAExit() == XA_ACTIVE) {

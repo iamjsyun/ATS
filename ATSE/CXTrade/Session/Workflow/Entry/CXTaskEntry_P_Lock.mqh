@@ -1,11 +1,11 @@
-#ifndef CX_TASK_ENTRY_P_LOCK_MQH
+﻿#ifndef CX_TASK_ENTRY_P_LOCK_MQH
 #define CX_TASK_ENTRY_P_LOCK_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\..\Shared\Logging\CXMessageProvider.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskEntry_P_Lock

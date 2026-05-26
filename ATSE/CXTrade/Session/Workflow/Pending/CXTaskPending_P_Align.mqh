@@ -1,11 +1,11 @@
-#ifndef CX_TASK_PENDING_P_ALIGN_MQH
+﻿#ifndef CX_TASK_PENDING_P_ALIGN_MQH
 #define CX_TASK_PENDING_P_ALIGN_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\..\Core\Interfaces\IXOrderManager.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_P_Align

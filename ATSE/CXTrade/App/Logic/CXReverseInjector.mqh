@@ -1,14 +1,14 @@
-#ifndef CXREVERSEINJECTOR_MQH
+﻿#ifndef CXREVERSEINJECTOR_MQH
 #define CXREVERSEINJECTOR_MQH
 
-#include "..\..\Core\Interfaces\ICXContext.mqh"
-#include "..\..\Core\Interfaces\ICXParam.mqh"
-#include "..\..\Core\Interfaces\IRepository.mqh"
-#include "..\..\Core\Interfaces\ICXSessionManager.mqh"
-#include "..\..\Core\Interfaces\ICXTradingSession.mqh"
-#include "..\..\Core\Models\CXSignal.mqh"
-#include "..\..\Core\Models\CXTerminalAsset.mqh"
-#include "..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
+#include "..\..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXSessionManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXTradingSession.mqh"
+#include "..\..\Platform\Core\Models\CXSignal.mqh"
+#include "..\..\Platform\Core\Models\CXTerminalAsset.mqh"
+#include "..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 #include "CXTerminalScanner.mqh"
 
 /**

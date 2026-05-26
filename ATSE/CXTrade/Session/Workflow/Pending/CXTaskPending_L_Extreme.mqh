@@ -1,9 +1,10 @@
-#ifndef CX_TASK_PENDING_L_EXTREME_MQH
+﻿#ifndef CX_TASK_PENDING_L_EXTREME_MQH
 #define CX_TASK_PENDING_L_EXTREME_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
  * @class CXTaskPending_L_Extreme
@@ -16,7 +17,8 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTEStart()) return TASK_CONTINUE;
 
-        double currentPrice = SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
+        ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
+        double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
         string extKey = "LastEntryExtremity_" + sig.GetSid();
         double lastExt = 0;

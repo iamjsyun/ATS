@@ -1,10 +1,10 @@
-#ifndef CX_TASK_PENDING_V_TERMINAL_MQH
+﻿#ifndef CX_TASK_PENDING_V_TERMINAL_MQH
 #define CX_TASK_PENDING_V_TERMINAL_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Core\Interfaces\ICXInventoryManager.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskPending_V_Terminal

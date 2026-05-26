@@ -1,17 +1,17 @@
-#ifndef CXTRADINGSESSIONBASE_MQH
+﻿#ifndef CXTRADINGSESSIONBASE_MQH
 #define CXTRADINGSESSIONBASE_MQH
 
-#include "..\Core\Interfaces\IRepository.mqh"
-#include "..\Core\Interfaces\ICXContext.mqh"
-#include "..\Core\Interfaces\ICXFluentSequence.mqh"
-#include "..\Core\Interfaces\ICXTradingSession.mqh"
-#include "..\Shared\Logging\CXLogDispatcher.mqh"
-#include "..\Shared\Logging\CXFileLogger.mqh"
-#include "Sequence\CXSequenceOrchestrator.mqh"
-#include "CXContext.mqh"
-#include "Sequence\CXFluentSequence.mqh"
-#include "..\Shared\Logging\CXAuditFormatter.mqh"
-#include "..\Core\Interfaces\ICXServiceFactory.mqh"
+#include "..\Platform\Core\Interfaces\IRepository.mqh"
+#include "..\Platform\Core\Interfaces\ICXContext.mqh"
+#include "..\Platform\Core\Interfaces\ICXFluentSequence.mqh"
+#include "..\Platform\Core\Interfaces\ICXTradingSession.mqh"
+#include "..\Platform\Shared\Logging\CXLogDispatcher.mqh"
+#include "..\Platform\Shared\Logging\CXFileLogger.mqh"
+#include "..\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
+#include "..\Platform\Core\Models\CXContext.mqh"
+#include "..\Platform\Core\Sequence\CXFluentSequence.mqh"
+#include "..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
 
 /**
  * @class CXTradingSessionBase
@@ -28,10 +28,11 @@ protected:
     ICXServiceFactory*  m_factory; 
     bool                m_isActive;
     string              m_sid;
+    ICXSymbolManager*   m_symMgr;
 
 public:
     CXTradingSessionBase(IRepository* repo, ICXContext* globalCtx, ICXServiceFactory* factory) 
-        : m_repo(repo), m_globalCtx(globalCtx), m_isActive(false), m_signal(NULL), m_factory(factory), m_logger(NULL), m_ctx(NULL), m_sequence(NULL) {
+        : m_repo(repo), m_globalCtx(globalCtx), m_isActive(false), m_signal(NULL), m_factory(factory), m_logger(NULL), m_ctx(NULL), m_sequence(NULL), m_symMgr(NULL) {
     }
 
     virtual ~CXTradingSessionBase() {
@@ -40,6 +41,7 @@ public:
         }
         SAFE_DELETE(m_sequence); 
         SAFE_DELETE(m_logger);
+        SAFE_DELETE(m_symMgr);
         SAFE_DELETE(m_ctx);
         SAFE_DELETE(m_signal); 
     }
@@ -51,6 +53,7 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_VALID(sig)) {
             string incomingSid = sig.GetSid();
+            StringTrimLeft(incomingSid); StringTrimRight(incomingSid);
             if(m_sid == "") m_sid = incomingSid;
             if(m_signal == NULL) m_signal = sig;
             if(incomingSid != m_sid) return;
@@ -121,8 +124,13 @@ protected:
             m_ctx.Register("config", m_globalCtx.Get("config"));
             m_ctx.Register("logger", m_globalCtx.Get("logger"));
             m_ctx.Register("orchestrator", m_globalCtx.Get("orchestrator"));
+            m_ctx.Register("terminal_platform", m_globalCtx.Get("terminal_platform"));
         }
         m_ctx.Register("repo", m_repo);
+        
+        // [v18.0 Dependency Fix] Add SymbolManager to base context
+        m_symMgr = factory.CreateSymbolManager(m_ctx);
+        if(IS_VALID(m_symMgr)) m_ctx.Register("sym_mgr", m_symMgr);
         
         m_sequence = factory.CreateSequence(m_ctx, "SessionSeq");
         if(IS_VALID(m_sequence)) {

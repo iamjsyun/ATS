@@ -1,9 +1,9 @@
-#ifndef CX_TASK_EXIT_L_PREPARE_MQH
+﻿#ifndef CX_TASK_EXIT_L_PREPARE_MQH
 #define CX_TASK_EXIT_L_PREPARE_MQH
 
-#include "..\..\..\Core\Interfaces\IXTask.mqh"
-#include "..\..\..\Core\Macros\CXMacros.mqh"
-#include "..\..\..\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
+#include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
  * @class CXTaskExit_L_Prepare
