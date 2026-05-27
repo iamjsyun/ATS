@@ -171,6 +171,15 @@ public:
 
    //--- [Test Runner Helpers]
    bool Add(ICXSignal* sig) { SaveSignal(sig); return true; }
+   
+   /**
+    * @brief [v19.40] 테스트용 전체 초기화 (Truncate)
+    */
+   bool TruncateSignals() {
+      if(IS_INVALID(m_db)) return false;
+      return m_db.Execute("DELETE FROM signals");
+   }
+
    bool DeleteSignalByCnoSno(int cno, int sno, string symbol) {
       if(IS_INVALID(m_db)) return false;
       string sql = StringFormat("DELETE FROM signals WHERE cno=%d AND sno=%d AND symbol='%s'", 

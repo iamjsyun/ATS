@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                   CXTclParser.mqh |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v1.0] TCL (Test Scenario Language) Parser for ATSE Self-Testing |
+//| [v1.1] TCL (Test Scenario Language) Parser for ATSE Self-Testing |
 //+------------------------------------------------------------------+
 #ifndef CX_TCL_PARSER_MQH
 #define CX_TCL_PARSER_MQH
@@ -150,6 +150,29 @@ public:
         return "";
     }
 
+    /**
+     * @brief [v19.50] 시나리오의 최대 틱 번호 확인
+     */
+    int GetMaxTick() {
+        int maxTick = 0;
+        for(int i = 0; i < m_steps.Total(); i++) {
+            CXTclStep* step = (CXTclStep*)m_steps.At(i);
+            if(step.m_tickNum > maxTick) maxTick = step.m_tickNum;
+        }
+        return maxTick;
+    }
+
+    /**
+     * @brief [v19.51] 특정 틱 번호의 스텝 정보 반환
+     */
+    CXTclStep* GetStep(int tickNum) {
+        for(int i = 0; i < m_steps.Total(); i++) {
+            CXTclStep* step = (CXTclStep*)m_steps.At(i);
+            if(step.m_tickNum == tickNum) return step;
+        }
+        return NULL;
+    }
+
     void AddPricerParam(string key, string val) {
         int n = ArraySize(m_pricerKeys);
         ArrayResize(m_pricerKeys, n + 1);
@@ -173,6 +196,16 @@ public:
 class CXTclParser {
 private:
     /**
+     * @brief MQL5 규격에 맞게 문자열 양끝 공백 제거 (Wrapper)
+     */
+    static string Trim(string s) {
+        string res = s;
+        StringTrimLeft(res);
+        StringTrimRight(res);
+        return res;
+    }
+
+    /**
      * @brief 샵(#) 뒤 주석 문자열 제거
      */
     static string TrimComment(string line) {
@@ -180,7 +213,7 @@ private:
         if(pos >= 0) {
             line = StringSubstr(line, 0, pos);
         }
-        return StringTrimLeft(StringTrimRight(line));
+        return Trim(line);
     }
 
     /**
@@ -192,15 +225,15 @@ private:
         int numTokens = StringSplit(paramStr, u_comma, tokens);
         for(int i = 0; i < numTokens; i++) {
             string t = tokens[i];
-            t = StringTrimLeft(StringTrimRight(t));
+            t = Trim(t);
             if(t == "") continue;
 
             int eqPos = StringFind(t, "=");
             if(eqPos > 0) {
                 string k = StringSubstr(t, 0, eqPos);
                 string v = StringSubstr(t, eqPos + 1);
-                k = StringTrimLeft(StringTrimRight(k));
-                v = StringTrimLeft(StringTrimRight(v));
+                k = Trim(k);
+                v = Trim(v);
 
                 // 큰따옴표가 감싸고 있다면 제거
                 if(StringLen(v) >= 2 && StringSubstr(v, 0, 1) == "\"" && StringSubstr(v, StringLen(v)-1, 1) == "\"") {
@@ -219,25 +252,25 @@ private:
      * @brief 틱 구문 안의 액션 및 검증 해석 분기
      */
     static void ParseActionOrExpect(string text, CXTclStep* step) {
-        text = StringTrimLeft(StringTrimRight(text));
+        text = Trim(text);
         if(text == "") return;
 
         if(StringSubstr(text, 0, 1) == ">") {
             // Action 구문: "> INJECT: signals : xa_entry=1, xa_exit=0"
-            string actionPart = StringTrimLeft(StringTrimRight(StringSubstr(text, 1)));
+            string actionPart = Trim(StringSubstr(text, 1));
             int posColon1 = StringFind(actionPart, ":");
             if(posColon1 >= 0) {
-                string actionType = StringTrimLeft(StringTrimRight(StringSubstr(actionPart, 0, posColon1)));
+                string actionType = Trim(StringSubstr(actionPart, 0, posColon1));
                 string rest = StringSubstr(actionPart, posColon1 + 1);
 
                 int posColon2 = StringFind(rest, ":");
                 string target = "";
                 string paramsPart = "";
                 if(posColon2 >= 0) {
-                    target = StringTrimLeft(StringTrimRight(StringSubstr(rest, 0, posColon2)));
+                    target = Trim(StringSubstr(rest, 0, posColon2));
                     paramsPart = StringSubstr(rest, posColon2 + 1);
                 } else {
-                    target = StringTrimLeft(StringTrimRight(rest));
+                    target = Trim(rest);
                 }
 
                 CXTclAction* action = new CXTclAction();
@@ -249,20 +282,20 @@ private:
         }
         else if(StringSubstr(text, 0, 1) == "?") {
             // Expect 구문: "? EXPECT: session : state=ORD_READY * xe_status=..."
-            string expectPart = StringTrimLeft(StringTrimRight(StringSubstr(text, 1)));
+            string expectPart = Trim(StringSubstr(text, 1));
 
             // 실패 메시지 (!) 존재 검사
             int posExcl = StringFind(expectPart, "!");
             string failMsg = "";
             if(posExcl >= 0) {
                 string rest = StringSubstr(expectPart, posExcl + 1);
-                rest = StringTrimLeft(StringTrimRight(rest));
+                rest = Trim(rest);
                 if(StringSubstr(rest, 0, 9) == "FAIL_MSG:") {
                     failMsg = StringSubstr(rest, 9);
                 } else {
                     failMsg = rest;
                 }
-                failMsg = StringTrimLeft(StringTrimRight(failMsg));
+                failMsg = Trim(failMsg);
                 if(StringLen(failMsg) >= 2 && StringSubstr(failMsg, 0, 1) == "\"" && StringSubstr(failMsg, StringLen(failMsg)-1, 1) == "\"") {
                     failMsg = StringSubstr(failMsg, 1, StringLen(failMsg)-2);
                 }
@@ -273,19 +306,19 @@ private:
             if(posExpect >= 0) {
                 expectPart = StringSubstr(expectPart, posExpect + 7);
             }
-            expectPart = StringTrimLeft(StringTrimRight(expectPart));
+            expectPart = Trim(expectPart);
 
             int posColon = StringFind(expectPart, ":");
             string expectType = "";
             string paramsPart = "";
             if(posColon >= 0) {
-                expectType = StringTrimLeft(StringTrimRight(StringSubstr(expectPart, 0, posColon)));
+                expectType = Trim(StringSubstr(expectPart, 0, posColon));
                 paramsPart = StringSubstr(expectPart, posColon + 1);
             } else {
                 expectType = expectPart;
             }
 
-            paramsPart = StringTrimLeft(StringTrimRight(paramsPart));
+            paramsPart = Trim(paramsPart);
             // * 및 , 혼용 지원 (WPF/TCL 통일성을 위해 *을 ,로 임시 치환하여 파싱)
             string cleanParams = paramsPart;
             StringReplace(cleanParams, "*", ",");
@@ -317,14 +350,14 @@ public:
 
         while(!FileIsEnding(handle)) {
             string lineStr = FileReadString(handle);
-            lineStr = StringTrimLeft(StringTrimRight(lineStr));
+            lineStr = Trim(lineStr);
             if(lineStr == "") continue;
 
             // 라인 백슬래시(\) 연결자 처리
             while(StringLen(lineStr) >= 1 && StringSubstr(lineStr, StringLen(lineStr) - 1, 1) == "\\" && !FileIsEnding(handle)) {
                 lineStr = StringSubstr(lineStr, 0, StringLen(lineStr) - 1);
                 string nextLine = FileReadString(handle);
-                nextLine = StringTrimLeft(StringTrimRight(nextLine));
+                nextLine = Trim(nextLine);
                 lineStr = lineStr + " " + nextLine;
             }
 
@@ -337,15 +370,15 @@ public:
                 string rest = StringSubstr(lineStr, 9);
                 int posColon = StringFind(rest, ":");
                 if(posColon >= 0) {
-                    scenario.m_id = StringTrimLeft(StringTrimRight(StringSubstr(rest, 0, posColon)));
+                    scenario.m_id = Trim(StringSubstr(rest, 0, posColon));
                     string desc = StringSubstr(rest, posColon + 1);
-                    desc = StringTrimLeft(StringTrimRight(desc));
+                    desc = Trim(desc);
                     if(StringLen(desc) >= 2 && StringSubstr(desc, 0, 1) == "\"" && StringSubstr(desc, StringLen(desc)-1, 1) == "\"") {
                         desc = StringSubstr(desc, 1, StringLen(desc)-2);
                     }
                     scenario.m_desc = desc;
                 } else {
-                    scenario.m_id = StringTrimLeft(StringTrimRight(rest));
+                    scenario.m_id = Trim(rest);
                 }
                 continue;
             }
@@ -367,8 +400,8 @@ public:
                 int posArrow = StringFind(rest, ">");
                 int posColon = StringFind(rest, ":");
                 if(posArrow >= 0 && posColon >= 0) {
-                    scenario.m_pricerSymbol = StringTrimLeft(StringTrimRight(StringSubstr(rest, 0, posArrow)));
-                    scenario.m_pricerModel = StringTrimLeft(StringTrimRight(StringSubstr(rest, posArrow + 1, posColon - posArrow - 1)));
+                    scenario.m_pricerSymbol = Trim(StringSubstr(rest, 0, posArrow));
+                    scenario.m_pricerModel = Trim(StringSubstr(rest, posArrow + 1, posColon - posArrow - 1));
                     string paramsStr = StringSubstr(rest, posColon + 1);
                     string keys[], values[];
                     ParseParams(paramsStr, keys, values);
@@ -385,7 +418,7 @@ public:
                 int posArrow = StringFind(rest, ">");
                 int posExpect = StringFind(rest, "?");
                 int endOfTickNum = (posArrow >= 0) ? posArrow : ((posExpect >= 0) ? posExpect : StringLen(rest));
-                string tickNumStr = StringTrimLeft(StringTrimRight(StringSubstr(rest, 0, endOfTickNum)));
+                string tickNumStr = Trim(StringSubstr(rest, 0, endOfTickNum));
                 int tickNum = (int)StringToInteger(tickNumStr);
 
                 currentStep = NULL;

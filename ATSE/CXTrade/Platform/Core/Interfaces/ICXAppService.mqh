@@ -15,6 +15,8 @@ public:
      */
     virtual bool Initialize(ICXConfig* config, ICXServiceFactory* factory) = 0;
     virtual void Pulse() = 0;
+    virtual ICXContext* GetContext() = 0;
+
     virtual void OnTradeTransaction(const MqlTradeTransaction& trans,
                                     const MqlTradeRequest& request,
                                     const MqlTradeResult& result) = 0;

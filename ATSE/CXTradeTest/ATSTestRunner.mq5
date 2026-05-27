@@ -8,10 +8,13 @@
 #property version   "1.00"
 #property strict
 
-#include "Scenarios\TestEntryValidate.mqh"
-#include "Scenarios\TestSequenceDSL.mqh"
-#include "Scenarios\TestIntegritySimulation.mqh"
-#include "Scenarios\TestRedirectRecovery.mqh"
+#include "UnitTests\TestEntryValidate.mqh"
+#include "UnitTests\TestSequenceDSL.mqh"
+#include "UnitTests\TestIntegritySimulation.mqh"
+#include "UnitTests\TestRedirectRecovery.mqh"
+#include "UnitTests\TestTrailingEntry.mqh"
+#include "UnitTests\TestTrailingStop.mqh"
+#include "UnitTests\TestManualExitBypass.mqh"
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -29,6 +32,9 @@ int OnInit() {
     if (TestSequenceDSL::Run()) passed++; else failed++;
     if (TestIntegritySimulation::Run()) passed++; else failed++;
     if (TestRedirectRecovery::Run()) passed++; else failed++;
+    if (TestTrailingEntry::Run()) passed++; else failed++;
+    if (TestTrailingStop::Run()) passed++; else failed++;
+    if (TestManualExitBypass::Run()) passed++; else failed++;
     
     // Add more test classes here...
     

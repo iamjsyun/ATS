@@ -138,6 +138,8 @@ public:
         if(IS_VALID(m_ui)) m_ui.Refresh();
     }
 
+    virtual ICXContext* GetContext() override { return m_globalContext; }
+
     virtual void OnTradeTransaction(const MqlTradeTransaction& trans,
                                     const MqlTradeRequest& request,
                                     const MqlTradeResult& result) override {
