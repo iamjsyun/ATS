@@ -134,6 +134,7 @@ public:
         // 7. 역주입 엔진 (Sync Engine) 실행
         m_scanner = new CXTerminalScanner();
         m_injector = new CXReverseInjector(m_scanner, m_repo, m_sessionManager, m_config, m_db);
+        m_globalContext.Register("injector", m_injector);
         
         if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STEP 6/6] System Bootstrap Complete.");
         return true;

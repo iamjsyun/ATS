@@ -1,4 +1,4 @@
-﻿#ifndef CXTRADINGSESSIONBASE_MQH
+#ifndef CXTRADINGSESSIONBASE_MQH
 #define CXTRADINGSESSIONBASE_MQH
 
 #include "..\Platform\Core\Interfaces\IRepository.mqh"
@@ -99,6 +99,7 @@ public:
     virtual bool IsActive() const override { return m_isActive; }
     virtual string GetSid() const override { return m_sid; }
     virtual ICXSignal* GetSignal() const override { return m_signal; }
+    virtual int        GetState() const override { return (m_sequence != NULL) ? m_sequence.State() : -1; }
 
 protected:
     virtual void HandleSequenceResult(ICXParam* xp, ICXSignal* sig) {

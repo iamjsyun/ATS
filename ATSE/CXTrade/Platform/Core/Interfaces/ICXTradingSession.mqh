@@ -20,6 +20,7 @@ public:
     virtual bool IsActive() const = 0;
     virtual string GetSid() const = 0;
     virtual ICXSignal* GetSignal() const = 0;
+    virtual int        GetState() const = 0;
 };
 
 #endif
