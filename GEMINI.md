@@ -1,6 +1,7 @@
 <!-- Import: C:\Users\hsnote\.gemini\extensions\oh-my-gemini-cli\GEMINI.md -->
-## Cross-PC Synchronization & Modular Memory (v2.1)
-- **Log Persistence Mandate (Critical)**: 모든 EA(ATSE) 및 App(ATSA) 기동 시 기존 로그 파일을 초기화(Truncate)하거나 삭제하는 것을 엄격히 금지한다. 모든 로그는 반드시 **Append-Only (추가 기록)** 방식으로 운영되어야 하며, 데이터 연속성을 보장해야 한다.
+## Cross-PC Synchronization & Modular Memory (v2.2)
+- **Log Initialization Mandate (v11.5 - Critical)**: 모든 EA(ATSE) 및 App(ATSA) 기동 시 기존 로그 파일을 **반드시 초기화(Truncate)** 해야 한다. 이전 가동 기록은 삭제하거나 새로운 파일로 교체하여 데이터의 신선함을 유지한다.
+- **System Log Mirroring**: 모든 파일 로그 기록 시, 터미널의 시스템 로그(Experts Tab)에도 동일한 메시지가 **반드시 출력(Print)** 되어야 한다. 로그 파일과 시스템 로그 간의 메세지 불일치를 엄격히 금지한다.
 - **Symbolic Link Mandate (Recommended)**: To ensure real-time synchronization of **Global Memory** and **Settings**, run the following in Administrator PowerShell:
   ```powershell
   Remove-Item -Path "$env:USERPROFILE\.gemini" -Recurse -Force
@@ -51,22 +52,13 @@
 2.  **시장가 역전 보정**: 지정가가 시장가를 역전할 경우 자동으로 시장가 보정하여 `10015` 에러를 원천 차단한다.
 3.  **포인트 기반 변환**: 가격과 로트를 제외한 모든 옵션(SL, TP, TE, TS)은 정수 포인트값으로 취급하며, 계산 시에만 가격으로 변환한다.
 
-### 3. 로깅 및 사후 검증 규칙 (Execution & Verify)
-1.  **전역 파라미터 로깅**: 모든 트레이딩 함수 호출 시 인자 전체와 주요 트레일링 파라미터를 상세 로그에 기록한다.
-2.  **결과 로깅**: 브로커 리턴 코드와 응답 메시지를 반드시 기록한다.
-3.  **물리적 자산 재검색**: 함수 호출 직후 터미널의 실물 자산 존재 여부를 재확인하고 결과를 로그에 남긴다.
+### 4. Loop Stability & Atomic Batch Delete Mandate (v11.4 - Critical)
+모든 리스트(CArrayObj 등) 순회 및 객체 처리 시 다음 규격을 엄격히 준수한다.
 
-## Encoding Policy
-- **MQL5 Source Files**: All `.mqh` and `.mq5` files must be managed using UTF-8 encoding (BOM or No-BOM) to ensure consistent character representation and prevent corruption.
-
-    - `g:` -> `G:\내 드라이브\` (Google Drive Shared Folder)
-    - 공용 문서 폴더 -> `G:\내 드라이브\_Doc\`
-- **Automatic Synchronization**: All `GEMINI.md` and private `MEMORY.md` files are automatically synchronized with the G: drive shared workspace for cross-environment persistence.
-- **Partial Class Strategy**: Refactoring FluentSeq services into `partial class` files (`.Sequence.cs`, `.Methods.cs`) is approved for AI-optimized context management.
-
-## Testing Policy
-- **XTA.Test Execution**: Do not execute the `XTA.Test` project automatically during implementation turns. Execute tests only when explicitly requested by the user.
-- **ATSE Build Policy**: Do not perform automatic builds for the ATSE (MQL5) project. Execute build commands only when explicitly requested by the user.
+1.  **Index Manipulation Prohibition**: 루프 내부에서 `Detach()`, `i--`, `total--` 등 리스트의 크기나 인덱스를 동적으로 변경하는 모든 행위를 **절대 금지**한다.
+2.  **Stable Task Queue**: 루프는 고정된 크기의 작업 큐로 간주하며, 순방향(`0 -> Total`) 순회를 원칙으로 한다.
+3.  **Atomic Batch Delete**: 객체의 개별 삭제(`SAFE_DELETE(sig)`)는 루프 내에서 수행하지 않는다. 루프 완료 후 리스트 자체를 삭제(`SAFE_DELETE(list)`)하거나 일괄 해제(`Clear()`) 함으로써 메모리 관리의 원자성을 보장한다.
+4.  **Dangling Pointer Protection**: 루프 종료 직후 반드시 `xp.SetSignal(NULL)` 및 관련 컨텍스트 레지스트리를 정리하여 허상 포인터 발생을 차단한다.
 
 ## Architectural Mandates
 - **ID Governance**: All SID/GID generation must delegate to `XIdManager` (v8.2 Standard).

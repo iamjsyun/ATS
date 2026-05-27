@@ -3,7 +3,7 @@
 
 #include "..\..\CXTrade\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
 #include "..\..\CXTrade\Platform\Core\Sequence\CXFluentSequence.mqh"
-#include "..\..\CXTrade\Session\CXContext.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXContext.mqh"
 #include "..\..\CXTrade\Platform\Core\Models\CXParam.mqh"
 #include "..\..\CXTrade\Platform\Core\Interfaces\IXStage.mqh"
 

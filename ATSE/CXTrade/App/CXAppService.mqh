@@ -5,10 +5,10 @@
 #include "..\Platform\Core\Interfaces\ICXConfig.mqh"
 #include "..\Platform\Core\Interfaces\IDatabase.mqh"
 #include "..\Platform\Core\Interfaces\IRepository.mqh"
-#include "..\Platform\Core\Interfaces\ICXSessionManager.mqh"
+#include "..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 #include "..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
 #include "..\Platform\Core\Interfaces\ICXSignalWatcher.mqh"
-#include "..\Session\CXSessionManager.mqh"
+#include "..\Session\CXAssetManager.mqh"
 #include "Orchestration\AppOrchestrator.mqh"
 #include "..\Watcher\CXSignalWatcher.mqh"
 #include "..\Platform\Core\Models\CXParam.mqh"
@@ -26,19 +26,19 @@
 
 /**
  * @class CXAppService
- * @brief EA의 전체 생명주기 및 의존성 주입을 총괄하는 서비스 (v14.47 Dynamic Session)
+ * @brief EA의 전체 생명주기 및 의존성 주입을 총괄하는 서비스 (v14.47 Dynamic Asset)
  */
 class CXAppService : public ICXAppService {
 private:
     ICXConfig*            m_config;
     IDatabase*            m_db;
     IRepository*          m_repo;
-    ICXSessionManager*    m_sessionManager;
+    ICXAssetManager*      m_assetManager;
     ICXServiceFactory*    m_factory;
     ICXSignalWatcher*     m_watcher;
     ICXLogger*            m_logger;
     ICXContext*           m_globalContext;
-    ICXParam*             m_pulseParam; // [v18.27] Persistent param for high-frequency pulses
+    ICXParam*             m_pulseParam;
     
     // Lifecycle-managed dependencies
     CXSequenceOrchestrator* m_orchestrator;
@@ -49,7 +49,7 @@ private:
     CXUI*                 m_ui;
 
 public:
-    CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_sessionManager(NULL), 
+    CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_assetManager(NULL), 
                     m_factory(NULL), m_watcher(NULL), m_logger(NULL), m_globalContext(NULL),
                     m_orchestrator(NULL), m_guard(NULL), m_terminalPlatform(NULL),
                     m_priceManager(NULL), m_exitManager(NULL), m_ui(NULL) {}
@@ -57,7 +57,7 @@ public:
     virtual ~CXAppService() override {
         SAFE_DELETE(m_ui);
         SAFE_DELETE(m_watcher);
-        SAFE_DELETE(m_sessionManager);
+        SAFE_DELETE(m_assetManager);
         SAFE_DELETE(m_repo);
         SAFE_DELETE(m_db);
         SAFE_DELETE(m_config);
@@ -76,12 +76,20 @@ public:
         m_factory = factory;
         if(IS_INVALID(m_config) || IS_INVALID(m_factory)) return false;
 
-        // 1. 글로벌 컨텍스트 구축
         m_globalContext = m_factory.CreateContext();
         if(IS_INVALID(m_globalContext)) return false;
 
-        // 2. 핵심 인프라 서비스 초기화
         m_logger = m_factory.CreateLogger("System", m_config);
+        
+        // [v18.42] Log Bootstrap banner immediately to sync timestamps with Logger init (e.g. RemoteLog)
+        if(IS_VALID(m_logger)) {
+            m_logger.Log(LOG_LVL_INFO, "================================================");
+            m_logger.Log(LOG_LVL_INFO, "[BOOTSTRAP] System Startup Initiated.");
+            m_logger.Log(LOG_LVL_INFO, StringFormat("[BOOTSTRAP] Log Level: %s", EnumToString(m_config.GetLogLevel())));
+            m_logger.Log(LOG_LVL_INFO, "[BOOTSTRAP] Log Initialization Mandate (v11.5) Applied.");
+            m_logger.Log(LOG_LVL_INFO, "================================================");
+        }
+
         m_orchestrator = new AppOrchestrator();
         m_guard = new CXGuard(m_globalContext);
         m_terminalPlatform = m_factory.CreateTerminalPlatform(m_globalContext);
@@ -90,6 +98,7 @@ public:
         m_pulseParam = new CXParam();
 
         m_globalContext.Register("logger", m_logger);
+        m_globalContext.Register("global_logger", m_logger); // [v18.32] For cross-module system logging
         m_globalContext.Register("config", m_config);
         m_globalContext.Register("orchestrator", m_orchestrator);
         m_globalContext.Register("guard", m_guard);
@@ -97,34 +106,23 @@ public:
         m_globalContext.Register("price_mgr", m_priceManager);
         m_globalContext.Register("exit_mgr", m_exitManager);
 
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 1/6] Core Services Initialized.");
-
-        // 3. DB & Repository 연결
         m_db = m_factory.CreateDatabase();
         if(IS_INVALID(m_db) || !m_db.Open(m_config.GetDatabaseName(), m_config.IsDatabaseCommon())) return false;
         
         m_repo = m_factory.CreateRepository(m_db);
         if(IS_INVALID(m_repo)) return false;
-        m_globalContext.Register("db", m_db); // Register db for zombie reverse injection
-        m_globalContext.Register("repo", m_repo); // [v15.6 Fix] Watcher Discovery & Spawning dependency
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 2/6] Database Connected.");
+        m_globalContext.Register("db", m_db);
+        m_globalContext.Register("repo", m_repo);
 
-        // 4. 세션 매니저 초기화 (동적 인스턴스 방식)
-        m_sessionManager = new CXSessionManager();
-        m_sessionManager.Initialize(m_repo, m_globalContext, m_factory);
-        m_globalContext.Register("session_mgr", m_sessionManager);
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 3/6] Session Manager Initialized.");
+        m_assetManager = new CXAssetManager();
+        m_assetManager.Initialize(m_repo, m_globalContext, m_factory);
+        m_globalContext.Register("asset_mgr", m_assetManager);
 
-        // 5. 신호 감시자 (Watcher) 초기화 (통합 루프)
-        m_watcher = new CXSignalWatcher(m_repo, m_config, m_sessionManager, m_globalContext, m_factory, "Unified");
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 4/6] Unified Signal Watcher Initialized.");
+        m_watcher = new CXSignalWatcher(m_repo, m_config, m_assetManager, m_globalContext, m_factory, "Unified");
 
-        // 6. 대시보드 (UI) 초기화
         m_ui = new CXUI(m_globalContext);
         if(IS_VALID(m_ui)) m_ui.Initialize();
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 5/6] Dashboard Initialized.");
         
-        if(IS_VALID(m_logger)) m_logger.Log(LOG_LVL_TRACE, "[STAGE 6/6] System Bootstrap Complete.");
         return true;
     }
 
@@ -132,13 +130,11 @@ public:
         if(IS_INVALID(m_pulseParam)) return;
         m_pulseParam.Reset();
         
-        //-- 1. 신호 감시 (통합 워처 가동)
         if(IS_VALID(m_watcher)) m_watcher.Pulse(m_pulseParam);
         
-        //-- 2. 활성 세션 구동 및 GC (Execution & Cleanup)
-        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(m_pulseParam);
-
-        //-- 3. 대시보드 갱신
+        // [v18.43 Fix] 워처에 의해 오염된 컨텍스트를 글로벌로 원상복구하여 세션이 System 로거를 상속받게 함
+        m_pulseParam.SetContext(m_globalContext); 
+        if(IS_VALID(m_assetManager)) m_assetManager.Pulse(m_pulseParam);
         if(IS_VALID(m_ui)) m_ui.Refresh();
     }
 
@@ -149,8 +145,9 @@ public:
         m_pulseParam.Reset();
         m_pulseParam.SetEvent(EVENT_TRANSACTION);
         m_pulseParam.SetTransaction(trans); 
+        m_pulseParam.SetContext(m_globalContext); // [v18.43 Fix]
         
-        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(m_pulseParam);
+        if(IS_VALID(m_assetManager)) m_assetManager.Pulse(m_pulseParam);
     }
 };
 

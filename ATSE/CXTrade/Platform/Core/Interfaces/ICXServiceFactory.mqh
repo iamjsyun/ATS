@@ -5,6 +5,7 @@
 #include "ICXContext.mqh"
 #include "ICXLogger.mqh"
 #include "ICXFluentSequence.mqh"
+#include "ICXTradingSession.mqh"
 #include "IXEntryManager.mqh"
 #include "IXOrderManager.mqh"
 #include "IXPositionManager.mqh"
@@ -16,6 +17,7 @@
 class ICXContext;
 class ICXLogger;
 class ICXFluentSequence;
+class ICXTradingSession;
 class ICXConfig;
 class IDatabase;
 class IRepository;
@@ -27,12 +29,11 @@ class IXPriceTracker;
 class ICXPriceManager;
 class ICXRiskManager;
 class ICXSymbolManager;
-class ICXInventoryManager;
 class IXTerminalPlatform;
 
 /**
  * @class ICXServiceFactory
- * @brief 의존성 주입(DI)을 위한 서비스 팩토리 인터페이스 (객체 생성의 책임 분리)
+ * @brief 의존성 주입(DI)을 위한 서비스 팩토리 인터페이스 (v18.30 expanded)
  */
 class ICXServiceFactory : public CObject {
 public:
@@ -42,6 +43,7 @@ public:
     virtual ICXContext*        CreateContext() = 0;
     virtual ICXLogger*         CreateLogger(string sid, ICXConfig* config) = 0;
     virtual ICXFluentSequence* CreateSequence(ICXContext* ctx, string name) = 0;
+    virtual ICXTradingSession* CreateSession(ICXParam* xp) = 0;
     virtual IDatabase*         CreateDatabase() = 0;
     virtual IRepository*       CreateRepository(IDatabase* db) = 0;
     virtual IXTerminalPlatform* CreateTerminalPlatform(ICXContext* ctx) = 0;
@@ -55,6 +57,5 @@ public:
     virtual ICXPriceManager*   CreatePriceManager(ICXContext* ctx) = 0;
     virtual ICXRiskManager*    CreateRiskManager(ICXContext* ctx) = 0;
     virtual ICXSymbolManager*  CreateSymbolManager(ICXContext* ctx) = 0;
-    virtual ICXInventoryManager* CreateInventoryManager(ICXContext* ctx) = 0;
-    };
+};
 #endif

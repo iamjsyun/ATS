@@ -33,12 +33,12 @@ public:
             if(targetStatus == XE_PENDING_PLACED && sig.GetTEStart() >= 1) {
                 ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
                 double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
-                double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
+                double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? -1.0 : 1.0;
                 double orderPrice = sig.GetPriceOpen();
                 
                 if(orderPrice > 0) {
                     double triggerLine = orderPrice + (sig.GetTEStart() * point * dir_sign);
-                    CXChartVisualizer::DrawTEStart(sig, triggerLine);
+                    CXChartVisualizer::DrawTEStart(ctx, sig, triggerLine, "CXTaskEntry_P_Finalize");
                 }
             }
 

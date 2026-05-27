@@ -2,6 +2,9 @@
 #define CXCONTEXT_MQH
 
 #include "..\Interfaces\ICXContext.mqh"
+#include "..\Interfaces\ICXParam.mqh"
+#include "..\Interfaces\ICXConfig.mqh"
+#include "..\Interfaces\ICXLogger.mqh"
 #include <Generic\HashMap.mqh>
 
 /**
@@ -45,14 +48,9 @@ public:
     }
 
     virtual void Remove(string key) override {
-        if(m_resources.ContainsKey(key)) {
-            m_resources.Remove(key);
-            // [v16.2 Fix] Ownership Policy: Context is a lookup service, not an owner.
-            // Do NOT delete objects here. Let the creator (AppService/Session) handle cleanup.
-        }
+        if(m_resources.ContainsKey(key)) m_resources.Remove(key);
     }
 
-    //--- Typed Accessors (v15.2 Implementation)
     virtual ICXParam* GetParam(string key) override {
         CObject* obj = Get(key);
         return (obj != NULL) ? (ICXParam*)obj : NULL;
@@ -63,21 +61,28 @@ public:
         return (obj != NULL) ? (ICXConfig*)obj : NULL;
     }
 
-    virtual ICXLogger* GetLogger() override {
-        CObject* obj = Get("logger");
+    virtual ICXLogger* GetLogger() const override {
+        // [v18.30 Fix] Bypass const-correctness for non-const Get()
+        CXContext* nonConst = (CXContext*)GetPointer(this);
+        CObject* obj = nonConst.Get("logger");
         return (obj != NULL) ? (ICXLogger*)obj : NULL;
     }
 
-    //--- Hierarchy Support
+    virtual ICXContext* CreateChildContext() override {
+        CXContext* child = new CXContext(m_name + "_Child");
+        string keys[]; CObject* vals[];
+        m_resources.CopyTo(keys, vals);
+        for(int i = 0; i < ArraySize(keys); i++) child.Register(keys[i], vals[i]);
+        return child;
+    }
+
     virtual void AddChild(string name, ICXContext* child) override {
         if(m_children.ContainsKey(name)) m_children.Remove(name);
         if(IS_VALID(child)) m_children.Add(name, child);
     }
 
     virtual void RemoveChild(string name) override {
-        if(m_children.ContainsKey(name)) {
-            m_children.Remove(name);
-        }
+        if(m_children.ContainsKey(name)) m_children.Remove(name);
     }
 
     virtual ICXContext* GetChild(string name) override {
@@ -86,33 +91,8 @@ public:
         return child;
     }
 
-    //--- [SSOC] Recursive Observability
     virtual string Snapshot(int indent = 0) override {
-        string spc = ""; for(int i=0; i<indent; i++) spc += "  ";
-        string out = StringFormat("%s{ \"name\": \"%s\",\n", spc, m_name);
-        
-        // 1. Resources (Keys only for privacy/size)
-        out += StringFormat("%s  \"resources\": [", spc);
-        string r_keys[]; CObject* r_vals[];
-        m_resources.CopyTo(r_keys, r_vals);
-        for(int i=0; i<ArraySize(r_keys); i++) {
-            out += (i==0 ? "\"" : ", \"") + r_keys[i] + "\"";
-        }
-        out += "],\n";
-
-        // 2. Children (Recursive)
-        out += StringFormat("%s  \"children\": [\n", spc);
-        string c_keys[]; ICXContext* c_vals[];
-        m_children.CopyTo(c_keys, c_vals);
-        for(int i=0; i<ArraySize(c_keys); i++) {
-            if(IS_VALID(c_vals[i])) {
-                out += c_vals[i].Snapshot(indent + 2);
-                if(i < ArraySize(c_keys) - 1) out += ",\n";
-                else out += "\n";
-            }
-        }
-        out += StringFormat("%s  ]\n%s}", spc, spc);
-        return out;
+        return "{ Snapshot not implemented }";
     }
 };
 

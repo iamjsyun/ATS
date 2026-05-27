@@ -1,9 +1,9 @@
-﻿#ifndef TEST_SEQUENCE_DSL_MQH
+#ifndef TEST_SEQUENCE_DSL_MQH
 #define TEST_SEQUENCE_DSL_MQH
 
 #include "..\..\CXTrade\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
 #include "..\..\CXTrade\Platform\Core\Sequence\CXFluentSequence.mqh"
-#include "..\..\CXTrade\Session\CXContext.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXContext.mqh"
 
 class TestSequenceDSL {
 public:
@@ -35,7 +35,7 @@ public:
         orchestrator.BuildFromDSL(customDsl, GetPointer(customMap));
         
         if (customMap.Total() == 1) {
-            CXSequenceStep* step = CX_CAST(CXSequenceStep, customMap.At(0));
+            CXSequenceStage* step = CX_CAST(CXSequenceStage, customMap.At(0));
             if (step.GetStateId() == 0 && step.GetName() == "TestStep" && step.GetTimeout() == 10 && step.GetRetries() == 5) {
                 Print("  [PASS] Custom DSL parsed correctly.");
             } else {

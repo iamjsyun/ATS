@@ -1,4 +1,4 @@
-﻿#ifndef CXENTRYMANAGER_MQH
+#ifndef CXENTRYMANAGER_MQH
 #define CXENTRYMANAGER_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXEntryManager.mqh"
@@ -8,7 +8,6 @@
 #include "..\..\Platform\Core\Interfaces\IXGuard.mqh"
 #include "..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
-#include "..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
 #include "..\..\Platform\Core\Interfaces\IXTerminalPlatform.mqh"
 #include "..\..\Platform\Core\Interfaces\IRepository.mqh"
 #include "..\..\Platform\Shared\Logging\CXMessageProvider.mqh"

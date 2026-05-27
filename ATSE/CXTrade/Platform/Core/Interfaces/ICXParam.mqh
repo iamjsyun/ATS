@@ -29,6 +29,9 @@ public:
     
     virtual long   GetLong() const = 0;
     virtual void   SetLong(long val) = 0;
+
+    virtual void   SetTransaction(const MqlTradeTransaction& trans) = 0;
+    virtual void   GetTransaction(MqlTradeTransaction& trans) const = 0;
     
     //--- Factory (v15.2)
     virtual ICXParam* CreateEmptyParam() = 0;

@@ -2,9 +2,10 @@
 #define CXPOSITIONMANAGER_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXPositionManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXTradingSession.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
-#include "..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 #include "..\..\Platform\Core\Defines\CXDefine.mqh"
 #include "..\..\Platform\Core\Macros\CXMacros.mqh"
 #include "..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
@@ -61,9 +62,9 @@ public:
         if(ticket == 0) return;
 
         //--- [v11.3 SSOC Resolution]
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(m_ctx, "asset_mgr", ICXAssetManager);
         if(IS_INVALID(invMgr)) {
-            XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "CRITICAL: InventoryManager Missing."));
+            XP_LOG_ERROR(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "CRITICAL: AssetManager Missing."));
             return;
         }
 
@@ -124,7 +125,7 @@ public:
     virtual bool ModifyPosition(ICXParam* xp, ulong ticket, double sl, double tp) override {
         XP_LOG_INFO(xp, GetAuditString(xp, "POS-MODIFY-START"));
 
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(m_ctx, "asset_mgr", ICXAssetManager);
         if(IS_INVALID(invMgr)) return false;
 
         // 1. 수정 시도
@@ -159,7 +160,7 @@ public:
     }
 
     virtual void ScanAndBind(ICXParam* xp, CObject* sessionMgr) override {
-        ICXSessionManager* mgr = CX_CAST(ICXSessionManager, sessionMgr);
+        ICXAssetManager* mgr = CX_CAST(ICXAssetManager, sessionMgr);
         if(IS_INVALID(mgr)) return;
 
         int total = m_terminal.GetPositionsTotal();
@@ -199,10 +200,14 @@ public:
 
                 // [v18.26 Fix] Reuse persistent xp instead of stack sp to avoid invalid pointer access
                 xp.SetSignal(sig);
-                ICXTradingSession* session = mgr.CreateSession(xp);
-                if(IS_VALID(session)) {
-                    session.Start(xp);
-                    XP_LOG_OK(xp, StringFormat("[POS-MANAGER-SCAN] Bound new active position to session. Ticket:%I64u, SID:%s", ticket, sid));
+                if(IS_VALID(mgr)) {
+                    ICXTradingSession* session = mgr.CreateSession(xp);
+                    if(IS_VALID(session)) {
+                        session.Start(xp);
+                        XP_LOG_OK(xp, StringFormat("[POS-MANAGER-SCAN] Bound new active position to session. Ticket:%I64u, SID:%s", ticket, sid));
+                    } else {
+                        SAFE_DELETE(sig);
+                    }
                 } else {
                     SAFE_DELETE(sig);
                 }

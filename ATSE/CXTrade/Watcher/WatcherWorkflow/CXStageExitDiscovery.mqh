@@ -44,7 +44,7 @@ public:
         SAFE_DELETE(activeList);
         CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
         if(IS_VALID(orchestrator)) {
-            return orchestrator.ResolveId("WATCHER_ZOMBIE_DISCOVERY");
+            return orchestrator.ResolveId("WATCHER_ENTRY_DISCOVERY");
         }
         return STATE_UNCHANGED;
     }

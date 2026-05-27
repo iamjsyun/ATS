@@ -39,7 +39,7 @@ public:
      * @brief Layer 1: 티켓 기반 정밀 청산 및 사후 검증
      */
     virtual bool CloseByTicket(ICXParam* xp, ICXSignal* sig) override {
-        if(IS_INVALID(sig)) return false;
+        if(IS_INVALID(sig) || IS_INVALID(m_terminal)) return false;
         ulong ticket = (ulong)sig.GetTicket();
         string sid = sig.GetSid();
         if(ticket <= 0) return true;

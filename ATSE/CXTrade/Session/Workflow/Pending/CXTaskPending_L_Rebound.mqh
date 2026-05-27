@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_PENDING_L_REBOUND_MQH
+#ifndef CX_TASK_PENDING_L_REBOUND_MQH
 #define CX_TASK_PENDING_L_REBOUND_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -18,6 +18,14 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTEStart()) return TASK_CONTINUE;
 
+        // 중복 출력 및 처리 방지 (동일 SID/티켓 1회만 출력)
+        string triggeredKey = "ReboundTriggered_" + sig.GetSid();
+        ICXParam* pTriggered = ctx.GetParam(triggeredKey);
+        if(IS_VALID(pTriggered) && pTriggered.GetInt() == 1) {
+            xp.SetInt(10); // 시장가 전환 트리거 상태 유지
+            return TASK_CONTINUE;
+        }
+
         ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
 
@@ -36,12 +44,18 @@ public:
                                                          : (extreme - currentPrice >= sig.GetTEStep() * point);
 
         if(is_rebounded) {
+            if(IS_INVALID(pTriggered)) {
+                pTriggered = new CXParam();
+                ctx.Set(triggeredKey, pTriggered);
+            }
+            pTriggered.SetInt(1);
+
             XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, 
                 StringFormat("TE-STEP Rebound Triggered! Mkt:%.5f, Extreme:%.5f, Step:%d", 
-                currentPrice, extreme, sig.GetTEStep())));
+                currentPrice, extreme, (int)sig.GetTEStep())));
             
             xp.SetInt(10); // 시장가 전환 트리거 (Market Fallback)
-            CXChartVisualizer::RemoveTEStart(sig); // 라인 제거
+            CXChartVisualizer::RemoveTEStart(ctx, sig); // 라인 제거
         }
 
         return TASK_CONTINUE;

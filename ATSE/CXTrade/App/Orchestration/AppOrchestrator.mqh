@@ -5,160 +5,85 @@
 
 /**
  * @class AppOrchestrator
- * @brief [v18.8] 비즈니스 로직(8-Phase) 및 앱 전용 시퀀스 구성을 정의하는 구체 클래스
- * @details 하이퍼-원자적 상태 분할 및 시맨틱 화살표(>) 표기법 전면 적용 완료
+ * @brief [v18.30] 자산 중심 아키텍처에 최적화된 핵심 트레이딩 시퀀스 정의
  */
 class AppOrchestrator : public CXSequenceOrchestrator {
 public:
     AppOrchestrator() : CXSequenceOrchestrator() {
-        // 부모 생성자 호출 후 자동 초기화
         Initialize();
     }
 
 protected:
-    /**
-     * @brief [v18.8] 표준 명칭과 실제 상수값 매핑
-     */
     virtual void RegisterStandardNames() override {
-        // Hyper-Atomic State Mapping (Old Names)
-        m_registry.Add("SESSION_READY",           (int)SESSION_READY);
-        m_registry.Add("SESSION_VALIDATING",      (int)SESSION_VALIDATING);
-        m_registry.Add("SESSION_EXECUTING",       (int)SESSION_EXECUTING);
-        m_registry.Add("SESSION_PENDING",         (int)SESSION_PENDING);
-        m_registry.Add("SESSION_TRAILING_ENTRY",  (int)SESSION_TRAILING_ENTRY);
-        m_registry.Add("SESSION_ACTIVE",          (int)SESSION_ACTIVE);
-        m_registry.Add("SESSION_TRAILING_STOP",   (int)SESSION_TRAILING_STOP);
-        m_registry.Add("SESSION_LIQUIDATING",     (int)SESSION_LIQUIDATING);
-        m_registry.Add("SESSION_CLOSED",          (int)SESSION_CLOSED);
-        m_registry.Add("SESSION_ERROR",           (int)SESSION_ERROR);
+        // Core Logic States
+        m_registry.Add("ORD_TRACKING",   (int)ORD_TRAILING);
+        m_registry.Add("POS_MONITORING", (int)POS_ACTIVE);
+        m_registry.Add("SYS_CLOSED",     (int)SYS_CLOSED);
+        m_registry.Add("SYS_ERROR",      (int)SYS_ERROR);
 
-        // Hyper-Atomic State Mapping (New E2E Names)
-        m_registry.Add("ORD_READY",               (int)ORD_READY);
-        m_registry.Add("ORD_VALIDATING",          (int)ORD_VALIDATING);
-        m_registry.Add("ORD_EXECUTING",           (int)ORD_EXECUTING);
-        m_registry.Add("ORD_PENDING",             (int)ORD_PENDING);
-        m_registry.Add("ORD_TRAILING",            (int)ORD_TRAILING);
-        m_registry.Add("POS_ACTIVE",              (int)POS_ACTIVE);
-        m_registry.Add("POS_TRAILING",            (int)POS_TRAILING);
-        m_registry.Add("POS_LIQUIDATING",         (int)POS_LIQUIDATING);
-        m_registry.Add("SYS_CLOSED",              (int)SYS_CLOSED);
-        m_registry.Add("SYS_ERROR",               (int)SYS_ERROR);
-
-        // XE_STATUS Anchors (For Internal Logic)
-        m_registry.Add("XE_READY",             (int)XE_READY);
-        m_registry.Add("XE_PENDING_REQ",       (int)XE_PENDING_REQ);
-        m_registry.Add("XE_IN_TRANSIT",        (int)XE_IN_TRANSIT);
-        m_registry.Add("XE_PENDING_PLACED",    (int)XE_PENDING_PLACED);
-        m_registry.Add("XE_EXECUTED",          (int)XE_EXECUTED);
-        m_registry.Add("XE_CLOSED_SIGNAL",     (int)XE_CLOSED_SIGNAL);
-        m_registry.Add("XE_CLOSED_SL",         (int)XE_CLOSED_SL);
-        m_registry.Add("XE_CLOSED_TP",         (int)XE_CLOSED_TP);
-        m_registry.Add("XE_ERROR",             (int)XE_ERROR);
-
-        // Watcher States (Align with ENUM_WATCHER_STATE)
-        m_registry.Add("WATCHER_DISCOVERY",    (int)WATCHER_DISCOVERY);
-        m_registry.Add("WATCHER_VALIDATION",   (int)WATCHER_VALIDATION);
-        m_registry.Add("WATCHER_SPAWNING",     (int)WATCHER_SPAWNING);
-        m_registry.Add("WATCHER_ERROR",        (int)WATCHER_ERROR);
+        // Watcher States
+        m_registry.Add("SYS_BOOTSTRAP",           999);
+        m_registry.Add("WATCHER_ENTRY_DISCOVERY", 1000);
+        m_registry.Add("WATCHER_ENTRY_EXECUTE",   1001);
+        m_registry.Add("WATCHER_EXIT_DISCOVERY",  1002);
+        m_registry.Add("WATCHER_EXIT_EXECUTE",    1003);
     }
 
     /**
-     * @brief Watcher DSL 정의 (v18.8 Flow Semantic)
+     * @brief [v18.30] 단순 명확한 4단계 코어 워처 시퀀스
      */
     virtual void InitWatcherMap() override {
         string unifiedDsl[] = {
+            "SYS_BOOTSTRAP             > SystemSetup        ? WATCHER_ENTRY_DISCOVERY  ! SYS_ERROR                 @ 0s, 0x",
+
             "WATCHER_ENTRY_DISCOVERY   > EntryDiscovery     ? WATCHER_ENTRY_EXECUTE    ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
             "WATCHER_ENTRY_EXECUTE     > EntryExecute       ? WATCHER_EXIT_DISCOVERY   ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
-            
-            "WATCHER_EXIT_DISCOVERY    > ExitDiscovery      ? WATCHER_EXIT_EXECUTE     ! WATCHER_ZOMBIE_DISCOVERY  @ 0s, 0x",
-            "WATCHER_EXIT_EXECUTE      > ExitExecute        ? WATCHER_ZOMBIE_DISCOVERY ! WATCHER_ZOMBIE_DISCOVERY  @ 0s, 0x",
-            
-            "WATCHER_ZOMBIE_DISCOVERY  > ZombieDiscovery    ? WATCHER_REVERSE_INJECT   ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x",
-            "WATCHER_REVERSE_INJECT    > ReverseInject      ? WATCHER_ENTRY_DISCOVERY  ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x"
+
+            "WATCHER_EXIT_DISCOVERY    > ExitDiscovery      ? WATCHER_EXIT_EXECUTE     ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x",
+            "WATCHER_EXIT_EXECUTE      > ExitExecute        ? WATCHER_ENTRY_DISCOVERY  ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x"
         };
         BuildFromDSL(unifiedDsl, m_watcher_map);
     }
 
     /**
-     * @brief 8-Phase Hyper-Atomic Session DSL (v18.8 Semantic Flow)
+     * @brief [v18.30] 자산 단위 태스크 시퀀스 (Unit Task DSL)
      */
     virtual void InitSessionMap() override {
-        // Phase 1: Preparation & Execution
-        string prepDsl[] = {
-            "ORD_READY                                                                     "
-            "> Stage_OrderValidation                                                       "
-            "  : TASK_E_L_VALIDATE, TASK_E_L_IDENTITY, TASK_E_L_RISK, TASK_E_L_PRICE,      "
-            "    TASK_E_G_SPREAD, TASK_E_P_INTENT                                          "
-            "? ORD_EXECUTING                                                               "
-            "! SYS_ERROR                                                                   "
-            "@ 60s, 0x",
-
-            "ORD_EXECUTING                                                                 "
-            "> Stage_OrderPlacement                                                        "
-            "  : TASK_A_INTENT_WATCH, TASK_E_R_ORDER, TASK_E_V_ERROR, TASK_E_V_TICKET      "
-            "? ORD_PENDING                                                                 "
-            "! SYS_ERROR                                                                   "
-            "@ 60s, 3x"
-        };
-        BuildFromDSL(prepDsl, m_session_map);
-
-        // Phase 2: Entry Optimization
-        string entryDsl[] = {
-            "ORD_PENDING                                                                   "
-            "> Stage_OrderWatch                                                            "
-            "  : TASK_A_INTENT_WATCH, TASK_P_V_TERMINAL, TASK_P_V_SYNC                     "
-            "? ORD_TRAILING                                                                "
-            "! SYS_ERROR                                                                   "
-            "@ 300s, 0x                                                                    "
-            "* XE_EXECUTED=POS_ACTIVE",
-
-            "ORD_TRAILING                                                                  "
+        // A. 대기 주문 관리 태스크 (Pending)
+        string pendingDsl[] = {
+            "ORD_TRACKING                                                                  "
             "> Stage_OrderOptimization                                                     "
             "  : TASK_A_INTENT_WATCH, TASK_P_L_EXTREME, TASK_P_L_REBOUND, TASK_P_L_IMPROVE,  "
             "    TASK_P_R_APPLY, TASK_P_V_SYNC                                             "
-            "? POS_ACTIVE                                                                  "
+            "? ORD_TRACKING                                                                "
+            "! SYS_ERROR                                                                   "
+            "@ 300s, 0x                                                                    "
+            "* 10=POS_MONITORING, 20=SYS_CLOSED" // [v18.39] XE_EXECUTED(10), SESSION_LIQUIDATING(20) 예외 전이 허용
+        };
+        BuildFromDSL(pendingDsl, m_session_map);
+
+        // B. 포지션 관리 태스크 (Positioned)
+        string positionedDsl[] = {
+            "POS_MONITORING                                                                "
+            "> Stage_PositionGovernance                                                    "
+            "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL,"
+            "    TASK_A_P_ALIGN                                                            "
+            "? POS_MONITORING                                                              "
             "! SYS_ERROR                                                                   "
             "@ 3600s, 0x                                                                   "
-            "* XE_EXECUTED=POS_ACTIVE"
-        };
-        BuildFromDSL(entryDsl, m_session_map);
-
-        // Phase 3: Position Management & Profit Trailing
-        string positionedDsl[] = {
-            "POS_ACTIVE                                                                    "
-            "> Stage_PositionWatch                                                         "
-            "  : TASK_A_INTENT_WATCH, TASK_A_V_TERMINAL, TASK_A_TS_TRIGGER_WATCH           "
-            "? POS_TRAILING                                                                "
-            "! SYS_ERROR                                                                   "
-            "@ 72000s, 0x                                                                  "
-            "* XE_CLOSED_SIGNAL=POS_LIQUIDATING",
-
-            "POS_TRAILING                                                                  "
-            "> Stage_PositionGovernance                                                    "
-            "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL"
-            "? POS_LIQUIDATING                                                             "
-            "! SYS_ERROR                                                                   "
-            "@ 72000s, 0x                                                                  "
-            "* XE_CLOSED_SIGNAL=POS_LIQUIDATING"
+            "* 20=SYS_CLOSED" // [v18.39] SESSION_LIQUIDATING(20) 예외 전이 허용
         };
         BuildFromDSL(positionedDsl, m_session_map);
 
-        // Phase 4: Termination
+        // C. 청산 관리 태스크 (Exit/Liquidation)
         string exitDsl[] = {
-            "POS_LIQUIDATING                                                               "
+            "SESSION_LIQUIDATING                                                           "
             "> Stage_PositionLiquidation                                                   "
             "  : TASK_A_INTENT_WATCH, TASK_X_L_PREPARE, TASK_X_P_LOCK, TASK_X_R_ORDER,      "
             "    TASK_X_V_ERROR,      TASK_X_V_TERMINAL, TASK_X_P_FINALIZE                 "
             "? SYS_CLOSED                                                                  "
             "! SYS_ERROR                                                                   "
-            "@ 300s, 3x",
-
-            "SYS_CLOSED                                                                    "
-            "> Stage_SystemCleanup                                                         "
-            "  : TASK_ACTIVE_CLOSED                                                        "
-            "? SYS_CLOSED                                                                  "
-            "! SYS_ERROR                                                                   "
-            "@ 0s, 0x"
+            "@ 300s, 3x"
         };
         BuildFromDSL(exitDsl, m_session_map);
     }

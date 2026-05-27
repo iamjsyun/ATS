@@ -29,18 +29,18 @@ input ENUM_LOG_LEVEL InpLog_Level       = LOG_LVL_TRACE;        // Log Level
 //--- [Group: Signal Watcher Log]
 input bool           InpWatcher_UseFile   = true;              // Watcher: File Log Enabled
 input bool           InpWatcher_UseRemote = true;              // Watcher: Remote Log Enabled
-input bool           InpWatcher_InitStart = true;              // Watcher: Clear Log on Start
+input bool           InpWatcher_InitStart = false;             // Watcher: Clear Log on Start (Prohibited by Mandate)
 
 //--- [Group: System Infra Log]
 input bool           InpSystem_UseFile    = true;              // System: File Log Enabled
 input bool           InpSystem_UseRemote  = false;             // System: Remote Log Enabled
-input bool           InpSystem_InitStart  = true;              // System: Clear Log on Start
+input bool           InpSystem_InitStart  = false;             // System: Clear Log on Start (Prohibited by Mandate)
 
 //--- [Group: Trading Session Log]
 input bool           InpSession_UseFile   = true;              // Session: File Log Enabled
 input bool           InpSession_UseRemote = true;              // Session: Remote Log Enabled
 input bool           InpSession_UseUI     = true;              // Session: UI Log Enabled
-input bool           InpSession_InitStart = true;              // Session: Clear Log on Start
+input bool           InpSession_InitStart = false;             // Session: Clear Log on Start (Prohibited by Mandate)
 
 //--- Global Instance
 CXAppService* g_app = NULL;
@@ -57,18 +57,7 @@ int OnInit() {
     //--- [v10.4] Testing Mode: Timer-only execution (0.5s)
     EventSetMillisecondTimer(500);
     
-    //--- Show Version Label
-    //string ver_name = "ATSE_Version_Label";
-    //ObjectDelete(0, ver_name);
-    //if(ObjectCreate(0, ver_name, OBJ_LABEL, 0, 0, 0)) {
-    //    ObjectSetInteger(0, ver_name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
-    //    ObjectSetInteger(0, ver_name, OBJPROP_XDISTANCE, 20);
-    //    ObjectSetInteger(0, ver_name, OBJPROP_YDISTANCE, 40);
-    //    ObjectSetInteger(0, ver_name, OBJPROP_COLOR, clrWhite);
-    //    ObjectSetInteger(0, ver_name, OBJPROP_FONTSIZE, 10);
-    //    ObjectSetString(0, ver_name, OBJPROP_TEXT, "ATSE Core v10.27 (STABLE)");
-    //}
-
+ 
     // 1. Configuration 객체 생성 (v10.27)
     g_config = new CXConfig(InpTargetMagics, InpTimerInterval, InpRemoteAddr, 
                             InpLog_UseUI, InpLog_UseRemote, InpLog_FilterCnos, InpLog_Level,

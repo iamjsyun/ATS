@@ -182,14 +182,16 @@ private:
 
         if(isPosition) {
             // 포지션 모드: TP 및 Trailing Stop 정보 표시
-            p0_lbl = "TP";     p0 = sig.GetPriceTP();
+            p0_lbl = "TP";     p0 = 0.0;
             p1_lbl = "SSTART"; p1 = currentPrice + (sig.GetTSStart() * point * -dirSign); // TS는 가격 뒤를 따름
-            p2_lbl = "SSTEP";  p2 = currentPrice + (sig.GetTSStep() * point * -dirSign);
+            p2_lbl = "SSTEP";  p2 = sig.GetTSStep() * point;
         } else {
             // 대기오더 모드: 진입가 및 Trailing Entry 정보 표시
-            p0_lbl = "LIMIT";  p0 = sig.GetPriceOpen();
+            p0_lbl = "LIMIT";  
+            p0 = sig.GetPriceSignal();
+            if(p0 <= 0) p0 = sig.GetPriceOpen();
             p1_lbl = "ESTART"; p1 = currentPrice + (sig.GetTEStart() * point * dirSign);  // TE는 가격 앞을 따름
-            p2_lbl = "ESTEP";  p2 = currentPrice + (sig.GetTEStep() * point * dirSign);
+            p2_lbl = "ESTEP";  p2 = sig.GetTEStep() * point;
         }
 
         // Line 1: {SID} {te_start} | {te_step} | {te_limit} [{state}]
@@ -207,10 +209,19 @@ private:
                                     p1_lbl, DoubleToString(p1, digits),
                                     p2_lbl, DoubleToString(p2, digits));
 
-        // 색상 적용 (포지션: Gold, 대기오더: Wheat)
+        // 색상 적용 (포지션: Gold, 대기오더: Wheat, TS 트리거 시 Line 2는 Lime)
         color slotColor = isPosition ? clrGold : clrWheat;
         m_elements[slotIdx].Line1.Color(slotColor);
-        m_elements[slotIdx].Line2.Color(slotColor);
+
+        bool isTSTriggered = false;
+        if(isPosition && sig.GetTSStart() > 0) {
+            double profit = (currentPrice - sig.GetPriceOpen()) * (-dirSign);
+            if(profit >= sig.GetTSStart() * point) {
+                isTSTriggered = true;
+            }
+        }
+        color slotColorL2 = isTSTriggered ? clrLime : slotColor;
+        m_elements[slotIdx].Line2.Color(slotColorL2);
 
         m_elements[slotIdx].Line1.Description(txtL1);
         m_elements[slotIdx].Line2.Description(txtL2);

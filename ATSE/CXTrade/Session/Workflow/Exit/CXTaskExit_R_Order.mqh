@@ -5,6 +5,7 @@
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
 #include "..\..\..\Platform\Core\Interfaces\IXExitManager.mqh"
 #include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 
 /**
  * @class CXTaskExit_R_Order
@@ -15,7 +16,7 @@ public:
     virtual string Name() override { return "Exit_R_Order"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         IXExitManager* exitMgr = CX_GET_OBJ(ctx, "exit_mgr", IXExitManager);
-        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(ctx, "asset_mgr", ICXAssetManager);
         
         if(IS_INVALID(exitMgr) || IS_INVALID(invMgr)) {
             XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "FAILED: Required context missing."));

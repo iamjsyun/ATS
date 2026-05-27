@@ -58,8 +58,8 @@ public:
     virtual void SetSignal(ICXSignal* sig) override { m_sig = sig; }
     virtual void SetContext(ICXContext* ctx) override { m_ctx = ctx; }
 
-    void SetTransaction(const MqlTradeTransaction& trans) { m_trans = trans; }
-    MqlTradeTransaction GetTransaction() const { return m_trans; }
+    virtual void SetTransaction(const MqlTradeTransaction& trans) override { m_trans = trans; }
+    virtual void GetTransaction(MqlTradeTransaction& trans) const override { trans = m_trans; }
 
     virtual ICXParam* CreateEmptyParam() override { return new CXParam(); }
 };

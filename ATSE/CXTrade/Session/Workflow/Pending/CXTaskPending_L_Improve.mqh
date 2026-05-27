@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_PENDING_L_IMPROVE_MQH
+#ifndef CX_TASK_PENDING_L_IMPROVE_MQH
 #define CX_TASK_PENDING_L_IMPROVE_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -20,7 +20,7 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig) || 0 >= sig.GetTEStart() || xp.GetInt() == 10) {
             // [v16.20 Cleanup] 진입 완료 또는 로직 중단 시 라인 제거
-            if(IS_VALID(sig)) CXChartVisualizer::RemoveTEStart(sig);
+            if(IS_VALID(sig)) CXChartVisualizer::RemoveTEStart(ctx, sig);
             return TASK_CONTINUE;
         }
 
@@ -53,20 +53,20 @@ public:
                                                        : (currentPrice - lastExt >= sig.GetTEStep() * point);
         }
 
+        double extVal = lastExt;
         if(is_improved) {
             // [v16.26 Mandate] 극점(lastExt) 갱신 및 트리거 라인(TE_START) 재계산
-            // 트리거 라인 = 현재 극점으로부터 TE_START 만큼 반등 방향으로 설정
-            double newExt = currentPrice;
-            double triggerPrice = newExt + (sig.GetTEStart() * point * (-dir_sign));
-            
-            // [v16.27] Solid Blue Line으로 시각화 (MT5 기본 점선과 구별)
-            CXChartVisualizer::DrawTEStart(sig, triggerPrice);
+            extVal = currentPrice;
             
             if(IS_INVALID(pExt)) {
                 pExt = new CXParam();
                 ctx.Set(extKey, pExt);
             }
-            pExt.SetDouble(newExt);
+            pExt.SetDouble(extVal);
+
+            // [v18.35 Optimization] 가격 개선 발생 시에만 트리거 라인 이동 호출
+            double triggerPrice = extVal + (sig.GetTEStart() * point * dir_sign);
+            CXChartVisualizer::DrawTEStart(ctx, sig, triggerPrice, "CXTaskPending_L_Improve");
         }
 
         // --- 2. [진입 오더 가격 유지 (1분봉 마감)] ---

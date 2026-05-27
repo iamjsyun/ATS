@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_ACTIVE_CLOSED_MQH
+#ifndef CX_TASK_ACTIVE_CLOSED_MQH
 #define CX_TASK_ACTIVE_CLOSED_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"

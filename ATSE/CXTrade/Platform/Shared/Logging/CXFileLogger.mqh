@@ -54,48 +54,39 @@ private:
     bool OpenByTime(MqlDateTime &dt, bool truncate) {
         Close();
 
-        //-- [v14.42] Ensure directory exists
         if(!FolderCreate("ATSE", FILE_COMMON)) {
             int err = GetLastError();
-            if(err != 0 && err != 5019) { // 5019: Folder already exists
-                PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d", err);
-            }
+            if(err != 0 && err != 5019) PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d", err);
         }
 
-        //-- [v10.18] Format Update: {yyMMdd-HH0000}.log
-        string timestamp = StringFormat("%02d%02d%02d-%02d0000", 
-            dt.year % 100, dt.mon, dt.day, dt.hour);
-
+        string timestamp = StringFormat("%02d%02d%02d-%02d0000", dt.year % 100, dt.mon, dt.day, dt.hour);
         m_filename = StringFormat("ATSE\\%s-%s.log", m_sid, timestamp);
         
-        // [v15.9] Initialization Logic
+        int sharedFlags = FILE_SHARE_READ|FILE_SHARE_WRITE;
+        int flags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON;
+
         if(truncate) {
-            // Truncate existing file by opening with FILE_WRITE only
-            int flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
-            m_handle = FileOpen(m_filename, flags);
-            if(m_handle != INVALID_HANDLE) return true;
+            FileDelete(m_filename, FILE_COMMON);
         }
 
-        //-- Default: Robust Append Mode
-        // 1. First attempt: Open for Read/Write (Append mode)
-        int flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
-        m_handle = FileOpen(m_filename, flags);
-
-        // 2. Second attempt: Create new if not exists
+        // 1. Try to open for Append (File must exist)
+        m_handle = FileOpen(m_filename, flags|FILE_READ|FILE_WRITE);
+        
+        // 2. If it doesn't exist, create it, close it, and reopen for Append
         if(m_handle == INVALID_HANDLE) {
-            flags = FILE_TXT|FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
-            m_handle = FileOpen(m_filename, flags);
+            int tempHandle = FileOpen(m_filename, flags|FILE_WRITE);
+            if(tempHandle != INVALID_HANDLE) FileClose(tempHandle);
+            
+            // Reopen in Append mode
+            m_handle = FileOpen(m_filename, flags|FILE_READ|FILE_WRITE);
         }
+        
+        if(m_handle != INVALID_HANDLE) FileSeek(m_handle, 0, SEEK_END);
 
-        if(m_handle != INVALID_HANDLE) {
-            FileSeek(m_handle, 0, SEEK_END);
-            return true;
-        }
+        if(m_handle != INVALID_HANDLE) return true;
         
-        //-- [v14.44] Replace MessageBox with Print for Tester/Headless compatibility
-        PrintFormat("[LOG-CRITICAL] Failed to create log file! Path: ATSE\\%s, SID: %s, Error Code: %d", 
+        PrintFormat("[LOG-CRITICAL] Failed to create log file! Path: ATSE\\%s, SID: %s, Error: %d", 
                     m_filename, m_sid, GetLastError());
-        
         return false;
     }
 

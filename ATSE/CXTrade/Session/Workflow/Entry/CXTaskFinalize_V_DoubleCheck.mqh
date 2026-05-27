@@ -1,10 +1,10 @@
-﻿#ifndef CX_TASK_FINALIZE_V_DOUBLECHECK_MQH
+#ifndef CX_TASK_FINALIZE_V_DOUBLECHECK_MQH
 #define CX_TASK_FINALIZE_V_DOUBLECHECK_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
 #include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
-#include "..\..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 
 /**
  * @class CXTaskFinalize_V_DoubleCheck
@@ -22,7 +22,7 @@ public:
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("FINAL-V-CHECK", xp, StringFormat("Double-Checking Ticket:%I64u", ticket)));
 
-        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(ctx, "asset_mgr", ICXAssetManager);
         if(IS_INVALID(invMgr) || !invMgr.IsAssetExists(ticket, sig.GetType())) {
             XP_LOG_ERROR(xp, CXAuditFormatter::Build("FINAL-V-CHECK", xp, StringFormat("FAILED: Phantom Ticket:%I64u", ticket)));
             return TASK_BREAK;

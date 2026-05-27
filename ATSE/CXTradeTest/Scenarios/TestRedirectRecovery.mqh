@@ -1,8 +1,8 @@
-﻿#ifndef TEST_REDIRECT_RECOVERY_MQH
+#ifndef TEST_REDIRECT_RECOVERY_MQH
 #define TEST_REDIRECT_RECOVERY_MQH
 
 #include "..\..\CXTrade\Session\Workflow\Entry\CXTaskEntry_L_Redirect.mqh"
-#include "..\..\CXTrade\Session\CXContext.mqh"
+#include "..\..\CXTrade\Platform\Core\Models\CXContext.mqh"
 #include "..\..\CXTrade\Platform\Core\Models\CXParam.mqh"
 #include "..\..\CXTrade\Platform\Core\Models\CXSignal.mqh"
 

@@ -100,8 +100,17 @@ public:
             StringSplit(logicPart, StringGetCharacter(":", 0), stageParts);
             
             string typeStr = Clean(stageParts[0]);
-            string alias   = (ArraySize(stageParts) > 1) ? Clean(stageParts[1]) : "";
-            string taskStr = (ArraySize(stageParts) > 2) ? Clean(stageParts[2]) : "";
+            string alias   = "";
+            string taskStr = "";
+            if(ArraySize(stageParts) == 2) {
+                // If only 1 colon is present, the second part represents the task list
+                taskStr = Clean(stageParts[1]);
+                alias = typeStr; // Default alias to the stage type
+            } else if(ArraySize(stageParts) > 2) {
+                // If 2 or more colons are present (v14.8 standard)
+                alias = Clean(stageParts[1]);
+                taskStr = Clean(stageParts[2]);
+            }
             
             int next = ResolveId(GetSegment(s, "?", "|!@*"));
             int fail = ResolveId(GetSegment(s, "!", "|?@*"));

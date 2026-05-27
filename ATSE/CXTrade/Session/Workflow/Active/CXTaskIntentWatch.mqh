@@ -1,7 +1,8 @@
-﻿#ifndef CX_TASK_INTENT_WATCH_MQH
+#ifndef CX_TASK_INTENT_WATCH_MQH
 #define CX_TASK_INTENT_WATCH_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
+#include "..\..\..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
 #include "..\..\..\Platform\Shared\Logging\CXMessageProvider.mqh"
 #include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
@@ -16,7 +17,7 @@ public:
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
         IRepository* repo = CX_GET_OBJ(ctx, "repo", IRepository);
-        ICXInventoryManager* invMgr = CX_GET_OBJ(ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(ctx, "asset_mgr", ICXAssetManager);
         
         if(IS_INVALID(sig) || IS_INVALID(repo)) return TASK_BREAK;
 

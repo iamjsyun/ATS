@@ -134,11 +134,17 @@
 ### 3.1 Post-Action Verification (Mandatory)
 Every trading action must verify physical state in MT5 immediately after the request.
 
-### 3.2 Memory Safety & Inheritance
+### 3.4 Memory Safety & Inheritance
 - **Base Class Mandate**: 모든 커스텀 객체(인터페이스, 모델 등)는 `CObject`를 상속하여 포인터 관리의 일관성을 유지한다.
 - **Null Guard**: `SAFE_DELETE`와 `IS_VALID` / `IS_INVALID` 매크로를 사용하여 댕글링 포인터를 방지한다.
+- **Loop Stability & Atomic Batch Delete (v11.4 - Critical)**: 모든 처리 루프에서 인덱스 조작(`i--`, `total--`, `Detach`)을 금지하며, 루프 종료 후 컬렉션을 통째로 삭제하거나 `Clear` 함으로써 메모리 원자성을 확보한다.
 
-### 3.3 Sequence Design & Task Atomization (v9.7)
+### 3.4.3 Logging Governance (v11.5 - Mandate)
+- **Startup Truncation**: 모든 로그 채널(File, SID File)은 EA 기동 시 기존 내용을 파괴하고 새로 작성한다 (`truncate=true`). 이는 세션별 데이터 독립성을 보장하기 위함이다.
+- **Mandatory Mirroring**: 파일 로그 기록 성공 여부와 관계없이, 모든 로그 메시지는 반드시 `Print()`를 통해 터미널 시스템 로그(Experts)에 실시간 미러링 되어야 한다.
+- **Log Categorization**: SID 명칭에 포함된 키워드(`Watcher`, `System`, `Session`)를 기반으로 로그 카테고리를 자동 분류하여 관리한다.
+
+### 3.5 Sequence Design & Task Atomization (v9.7)
 모든 비즈니스 로직 시퀀스는 원자적 태스크 단위로 분해되어야 하며, **1 Task = 1 Responsibility (SRP 준수)** 원칙을 강제한다.
 
 ### 3.4 Trading Process Standard (v11.3 - Mandatory)

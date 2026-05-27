@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_ALPHA_CALC_MQH
+#ifndef CX_TASK_ALPHA_CALC_MQH
 #define CX_TASK_ALPHA_CALC_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"

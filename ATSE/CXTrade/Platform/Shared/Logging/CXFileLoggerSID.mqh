@@ -59,39 +59,34 @@ private:
 
         if(!FolderCreate("ATSE", FILE_COMMON)) {
             int err = GetLastError();
-            if(err != 0 && err != 5019) {
-                PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d. Aborting logger init.", err);
-                return false; 
-            }
+            if(err != 0 && err != 5019) PrintFormat("[LOG-ERR] FolderCreate ATSE failed. Code:%d", err);
         }
 
         string timestamp = StringFormat("%02d%02d%02d-%02d0000", dt.year % 100, dt.mon, dt.day, dt.hour);
         m_filename = StringFormat("ATSE\\%s-%s.log", m_sid, timestamp);
         
-        // [v15.9] Robust Shared Flags (FILE_SHARE_READ|FILE_SHARE_WRITE)
         int sharedFlags = FILE_SHARE_READ|FILE_SHARE_WRITE;
-        
-        // 1. Initialization Logic (Truncate)
+        int flags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON;
+
         if(truncate) {
-            int flags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
-            m_handle = FileOpen(m_filename, flags);
-            if(m_handle != INVALID_HANDLE) return true;
+            FileDelete(m_filename, FILE_COMMON);
         }
 
-        // 2. Default: Robust Append Mode
-        int appendFlags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_READ|FILE_WRITE;
-        m_handle = FileOpen(m_filename, appendFlags);
-
-        // 3. Fallback: Create new if not exists
+        // 1. Try to open for Append (File must exist)
+        m_handle = FileOpen(m_filename, flags|FILE_READ|FILE_WRITE);
+        
+        // 2. If it doesn't exist, create it, close it, and reopen for Append
         if(m_handle == INVALID_HANDLE) {
-            int createFlags = FILE_TXT|sharedFlags|FILE_UNICODE|FILE_COMMON|FILE_WRITE;
-            m_handle = FileOpen(m_filename, createFlags);
+            int tempHandle = FileOpen(m_filename, flags|FILE_WRITE);
+            if(tempHandle != INVALID_HANDLE) FileClose(tempHandle);
+            
+            // Reopen in Append mode
+            m_handle = FileOpen(m_filename, flags|FILE_READ|FILE_WRITE);
         }
+        
+        if(m_handle != INVALID_HANDLE) FileSeek(m_handle, 0, SEEK_END);
 
-        if(m_handle != INVALID_HANDLE) {
-            FileSeek(m_handle, 0, SEEK_END);
-            return true;
-        }
+        if(m_handle != INVALID_HANDLE) return true;
         
         PrintFormat("[LOG-CRITICAL] SID File Creation Failed! Path: ATSE\\%s, SID: %s, Error: %d", m_filename, m_sid, GetLastError());
         return false;

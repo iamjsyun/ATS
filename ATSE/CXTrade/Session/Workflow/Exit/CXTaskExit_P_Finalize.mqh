@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_EXIT_P_FINALIZE_MQH
+#ifndef CX_TASK_EXIT_P_FINALIZE_MQH
 #define CX_TASK_EXIT_P_FINALIZE_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -22,11 +22,9 @@ public:
         int finalStatus = sig.GetStatus();
         if(finalStatus < XE_CLOSED_SIGNAL) finalStatus = XE_CLOSED_SIGNAL;
 
-        // [v14.6 Manual-Close Fast-Track]
-        if(finalStatus == XE_CLOSED_MANUAL) {
-            sig.SetXAExit(XA_CLOSED_COMPLETED); // 2
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("EXIT-P-FIN", xp, "Manual Close Fast-Track: xa_exit=2"));
-        }
+        // [v14.6 Manual-Close Fast-Track / General Exit completion]
+        sig.SetXAExit(XA_CLOSED_COMPLETED); // 2
+        XP_LOG_INFO(xp, CXAuditFormatter::Build("EXIT-P-FIN", xp, StringFormat("Exit Finalized: xa_exit=2, status=%d", finalStatus)));
 
         CXMessageProvider::UpdateStatus(sig, finalStatus, "Liquidation Finalized. Session Closed.");
         if(repo.UpdateStatus(sig)) {

@@ -2,12 +2,13 @@
 #define CXORDERMANAGER_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXTradingSession.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXContext.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXParam.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXRiskManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
-#include "..\..\Platform\Core\Interfaces\ICXInventoryManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXAssetManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXAuditProvider.mqh"
 #include "..\..\Platform\Core\Interfaces\IXGuard.mqh"
 #include "..\..\Platform\Core\Defines\CXDefine.mqh"
@@ -61,7 +62,7 @@ public:
         ulong ticket = sig.GetTicket();
         if(ticket == 0) return;
 
-        ICXInventoryManager* invMgr = CX_GET_OBJ(m_ctx, "inventory_mgr", ICXInventoryManager);
+        ICXAssetManager* invMgr = CX_GET_OBJ(m_ctx, "asset_mgr", ICXAssetManager);
         if(IS_INVALID(invMgr)) return;
 
         // 1. 오더가 아직 존재하면 정상 (대기 중)
@@ -309,7 +310,7 @@ public:
     }
 
     virtual void ScanAndBind(ICXParam* xp, CObject* sessionMgr) override {
-        ICXSessionManager* mgr = CX_CAST(ICXSessionManager, sessionMgr);
+        ICXAssetManager* mgr = CX_CAST(ICXAssetManager, sessionMgr);
         if(IS_INVALID(mgr)) return;
 
         int total = m_terminal.GetOrdersTotal();
@@ -347,16 +348,28 @@ public:
                 sig.SetStatusMsg(StringFormat("Order Scanned and Bound. Ticket:%I64u", ticket));
                 repo.UpdateStatus(sig);
 
-                // [v18.26 Fix] Reuse persistent xp instead of stack sp to avoid invalid pointer access
+                // [v18.26 Fix] Reuse persistent xp instead of stack sp
                 xp.SetSignal(sig);
-                ICXTradingSession* session = mgr.CreateSession(xp);
-                if(IS_VALID(session)) {
-                    session.Start(xp);
-                    XP_LOG_OK(xp, StringFormat("[ORDER-MANAGER-SCAN] Bound new pending order to session. Ticket:%I64u, SID:%s", ticket, sid));
+                if(IS_VALID(mgr)) {
+                    ICXTradingSession* session = mgr.CreateSession(xp);
+                    if(IS_VALID(session)) {
+                        session.Start(xp);
+                        // Only log the initial binding success per ticket
+                        XP_LOG_OK(xp, StringFormat("[ORDER-MANAGER-SCAN] Successfully bound new pending order. Ticket:%I64u, SID:%s", ticket, sid));
+                    } else {
+                        SAFE_DELETE(sig);
+                    }
                 } else {
                     SAFE_DELETE(sig);
                 }
                 xp.SetSignal(NULL);
+            } else {
+                // If session exists, ensure the signal ticket is up to date without logging every scan
+                ICXSignal* sig = existing.GetSignal();
+                if(IS_VALID(sig) && sig.GetTicket() != ticket) {
+                    sig.SetTicket(ticket);
+                    // No log here to prevent flooding
+                }
             }
         }
     }

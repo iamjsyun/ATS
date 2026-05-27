@@ -35,11 +35,16 @@ public:
     virtual void Log(ENUM_LOG_LEVEL level, string msg) override {
         if(!m_enabled) return;
 
-        // 1. File Logger (Always on if SID initialized)
+        // 1. File Logger
         if(IS_VALID(m_file) && m_file.IsEnabled()) m_file.Log(level, msg);
         
-        // 2. MT5 Tab (Journal)
-        if(IS_VALID(m_tab) && m_tab.IsEnabled()) m_tab.Log(level, msg);
+        // 2. MT5 Tab (Journal) - Mirroring Mandate (v11.5)
+        if(IS_VALID(m_tab) && m_tab.IsEnabled()) {
+            m_tab.Log(level, msg);
+        } else {
+            // [v11.5] Mandatory Mirroring: Tab logger가 없거나 비활성화된 경우에도 최소한 Print()는 수행
+            PrintFormat("[%s] %s", EnumToString(level), msg);
+        }
 
         // 3. UI & Remote (Check global config)
         if(IS_VALID(m_config)) {
