@@ -18,7 +18,7 @@ public:
         bool allPassed = true;
         
         CXContext ctx;
-        CXVirtualPricer pricer("EURUSD", 0.00001);
+        CXVirtualPricer pricer("GOLDF#", 0.01);
         MockPriceManager priceMgr(NULL);
         priceMgr.SetPricer(GetPointer(pricer));
         MockTerminalPlatform terminal;
@@ -28,14 +28,14 @@ public:
         
         CXParam xp;
         CXSignal sig;
-        sig.SetSymbol("EURUSD");
+        sig.SetSymbol("GOLDF#");
         sig.SetDir(CX_DIR_BUY);
         sig.SetType(ORDER_LIMIT);
-        sig.SetPriceOpen(1.0900);
-        sig.SetPriceSignal(1.0950);
-        sig.SetTEStart(10);  // 1.0950 - 10pt = 1.0940 trigger
-        sig.SetTEStep(5);
-        sig.SetTELimit(50);
+        sig.SetPriceOpen(2345.00);
+        sig.SetPriceSignal(2350.00);
+        sig.SetTEStart(300);  // 2350.00 - 300pt ($3.00) = 2347.00 trigger
+        sig.SetTEStep(100);  // 100pt ($1.00) rebound
+        sig.SetTELimit(500);  // 500pt ($5.00) limit
         sig.SetSid("TEST-TE-01");
         xp.SetSignal(GetPointer(sig));
         
@@ -44,40 +44,40 @@ public:
         CXTaskPending_L_Rebound taskReb;
         
         // Phase 1: Activation Test
-        pricer.OverridePrice(1.0945); // Not yet activated
+        pricer.OverridePrice(2347.50); // Not yet activated (2.50 drop < 3.00)
         taskExt.Execute(GetPointer(xp), GetPointer(ctx));
         ICXParam* pActive = ctx.GetParam("TE_Active_TEST-TE-01");
         if(IS_INVALID(pActive) || pActive.GetInt() != 1) {
-            Print("  [PASS] TE not activated at 1.0945.");
+            Print("  [PASS] TE not activated at 2347.50.");
         } else {
-            Print("  [FAIL] TE activated prematurely at 1.0945.");
+            Print("  [FAIL] TE activated prematurely at 2347.50.");
             allPassed = false;
         }
         
-        pricer.OverridePrice(1.0935); // Trigger reached (<= 1.0940)
+        pricer.OverridePrice(2346.50); // Trigger reached (<= 2347.00)
         taskExt.Execute(GetPointer(xp), GetPointer(ctx));
         pActive = ctx.GetParam("TE_Active_TEST-TE-01");
         if(IS_VALID(pActive) && pActive.GetInt() == 1) {
-            Print("  [PASS] TE activated at 1.0935.");
+            Print("  [PASS] TE activated at 2346.50.");
         } else {
-            Print("  [FAIL] TE failed to activate at 1.0935.");
+            Print("  [FAIL] TE failed to activate at 2346.50.");
             allPassed = false;
         }
         
         // Phase 2: Improvement Test
-        pricer.OverridePrice(1.0925); // New extreme
+        pricer.OverridePrice(2343.00); // New extreme
         taskExt.Execute(GetPointer(xp), GetPointer(ctx));
         taskImp.Execute(GetPointer(xp), GetPointer(ctx));
         ICXParam* pExt = ctx.GetParam("LastEntryExtremity_TEST-TE-01");
-        if(IS_VALID(pExt) && MathAbs(pExt.GetDouble() - 1.0925) < 0.00001) {
-            Print("  [PASS] Extreme updated to 1.0925.");
+        if(IS_VALID(pExt) && MathAbs(pExt.GetDouble() - 2343.00) < 0.01) {
+            Print("  [PASS] Extreme updated to 2343.00.");
         } else {
-            PrintFormat("  [FAIL] Extreme not updated. Expected 1.0925, got %.5f", IS_VALID(pExt)?pExt.GetDouble():0);
+            PrintFormat("  [FAIL] Extreme not updated. Expected 2343.00, got %.2f", IS_VALID(pExt)?pExt.GetDouble():0);
             allPassed = false;
         }
         
         // Phase 3: Rebound Entry Test
-        pricer.OverridePrice(1.0931); // Rebound of 6pt (> TEStep 5)
+        pricer.OverridePrice(2344.10); // Rebound of 1.10 (> TEStep 1.00 / 100pt)
         int res = taskReb.Execute(GetPointer(xp), GetPointer(ctx));
         if(xp.GetInt() == 10) { // Market Fallback trigger
             Print("  [PASS] Rebound detected and market entry triggered.");

@@ -19,7 +19,7 @@ public:
         
         CXParam xp;
         CXSignal sig;
-        sig.SetSymbol("EURUSD");
+        sig.SetSymbol("GOLDF#");
         sig.SetSid("TEST-MANUAL-01");
         sig.SetTicket(99001);
         sig.SetStatus(XE_EXECUTED);
@@ -29,7 +29,7 @@ public:
         CXTaskIntentWatch task;
         
         // 1. Asset exists -> Continue
-        terminal.InjectMockAsset(true, 99001, "TEST-MANUAL-01", "EURUSD", 1001, CX_DIR_BUY, 0.1, 1.1000, 0, 0);
+        terminal.InjectMockAsset(true, 99001, "TEST-MANUAL-01", "GOLDF#", 1001, CX_DIR_BUY, 0.1, 2350.00, 0, 0);
         int res = task.Execute(GetPointer(xp), GetPointer(ctx));
         if(res == TASK_CONTINUE) {
             Print("  [PASS] Task continues when asset exists.");

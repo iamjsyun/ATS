@@ -1,27 +1,29 @@
 //+------------------------------------------------------------------+
-//|                                                   CXTclParser.mqh |
+//|                                                  CXTsdlParser.mqh |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v1.1] TCL (Test Scenario Language) Parser for ATSE Self-Testing |
+//| [v1.1] TSDL (Test Scenario Definition Language) Parser           |
 //+------------------------------------------------------------------+
-#ifndef CX_TCL_PARSER_MQH
-#define CX_TCL_PARSER_MQH
+//| [v1.1] TSDL (Test Scenario Definition Language) Parser           |
+//+------------------------------------------------------------------+
+#ifndef CX_TSDL_PARSER_MQH
+#define CX_TSDL_PARSER_MQH
 
 #include <Object.mqh>
 #include <Arrays\ArrayObj.mqh>
 
 /**
- * @class CXTclAction
+ * @class CXTsdlAction
  * @brief 시나리오 틱 동작 정보 (INJECT: signals, MARKET, etc.)
  */
-class CXTclAction : public CObject {
+class CXTsdlAction : public CObject {
 public:
     string m_type;   // INJECT, MARKET, etc.
-    string m_target; // signals, terminal, EURUSD, etc.
+    string m_target; // signals, terminal, GOLD#, etc.
     string m_keys[];
     string m_values[];
 
-    CXTclAction() : m_type(""), m_target("") {}
-    virtual ~CXTclAction() override {}
+    CXTsdlAction() : m_type(""), m_target("") {}
+    virtual ~CXTsdlAction() override {}
 
     string GetParam(string key) {
         for(int i = 0; i < ArraySize(m_keys); i++) {
@@ -52,18 +54,18 @@ public:
 };
 
 /**
- * @class CXTclExpect
+ * @class CXTsdlExpect
  * @brief 시나리오 틱 검증 정보 (EXPECT: session : state=ORD_READY * xe_status=...)
  */
-class CXTclExpect : public CObject {
+class CXTsdlExpect : public CObject {
 public:
     string m_type;    // session, etc.
     string m_keys[];
     string m_values[];
     string m_failMsg;
 
-    CXTclExpect() : m_type(""), m_failMsg("") {}
-    virtual ~CXTclExpect() override {}
+    CXTsdlExpect() : m_type(""), m_failMsg("") {}
+    virtual ~CXTsdlExpect() override {}
 
     string GetParam(string key) {
         for(int i = 0; i < ArraySize(m_keys); i++) {
@@ -86,31 +88,31 @@ public:
 };
 
 /**
- * @class CXTclStep
+ * @class CXTsdlStep
  * @brief 특정 틱 번호 아래의 동작 및 검증 그룹
  */
-class CXTclStep : public CObject {
+class CXTsdlStep : public CObject {
 public:
     int        m_tickNum;
     CArrayObj* m_actions;
     CArrayObj* m_expectations;
 
-    CXTclStep(int tickNum) : m_tickNum(tickNum) {
+    CXTsdlStep(int tickNum) : m_tickNum(tickNum) {
         m_actions = new CArrayObj();
         m_expectations = new CArrayObj();
     }
 
-    virtual ~CXTclStep() override {
+    virtual ~CXTsdlStep() override {
         if(CheckPointer(m_actions) == POINTER_DYNAMIC) delete m_actions;
         if(CheckPointer(m_expectations) == POINTER_DYNAMIC) delete m_expectations;
     }
 };
 
 /**
- * @class CXTclScenario
- * @brief 전체 TCL 시나리오 구조를 적재하는 최상위 모델
+ * @class CXTsdlScenario
+ * @brief 전체 TSDL 시나리오 구조를 적재하는 최상위 모델
  */
-class CXTclScenario : public CObject {
+class CXTsdlScenario : public CObject {
 public:
     string     m_id;
     string     m_desc;
@@ -127,11 +129,11 @@ public:
 
     CArrayObj* m_steps;
 
-    CXTclScenario() : m_id(""), m_desc(""), m_pricerSymbol(""), m_pricerModel("") {
+    CXTsdlScenario() : m_id(""), m_desc(""), m_pricerSymbol(""), m_pricerModel("") {
         m_steps = new CArrayObj();
     }
 
-    virtual ~CXTclScenario() override {
+    virtual ~CXTsdlScenario() override {
         if(CheckPointer(m_steps) == POINTER_DYNAMIC) delete m_steps;
     }
 
@@ -151,23 +153,23 @@ public:
     }
 
     /**
-     * @brief [v19.50] 시나리오의 최대 틱 번호 확인
+     * @brief 시나리오의 최대 틱 번호 확인
      */
     int GetMaxTick() {
         int maxTick = 0;
         for(int i = 0; i < m_steps.Total(); i++) {
-            CXTclStep* step = (CXTclStep*)m_steps.At(i);
+            CXTsdlStep* step = (CXTsdlStep*)m_steps.At(i);
             if(step.m_tickNum > maxTick) maxTick = step.m_tickNum;
         }
         return maxTick;
     }
 
     /**
-     * @brief [v19.51] 특정 틱 번호의 스텝 정보 반환
+     * @brief 특정 틱 번호의 스텝 정보 반환
      */
-    CXTclStep* GetStep(int tickNum) {
+    CXTsdlStep* GetStep(int tickNum) {
         for(int i = 0; i < m_steps.Total(); i++) {
-            CXTclStep* step = (CXTclStep*)m_steps.At(i);
+            CXTsdlStep* step = (CXTsdlStep*)m_steps.At(i);
             if(step.m_tickNum == tickNum) return step;
         }
         return NULL;
@@ -190,10 +192,10 @@ public:
 };
 
 /**
- * @class CXTclParser
- * @brief TCL 소스 스트림을 기계적으로 해석하는 파싱 엔진
+ * @class CXTsdlParser
+ * @brief TSDL 소스 스트림을 기계적으로 해석하는 파싱 엔진
  */
-class CXTclParser {
+class CXTsdlParser {
 private:
     /**
      * @brief MQL5 규격에 맞게 문자열 양끝 공백 제거 (Wrapper)
@@ -251,7 +253,7 @@ private:
     /**
      * @brief 틱 구문 안의 액션 및 검증 해석 분기
      */
-    static void ParseActionOrExpect(string text, CXTclStep* step) {
+    static void ParseActionOrExpect(string text, CXTsdlStep* step) {
         text = Trim(text);
         if(text == "") return;
 
@@ -273,7 +275,7 @@ private:
                     target = Trim(rest);
                 }
 
-                CXTclAction* action = new CXTclAction();
+                CXTsdlAction* action = new CXTsdlAction();
                 action.m_type = actionType;
                 action.m_target = target;
                 ParseParams(paramsPart, action.m_keys, action.m_values);
@@ -319,11 +321,11 @@ private:
             }
 
             paramsPart = Trim(paramsPart);
-            // * 및 , 혼용 지원 (WPF/TCL 통일성을 위해 *을 ,로 임시 치환하여 파싱)
+            // * 및 , 혼용 지원 (WPF/TSDL 통일성을 위해 *을 ,로 임시 치환하여 파싱)
             string cleanParams = paramsPart;
             StringReplace(cleanParams, "*", ",");
 
-            CXTclExpect* expect = new CXTclExpect();
+            CXTsdlExpect* expect = new CXTsdlExpect();
             expect.m_type = expectType;
             expect.m_failMsg = failMsg;
             ParseParams(cleanParams, expect.m_keys, expect.m_values);
@@ -333,20 +335,20 @@ private:
 
 public:
     /**
-     * @brief TCL 파일을 열어 파싱하여 시나리오 객체 반환
+     * @brief TSDL 파일을 열어 파싱하여 시나리오 객체 반환
      */
-    static CXTclScenario* Parse(string filename) {
+    static CXTsdlScenario* Parse(string filename) {
         int handle = FileOpen(filename, FILE_READ|FILE_TXT|FILE_ANSI);
         if(handle == INVALID_HANDLE) {
             handle = FileOpen(filename, FILE_READ|FILE_TXT);
         }
         if(handle == INVALID_HANDLE) {
-            PrintFormat("[TCL-PARSER] ERROR: Failed to open scenario file '%s'. Error: %d", filename, GetLastError());
+            PrintFormat("[TSDL-PARSER] ERROR: Failed to open scenario file '%s'. Error: %d", filename, GetLastError());
             return NULL;
         }
 
-        CXTclScenario* scenario = new CXTclScenario();
-        CXTclStep* currentStep = NULL;
+        CXTsdlScenario* scenario = new CXTsdlScenario();
+        CXTsdlStep* currentStep = NULL;
 
         while(!FileIsEnding(handle)) {
             string lineStr = FileReadString(handle);
@@ -423,14 +425,14 @@ public:
 
                 currentStep = NULL;
                 for(int i = 0; i < scenario.m_steps.Total(); i++) {
-                    CXTclStep* step = (CXTclStep*)scenario.m_steps.At(i);
+                    CXTsdlStep* step = (CXTsdlStep*)scenario.m_steps.At(i);
                     if(step.m_tickNum == tickNum) {
                         currentStep = step;
                         break;
                     }
                 }
                 if(currentStep == NULL) {
-                    currentStep = new CXTclStep(tickNum);
+                    currentStep = new CXTsdlStep(tickNum);
                     scenario.m_steps.Add(currentStep);
                 }
 
@@ -446,7 +448,7 @@ public:
         }
 
         FileClose(handle);
-        PrintFormat("[TCL-PARSER] SUCCESS: Loaded scenario '%s' with %d steps.", scenario.m_id, scenario.m_steps.Total());
+        PrintFormat("[TSDL-PARSER] SUCCESS: Loaded scenario '%s' with %d steps.", scenario.m_id, scenario.m_steps.Total());
         return scenario;
     }
 };

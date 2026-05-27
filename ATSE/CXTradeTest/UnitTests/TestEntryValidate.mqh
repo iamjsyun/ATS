@@ -22,7 +22,7 @@ public:
         CXSignal sig;
         sig.SetStatus(XE_READY);
         sig.xa_entry = XA_ACTIVE;
-        sig.symbol = "GOLD#";
+        sig.symbol = "GOLDF#";
         sig.lot = 0.1;
         xp.SetSignal(GetPointer(sig));
         

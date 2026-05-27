@@ -17,7 +17,7 @@ public:
         bool allPassed = true;
         
         CXContext ctx;
-        CXVirtualPricer pricer("EURUSD", 0.00001);
+        CXVirtualPricer pricer("GOLDF#", 0.01);
         MockPriceManager priceMgr(NULL);
         priceMgr.SetPricer(GetPointer(pricer));
         MockTerminalPlatform terminal;
@@ -27,40 +27,40 @@ public:
         
         CXParam xp;
         CXSignal sig;
-        sig.SetSymbol("EURUSD");
+        sig.SetSymbol("GOLDF#");
         sig.SetDir(CX_DIR_BUY);
         sig.SetType(ORDER_TYPE_BUY);
-        sig.SetPriceOpen(1.1000);
-        sig.SetTSStart(20); // TS Start at +20pt
-        sig.SetTSStep(5);   // TS Step 5pt
+        sig.SetPriceOpen(2350.00);
+        sig.SetTSStart(2000); // TS Start at +2000pt ($20.00)
+        sig.SetTSStep(500);   // TS Step 500pt ($5.00)
         sig.SetTicket(90001);
         sig.SetSid("TEST-TS-01");
         xp.SetSignal(GetPointer(sig));
         
         // Inject physical position
-        terminal.InjectMockAsset(true, 90001, "TEST-TS-01", "EURUSD", 1001, CX_DIR_BUY, 0.1, 1.1000, 0, 0);
+        terminal.InjectMockAsset(true, 90001, "TEST-TS-01", "GOLDF#", 1001, CX_DIR_BUY, 0.1, 2350.00, 0, 0);
         
         CXTaskAlphaCalc taskCalc;
         CXTaskAlphaApply taskApply;
         
         // 1. Below trigger
-        pricer.OverridePrice(1.1010); // +10pt < 20pt
+        pricer.OverridePrice(2360.00); // +10.00 profit < +20.00 trigger
         taskCalc.Execute(GetPointer(xp), GetPointer(ctx));
         if(xp.GetDouble() == 0) {
             Print("  [PASS] No TS calculation below trigger.");
         } else {
-            PrintFormat("  [FAIL] TS calculated prematurely. xp.GetDouble() = %.5f", xp.GetDouble());
+            PrintFormat("  [FAIL] TS calculated prematurely. xp.GetDouble() = %.2f", xp.GetDouble());
             allPassed = false;
         }
         
         // 2. Above trigger
-        pricer.OverridePrice(1.1025); // +25pt > 20pt
+        pricer.OverridePrice(2375.00); // +25.00 profit > +20.00 trigger
         taskCalc.Execute(GetPointer(xp), GetPointer(ctx));
         double targetSL = xp.GetDouble();
-        if(targetSL > 1.1000) {
-            PrintFormat("  [PASS] TS calculated at trigger. Target SL: %.5f", targetSL);
+        if(targetSL > 2350.00) {
+            PrintFormat("  [PASS] TS calculated at trigger. Target SL: %.2f", targetSL);
         } else {
-            PrintFormat("  [FAIL] TS calculation failed. Target SL: %.5f", targetSL);
+            PrintFormat("  [FAIL] TS calculation failed. Target SL: %.2f", targetSL);
             allPassed = false;
         }
         
@@ -69,7 +69,7 @@ public:
         if(terminal.GetPositionSL(90001) == targetSL) {
             Print("  [PASS] Position SL updated on terminal.");
         } else {
-            PrintFormat("  [FAIL] Terminal SL mismatch. Expected %.5f, got %.5f", targetSL, terminal.GetPositionSL(90001));
+            PrintFormat("  [FAIL] Terminal SL mismatch. Expected %.2f, got %.2f", targetSL, terminal.GetPositionSL(90001));
             allPassed = false;
         }
 
