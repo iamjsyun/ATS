@@ -54,23 +54,29 @@ protected:
         m_registry.Add("XE_CLOSED_SL",         (int)XE_CLOSED_SL);
         m_registry.Add("XE_CLOSED_TP",         (int)XE_CLOSED_TP);
         m_registry.Add("XE_ERROR",             (int)XE_ERROR);
+
+        // Watcher States (Align with ENUM_WATCHER_STATE)
+        m_registry.Add("WATCHER_DISCOVERY",    (int)WATCHER_DISCOVERY);
+        m_registry.Add("WATCHER_VALIDATION",   (int)WATCHER_VALIDATION);
+        m_registry.Add("WATCHER_SPAWNING",     (int)WATCHER_SPAWNING);
+        m_registry.Add("WATCHER_ERROR",        (int)WATCHER_ERROR);
     }
 
     /**
      * @brief Watcher DSL 정의 (v18.8 Flow Semantic)
      */
     virtual void InitWatcherMap() override {
-        string entryDsl[] = {
-            "WATCHER_ENTRY_DISCOVERY  > EntryDiscovery   ? WATCHER_ENTRY_EXECUTE   ! WATCHER_ENTRY_DISCOVERY @ 0s, 0x",
-            "WATCHER_ENTRY_EXECUTE    > EntryExecute     ? WATCHER_ENTRY_DISCOVERY ! WATCHER_ENTRY_DISCOVERY @ 0s, 0x"
+        string unifiedDsl[] = {
+            "WATCHER_ENTRY_DISCOVERY   > EntryDiscovery     ? WATCHER_ENTRY_EXECUTE    ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
+            "WATCHER_ENTRY_EXECUTE     > EntryExecute       ? WATCHER_EXIT_DISCOVERY   ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
+            
+            "WATCHER_EXIT_DISCOVERY    > ExitDiscovery      ? WATCHER_EXIT_EXECUTE     ! WATCHER_ZOMBIE_DISCOVERY  @ 0s, 0x",
+            "WATCHER_EXIT_EXECUTE      > ExitExecute        ? WATCHER_ZOMBIE_DISCOVERY ! WATCHER_ZOMBIE_DISCOVERY  @ 0s, 0x",
+            
+            "WATCHER_ZOMBIE_DISCOVERY  > ZombieDiscovery    ? WATCHER_REVERSE_INJECT   ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x",
+            "WATCHER_REVERSE_INJECT    > ReverseInject      ? WATCHER_ENTRY_DISCOVERY  ! WATCHER_ENTRY_DISCOVERY   @ 0s, 0x"
         };
-        BuildFromDSL(entryDsl, m_watcher_map);
-
-        string exitDsl[] = {
-            "WATCHER_EXIT_DISCOVERY   > ExitDiscovery    ? WATCHER_EXIT_EXECUTE    ! WATCHER_EXIT_DISCOVERY @ 0s, 0x",
-            "WATCHER_EXIT_EXECUTE     > ExitExecute      ? WATCHER_EXIT_DISCOVERY  ! WATCHER_EXIT_DISCOVERY @ 0s, 0x"
-        };
-        BuildFromDSL(exitDsl, m_watcher_exit_map);
+        BuildFromDSL(unifiedDsl, m_watcher_map);
     }
 
     /**
@@ -80,7 +86,7 @@ protected:
         // Phase 1: Preparation & Execution
         string prepDsl[] = {
             "ORD_READY                                                                     "
-            "> Step_OrderValidation                                                        "
+            "> Stage_OrderValidation                                                       "
             "  : TASK_E_L_VALIDATE, TASK_E_L_IDENTITY, TASK_E_L_RISK, TASK_E_L_PRICE,      "
             "    TASK_E_G_SPREAD, TASK_E_P_INTENT                                          "
             "? ORD_EXECUTING                                                               "
@@ -88,7 +94,7 @@ protected:
             "@ 60s, 0x",
 
             "ORD_EXECUTING                                                                 "
-            "> Step_OrderPlacement                                                         "
+            "> Stage_OrderPlacement                                                        "
             "  : TASK_A_INTENT_WATCH, TASK_E_R_ORDER, TASK_E_V_ERROR, TASK_E_V_TICKET      "
             "? ORD_PENDING                                                                 "
             "! SYS_ERROR                                                                   "
@@ -99,7 +105,7 @@ protected:
         // Phase 2: Entry Optimization
         string entryDsl[] = {
             "ORD_PENDING                                                                   "
-            "> Step_OrderWatch                                                             "
+            "> Stage_OrderWatch                                                            "
             "  : TASK_A_INTENT_WATCH, TASK_P_V_TERMINAL, TASK_P_V_SYNC                     "
             "? ORD_TRAILING                                                                "
             "! SYS_ERROR                                                                   "
@@ -107,7 +113,7 @@ protected:
             "* XE_EXECUTED=POS_ACTIVE",
 
             "ORD_TRAILING                                                                  "
-            "> Step_OrderOptimization                                                      "
+            "> Stage_OrderOptimization                                                     "
             "  : TASK_A_INTENT_WATCH, TASK_P_L_EXTREME, TASK_P_L_REBOUND, TASK_P_L_IMPROVE,  "
             "    TASK_P_R_APPLY, TASK_P_V_SYNC                                             "
             "? POS_ACTIVE                                                                  "
@@ -120,7 +126,7 @@ protected:
         // Phase 3: Position Management & Profit Trailing
         string positionedDsl[] = {
             "POS_ACTIVE                                                                    "
-            "> Step_PositionWatch                                                          "
+            "> Stage_PositionWatch                                                         "
             "  : TASK_A_INTENT_WATCH, TASK_A_V_TERMINAL, TASK_A_TS_TRIGGER_WATCH           "
             "? POS_TRAILING                                                                "
             "! SYS_ERROR                                                                   "
@@ -128,7 +134,7 @@ protected:
             "* XE_CLOSED_SIGNAL=POS_LIQUIDATING",
 
             "POS_TRAILING                                                                  "
-            "> Step_PositionGovernance                                                     "
+            "> Stage_PositionGovernance                                                    "
             "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL"
             "? POS_LIQUIDATING                                                             "
             "! SYS_ERROR                                                                   "
@@ -140,7 +146,7 @@ protected:
         // Phase 4: Termination
         string exitDsl[] = {
             "POS_LIQUIDATING                                                               "
-            "> Step_PositionLiquidation                                                    "
+            "> Stage_PositionLiquidation                                                   "
             "  : TASK_A_INTENT_WATCH, TASK_X_L_PREPARE, TASK_X_P_LOCK, TASK_X_R_ORDER,      "
             "    TASK_X_V_ERROR,      TASK_X_V_TERMINAL, TASK_X_P_FINALIZE                 "
             "? SYS_CLOSED                                                                  "
@@ -148,7 +154,7 @@ protected:
             "@ 300s, 3x",
 
             "SYS_CLOSED                                                                    "
-            "> Step_SystemCleanup                                                          "
+            "> Stage_SystemCleanup                                                         "
             "  : TASK_ACTIVE_CLOSED                                                        "
             "? SYS_CLOSED                                                                  "
             "! SYS_ERROR                                                                   "

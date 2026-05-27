@@ -12,7 +12,7 @@
 
 /**
  * @interface IXTask
- * @brief 시퀀스 스텝(Step) 내부에서 단일 책임을 수행하는 원자적 태스크 인터페이스
+ * @brief 시퀀스 스테이지(Stage) 내부에서 단일 책임을 수행하는 원자적 태스크 인터페이스
  * [v9.9.2] Hyper-Atomization을 위한 상태 제어 상수 및 프로퍼티 확장
  */
 class IXTask : public CObject {

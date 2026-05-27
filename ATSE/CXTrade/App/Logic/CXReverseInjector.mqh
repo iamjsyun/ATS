@@ -11,12 +11,13 @@
 #include "..\..\Platform\Core\Models\CXTerminalAsset.mqh"
 #include "..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 #include "CXTerminalScanner.mqh"
+#include <Object.mqh>
 
 /**
  * @class CXReverseInjector
  * @brief 터미널의 실물 자산을 기반으로 세션을 역으로 복구/생성 담당
  */
-class CXReverseInjector {
+class CXReverseInjector : public CObject {
 private:
     CXTerminalScanner*      m_scanner;
     IRepository*            m_repo;

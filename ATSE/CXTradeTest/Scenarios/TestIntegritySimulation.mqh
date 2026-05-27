@@ -1,25 +1,25 @@
-﻿#ifndef TEST_INTEGRITY_SIMULATION_MQH
+#ifndef TEST_INTEGRITY_SIMULATION_MQH
 #define TEST_INTEGRITY_SIMULATION_MQH
 
 #include "..\..\CXTrade\Platform\Core\Sequence\CXSequenceOrchestrator.mqh"
 #include "..\..\CXTrade\Platform\Core\Sequence\CXFluentSequence.mqh"
 #include "..\..\CXTrade\Session\CXContext.mqh"
 #include "..\..\CXTrade\Platform\Core\Models\CXParam.mqh"
-#include "..\..\CXTrade\Platform\Core\Interfaces\IXStep.mqh"
+#include "..\..\CXTrade\Platform\Core\Interfaces\IXStage.mqh"
 
 /**
- * @class MockYieldStep
- * @brief 시뮬레이션을 위해 강제로 TASK_YIELD 또는 에러를 반환하는 가짜 스텝
+ * @class MockYieldStage
+ * @brief 시뮬레이션을 위해 강제로 TASK_YIELD 또는 에러를 반환하는 가짜 스테이지
  */
-class MockYieldStep : public IXStep {
+class MockYieldStage : public IXStage {
 private:
     int m_failCount;
     int m_currentCount;
     int m_returnState;
 
 public:
-    MockYieldStep(int failAt, int returnState) : m_failCount(failAt), m_currentCount(0), m_returnState(returnState) {}
-    virtual string Name() override { return "MockYieldStep"; }
+    MockYieldStage(int failAt, int returnState) : m_failCount(failAt), m_currentCount(0), m_returnState(returnState) {}
+    virtual string Name() override { return "MockYieldStage"; }
     virtual int OnProcess(ICXParam* xp, ICXContext* ctx) override {
         m_currentCount++;
         if(m_currentCount <= m_failCount) return m_returnState; // Fail (if_false path)
@@ -46,7 +46,7 @@ public:
             // From 0, Execute Mock (Fail 2 times), Success 10, Fail 99, Retries 3
             // if_false(fail path)로 가더라도 리트라이 횟수가 남았으면 스테이트 유지
             seq.From(0)
-               .Execute(new MockYieldStep(2, 99)) // 2번 실패(99 반환)
+               .Execute(new MockYieldStage(2, 99)) // 2번 실패(99 반환)
                .OnSuccess(10)
                .OnFail(99)
                .Retries(3)
@@ -76,7 +76,7 @@ public:
             CXFluentSequence seq(GetPointer(ctx), "CircuitBreakerTest");
 
             seq.From(0)
-               .Execute(new MockYieldStep(10, 99)) // 계속 실패
+               .Execute(new MockYieldStage(10, 99)) // 계속 실패
                .OnSuccess(10)
                .OnFail(99)
                .Retries(2)

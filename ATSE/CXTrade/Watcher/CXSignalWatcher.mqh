@@ -44,8 +44,9 @@ public:
             m_watcherContext.Register("guard", globalCtx.Get("guard"));
             m_watcherContext.Register("exit_mgr", globalCtx.Get("exit_mgr"));
             m_watcherContext.Register("terminal_platform", globalCtx.Get("terminal_platform"));
+            m_watcherContext.Register("db", globalCtx.Get("db")); // [Zombie Integration] Register database dependency
             m_watcherContext.Register("logger", m_watcherLogger); // 독립 로거 주입
-            m_watcherContext.Register("factory", factory); // [v18.25] Register factory for dynamic steps
+            m_watcherContext.Register("factory", factory); // [v18.25] Register factory for dynamic stages
         }
 
         m_sequence = new CXFluentSequence(m_watcherContext, "Watcher" + m_mode + "Seq");
@@ -58,6 +59,8 @@ public:
             // [v16.2] Dependency Injection refinement
             if(m_mode == "Exit") {
                 m_orchestrator.BuildWatcherExitSequence(m_sequence);
+            } else if(m_mode == "Unified") {
+                m_orchestrator.BuildWatcherSequence(m_sequence);
             } else {
                 m_orchestrator.BuildWatcherEntrySequence(m_sequence);
             }

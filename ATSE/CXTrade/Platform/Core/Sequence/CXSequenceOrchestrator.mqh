@@ -5,6 +5,7 @@
 #include <Generic\HashMap.mqh>
 #include "..\Defines\CXDefine.mqh"
 #include "CXSequenceRegistry.mqh"
+#include "CXSequenceStage.mqh"
 
 /**
  * @class CXSequenceOrchestrator
@@ -95,12 +96,12 @@ public:
             // [v18.7] Support both '|' (Pipe) and '>' (Terminator)
             string delim = StringSubstr(s, firstDelim, 1);
             string logicPart = GetSegment(s, delim, "?!@*");
-            string stepParts[];
-            StringSplit(logicPart, StringGetCharacter(":", 0), stepParts);
+            string stageParts[];
+            StringSplit(logicPart, StringGetCharacter(":", 0), stageParts);
             
-            string typeStr = Clean(stepParts[0]);
-            string alias   = (ArraySize(stepParts) > 1) ? Clean(stepParts[1]) : "";
-            string taskStr = (ArraySize(stepParts) > 2) ? Clean(stepParts[2]) : "";
+            string typeStr = Clean(stageParts[0]);
+            string alias   = (ArraySize(stageParts) > 1) ? Clean(stageParts[1]) : "";
+            string taskStr = (ArraySize(stageParts) > 2) ? Clean(stageParts[2]) : "";
             
             int next = ResolveId(GetSegment(s, "?", "|!@*"));
             int fail = ResolveId(GetSegment(s, "!", "|?@*"));
@@ -111,7 +112,7 @@ public:
             int timeout = (ArraySize(constParts) > 0) ? ParseSuffixValue(constParts[0]) : 0;
             int retries = (ArraySize(constParts) > 1) ? ParseSuffixValue(constParts[1]) : 0;
 
-            CXSequenceStep* node = new CXSequenceStep(id, typeStr, next, fail, timeout, retries, alias);
+            CXSequenceStage* node = new CXSequenceStage(id, typeStr, next, fail, timeout, retries, alias);
             
             string tasks[];
             if(StringSplit(taskStr, StringGetCharacter(",", 0), tasks) > 0) {

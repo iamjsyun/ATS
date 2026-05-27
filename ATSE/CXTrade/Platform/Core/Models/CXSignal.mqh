@@ -94,7 +94,6 @@ public:
     
     virtual void   UpdatePriceSignal(double p) override { price_signal = p; }
     virtual double GetOffset() const override { return 0; } 
-    virtual double GetStep() const override { return 0; }   
     
     //--- [v11.0] Log Spam Prevention
     virtual int    GetLastStatus() const override { return last_status; }

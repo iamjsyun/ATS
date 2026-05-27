@@ -24,7 +24,6 @@ public:
     virtual int       GetGno() const = 0;
     virtual void      UpdatePriceSignal(double price) = 0;
     virtual double    GetOffset() const = 0;
-    virtual double    GetStep() const = 0;
     
     //--- [v11.0] Log Spam Prevention
     virtual int       GetLastStatus() const = 0;

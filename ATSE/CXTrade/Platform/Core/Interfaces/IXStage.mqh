@@ -1,11 +1,11 @@
-#ifndef IXSTEP_MQH
-#define IXSTEP_MQH
+#ifndef IXSTAGE_MQH
+#define IXSTAGE_MQH
 
 #include <Object.mqh>
 #include "ICXParam.mqh"
 #include "ICXContext.mqh"
 
-class IXStep : public CObject {
+class IXStage : public CObject {
 public:
     virtual string    Name() = 0;
     virtual bool      OnCondition(ICXParam* xp, ICXContext* ctx, int current_state) = 0;

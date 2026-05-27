@@ -5,12 +5,12 @@
 #include "ICXContext.mqh"
 #include "ICXParam.mqh"
 
-class IXStep;
+class IXStage;
 
 class ICXFluentSequence : public CObject {
 public:
     virtual ~ICXFluentSequence() {}
-    virtual void AddStep(int state_id, IXStep* step) = 0;
+    virtual void AddStage(int state_id, IXStage* stage) = 0;
     virtual void Pulse(ICXParam* xp) = 0;
     virtual int  State() const = 0;
     virtual void ForceState(int next_state) = 0;

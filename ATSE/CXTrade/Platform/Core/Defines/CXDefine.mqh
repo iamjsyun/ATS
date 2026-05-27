@@ -95,9 +95,9 @@ enum ENUM_CX_EVENT {
     EVENT_INJECT        = 101
 };
 
-//--- Step 실행 공통 결과 (Generic Step Results)
+//--- Stage 실행 공통 결과 (Generic Stage Results)
 #define STATE_UNCHANGED     -1
-#define STEP_SUCCESS        -100
+#define STAGE_SUCCESS       -100
 
 //--- 계산 스텝 결과 (Alpha Calculation Results)
 enum ENUM_CALC_RESULT {
@@ -137,7 +137,7 @@ enum ENUM_TIMEOUT_VAL {
 
 //--- [v11.4] 시퀀스 무결성 및 DSL 상수
 #define SEQ_NODE_DELIMITER   "|"
-#define SEQ_STEP_DELIMITER   ":"
+#define SEQ_STAGE_DELIMITER  ":"
 #define MAX_RETRY_COUNT      5
 #define RETRY_BACKOFF_BASE   1000  // MS
 

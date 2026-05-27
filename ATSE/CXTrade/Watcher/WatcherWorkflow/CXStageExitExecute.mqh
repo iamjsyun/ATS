@@ -1,7 +1,7 @@
-#ifndef CXSTEPEXITEXECUTE_MQH
-#define CXSTEPEXITEXECUTE_MQH
+#ifndef CXSTAGEEXITEXECUTE_MQH
+#define CXSTAGEEXITEXECUTE_MQH
 
-#include "..\..\Platform\Core\Interfaces\IXStep.mqh"
+#include "..\..\Platform\Core\Interfaces\IXStage.mqh"
 #include "..\..\Platform\Core\Interfaces\IXExitManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXSessionManager.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXTradingSession.mqh"
@@ -15,15 +15,15 @@
 #include <Arrays\ArrayObj.mqh>
 
 /**
- * @class CXStepExitExecute
+ * @class CXStageExitExecute
  * @brief 청산 신호 발견 시 세션 제어 전환 또는 직접 물리/DB 청산을 집행하는 단계
  */
-class CXStepExitExecute : public IXStep {
+class CXStageExitExecute : public IXStage {
 public:
-    CXStepExitExecute() {}
-    virtual ~CXStepExitExecute() {}
+    CXStageExitExecute() {}
+    virtual ~CXStageExitExecute() {}
 
-    virtual string Name() override { return "Step_ExitExecute"; }
+    virtual string Name() override { return "Stage_ExitExecute"; }
 
     virtual bool OnCondition(ICXParam* xp, ICXContext* ctx, int current_state) override {
         CArrayObj* activeList = CX_GET_OBJ(ctx, "exit_signals", CArrayObj);
@@ -38,7 +38,7 @@ public:
 
         if(IS_INVALID(activeList) || IS_INVALID(exitMgr) || IS_INVALID(repo)) {
             CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
-            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_EXIT_DISCOVERY") : STATE_UNCHANGED;
+            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_ZOMBIE_DISCOVERY") : STATE_UNCHANGED;
         }
 
         int total = activeList.Total();
@@ -117,7 +117,7 @@ public:
         SAFE_DELETE(activeList);
 
         CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
-        return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_EXIT_DISCOVERY") : STATE_UNCHANGED;
+        return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_ZOMBIE_DISCOVERY") : STATE_UNCHANGED;
     }
 
     virtual void OnEnter(ICXContext* ctx) override {}

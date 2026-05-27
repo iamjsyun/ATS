@@ -1,4 +1,4 @@
-﻿#ifndef CXTASKFACTORY_MQH
+#ifndef CXTASKFACTORY_MQH
 #define CXTASKFACTORY_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -96,7 +96,7 @@ public:
         if(name == "TASK_A_ALPHA_CALC")        return new CXTaskAlphaCalc();
         if(name == "TASK_A_ALPHA_APPLY")       return new CXTaskAlphaApply();
         if(name == "TASK_A_TS_TRIGGER_WATCH")  return new CXTaskActive_TS_TriggerWatch();
-        if(name == "TASK_E_P_FINALIZE")        return new CXTaskEntry_P_Finalize(); // Reuse for Step_Closed
+        if(name == "TASK_E_P_FINALIZE")        return new CXTaskEntry_P_Finalize(); // Reuse for Stage_Closed
         if(name == "TASK_ACTIVE_CLOSED")       return new CXTaskActive_Closed(); // Specific cleanup
         
         // Exit

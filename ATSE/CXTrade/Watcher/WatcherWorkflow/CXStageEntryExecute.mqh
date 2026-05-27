@@ -1,7 +1,7 @@
-#ifndef CXSTEPENTRYEXECUTE_MQH
-#define CXSTEPENTRYEXECUTE_MQH
+#ifndef CXSTAGEENTRYEXECUTE_MQH
+#define CXSTAGEENTRYEXECUTE_MQH
 
-#include "..\..\Platform\Core\Interfaces\IXStep.mqh"
+#include "..\..\Platform\Core\Interfaces\IXStage.mqh"
 #include "..\..\Platform\Core\Interfaces\IXGuard.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
 #include "..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
@@ -15,15 +15,15 @@
 #include <Arrays\ArrayObj.mqh>
 
 /**
- * @class CXStepEntryExecute
+ * @class CXStageEntryExecute
  * @brief [v18.10] 신규 진입 신호 검증 및 최초 대기 오더 접수를 집행하는 단계 (WATCHER_ENTRY_EXECUTE)
  */
-class CXStepEntryExecute : public IXStep {
+class CXStageEntryExecute : public IXStage {
 public:
-    CXStepEntryExecute() {}
-    virtual ~CXStepEntryExecute() {}
+    CXStageEntryExecute() {}
+    virtual ~CXStageEntryExecute() {}
 
-    virtual string Name() override { return "Step_EntryExecute"; }
+    virtual string Name() override { return "Stage_EntryExecute"; }
 
     virtual bool OnCondition(ICXParam* xp, ICXContext* ctx, int current_state) override {
         CArrayObj* activeList = CX_GET_OBJ(ctx, "entry_signals", CArrayObj);
@@ -38,7 +38,7 @@ public:
 
         if(IS_INVALID(activeList) || IS_INVALID(factory) || IS_INVALID(repo)) {
             CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
-            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_ENTRY_DISCOVERY") : STATE_UNCHANGED;
+            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_EXIT_DISCOVERY") : STATE_UNCHANGED;
         }
 
         int total = activeList.Total();
@@ -50,7 +50,7 @@ public:
             XP_LOG_ERROR(xp, "[WATCHER-ENTRY-EXECUTE] FAILED: OrderManager creation failed.");
             SAFE_DELETE(activeList);
             CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
-            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_ENTRY_DISCOVERY") : STATE_UNCHANGED;
+            return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_EXIT_DISCOVERY") : STATE_UNCHANGED;
         }
 
         for(int i = 0; i < total; i++) {
@@ -117,7 +117,7 @@ public:
         SAFE_DELETE(activeList);
 
         CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
-        return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_ENTRY_DISCOVERY") : STATE_UNCHANGED;
+        return IS_VALID(orchestrator) ? orchestrator.ResolveId("WATCHER_EXIT_DISCOVERY") : STATE_UNCHANGED;
     }
 
     virtual void OnEnter(ICXContext* ctx) override {}

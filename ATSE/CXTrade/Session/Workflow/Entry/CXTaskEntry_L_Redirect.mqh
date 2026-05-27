@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_ENTRY_L_REDIRECT_MQH
+#ifndef CX_TASK_ENTRY_L_REDIRECT_MQH
 #define CX_TASK_ENTRY_L_REDIRECT_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -19,7 +19,7 @@ public:
         // 1. [v14.34 Exit-First Priority] 청산 의도가 주입된 경우 (Bypass XE_ERROR)
         if(sig.GetXAExit() == XA_ACTIVE) {
             XP_LOG_WARN(xp, CXAuditFormatter::Build("ENTRY-L-REDIR", xp, "ABORT: Exit intent detected. Redirecting to EXIT Phase."));
-            return SESSION_LIQUIDATING; // STEP_EXIT (20)
+            return SESSION_LIQUIDATING; // STAGE_EXIT (20)
         }
 
         // 2. 에러 상태인 경우 세션 에러로 전환
@@ -33,7 +33,7 @@ public:
         // [v15.0 Recovery] 이미 실물 처리 완료 단계인 경우 ACTIVE Phase로 점프
         if(sig.GetStatus() >= XE_EXECUTED) {
             XP_LOG_INFO(xp, CXAuditFormatter::Build("ENTRY-L-REDIR", xp, "Redirecting to ACTIVE Phase (Recovery)"));
-            return SESSION_ACTIVE; // STEP_ACTIVE (10)
+            return SESSION_ACTIVE; // STAGE_ACTIVE (10)
         }
         
         // 3. 진입 의도가 없거나 이미 실행 완료된 경우 중단 (XA_ACTIVE 가 아니면 무시)

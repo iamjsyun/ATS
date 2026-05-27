@@ -2,19 +2,19 @@
 #define CXFLUENTSEQUENCE_MQH
 
 #include "..\Interfaces\ICXFluentSequence.mqh"
-#include "..\Interfaces\IXStep.mqh"
+#include "..\Interfaces\IXStage.mqh"
 #include "..\Interfaces\IXGuard.mqh"
 #include "..\Defines\CXDefine.mqh"
 #include "..\Macros\CXMacros.mqh"
 #include <Generic\HashMap.mqh>
 
 /**
- * @class CXStepNode
+ * @class CXStageNode
  * @brief 시퀀스 노드 데이터 관리용 (Infra 전용)
  */
-class CXStepNode : public CObject {
+class CXStageNode : public CObject {
 public:
-    IXStep*             step;
+    IXStage*            stage;
     IXGuard*            guard; 
     int                 if_true;
     int                 if_false;
@@ -23,15 +23,15 @@ public:
     int                 current_retries;
     CHashMap<int, int>* branches;
 
-    CXStepNode(IXStep* s, int t_path, int f_path, int timeout = 0, int retries = 0, IXGuard* g = NULL) 
-        : step(s), if_true(t_path), if_false(f_path), 
+    CXStageNode(IXStage* s, int t_path, int f_path, int timeout = 0, int retries = 0, IXGuard* g = NULL) 
+        : stage(s), if_true(t_path), if_false(f_path), 
           timeout_sec(timeout), max_retries(retries), current_retries(0), guard(g) {
         branches = new CHashMap<int, int>();
         if(IS_INVALID(branches)) { /* Critical Error */ }
     }
           
-    ~CXStepNode() { 
-        SAFE_DELETE(step); 
+    ~CXStageNode() { 
+        SAFE_DELETE(stage); 
         SAFE_DELETE(guard); 
         SAFE_DELETE(branches);
     }
@@ -43,32 +43,33 @@ public:
  */
 class CXFluentSequence : public ICXFluentSequence {
 private:
-    ICXContext*                 m_ctx;
-    int                         m_current_state;
-    datetime                    m_state_entered;
-    CHashMap<int, CXStepNode*>  m_map;
-    string                      m_name;
-    int                         m_first_state;
+    ICXContext*                  m_ctx;
+    int                          m_current_state;
+    datetime                     m_state_entered;
+    CHashMap<int, CXStageNode*>* m_map;
+    string                       m_name;
+    int                          m_first_state;
     
     // Log Suppression
-    int                         m_last_log_from;
-    int                         m_last_log_to;
+    int                          m_last_log_from;
+    int                          m_last_log_to;
 
     // Builder State
-    int                         m_tmp_from;
-    IXStep*                     m_tmp_step;
-    IXGuard*                    m_tmp_guard;
-    int                         m_tmp_success;
-    int                         m_tmp_fail;
-    int                         m_tmp_timeout;
-    int                         m_tmp_retries;
-    CHashMap<int, int>*         m_tmp_branches;
+    int                          m_tmp_from;
+    IXStage*                     m_tmp_stage;
+    IXGuard*                     m_tmp_guard;
+    int                          m_tmp_success;
+    int                          m_tmp_fail;
+    int                          m_tmp_timeout;
+    int                          m_tmp_retries;
+    CHashMap<int, int>*          m_tmp_branches;
 
 public:
     CXFluentSequence(ICXContext* ctx, string name) 
         : m_ctx(ctx), m_name(name), m_current_state(-1), m_tmp_from(-1), m_first_state(-1),
-          m_tmp_step(NULL), m_tmp_guard(NULL), m_tmp_success(-1), m_tmp_fail(-1),
+          m_tmp_stage(NULL), m_tmp_guard(NULL), m_tmp_success(-1), m_tmp_fail(-1),
           m_tmp_timeout(0), m_tmp_retries(0), m_last_log_from(-1), m_last_log_to(-1) {
+        m_map = new CHashMap<int, CXStageNode*>();
         m_tmp_branches = new CHashMap<int, int>();
         if(IS_VALID(m_tmp_branches)) {
             m_state_entered = TimeCurrent();
@@ -77,10 +78,11 @@ public:
     
     ~CXFluentSequence() {
         int keys[];
-        CXStepNode* values[];
+        CXStageNode* values[];
         m_map.CopyTo(keys, values);
         for(int i = 0; i < ArraySize(values); i++) if(IS_VALID(values[i])) SAFE_DELETE(values[i]);
         m_map.Clear();
+        SAFE_DELETE(m_map);
         SAFE_DELETE(m_tmp_branches);
     }
 
@@ -91,7 +93,7 @@ public:
         if(m_first_state == -1) m_first_state = state; 
         return GetPointer(this); 
     }
-    CXFluentSequence* Execute(IXStep* step) { m_tmp_step = step; return GetPointer(this); }
+    CXFluentSequence* Execute(IXStage* stage) { m_tmp_stage = stage; return GetPointer(this); }
     CXFluentSequence* Guard(IXGuard* guard) { m_tmp_guard = guard; return GetPointer(this); }
     CXFluentSequence* OnSuccess(int next) { m_tmp_success = next; return GetPointer(this); }
     CXFluentSequence* OnFail(int next) { m_tmp_fail = next; return GetPointer(this); }
@@ -119,23 +121,23 @@ public:
         // [v18.15 Immediate Transition Loop]
         // 전이 발생 시 대기 없이 즉시 새로운 상태의 태스크를 실행 (최대 3회 전이까지 허용하여 무한루프 방지)
         for(int loop = 0; loop < 3; loop++) {
-            CXStepNode* node = NULL;
+            CXStageNode* node = NULL;
             if(!m_map.TryGetValue(m_current_state, node) || IS_INVALID(node)) return;
 
             if(IS_VALID(node.guard) && !node.guard.Check(xp, m_ctx)) return;
 
             if(node.timeout_sec > 0 && (TimeCurrent() - m_state_entered > node.timeout_sec)) {
-                int next = (node.if_false != -1) ? node.if_false : SESSION_ERROR;
+                int next = (node.if_false != -1) ? node.if_false : SYS_ERROR;
                 XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] State %d Timeout (%d sec). Moving to %d", m_name, m_current_state, node.timeout_sec, next));
                 UpdateState(next);
                 continue; 
             }
 
-            if(node.step.OnCondition(xp, m_ctx, m_current_state)) {
-                int next_state = node.step.OnProcess(xp, m_ctx);
+            if(node.stage.OnCondition(xp, m_ctx, m_current_state)) {
+                int next_state = node.stage.OnProcess(xp, m_ctx);
                 
-                // [v18.8] Map STEP_SUCCESS to DSL's ? (if_true) path
-                if (next_state == STEP_SUCCESS) {
+                // [v18.8] Map STAGE_SUCCESS to DSL's ? (if_true) path
+                if (next_state == STAGE_SUCCESS) {
                     next_state = node.if_true;
                 }
 
@@ -146,12 +148,12 @@ public:
                 if(next_state == node.if_false && node.max_retries > 0) {
                     node.current_retries++;
                     if(node.current_retries <= node.max_retries) {
-                        XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] Step '%s' failed. Retry %d/%d...", 
-                            m_name, node.step.Name(), node.current_retries, node.max_retries));
+                        XP_LOG_SEQ_WARN(xp, StringFormat("[SEQ:%s] Stage '%s' failed. Retry %d/%d...", 
+                            m_name, node.stage.Name(), node.current_retries, node.max_retries));
                         return;
                     } else {
-                        XP_LOG_SEQ_ERROR(xp, StringFormat("[SEQ:%s] Step '%s' exhausted retries. Moving to terminal fail state %d.", 
-                            m_name, node.step.Name(), node.if_false));
+                        XP_LOG_SEQ_ERROR(xp, StringFormat("[SEQ:%s] Stage '%s' exhausted retries. Moving to terminal fail state %d.", 
+                            m_name, node.stage.Name(), node.if_false));
                         node.current_retries = 0;
                         UpdateState(node.if_false);
                         continue;
@@ -176,8 +178,8 @@ public:
         }
     }
 
-    virtual void AddStep(int state_id, IXStep* step) override {
-        CXStepNode* node = new CXStepNode(step, -1, -1);
+    virtual void AddStage(int state_id, IXStage* stage) override {
+        CXStageNode* node = new CXStageNode(stage, -1, -1);
         if(IS_VALID(node)) m_map.Add(state_id, node);
     }
 
@@ -187,7 +189,7 @@ public:
     string GetSequenceName() const { return m_name; }
     int    GetNodeCount() { return m_map.Count(); }
     string GetStateSummary() {
-        int keys[]; CXStepNode* values[];
+        int keys[]; CXStageNode* values[];
         m_map.CopyTo(keys, values);
         string summary = "";
         for(int i=0; i<ArraySize(keys); i++) {
@@ -201,8 +203,8 @@ public:
 
 private:
     void CommitCurrent() {
-        if(m_tmp_from == -1 || IS_INVALID(m_tmp_step)) return;
-        CXStepNode* node = new CXStepNode(m_tmp_step, m_tmp_success, m_tmp_fail, m_tmp_timeout, m_tmp_retries, m_tmp_guard);
+        if(m_tmp_from == -1 || IS_INVALID(m_tmp_stage)) return;
+        CXStageNode* node = new CXStageNode(m_tmp_stage, m_tmp_success, m_tmp_fail, m_tmp_timeout, m_tmp_retries, m_tmp_guard);
         if(IS_INVALID(node)) return;
         
         int b_keys[]; int b_values[];
@@ -211,7 +213,7 @@ private:
         m_tmp_branches.Clear();
 
         m_map.Add(m_tmp_from, node);
-        m_tmp_from = -1; m_tmp_step = NULL; m_tmp_guard = NULL; m_tmp_success = -1; m_tmp_fail = -1;
+        m_tmp_from = -1; m_tmp_stage = NULL; m_tmp_guard = NULL; m_tmp_success = -1; m_tmp_fail = -1;
     }
 
     void UpdateState(int next) {
@@ -225,7 +227,7 @@ private:
         }
 
         // [v14.13 Fix] Ensure error message is set when moving to terminal error state
-        if(next == SESSION_ERROR) {
+        if(next == SYS_ERROR || next == 99) {
             ICXParam* xp = m_ctx.GetParam();
             if(IS_VALID(xp) && xp.GetString() == "") {
                 xp.SetString(StringFormat("[%s] Sequence reached terminal ERROR state from %d", m_name, m_current_state));
@@ -239,24 +241,24 @@ private:
     }
 
     bool ValidateTransition(int from, int to) {
-        if(to == SESSION_ERROR || to == 99) return true;
+        if(to == SYS_ERROR || to == 99) return true;
         if(from == -1 || from == to) return true;
         if(m_name != "SessionSeq") return true;
 
         // 이미 종료된 세션에서의 전이는 원칙적 차단 (에러 제외)
-        if(from == SESSION_CLOSED || from == SESSION_ERROR) return false;
+        if(from == SYS_CLOSED || from == SYS_ERROR) return false;
 
         return true; 
     }
 
     void TriggerOnEnter(int state) {
-        CXStepNode* node = NULL;
-        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnEnter(m_ctx);
+        CXStageNode* node = NULL;
+        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.stage.OnEnter(m_ctx);
     }
 
     void TriggerOnExit(int state) {
-        CXStepNode* node = NULL;
-        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.step.OnExit(m_ctx);
+        CXStageNode* node = NULL;
+        if(m_map.TryGetValue(state, node) && IS_VALID(node)) node.stage.OnExit(m_ctx);
     }
 };
 

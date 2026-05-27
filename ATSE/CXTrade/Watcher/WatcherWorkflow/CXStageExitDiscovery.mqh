@@ -1,7 +1,7 @@
-#ifndef CXSTEPEXITDISCOVERY_MQH
-#define CXSTEPEXITDISCOVERY_MQH
+#ifndef CXSTAGEEXITDISCOVERY_MQH
+#define CXSTAGEEXITDISCOVERY_MQH
 
-#include "..\..\Platform\Core\Interfaces\IXStep.mqh"
+#include "..\..\Platform\Core\Interfaces\IXStage.mqh"
 #include "..\..\Platform\Core\Interfaces\IRepository.mqh"
 #include "..\..\Platform\Core\Models\CXSignal.mqh"
 #include "..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -10,15 +10,15 @@
 #include <Arrays\ArrayObj.mqh>
 
 /**
- * @class CXStepExitDiscovery
+ * @class CXStageExitDiscovery
  * @brief DB에서 청산 요청 신호(xa_exit=1, xe_status < 20)를 검색하는 단계
  */
-class CXStepExitDiscovery : public IXStep {
+class CXStageExitDiscovery : public IXStage {
 public:
-    CXStepExitDiscovery() {}
-    virtual ~CXStepExitDiscovery() {}
+    CXStageExitDiscovery() {}
+    virtual ~CXStageExitDiscovery() {}
 
-    virtual string Name() override { return "Step_ExitDiscovery"; }
+    virtual string Name() override { return "Stage_ExitDiscovery"; }
 
     virtual bool OnCondition(ICXParam* xp, ICXContext* ctx, int current_state) override {
         return true; 
@@ -42,6 +42,10 @@ public:
         }
 
         SAFE_DELETE(activeList);
+        CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);
+        if(IS_VALID(orchestrator)) {
+            return orchestrator.ResolveId("WATCHER_ZOMBIE_DISCOVERY");
+        }
         return STATE_UNCHANGED;
     }
 

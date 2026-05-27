@@ -1,5 +1,5 @@
-﻿#ifndef CXCOMPOSITESTEP_MQH
-#define CXCOMPOSITESTEP_MQH
+#ifndef CXCOMPOSITESTAGE_MQH
+#define CXCOMPOSITESTAGE_MQH
 
 #include "..\..\Platform\Core\Interfaces\IXTask.mqh"
 #include "..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -8,10 +8,10 @@
 
 
 /**
- * @class CXCompositeStep
- * @brief 여러 개의 IXTask(마이크로 태스크)를 조립하여 순차 실행하는 복합 시퀀스 스텝
+ * @class CXCompositeStage
+ * @brief 여러 개의 IXTask(마이크로 태스크)를 조립하여 순차 실행하는 복합 시퀀스 스테이지
  */
-class CXCompositeStep : public IXStep {
+class CXCompositeStage : public IXStage {
 private:
     string      m_name;
     IXTask*     m_taskPtrs[];       // [v15.2] Typed Pointer Array
@@ -20,11 +20,11 @@ private:
     bool        m_hasConditionFunc;
 
 public:
-    CXCompositeStep(string name) : m_name(name), m_taskCount(0), m_currentTaskIndex(0), m_hasConditionFunc(false) {
+    CXCompositeStage(string name) : m_name(name), m_taskCount(0), m_currentTaskIndex(0), m_hasConditionFunc(false) {
         ArrayResize(m_taskPtrs, 0, 10);
     }
 
-    virtual ~CXCompositeStep() {
+    virtual ~CXCompositeStage() {
         for(int i=0; i<m_taskCount; i++) {
             SAFE_DELETE(m_taskPtrs[i]);
         }
@@ -36,7 +36,7 @@ public:
     /**
      * @brief 실행할 태스크를 체인에 추가합니다.
      */
-    CXCompositeStep* AddTask(IXTask* task) {
+    CXCompositeStage* AddTask(IXTask* task) {
         if(IS_VALID(task)) {
             m_taskCount++;
             ArrayResize(m_taskPtrs, m_taskCount);
@@ -125,7 +125,7 @@ public:
         }
         
         if(IS_VALID(pIdx)) pIdx.SetInt(0);
-        return STEP_SUCCESS; 
+        return STAGE_SUCCESS; 
     }
 
     virtual void OnEnter(ICXContext* ctx) override {
@@ -137,14 +137,14 @@ public:
         } else {
             pIdx.SetInt(0);
         }
-        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Entered (%d tasks)", m_name, m_taskCount));
+        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Stage Entered (%d tasks)", m_name, m_taskCount));
     }
     
     virtual void OnExit(ICXContext* ctx) override {
         string indexKey = StringFormat("CompositeIndex_%s", m_name);
         ICXParam* pIdx = ctx.GetParam(indexKey);
         if(IS_VALID(pIdx)) pIdx.SetInt(0);
-        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Step Exited", m_name));
+        XP_LOG_DEBUG(NULL, StringFormat("[%s] Composite Stage Exited", m_name));
     }
 };
 

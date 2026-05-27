@@ -3,8 +3,8 @@
 
 ---
 
-**Version**: v11.15 (UAF Nomenclature Sync & Exit-First Priority)
-**Date**: 2026-05-26
+**Version**: v11.16 (UAF Nomenclature Sync & Exit-First Priority)
+**Date**: 2026-05-27
 
 ---
 
@@ -16,7 +16,7 @@
 - **Exit-First Priority Mandate (Critical)**: 청산 의도(`xa_exit=1`)가 감지되면 시스템은 현재의 에러 상태(`xe_status=99`)나 진행 중인 진입 시퀀스를 즉시 우회하여 청산 파이프라인을 최우선으로 가동해야 한다. Watcher는 이를 위해 `xa_exit=1` 신호를 최상단으로 정렬하여 로드한다.
 - **>= Evaluation Mandate (Critical)**: 모든 트레일링 파라미터(ESTART, ESTEP, ELIMIT, SSTART, SSTEP)는 대입 시에는 `=`를 사용하되, 코드 내의 조건문에서 평가될 때는 반드시 **`>=` (크거나 같다)** 연산자를 사용해야 한다.
 - **Mandatory Pre-Call Audit (Critical)**: 브로커 통신 함수 호출 **직전**에, 해당 함수에 전달되는 모든 로우(Raw) 파라미터를 포함한 감사 로그를 반드시 기록해야 한다. 
-- **Mandatory Ticket Guard (Liquidation)**: 청산 프로세스(Step 20~23)는 반드시 유효한 물리적 티켓(`Ticket > 0`)이 존재하는 경우에만 트리거될 수 있다.
+- **Mandatory Ticket Guard (Liquidation)**: 청산 프로세스(Stage_PositionLiquidation)는 반드시 유효한 물리적 티켓(`Ticket > 0`)이 존재하는 경우에만 트리거될 수 있다.
 
 - **Responsibility Segregation**: Operations are strictly separated by domain: `OrderManager` for orders, `PositionManager` for active positions.
 - **Interface-First Mandate**: 모든 도메인 로직은 인터페이스에 의존해야 한다. 시스템은 **전역 관리 서비스(ICX...)**와 **트레이딩 실행 매니저(IX...)**로 이원화되어 운영된다.
@@ -62,41 +62,41 @@
 ### 2.4 AppOrchestrator Sequence-Class Mapping (v18.8)
 하이퍼-원자적 8-Phase 시퀀스의 각 단계별 DSL 명칭과 실제 실행되는 MQL5 구체 클래스의 전체 매칭 정보이다.
 
-| 시퀀스 상태 (State) | DSL 스텝 명칭 | 실행 태스크 (DSL Task Name) | 구체 클래스 (MQL5 Class) |
+| 시퀀스 상태 (State) | DSL 스테이지 명칭 | 실행 태스크 (DSL Task Name) | 구체 클래스 (MQL5 Class) |
 | :--- | :--- | :--- | :--- |
-| **SESSION_READY** | `Step_Validating` | **TASK_E_L_VALIDATE** | `CXTaskEntry_L_Validate` |
+| **ORD_READY** | `Stage_OrderValidation` | **TASK_E_L_VALIDATE** | `CXTaskEntry_L_Validate` |
 | | | `TASK_E_L_IDENTITY` | `CXTaskEntry_L_Identity` |
 | | | `TASK_E_L_RISK` | `CXTaskEntry_L_Risk` |
 | | | `TASK_E_L_PRICE` | `CXTaskEntry_L_Price` |
 | | | `TASK_E_G_SPREAD` | `CXTaskGuard_V_Spread` |
 | | | `TASK_E_P_INTENT` | `CXTaskEntry_P_Intent` |
-| **SESSION_EXECUTING** | `Step_Executing` | `TASK_E_R_ORDER` | `CXTaskEntry_R_Order` |
+| **ORD_EXECUTING** | `Stage_OrderPlacement` | `TASK_E_R_ORDER` | `CXTaskEntry_R_Order` |
 | | | `TASK_E_V_ERROR` | `CXTaskEntry_V_Error` |
 | | | `TASK_E_V_TICKET` | `CXTaskEntry_V_Ticket` |
-| **SESSION_PENDING** | `Step_Pending` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **ORD_PENDING** | `Stage_OrderWatch` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_P_V_TERMINAL` | `CXTaskPending_V_Terminal` |
 | | | `TASK_P_V_SYNC` | `CXTaskPending_V_Sync` |
-| **SESSION_TRAILING_ENTRY**| `Step_TrailingEntry` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **ORD_TRAILING** | `Stage_OrderOptimization` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_P_L_EXTREME` | `CXTaskPending_L_Extreme` |
 | | | `TASK_P_L_REBOUND` | `CXTaskPending_L_Rebound` |
 | | | `TASK_P_L_IMPROVE` | `CXTaskPending_L_Improve` |
 | | | `TASK_P_R_APPLY` | `CXTaskPending_R_Apply` |
 | | | `TASK_P_V_SYNC` | `CXTaskPending_V_Sync` |
-| **SESSION_ACTIVE** | `Step_Active` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **POS_ACTIVE** | `Stage_PositionWatch` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
 | | | `TASK_A_TS_TRIGGER_WATCH`| `CXTaskActive_TS_TriggerWatch` |
-| **SESSION_TRAILING_STOP** | `Step_TrailingStop` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **POS_TRAILING** | `Stage_PositionGovernance` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_A_ALPHA_CALC` | `CXTaskAlphaCalc` |
 | | | `TASK_A_ALPHA_APPLY` | `CXTaskAlphaApply` |
 | | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
-| **SESSION_LIQUIDATING** | `Step_Exit` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **POS_LIQUIDATING** | `Stage_PositionLiquidation` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_X_L_PREPARE` | `CXTaskExit_L_Prepare` |
 | | | `TASK_X_P_LOCK` | `CXTaskExit_P_Lock` |
 | | | `TASK_X_R_ORDER` | `CXTaskExit_R_Order` |
 | | | `TASK_X_V_ERROR` | `CXTaskExit_V_Error` |
 | | | `TASK_X_V_TERMINAL` | `CXTaskExit_V_Terminal` |
 | | | `TASK_X_P_FINALIZE` | `CXTaskExit_P_Finalize` |
-| **SESSION_CLOSED** | `Step_Closed` | `TASK_ACTIVE_CLOSED` | `CXTaskActive_Closed` |
+| **SYS_CLOSED** | `Stage_SystemCleanup` | `TASK_ACTIVE_CLOSED` | `CXTaskActive_Closed` |
 
 ### 2.5 DataManager State Transition Matrix (v9.8.11)
 
@@ -191,4 +191,4 @@ Every trading action must verify physical state in MT5 immediately after the req
 - **Reverse Injection (Exception)**: 터미널 스캔 중 DB에 없는 매직넘버 일치 자산 발견 시, EA는 예외적으로 `xa_entry=1`을 직접 마킹하여 좀비 자산을 복구한다.
 
 ---
-**Last Updated**: 2026-05-26
+**Last Updated**: 2026-05-27
