@@ -39,7 +39,12 @@ public:
         if(orderPrice <= 0) orderPrice = sig.GetPriceOpen();
         
         // --- 1. [트리거 라인 실시간 추격 (Timer)] ---
-        // 유리한 방향(Buy:하락, Sell:상승)으로 TE_STEP 이상 갱신 시 트리거 라인 이동
+        // [v16.31 Phase Detection] 활성화 상태에 따른 시각화 및 로직 분리
+        string activeKey = "TE_Active_" + sig.GetSid();
+        bool isActive = false;
+        ICXParam* pActive = ctx.GetParam(activeKey);
+        if(IS_VALID(pActive) && pActive.GetInt() == 1) isActive = true;
+
         string extKey = "LastEntryExtremity_" + sig.GetSid();
         double lastExt = 0;
         ICXParam* pExt = ctx.GetParam(extKey);
@@ -55,7 +60,7 @@ public:
 
         double extVal = lastExt;
         if(is_improved) {
-            // [v16.26 Mandate] 극점(lastExt) 갱신 및 트리거 라인(TE_START) 재계산
+            // [v16.26 Mandate] 극점(lastExt) 갱신
             extVal = currentPrice;
             
             if(IS_INVALID(pExt)) {
@@ -63,9 +68,23 @@ public:
                 ctx.Set(extKey, pExt);
             }
             pExt.SetDouble(extVal);
+        }
 
-            // [v18.35 Optimization] 가격 개선 발생 시에만 트리거 라인 이동 호출
-            double triggerPrice = extVal + (sig.GetTEStart() * point * dir_sign);
+        // [v16.32 Visual Correction] 활성화 여부에 따른 트리거 라인 위치 정밀화
+        double triggerPrice = 0;
+        if(!isActive) {
+            // 1. 활성화 전: 진트 활성화 임계선 표시 (price_signal 기준 고정)
+            double priceSignal = sig.GetPriceSignal();
+            if(priceSignal <= 0) priceSignal = orderPrice - (sig.GetTELimit() * point * dir_sign);
+            triggerPrice = priceSignal + (sig.GetTEStart() * point * dir_sign);
+        } else {
+            // 2. 활성화 후: 실제 시장가 진입 반등 트리거선 표시 (extreme 기준 유동)
+            // BUY: extreme + TE_STEP, SELL: extreme - TE_STEP
+            triggerPrice = extVal - (sig.GetTEStep() * point * dir_sign);
+        }
+        
+        // [v18.35 Optimization] 트리거 가격이 변했거나 활성화 상태가 변했을 때만 갱신
+        if(is_improved || !isActive) {
             CXChartVisualizer::DrawTEStart(ctx, sig, triggerPrice, "CXTaskPending_L_Improve");
         }
 

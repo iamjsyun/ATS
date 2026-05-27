@@ -73,6 +73,7 @@ public:
 
         string reason = "";
         int status = invMgr.CheckHistoryClosure(ticket, reason);
+        // ... (History retry logic follows as in original)
 
         if(status != XE_UNKNOWN) {
             IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);

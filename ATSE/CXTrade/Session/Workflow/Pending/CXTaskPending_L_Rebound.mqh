@@ -26,6 +26,11 @@ public:
             return TASK_CONTINUE;
         }
 
+        // [v16.30 Activation Guard] 활성화되지 않은 경우 반등 체크 스킵
+        string activeKey = "TE_Active_" + sig.GetSid();
+        ICXParam* pActive = ctx.GetParam(activeKey);
+        if(IS_INVALID(pActive) || pActive.GetInt() != 1) return TASK_CONTINUE;
+
         ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
 

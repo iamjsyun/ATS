@@ -13,6 +13,26 @@ public:
         Initialize();
     }
 
+    /**
+     * @brief [v19.30] 초기화 시퀀스 (SystemMap 추가)
+     */
+    virtual void Initialize() override {
+        RegisterStandardNames();
+        InitSystemMap();
+        InitWatcherMap();
+        InitSessionMap();
+    }
+
+    /**
+     * @brief [v19.31] 시스템 공통 시퀀스 등록 (Bootstrap)
+     */
+    void InitSystemMap() {
+        string systemDsl[] = {
+            "SYS_BOOTSTRAP             > SystemSetup        ? WATCHER_ENTRY_DISCOVERY  ! SYS_ERROR"
+        };
+        BuildFromDSL(systemDsl, m_watcher_map);
+    }
+
 protected:
     virtual void RegisterStandardNames() override {
         // Core Logic States
@@ -30,12 +50,10 @@ protected:
     }
 
     /**
-     * @brief [v18.30] 단순 명확한 4단계 코어 워처 시퀀스
+     * @brief [v18.30] 단순 명확한 4단계 코어 워처 시퀀스 (Discovery ~ Execute)
      */
     virtual void InitWatcherMap() override {
         string unifiedDsl[] = {
-            "SYS_BOOTSTRAP             > SystemSetup        ? WATCHER_ENTRY_DISCOVERY  ! SYS_ERROR                 @ 0s, 0x",
-
             "WATCHER_ENTRY_DISCOVERY   > EntryDiscovery     ? WATCHER_ENTRY_EXECUTE    ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
             "WATCHER_ENTRY_EXECUTE     > EntryExecute       ? WATCHER_EXIT_DISCOVERY   ! WATCHER_EXIT_DISCOVERY    @ 0s, 0x",
 

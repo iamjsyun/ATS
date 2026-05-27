@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
-                "mode": "source",
+                "file": "ATSE/_doc/PLAN_TEST_REFACTORING_v1.0.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "DESIGN_SEQUENCE_ORCHESTRATOR_v1.0"
+              "title": "PLAN_TEST_REFACTORING_v1.0"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 346.5
   },
   "right": {
     "id": "b30538696ef9ac62",
@@ -183,8 +183,20 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "ae1674b799e93e7b",
+  "active": "ba91c5173ed1985d",
   "lastOpenFiles": [
+    "ATSE/_doc/DESIGN_STAGE_SEQUENCE_MATRIX_ANALYSIS_v1.0.md",
+    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.0.md",
+    "_doc/ATSE_Master_Architecture_v1.2.md",
+    "_log/build_atse_20260527_220359.log",
+    "_log/build_atse_20260527_215840.log",
+    "ATSE/CXTrade/ATS.ex5",
+    "_log/build_atse_20260527_215510.log",
+    "_log/build_atse_20260527_215434.log",
+    "_doc/DESIGN_STAGE_AND_SEQUENCE_v1.0.md",
+    "_doc/DESIGN_ASSET_MANAGEMENT_SEQUENCE_v1.0.md",
+    "_doc/DESIGN_MODIFICATION_PIPELINE_v1.0.md",
+    "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
     "ATSE/_doc/REPORT_ORDER_PRICE_FAILURE_v1.0.md",
     "ATSA/ATSA/bin/Debug/net10.0-windows/_log/ATSA_20260527_130000.log",
     "ATSE/_doc/REPORT_ORDER_GUARD_ANALYSIS_v1.0.md",
@@ -207,19 +219,7 @@
     "_doc/gemini 구글 드라이브 사용 공유 설정.md",
     "_doc/GEMINI.md",
     "_doc/Folder_Structure_Redesign_Report_v1.0.md",
-    "_doc/Exit_Scenario_Addition_Design_v1.0.md",
-    "_doc/Exit_Sequence_Failure_Analysis_Report_v1.1.md",
-    "_doc/Exit_Sequence_Failure_Analysis_Report_v1.0.md",
-    "_doc/CXUI_Dashboard_Design_v1.0.md",
-    "_doc/ATSE_Master_Architecture_v1.2.md",
-    "_doc/ATSE_Watcher_Zombie_Design_v1.0.md",
     "_log/build_atse_20260527_115833.log",
-    "ATSE/CXTrade/Watcher/WatcherWorkflow/CXStageReverseInject.mqh",
-    "ATSE/CXTrade/Watcher/WatcherWorkflow/CXStageZombieDiscovery.mqh",
-    "_log/build_atse_20260527_114834.log",
-    "_doc/Sequence_Stage_Term_Violation_Report_v1.0.md",
-    "ATSE/CXTrade/ATS.ex5",
-    "_log/build_atse_20260527_112752.log",
-    "_log/build_atse_20260527_112740.log"
+    "ATSE/CXTrade/Watcher/WatcherWorkflow/CXStageReverseInject.mqh"
   ]
 }

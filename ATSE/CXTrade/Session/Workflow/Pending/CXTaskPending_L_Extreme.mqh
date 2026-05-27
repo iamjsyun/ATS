@@ -20,6 +20,35 @@ public:
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
         double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
         
+        // [v16.28 Activation Guard] 진트 활성화 여부 확인 및 플래그 설정
+        string activeKey = "TE_Active_" + sig.GetSid();
+        bool isActive = false;
+        ICXParam* pActive = ctx.GetParam(activeKey);
+        if(IS_VALID(pActive) && pActive.GetInt() == 1) isActive = true;
+
+        if(!isActive) {
+            ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+            double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+            double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? -1.0 : 1.0;
+            
+            double priceSignal = sig.GetPriceSignal();
+            if(priceSignal <= 0) priceSignal = sig.GetPriceOpen() - (sig.GetTELimit() * point * dir_sign);
+            
+            double triggerPrice = priceSignal + (sig.GetTEStart() * point * dir_sign);
+            
+            bool triggerReached = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice <= triggerPrice) : (currentPrice >= triggerPrice);
+            
+            if(triggerReached) {
+                if(IS_INVALID(pActive)) {
+                    pActive = new CXParam();
+                    ctx.Set(activeKey, pActive);
+                }
+                pActive.SetInt(1);
+                isActive = true;
+                XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-EXTR", xp, "Trailing Entry ACTIVATED!"));
+            }
+        }
+
         string extKey = "LastEntryExtremity_" + sig.GetSid();
         double lastExt = 0;
         ICXParam* pExt = ctx.GetParam(extKey);

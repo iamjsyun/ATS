@@ -29,15 +29,17 @@ public:
 
         CXMessageProvider::UpdateStatus(sig, targetStatus, msg);
         if(repo.UpdateStatus(sig)) {
-            // [v16.23 Initial Visual] 대기 오더 접수 직후 트리거 라인 즉시 생성 [v11.11 >= Mandate Compliance]
+            // [v16.23 Initial Visual] 대기 오더 접수 직후 활성화 트리거 라인 생성 (price_signal 기준) [v11.11 >= Mandate]
             if(targetStatus == XE_PENDING_PLACED && sig.GetTEStart() >= 1) {
                 ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
                 double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
                 double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? -1.0 : 1.0;
-                double orderPrice = sig.GetPriceOpen();
                 
-                if(orderPrice > 0) {
-                    double triggerLine = orderPrice + (sig.GetTEStart() * point * dir_sign);
+                double priceSignal = sig.GetPriceSignal();
+                if(priceSignal <= 0) priceSignal = sig.GetPriceOpen() - (sig.GetTELimit() * point * dir_sign); // price_signal 복원
+                
+                if(priceSignal > 0) {
+                    double triggerLine = priceSignal + (sig.GetTEStart() * point * dir_sign);
                     CXChartVisualizer::DrawTEStart(ctx, sig, triggerLine, "CXTaskEntry_P_Finalize");
                 }
             }
