@@ -347,15 +347,16 @@ public:
                 sig.SetStatusMsg(StringFormat("Order Scanned and Bound. Ticket:%I64u", ticket));
                 repo.UpdateStatus(sig);
 
-                CXParam sp;
-                sp.SetSignal(sig);
-                ICXTradingSession* session = mgr.CreateSession(GetPointer(sp));
+                // [v18.26 Fix] Reuse persistent xp instead of stack sp to avoid invalid pointer access
+                xp.SetSignal(sig);
+                ICXTradingSession* session = mgr.CreateSession(xp);
                 if(IS_VALID(session)) {
-                    session.Start(GetPointer(sp));
+                    session.Start(xp);
                     XP_LOG_OK(xp, StringFormat("[ORDER-MANAGER-SCAN] Bound new pending order to session. Ticket:%I64u, SID:%s", ticket, sid));
                 } else {
                     SAFE_DELETE(sig);
                 }
+                xp.SetSignal(NULL);
             }
         }
     }

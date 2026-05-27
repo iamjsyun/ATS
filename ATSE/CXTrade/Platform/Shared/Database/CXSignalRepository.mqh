@@ -195,9 +195,10 @@ public:
 
    virtual int LoadEntrySignals(CArrayObj* list) override {
       if (IS_INVALID(m_db) || IS_INVALID(list)) return 0;
-      string sql = StringFormat("SELECT * FROM signals WHERE xa_entry = %d AND xe_status < %d AND xe_status <> %d ORDER BY updated ASC", 
-                                XA_ACTIVE, XE_EXECUTED, XE_ERROR);
+      string sql = StringFormat("SELECT * FROM signals WHERE xa_entry = %d AND xe_status = %d ORDER BY updated ASC",
+                                XA_ACTIVE, XE_READY);
       int hQuery = DatabasePrepare(m_db.GetHandle(), sql);
+
       if(hQuery == INVALID_HANDLE) return 0;
       int count = FetchSignals(hQuery, list);
       DatabaseFinalize(hQuery);

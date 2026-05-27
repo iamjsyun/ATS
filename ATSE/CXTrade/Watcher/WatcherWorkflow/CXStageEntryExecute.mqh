@@ -5,6 +5,7 @@
 #include "..\..\Platform\Core\Interfaces\IXGuard.mqh"
 #include "..\..\Platform\Core\Interfaces\ICXServiceFactory.mqh"
 #include "..\..\Platform\Core\Interfaces\IXOrderManager.mqh"
+#include "..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 #include "..\..\Platform\Core\Interfaces\IRepository.mqh"
 #include "..\..\Platform\Core\Models\CXSignal.mqh"
 #include "..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -78,14 +79,38 @@ public:
                 CXMessageProvider::UpdateStatus(sig, XE_ERROR, err);
                 repo.UpdateStatus(sig);
                 failed++;
+                
+                activeList.Detach(i);
                 SAFE_DELETE(sig);
+                xp.SetSignal(NULL);
+                i--; total--;
                 continue;
             }
 
-            // 2. 최초 대기 오더 접수 진행
-            sig.SetStatus(XE_READY);
-            sig.SetStatusMsg("Initial Execute Placement");
+            // 2. [Atomic Lock] 브로커 요청 전 상태를 XE_PENDING_REQ(1)로 잠금하여 중복 진입 방지
+            sig.SetStatus(XE_PENDING_REQ);
+            sig.SetStatusMsg("Initial Execute Placement (Locked)");
             repo.UpdateStatus(sig);
+
+            //--- [v18.25 Fix] Calculate target open price and SL/TP prior to order placement
+            ICXPriceManager* priceMgr = factory.CreatePriceManager(ctx);
+            if(IS_VALID(priceMgr)) {
+                string symbol = sig.GetSymbol();
+                int dir = sig.GetDir();
+                double marketPrice = priceMgr.GetMarketPrice(symbol, dir);
+                double offset = (sig.GetType() == ORDER_MARKET) ? 0 : sig.GetTELimit();
+                
+                double execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), offset);
+                double basePrice = (sig.GetType() == ORDER_MARKET) ? marketPrice : execPrice;
+                double finalSL = priceMgr.CalculateSL(xp, symbol, dir, basePrice, sig.GetSL());
+                double finalTP = priceMgr.CalculateTP(xp, symbol, dir, basePrice, sig.GetTP());
+                
+                sig.SetPriceOpen(execPrice);
+                sig.SetPriceSL(finalSL);
+                sig.SetPriceTP(finalTP);
+                
+                SAFE_DELETE(priceMgr);
+            }
 
             XP_LOG_INFO(xp, StringFormat("[WATCHER-ENTRY-EXECUTE] Plunging Initial Order for SID:%s", sid));
 
@@ -109,11 +134,15 @@ public:
                 failed++;
             }
             
+            activeList.Detach(i);
             SAFE_DELETE(sig);
+            xp.SetSignal(NULL);
+            i--; total--;
         }
 
         SAFE_DELETE(orderMgr);
         while(activeList.Total() > 0) activeList.Detach(0);
+        ctx.Remove("entry_signals");
         SAFE_DELETE(activeList);
 
         CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);

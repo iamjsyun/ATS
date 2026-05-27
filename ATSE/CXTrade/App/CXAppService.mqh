@@ -38,6 +38,7 @@ private:
     ICXSignalWatcher*     m_watcher;
     ICXLogger*            m_logger;
     ICXContext*           m_globalContext;
+    ICXParam*             m_pulseParam; // [v18.27] Persistent param for high-frequency pulses
     
     // Lifecycle-managed dependencies
     CXSequenceOrchestrator* m_orchestrator;
@@ -67,6 +68,7 @@ public:
         SAFE_DELETE(m_terminalPlatform);
         SAFE_DELETE(m_priceManager);
         SAFE_DELETE(m_exitManager);
+        SAFE_DELETE(m_pulseParam);
     }
 
     virtual bool Initialize(ICXConfig* config, ICXServiceFactory* factory) override {
@@ -85,6 +87,7 @@ public:
         m_terminalPlatform = m_factory.CreateTerminalPlatform(m_globalContext);
         m_priceManager = m_factory.CreatePriceManager(m_globalContext);
         m_exitManager = m_factory.CreateExitManager(m_globalContext);
+        m_pulseParam = new CXParam();
 
         m_globalContext.Register("logger", m_logger);
         m_globalContext.Register("config", m_config);
@@ -126,13 +129,14 @@ public:
     }
 
     virtual void Pulse() override {
-        CXParam xp;
+        if(IS_INVALID(m_pulseParam)) return;
+        m_pulseParam.Reset();
         
         //-- 1. 신호 감시 (통합 워처 가동)
-        if(IS_VALID(m_watcher)) m_watcher.Pulse(GetPointer(xp));
+        if(IS_VALID(m_watcher)) m_watcher.Pulse(m_pulseParam);
         
         //-- 2. 활성 세션 구동 및 GC (Execution & Cleanup)
-        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
+        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(m_pulseParam);
 
         //-- 3. 대시보드 갱신
         if(IS_VALID(m_ui)) m_ui.Refresh();
@@ -141,11 +145,12 @@ public:
     virtual void OnTradeTransaction(const MqlTradeTransaction& trans,
                                     const MqlTradeRequest& request,
                                     const MqlTradeResult& result) override {
-        CXParam xp;
-        xp.SetEvent(EVENT_TRANSACTION);
-        xp.SetTransaction(trans); // Assuming CXParam has this or use raw access if needed
+        if(IS_INVALID(m_pulseParam)) return;
+        m_pulseParam.Reset();
+        m_pulseParam.SetEvent(EVENT_TRANSACTION);
+        m_pulseParam.SetTransaction(trans); 
         
-        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(GetPointer(xp));
+        if(IS_VALID(m_sessionManager)) m_sessionManager.Pulse(m_pulseParam);
     }
 };
 

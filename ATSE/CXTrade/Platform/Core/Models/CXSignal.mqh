@@ -24,12 +24,50 @@ public:
 
     /**
      * @brief [SSOT] 모든 필드를 표준 초기값으로 리셋.
-     * @details MQL5 내장 ZeroMemory를 사용하여 타입별 경고 없이 안전하게 초기화.
+     * @details [v18.27 Fix] string 객체에 ZeroMemory 사용 시 내부 포인터 파손으로 인한 크래시 발생 방지를 위해 개별 초기화 수행.
      */
     void Reset() {
-        #define X(type, name, dbType, getter) ZeroMemory(name);
-        SIGNAL_SCHEMA_FIELDS
-        #undef X
+        id = 0;
+        sid = "";
+        gid = "";
+        cno = 0;
+        sno = 0;
+        msg_id = 0;
+        raw_id = 0;
+        xa_entry = 0;
+        xa_exit = 0;
+        xe_status = 0;
+        xe_status_msg = "";
+        time = "";
+        symbol = "";
+        dir = 0;
+        type = 0;
+        price_signal = 0.0;
+        te_start = 0.0;
+        te_step = 0.0;
+        te_limit = 0.0;
+        te_interval = 0;
+        ikte_start = 0.0;
+        ikte_step = 0.0;
+        tp = 0.0;
+        sl = 0.0;
+        ts_start = 0;
+        ts_step = 0;
+        close_type = 0;
+        trail_price = 0.0;
+        price_limit = 0.0;
+        price = 0.0;
+        price_open = 0.0;
+        price_close = 0.0;
+        price_tp = 0.0;
+        price_sl = 0.0;
+        lot = 0.0;
+        ticket = 0;
+        magic = 0;
+        comment = "";
+        tag = "";
+        created = 0;
+        updated = 0;
         
         last_status = -1;
     }

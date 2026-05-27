@@ -64,9 +64,10 @@ public:
                 sig.SetStatusMsg("Exit Intent Synchronized: Forcing session transition.");
                 repo.UpdateStatus(sig);
                 
-                activeList.Delete(i);
-                handled++;
+                activeList.Detach(i);
                 SAFE_DELETE(sig);
+                xp.SetSignal(NULL);
+                handled++;
                 continue;
             }
 
@@ -91,9 +92,6 @@ public:
                     
                     CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, successMsg);
                     repo.UpdateStatus(sig);
-                    
-                    activeList.Delete(i);
-                    handled++;
                 } else {
                     XP_LOG_ERROR(xp, CXAuditFormatter::Build("WATCHER-DIRECT-EXIT", xp, StringFormat("FAILED to close Ticket %I64u", ticket)));
                 }
@@ -105,15 +103,16 @@ public:
                 
                 CXMessageProvider::UpdateStatus(sig, XE_CLOSED_SIGNAL, skipMsg);
                 repo.UpdateStatus(sig);
-                
-                activeList.Delete(i);
-                handled++;
             }
 
+            activeList.Detach(i);
             SAFE_DELETE(sig);
+            xp.SetSignal(NULL);
+            handled++;
         }
 
         while(activeList.Total() > 0) activeList.Detach(0);
+        ctx.Remove("exit_signals");
         SAFE_DELETE(activeList);
 
         CXSequenceOrchestrator* orchestrator = CX_GET_OBJ(ctx, "orchestrator", CXSequenceOrchestrator);

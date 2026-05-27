@@ -1,4 +1,4 @@
-﻿## Gemini Added Memories
+## Gemini Added Memories
 - When content is identical in Korean and English, prioritize displaying only Korean.
 - 항상 한국어로 답변하되, 아키텍처 명칭(L-P-R-V-P), 상태 코드(XE_READY 등), 클래스/메서드명 등 기술 용어는 영문 원문을 유지한다.
 - When handling data, especially text input and output, use UTF-8 encoding by default. This applies to file I/O and shell command output.
