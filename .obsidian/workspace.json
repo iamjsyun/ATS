@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "3c280908ca8cd5d4",
+        "id": "78e8b67484c56382",
         "type": "tabs",
         "children": [
           {
-            "id": "38ca7bb46da9bcf5",
+            "id": "80ec25eb0e760a92",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ATSE/_doc/PLAN_TEST_REFACTORING_v1.2.md",
+                "file": "_doc/REPORT_Full_Lifecycle_Orchestration_v1.3.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PLAN_TEST_REFACTORING_v1.2"
+              "title": "REPORT_Full_Lifecycle_Orchestration_v1.3"
             }
           }
         ]
@@ -183,43 +183,43 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "38ca7bb46da9bcf5",
+  "active": "80ec25eb0e760a92",
   "lastOpenFiles": [
-    "ATSE/_doc/DESIGN_STAGE_SEQUENCE_MATRIX_ANALYSIS_v1.0.md",
-    "ATSE/_doc/DESIGN_SEQUENCE_REGISTRY_v1.0.md",
-    "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v14.8.md",
-    "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.1.md",
-    "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
-    "ATSE/_doc/DESIGN_SELF_TEST_v1.0.md",
-    "ATSE/_doc/DESIGN_CHART_VISUALIZATION_v1.0.md",
-    "ATSE/_doc/DESIGN_DYNAMIC_SEQUENCE_v1.0.md",
-    "ATSE/_doc/DESIGN_CXTRADETEST_ENHANCEMENT_v1.0.md",
-    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.1.md",
-    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.2.md",
-    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.0.md",
-    "ATSE/_doc/REPORT_TSDL_INTEGRITY_ANALYSIS_v1.0.md",
-    "_log/build_atse_20260528_071312.log",
-    "_log/build_atse_20260528_071017.log",
-    "_log/build_atse_20260528_071004.log",
-    "_log/build_atse_20260528_070943.log",
-    "ATSE/Files/ATSE/test_trailing_entry_rebound.tsdl",
-    "ATSE/Files/ATSE/test_trailing_entry_limit.tsdl",
-    "_log/build_atse_20260528_070318.log",
-    "_log/build_atse_20260528_070305.log",
-    "ATSE/Files/ATSE/test_broker_sl_tp.tcl",
-    "ATSE/Files/ATSE/test_duplicate_sid.tcl",
-    "_doc/ATSE_Master_Architecture_v1.2.md",
-    "_doc/DESIGN_STAGE_AND_SEQUENCE_v1.0.md",
-    "_doc/DESIGN_ASSET_MANAGEMENT_SEQUENCE_v1.0.md",
-    "_doc/DESIGN_MODIFICATION_PIPELINE_v1.0.md",
-    "ATSE/_doc/REPORT_ORDER_PRICE_FAILURE_v1.0.md",
-    "ATSE/_doc/REPORT_ORDER_GUARD_ANALYSIS_v1.0.md",
+    "_doc/gemini/extensions/caveman/README.md",
+    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.3.md",
+    "_doc/REPORT_Trailing_Entry_Process_Analysis_v1.0.md",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/ATSA_tnwrv1t3_wpftmp.sourcelink.json",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/ATSA_tnwrv1t3_wpftmp.GlobalUsings.g.cs",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/ATSA_tnwrv1t3_wpftmp.AssemblyInfo.cs",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/ATSA_tnwrv1t3_wpftmp.AssemblyInfoInputs.cache",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.sourcelink.json",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.GlobalUsings.g.cs",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.AssemblyInfo.cs",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.AssemblyInfoInputs.cache",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.GeneratedMSBuildEditorConfig.editorconfig",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_n5zdnxl0_wpftmp.assets.cache",
+    "_doc/REPORT_Pulse_Performance_Optimization_v1.0.md",
+    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.2.md",
+    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.1.md",
+    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.0.md",
+    "_doc/REPORT_Logger_Improvement_Strategy_v1.1.md",
+    "_doc/REPORT_Trailing_Engine_Orchestration_Registration_v1.0.md",
+    "_doc/REPORT_Logger_Improvement_Strategy_v1.0.md",
+    "_doc/Log_Optimization_Strategy_v1.0.md",
+    "ATSE/_doc/REPORT_SEQUENCE_DESIGN_ANALYSIS_v1.0.md",
+    "_doc/REPORT_Naming_Convention_Consistency_v1.0.md",
+    "2026-05-28.md",
+    "_doc/REPORT_TE_TS_Orchestration_Improvements_v1.0.md",
+    "ATSE/_doc/진트.md",
     "ATSE/_doc/REPORT_WATCHER_SEQUENCE_FLOW_v1.0.md",
-    "_doc/spec.md",
-    "_doc/환경설정/환경설정 정보.md",
-    "_doc/_Report/ATSE_Phase3_Completion_Report_v1.0.md",
-    "_doc/_Report/ATSE_Detailed_Architecture_Report_v10.5.md",
-    "_doc/Master_Testing_Simulation_v1.0.md",
-    "_doc/Pipeline_Verification_Strategy_Report_v1.0.md"
+    "ATSE/_doc/REPORT_TSDL_INTEGRITY_ANALYSIS_v1.0.md",
+    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.2.md",
+    "_doc/WALKTHROUGH_CX_Trailing_Entry_Correctness_v1.0.md",
+    "_doc/PLAN_CX_Trailing_Entry_Correctness_v1.0.md",
+    "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.3.1.md",
+    "_doc/TASK_CX_Trailing_Entry_Fix_v1.3.1.md",
+    "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.0.md",
+    "_doc/TASK_CX_Trailing_Entry_Fix_v1.0.md",
+    "_doc/PLAN_CX_Trailing_Entry_Fix_v1.0.md"
   ]
 }

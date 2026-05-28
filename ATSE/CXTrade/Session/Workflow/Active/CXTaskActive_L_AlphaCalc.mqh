@@ -1,5 +1,5 @@
-#ifndef CX_TASK_ALPHA_CALC_MQH
-#define CX_TASK_ALPHA_CALC_MQH
+#ifndef CX_TASK_ACTIVE_L_ALPHA_CALC_MQH
+#define CX_TASK_ACTIVE_L_ALPHA_CALC_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -7,12 +7,13 @@
 #include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 #include "..\..\..\Platform\Core\Interfaces\ICXSymbolManager.mqh"
 #include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
+#include "..\..\..\Platform\Engine\Trailing\CXTrailingEngine.mqh"
 
 /**
- * @class CXTaskAlphaCalc
+ * @class CXTaskActive_L_AlphaCalc
  * @brief 알파(익절 트레일링) 로직 계산 (Pure Logic)
  */
-class CXTaskAlphaCalc : public IXTask {
+class CXTaskActive_L_AlphaCalc : public IXTask {
 public:
     virtual string Name() override { return "Task_AlphaCalc"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
@@ -32,23 +33,29 @@ public:
 
         if(0 >= sig.GetTSStart()) return TASK_BREAK;
 
-        IXPriceTracker* tracker = CX_GET_OBJ(ctx, "price_tracker", IXPriceTracker);
-        if(IS_INVALID(tracker)) return TASK_BREAK;
-
         ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
 
         double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
         double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
-        tracker.Update(currentPrice);
+        
+        string tsEngineKey = "TSEngine_" + sig.GetSid();
+        CXTrailingEngine* tsEngine = CX_CAST(CXTrailingEngine, ctx.Get(tsEngineKey));
+        if(IS_INVALID(tsEngine)) {
+            tsEngine = new CXTrailingEngine(TRAIL_MODE_EXIT, sig.GetDir(), point);
+            tsEngine.Configure(sig.GetPriceOpen(), sig.GetTSStart(), sig.GetTSStep());
+            ctx.Set(tsEngineKey, tsEngine);
+        }
+
+        tsEngine.Update(currentPrice);
 
         double dir_sign = (sig.GetDir() == CX_DIR_BUY) ? 1.0 : -1.0;
         double profit = (currentPrice - sig.GetPriceOpen()) * dir_sign;
 
-        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, StringFormat("Tracking: Profit %.0f pts", profit / point)));
+        XP_LOG_TRACE(xp, CXAuditFormatter::Build("ALPHA-CALC", xp, StringFormat("Tracking via TrailingEngine: Profit %.0f pts", profit / point)));
 
         if(profit >= sig.GetTSStart() * point) {
-            double peak = (sig.GetDir() == CX_DIR_BUY) ? tracker.GetHighest() : tracker.GetLowest();
+            double peak = tsEngine.GetExtreme();
             double target = peak - (sig.GetTSStart() * point * dir_sign);
 
             bool is_improved = false;

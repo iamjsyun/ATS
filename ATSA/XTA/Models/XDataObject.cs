@@ -16,6 +16,8 @@ namespace XTA.Models
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
         public XSignal? Signal { get; set; }
+        // When true, bypass sound suppression (spam/already-played) for this request
+        public bool Force { get; set; } = false;
 
         public T? GetSignal<T>() where T : class
         {

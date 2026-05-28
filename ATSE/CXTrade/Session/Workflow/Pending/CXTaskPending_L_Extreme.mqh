@@ -15,7 +15,7 @@ public:
     virtual string Name() override { return "Pending_L_Extreme"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         ICXSignal* sig = xp.GetSignal();
-        if(IS_INVALID(sig) || 0 >= sig.GetTEStart()) return TASK_CONTINUE;
+        if(IS_INVALID(sig) || 0 >= sig.GetTEStart() || xp.GetInt() == 10) return TASK_CONTINUE;
 
         ICXPriceManager* priceMgr = CX_GET_OBJ(ctx, "price_mgr", ICXPriceManager);
         double currentPrice = IS_VALID(priceMgr) ? priceMgr.GetLiquidationPrice(sig.GetSymbol(), sig.GetDir()) : SymbolInfoDouble(sig.GetSymbol(), (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_BID : SYMBOL_ASK);
@@ -54,9 +54,18 @@ public:
         ICXParam* pExt = ctx.GetParam(extKey);
         if(IS_VALID(pExt)) lastExt = pExt.GetDouble();
 
-        // 유리한 방향(Buy: 하락, Sell: 상승)으로 가격이 갱신되는지 확인
-        bool is_new_extreme = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice < lastExt || lastExt <= 0)
-                                                           : (currentPrice > lastExt || lastExt <= 0);
+        ICXSymbolManager* symMgr = CX_GET_OBJ(ctx, "sym_mgr", ICXSymbolManager);
+        double point = IS_VALID(symMgr) ? symMgr.GetPoint(sig.GetSymbol()) : SymbolInfoDouble(sig.GetSymbol(), SYMBOL_POINT);
+        double stepDistance = sig.GetTEStep() * point;
+
+        // [v1.1 Stepped Trailing Mandate] 유리한 방향으로 'te_step' 이상 움직였을 때만 극점 갱신
+        bool is_new_extreme = false;
+        if(lastExt <= 0) {
+            is_new_extreme = true;
+        } else {
+            is_new_extreme = (sig.GetDir() == CX_DIR_BUY) ? (lastExt - currentPrice >= stepDistance)
+                                                           : (currentPrice - lastExt >= stepDistance);
+        }
 
         if(is_new_extreme) {
             if(IS_INVALID(pExt)) {
@@ -64,6 +73,10 @@ public:
                 ctx.Set(extKey, pExt);
             }
             pExt.SetDouble(currentPrice);
+            if(isActive) {
+                XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-EXTR", xp, 
+                    StringFormat("New Trailing Extreme: %.5f (Prev: %.5f)", currentPrice, lastExt)));
+            }
         }
 
         return TASK_CONTINUE;

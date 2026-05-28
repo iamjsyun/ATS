@@ -1,5 +1,5 @@
-#ifndef CX_TASK_ACTIVE_CLOSED_MQH
-#define CX_TASK_ACTIVE_CLOSED_MQH
+#ifndef CX_TASK_ACTIVE_P_CLOSED_MQH
+#define CX_TASK_ACTIVE_P_CLOSED_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -7,10 +7,10 @@
 #include "..\..\..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 
 /**
- * @class CXTaskActive_Closed
+ * @class CXTaskActive_P_Closed
  * @brief [Persistence] 세션의 최종 종료 및 뒷정리 (v17.6)
  */
-class CXTaskActive_Closed : public IXTask {
+class CXTaskActive_P_Closed : public IXTask {
 public:
     virtual string Name() override { return "Task_Closed"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {

@@ -28,6 +28,12 @@ public:
     //--- [v11.0] Log Spam Prevention
     virtual int       GetLastStatus() const = 0;
     virtual void      SetLastStatus(int status) = 0;
+
+    //--- [v1.0] Runtime TS variables (removed from SQLite schema but retained for calculation)
+    virtual int       GetTSStart() const = 0;
+    virtual void      SetTSStart(int v) = 0;
+    virtual int       GetTSStep() const = 0;
+    virtual void      SetTSStep(int v) = 0;
 };
 
 //--- MQL5 전용 매크로 지원 (컴파일 타임 호환성용)

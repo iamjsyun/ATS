@@ -68,6 +68,8 @@ namespace ATSA.UI.DataManager
                     {
                         _selectedSignal.PropertyChanged += OnSelectedSignalPropertyChanged;
                         GenerateCurrentMessage();
+                        // Apply channel defaults (entry/exit/lot etc.) when a new signal is selected
+                        _ = ApplyChannelDefaultsAsync();
                     }
                 }
             }
@@ -131,14 +133,16 @@ namespace ATSA.UI.DataManager
                         SelectedSignal.te_start = entry.TeStart;
                         SelectedSignal.te_step = entry.TeStep;
                         SelectedSignal.te_limit = entry.TeLimit;
+                    ChannelEntryOption = merged.TradingOption != null ? ( (SelectedSignal.dir == XCode.BUY) ? merged.TradingOption.Buy.Entry ?? "" : merged.TradingOption.Sell.Entry ?? "" ) : "";
                     }
                     var exit = policy.ExitObj;
                     if (exit != null)
                     {
-                        SelectedSignal.ts_start = exit.TsStart;
-                        SelectedSignal.ts_step = exit.TsStep;
-                        SelectedSignal.tp = exit.TP;
+                        SelectedSignal.ikte_start = exit.TsStart;
+                        SelectedSignal.ikte_step = exit.TsStep;
                         SelectedSignal.sl = exit.SL;
+                        SelectedSignal.tp = exit.TP;
+                        ChannelExitOption = merged.TradingOption != null ? ( (SelectedSignal.dir == XCode.BUY) ? merged.TradingOption.Buy.Exit ?? "" : merged.TradingOption.Sell.Exit ?? "" ) : "";
                     }
                 }
 
@@ -150,14 +154,43 @@ namespace ATSA.UI.DataManager
                     SelectedSignal.sl = grid.sl;
                     SelectedSignal.te_start = grid.te_start;
                     SelectedSignal.te_step = grid.te_step;
-                    SelectedSignal.ts_start = grid.ts_start;
-                    SelectedSignal.ts_step = grid.ts_step;
+                    SelectedSignal.ikte_start = grid.ts_start;
+                    SelectedSignal.ikte_step = grid.ts_step;
                 }
                 SelectedSignal.RefreshAll();
             }
             catch (Exception ex)
             {
                 _param.nlog.Warn(ex, "[DM] Failed to apply channel defaults via XConfig.");
+            }
+        }
+
+        [Command]
+        public async Task SyncChannelOptions()
+        {
+            if (SelectedSignal == null) return;
+            try
+            {
+                var cfg = _param.Config.Channels.FirstOrDefault(c => c.CNO == SelectedSignal.cno);
+                if (cfg == null) return;
+
+                var dirOpt = (SelectedSignal.dir == XCode.BUY) ? cfg.TradingOption.Buy : cfg.TradingOption.Sell;
+                if (dirOpt != null)
+                {
+                    dirOpt.Entry = ChannelEntryOption;
+                    dirOpt.Exit = ChannelExitOption;
+                }
+
+                // Persist ATSA.json
+                var path = XConfig.GetConfigPath();
+                var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+                System.IO.File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(_param.Config, options));
+
+                _param.nlog.Info($"[DM:SYNC] Channel {SelectedSignal.cno} options synced to ATSA.json");
+            }
+            catch (Exception ex)
+            {
+                _param.nlog.Error(ex, "[DM:SYNC] Failed to sync channel options to ATSA.json");
             }
         }
 
@@ -172,9 +205,55 @@ namespace ATSA.UI.DataManager
             }
             
             if (CnoList == null || !CnoList.Any()) CnoList = new List<int> { 3001, 3002 };
+            // Initialize channel option editor from ATSA.json for the first CNO
+            try
+            {
+                if (_param.Config?.Channels != null && CnoList.Any())
+                {
+                    var cfg = _param.Config.Channels.FirstOrDefault(c => c.CNO == CnoList[0]);
+                    if (cfg != null && cfg.TradingOption != null)
+                    {
+                        ChannelEntryOption = cfg.TradingOption.Buy?.Entry ?? cfg.TradingOption.Sell?.Entry ?? string.Empty;
+                        ChannelExitOption = cfg.TradingOption.Buy?.Exit ?? cfg.TradingOption.Sell?.Exit ?? string.Empty;
+                    }
+                }
+            }
+            catch { }
+
 
             SelectedSignal = new BindableXSignal();
             UpdateToDefaults(SelectedSignal, DateTime.Now.ToString("yyMMddHH"));
+
+            // Initialize auto-sync timer (default: stopped) on the UI dispatcher
+            if (System.Windows.Application.Current?.Dispatcher != null)
+            {
+                _refreshTimer = new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Normal, System.Windows.Application.Current.Dispatcher);
+            }
+            else
+            {
+                _refreshTimer = new System.Windows.Threading.DispatcherTimer();
+            }
+            _refreshTimer.Interval = TimeSpan.FromMilliseconds(RefreshInterval);
+            _refreshTimer.Tick += async (s, e) =>
+            {
+                if (_isRefreshing) return;
+                try
+                {
+                    _isRefreshing = true;
+                    await LoadSignals();
+                }
+                finally
+                {
+                    _isRefreshing = false;
+                }
+            };
+
+            // Start timer if auto-sync default is enabled
+            try
+            {
+                if (IsAutoSync) _refreshTimer.Start();
+            }
+            catch { }
 
             _ = LoadSignals();
         }
@@ -184,6 +263,78 @@ namespace ATSA.UI.DataManager
         {
             get => _isForceInject;
             set => SetProperty(ref _isForceInject, value, nameof(IsForceInject));
+        }
+
+        // Auto-sync properties (mirrors Dashboard behavior)
+        private int _refreshInterval = 500;
+        public int RefreshInterval
+        {
+            get => _refreshInterval;
+            set
+            {
+                if (SetProperty(ref _refreshInterval, value, nameof(RefreshInterval)))
+                {
+                    if (_refreshTimer != null)
+                        _refreshTimer.Interval = TimeSpan.FromMilliseconds(_refreshInterval);
+                }
+            }
+        }
+
+        private bool _isAutoSync = false;
+        public bool IsAutoSync
+        {
+            get => _isAutoSync;
+            set
+            {
+                if (SetProperty(ref _isAutoSync, value, nameof(IsAutoSync)))
+                {
+                    try
+                    {
+                        if (System.Windows.Application.Current?.Dispatcher != null)
+                        {
+                            if (_isAutoSync) System.Windows.Application.Current.Dispatcher.Invoke(() => _refreshTimer?.Start());
+                            else System.Windows.Application.Current.Dispatcher.Invoke(() => _refreshTimer?.Stop());
+                        }
+                        else
+                        {
+                            if (_isAutoSync) _refreshTimer?.Start();
+                            else _refreshTimer?.Stop();
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        private readonly System.Windows.Threading.DispatcherTimer _refreshTimer;
+        private bool _isRefreshing = false; // prevent overlapping refreshes
+
+        private bool _isSyncing = false;
+        public bool IsSyncing
+        {
+            get => _isSyncing;
+            set => SetProperty(ref _isSyncing, value, nameof(IsSyncing));
+        }
+
+        private string _lastSyncText = "Last Sync: -";
+        public string LastSyncText
+        {
+            get => _lastSyncText;
+            set => SetProperty(ref _lastSyncText, value, nameof(LastSyncText));
+        }
+
+        private string _channelEntryOption = string.Empty;
+        public string ChannelEntryOption
+        {
+            get => _channelEntryOption;
+            set => SetProperty(ref _channelEntryOption, value, nameof(ChannelEntryOption));
+        }
+
+        private string _channelExitOption = string.Empty;
+        public string ChannelExitOption
+        {
+            get => _channelExitOption;
+            set => SetProperty(ref _channelExitOption, value, nameof(ChannelExitOption));
         }
 
         [Command]
@@ -241,7 +392,7 @@ namespace ATSA.UI.DataManager
                     if (!string.IsNullOrEmpty(soundCmd)) 
                     {
                         _param.nlog.Debug($"[DM:UPDATE:TTS] Manually triggering {soundCmd} for SID:{SelectedSignal.sid} (CNO:{SelectedSignal.cno} Dir:{SelectedSignal.dir} SNO:{SelectedSignal.sno})");
-                        sound.PlaySound(SelectedSignal, soundCmd);
+                        sound.PlaySound(SelectedSignal, soundCmd, "", true);
                     }
                 }
                 
@@ -289,8 +440,8 @@ namespace ATSA.UI.DataManager
                 var exit = policy?.ExitObj;
                 if (exit != null)
                 {
-                    SelectedSignal.ts_start = exit.TsStart;
-                    SelectedSignal.ts_step = exit.TsStep;
+                    SelectedSignal.ikte_start = exit.TsStart;
+                    SelectedSignal.ikte_step = exit.TsStep;
                     SelectedSignal.tp = exit.TP;
                     SelectedSignal.sl = exit.SL;
                     SelectedSignal.RefreshAll();
@@ -307,13 +458,18 @@ namespace ATSA.UI.DataManager
         public async Task LoadSignals()
         {
             _param.nlog.Info("[DM:LOAD] LoadSignals Command Triggered.");
+            IsSyncing = true;
             var repo = XContext.Instance.SignalRepo;
-            if (repo == null) return;
+            if (repo == null)
+            {
+                IsSyncing = false;
+                return;
+            }
 
             try
             {
                 var signals = await repo.GetSignalsByCnoAsync(0, 1000);
-                
+
                 void UpdateAction()
                 {
                     SignalList.Clear();
@@ -322,7 +478,7 @@ namespace ATSA.UI.DataManager
                         var bindable = BindableXSignal.FromModel(XTA.Models.XSignal.FromBase(s));
                         SignalList.Add(bindable);
                     }
-                    if (SignalList.Any() && SelectedSignal == null) 
+                    if (SignalList.Any() && SelectedSignal == null)
                     {
                         SelectedSignal = SignalList.First();
                     }
@@ -338,10 +494,17 @@ namespace ATSA.UI.DataManager
                 {
                     UpdateAction();
                 }
+
+                LastSyncText = $"Last Sync: {DateTime.Now:HH:mm:ss}";
             }
             catch (Exception ex)
             {
                 _param.nlog.Error(ex, "[DM] Failed to load signals from database.");
+                LastSyncText = "Last Sync: Error";
+            }
+            finally
+            {
+                IsSyncing = false;
             }
         }
 
@@ -405,8 +568,7 @@ namespace ATSA.UI.DataManager
                 baseSignal.te_limit = SelectedSignal.te_limit;
                 baseSignal.te_start = SelectedSignal.te_start;
                 baseSignal.te_step = SelectedSignal.te_step;
-                baseSignal.ts_start = SelectedSignal.ts_start;
-                baseSignal.ts_step = SelectedSignal.ts_step;
+                // ts_start/ts_step deprecated - use ikte_start/ikte_step
                 baseSignal.ikte_start = SelectedSignal.ikte_start;
                 baseSignal.ikte_step = SelectedSignal.ikte_step;
                 baseSignal.sl = SelectedSignal.sl;
@@ -446,7 +608,7 @@ namespace ATSA.UI.DataManager
                     _param.nlog.Info(final.ToAuditString("DM-SAVE", $"Force={IsForceInject}, Msg: Manual Injection Success"));
 
                     // [v9.0] 신규 주입 시 즉시 TTS 출력 (xa_entry 0->1 전이 효과)
-                    XContext.Instance.Sound?.PlaySound(final, "SIGNAL_RECEIVED");
+                    XContext.Instance.Sound?.PlaySound(final, "SIGNAL_RECEIVED", "", true);
                 }
 
                 // [Verification] DB 재로드
@@ -617,8 +779,8 @@ namespace ATSA.UI.DataManager
             sig.te_limit = 1000;
             sig.te_start = 500;
             sig.te_step = 100;
-            sig.ts_start = 500;
-            sig.ts_step = 100;
+            sig.ikte_start = 500;
+            sig.ikte_step = 100;
             
             sig.xa_entry = 0;
             sig.xa_exit = 0;

@@ -56,7 +56,8 @@ namespace XTA.Services.TelegramService
                 {
                     var matchedInfo = param.Channels.Values.SelectMany(l => l).FirstOrDefault(c =>
                         c.CID == rawId ||
-                        Math.Abs(c.CID % 10000000000L) == Math.Abs(rawId % 10000000000L) ||
+                        c.CID == -rawId ||
+                        Math.Abs(c.CID % 1000000000000L) == Math.Abs(rawId % 1000000000000L) ||
                         (uint)c.CID == (uint)rawId ||
                         (int)c.CID == (int)rawId
                     );

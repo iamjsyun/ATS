@@ -11,6 +11,7 @@ namespace XTA.XData.Models
     {
         public int id { get; set; }
         public string sid { get; set; } = string.Empty;
+        // gid retained for compatibility (deprecated)
         public string gid { get; set; } = string.Empty;
         public int cno { get; set; }
         public int sno { get; set; }
@@ -35,9 +36,11 @@ namespace XTA.XData.Models
         public double ikte_step { get; set; }
         public double tp { get; set; }
         public double sl { get; set; }
-        public int ts_start { get; set; } = 500;
-        public int ts_step { get; set; } = 100;
+        // ts_start/ts_step deprecated - use ikte_start/ikte_step
+        public int ts_start { get; set; }
+        public int ts_step { get; set; }
         public int close_type { get; set; }
+        // trail_price and price_limit retained for compatibility (deprecated)
         public double trail_price { get; set; }
         public double price_limit { get; set; }
         public double price { get; set; }
@@ -82,13 +85,7 @@ namespace XTA.XData.Models
             
             sid = XIdManager.Instance.Normalize(sid);
 
-            if (string.IsNullOrEmpty(gid) || !XIdManager.Instance.IsValidGid(gid))
-            {
-                // [v8.2] gno 필드를 직접 사용하여 GID 생성
-                gid = XIdManager.Instance.GenerateGid(cno, created, sno, gno);
-            }
-            
-            gid = XIdManager.Instance.Normalize(gid);
+            // GID generation removed; grouping handled by XIdManager when required
 
             if (string.IsNullOrEmpty(comment))
             {

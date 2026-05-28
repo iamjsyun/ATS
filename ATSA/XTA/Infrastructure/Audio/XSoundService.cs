@@ -108,13 +108,13 @@ namespace XTA.Infrastructure.Audio
                 .Build();
         }
 
-        public void PlaySound(XSignal? sig, string cmd, string text = "")
+        public void PlaySound(XSignal? sig, string cmd, string text = "", bool force = false)
         {
             // [v9.0] 스레드 안전성 보장
             lock (_seqLock)
             {
                 nlog.Debug($"[Sound:REQUEST] SID:{sig?.sid ?? "N/A"} Cmd:{cmd}");
-                _currentXdo = new XDataObject { Signal = sig, CMD = cmd, Text = text };
+                _currentXdo = new XDataObject { Signal = sig, CMD = cmd, Text = text, Force = force };
                 _currentTtsMsg = string.Empty;
                 _sequence.SetState(XSoundState.RequestReceived);
                 
@@ -187,6 +187,27 @@ namespace XTA.Infrastructure.Audio
         private void MarkAsPlayed(string sid, string cmd)
         {
             lock (_playedCache) { _playedCache.Add($"{sid}:{cmd}"); }
+        }
+
+        // Clear entries for a specific SID (all commands) - used when lifecycle completes and replay should be allowed
+        public void ClearPlayedForSid(string sid)
+        {
+            if (string.IsNullOrEmpty(sid)) return;
+            lock (_playedCache)
+            {
+                var toRemove = new System.Collections.Generic.List<string>();
+                foreach (var k in _playedCache)
+                {
+                    if (k.StartsWith(sid + ":")) toRemove.Add(k);
+                }
+                foreach (var r in toRemove) _playedCache.Remove(r);
+            }
+        }
+
+        // Clear entire session cache (not recommended for normal use)
+        public void ClearAllPlayed()
+        {
+            lock (_playedCache) { _playedCache.Clear(); }
         }
     }
 }

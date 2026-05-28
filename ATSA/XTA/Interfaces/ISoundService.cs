@@ -10,6 +10,16 @@ namespace XTA.Interfaces
         /// <summary>
         /// 사운드 재생 요청 (구 messenger.SendSound 대체)
         /// </summary>
-        void PlaySound(XSignal? sig, string cmd, string text = "");
+        void PlaySound(XSignal? sig, string cmd, string text = "", bool force = false);
+
+        /// <summary>
+        /// Clear cached played entries for given SID so future identical events can be played again.
+        /// </summary>
+        void ClearPlayedForSid(string sid);
+
+        /// <summary>
+        /// Clear entire played cache for the current session.
+        /// </summary>
+        void ClearAllPlayed();
     }
 }

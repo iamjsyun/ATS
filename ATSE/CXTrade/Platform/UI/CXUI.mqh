@@ -108,6 +108,7 @@ public:
         if(IS_INVALID(repo)) return;
 
         ICXPriceManager* priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
+        ICXAssetManager* assetMgr = CX_GET_OBJ(m_ctx, "asset_mgr", ICXAssetManager);
 
         CXTerminalScanner scanner;
         CArrayObj* assetList = new CArrayObj();
@@ -143,7 +144,7 @@ public:
             if(i < renderCount) {
                 ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
                 if(IS_VALID(sig)) {
-                    UpdateSlot(i, sig, priceMgr);
+                    UpdateSlot(i, sig, priceMgr, assetMgr);
                 } else {
                     ClearSlot(i);
                 }
@@ -161,7 +162,7 @@ private:
     /**
      * @brief 개별 슬롯에 활성 신호 데이터 바인딩 및 출력
      */
-    void UpdateSlot(int slotIdx, ICXSignal* sig, ICXPriceManager* priceMgr) {
+    void UpdateSlot(int slotIdx, ICXSignal* sig, ICXPriceManager* priceMgr, ICXAssetManager* assetMgr) {
         string symbol = sig.GetSymbol();
         int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
         double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
@@ -180,23 +181,59 @@ private:
         string p0_lbl, p1_lbl, p2_lbl;
         double p0, p1, p2;
 
+        ICXTradingSession* session = IS_VALID(assetMgr) ? assetMgr.FindSessionBySid(sig.GetSid()) : NULL;
+        bool isTrailing = false;
+        if(IS_VALID(session)) {
+            int sState = session.GetState();
+            if(sState == SESSION_TRAILING_ENTRY || sState == SESSION_TRAILING_STOP) {
+                isTrailing = true;
+            }
+        }
+
         if(isPosition) {
             // 포지션 모드: TP 및 Trailing Stop 정보 표시
             p0_lbl = "TP";     p0 = 0.0;
-            p1_lbl = "SSTART"; p1 = currentPrice + (sig.GetTSStart() * point * -dirSign); // TS는 가격 뒤를 따름
+            
+            // [v1.2 Fix] 지터 방지: 실시간 시장가 대신 극점(Extremity) 참조
+            double refPriceTS = currentPrice;
+            string extKey = "LastStopExtremity_" + sig.GetSid();
+            ICXParam* pExt = m_ctx.GetParam(extKey);
+            if(IS_VALID(pExt) && pExt.GetDouble() > 0) refPriceTS = pExt.GetDouble();
+            
+            p1_lbl = "SSTART"; p1 = refPriceTS + (sig.GetTSStart() * point * -dirSign); // TS는 가격 뒤를 따름
             p2_lbl = "SSTEP";  p2 = sig.GetTSStep() * point;
         } else {
             // 대기오더 모드: 진입가 및 Trailing Entry 정보 표시
             p0_lbl = "LIMIT";  
-            p0 = sig.GetPriceSignal();
-            if(p0 <= 0) p0 = sig.GetPriceOpen();
-            p1_lbl = "ESTART"; p1 = currentPrice + (sig.GetTEStart() * point * dirSign);  // TE는 가격 앞을 따름
+            p0 = 0;
+            ulong ticket = sig.GetTicket();
+            if(ticket > 0 && IS_VALID(assetMgr)) {
+                p0 = assetMgr.GetCurrentPriceOpen(ticket, false);
+            }
+            if(p0 <= 0) {
+                p0 = sig.GetPriceOpen();
+            }
+            if(p0 <= 0) {
+                p0 = sig.GetPriceSignal();
+            }
+            
+            // [v1.2 Fix] 지터 방지: 실시간 시장가 대신 극점(Extremity) 참조
+            double refPriceTE = currentPrice;
+            string extKey = "LastEntryExtremity_" + sig.GetSid();
+            ICXParam* pExt = m_ctx.GetParam(extKey);
+            if(IS_VALID(pExt) && pExt.GetDouble() > 0) refPriceTE = pExt.GetDouble();
+            
+            p1_lbl = "ESTART"; p1 = refPriceTE + (sig.GetTEStart() * point * dirSign);  // TE는 가격 앞을 따름
             p2_lbl = "ESTEP";  p2 = sig.GetTEStep() * point;
         }
 
         // Line 1: {SID} {te_start} | {te_step} | {te_limit} [{state}]
         string stateStr = GetStateName((ENUM_XE_STATUS)sig.GetStatus());
-        string txtL1 = StringFormat("%s  %d | %03d | %d  [%s]",
+        if(isTrailing) {
+            stateStr = stateStr + "*TR";
+        }
+        string txtL1 = StringFormat("%s%s  %d | %03d | %d  [%s]",
+                                    isTrailing ? "▶ " : "",
                                     sig.GetSid(),
                                     (int)sig.GetTEStart(),
                                     (int)sig.GetTEStep(),
@@ -209,8 +246,15 @@ private:
                                     p1_lbl, DoubleToString(p1, digits),
                                     p2_lbl, DoubleToString(p2, digits));
 
-        // 색상 적용 (포지션: Gold, 대기오더: Wheat, TS 트리거 시 Line 2는 Lime)
-        color slotColor = isPosition ? clrGold : clrWheat;
+        // 색상 적용 (방향별/상태별 색상 구분)
+        color slotColor = clrWhite;
+        if(sig.GetDir() == CX_DIR_BUY) {
+            slotColor = isPosition ? clrDodgerBlue : clrLightSkyBlue;
+        } else if(sig.GetDir() == CX_DIR_SELL) {
+            slotColor = isPosition ? clrTomato : clrLightCoral;
+        } else {
+            slotColor = isPosition ? clrGold : clrWheat;
+        }
         m_elements[slotIdx].Line1.Color(slotColor);
 
         bool isTSTriggered = false;
@@ -220,7 +264,13 @@ private:
                 isTSTriggered = true;
             }
         }
-        color slotColorL2 = isTSTriggered ? clrLime : slotColor;
+        
+        color slotColorL2 = slotColor;
+        if(isTrailing) {
+            slotColorL2 = clrRed; // 트레일링 중일 때 빨간색으로 변경
+        } else if(isTSTriggered) {
+            slotColorL2 = clrLime;
+        }
         m_elements[slotIdx].Line2.Color(slotColorL2);
 
         m_elements[slotIdx].Line1.Description(txtL1);

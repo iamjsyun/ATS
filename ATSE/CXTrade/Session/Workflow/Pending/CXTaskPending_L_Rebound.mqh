@@ -21,7 +21,7 @@ public:
         // 중복 출력 및 처리 방지 (동일 SID/티켓 1회만 출력)
         string triggeredKey = "ReboundTriggered_" + sig.GetSid();
         ICXParam* pTriggered = ctx.GetParam(triggeredKey);
-        if(IS_VALID(pTriggered) && pTriggered.GetInt() == 1) {
+        if(IS_VALID(pTriggered) && pTriggered.GetInt() >= 1) {
             xp.SetInt(10); // 시장가 전환 트리거 상태 유지
             return TASK_CONTINUE;
         }
@@ -45,20 +45,38 @@ public:
         double extreme = pExt.GetDouble();
         if(extreme <= 0) return TASK_CONTINUE;
 
+        // [v1.0 Logger Complement] 정밀 디버깅을 위한 반등 거리 변경 모니터링 로그 추가
+        double reboundDist = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice - extreme) / point : (extreme - currentPrice) / point;
+        string lastLogKey = "ReboundLastLogDist_" + sig.GetSid();
+        ICXParam* pLastLog = ctx.GetParam(lastLogKey);
+        double lastLogVal = IS_VALID(pLastLog) ? pLastLog.GetDouble() : -999999.0;
+
+        if(MathAbs(reboundDist - lastLogVal) >= 1.0) {
+            if(IS_INVALID(pLastLog)) {
+                pLastLog = new CXParam();
+                ctx.Set(lastLogKey, pLastLog);
+            }
+            pLastLog.SetDouble(reboundDist);
+            XP_LOG_TRACE(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, 
+                StringFormat("Trailing Entry Active: Mkt:%.5f, Extreme:%.5f, ReboundDist:%.1f pt, TargetStep:%d pt", 
+                currentPrice, extreme, reboundDist, (int)sig.GetTEStep())));
+        }
+
         bool is_rebounded = (sig.GetDir() == CX_DIR_BUY) ? (currentPrice - extreme >= sig.GetTEStep() * point)
                                                          : (extreme - currentPrice >= sig.GetTEStep() * point);
 
         if(is_rebounded) {
-            if(IS_INVALID(pTriggered)) {
-                pTriggered = new CXParam();
-                ctx.Set(triggeredKey, pTriggered);
-            }
-            pTriggered.SetInt(1);
-
             XP_LOG_OK(xp, CXAuditFormatter::Build("PEND-L-REBD", xp, 
                 StringFormat("TE-STEP Rebound Triggered! Mkt:%.5f, Extreme:%.5f, Step:%d", 
                 currentPrice, extreme, (int)sig.GetTEStep())));
             
+            sig.SetStatusMsg("Rebound Triggered: Pending Market Entry Task...");
+            
+            // [v1.2 Fix] 컨텍스트 영속 플래그 설정 (Task 간 간섭 방어)
+            ICXParam* pReb = new CXParam();
+            pReb.SetInt(10);
+            ctx.Set(triggeredKey, pReb);
+
             xp.SetInt(10); // 시장가 전환 트리거 (Market Fallback)
             CXChartVisualizer::RemoveTEStart(ctx, sig); // 라인 제거
         }

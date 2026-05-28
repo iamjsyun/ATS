@@ -1,5 +1,5 @@
-﻿#ifndef CX_TASK_ALPHA_APPLY_MQH
-#define CX_TASK_ALPHA_APPLY_MQH
+#ifndef CX_TASK_ACTIVE_R_ALPHA_APPLY_MQH
+#define CX_TASK_ACTIVE_R_ALPHA_APPLY_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
 #include "..\..\..\Platform\Core\Macros\CXMacros.mqh"
@@ -9,10 +9,10 @@
 #include "..\..\..\Platform\Core\Interfaces\ICXPriceManager.mqh"
 
 /**
- * @class CXTaskAlphaApply
+ * @class CXTaskActive_R_AlphaApply
  * @brief 계산된 SL/TP를 브로커에 적용 (Action)
  */
-class CXTaskAlphaApply : public IXTask {
+class CXTaskActive_R_AlphaApply : public IXTask {
 public:
     virtual string Name() override { return "Task_AlphaApply"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {

@@ -36,10 +36,11 @@ public:
 protected:
     virtual void RegisterStandardNames() override {
         // Core Logic States
-        m_registry.Add("ORD_TRACKING",   (int)ORD_TRAILING);
-        m_registry.Add("POS_MONITORING", (int)POS_ACTIVE);
-        m_registry.Add("SYS_CLOSED",     (int)SYS_CLOSED);
-        m_registry.Add("SYS_ERROR",      (int)SYS_ERROR);
+        m_registry.Add("ORD_TRACKING",          (int)ORD_TRAILING);
+        m_registry.Add("POS_MONITORING",        (int)POS_ACTIVE);
+        m_registry.Add("SESSION_LIQUIDATING",   (int)SESSION_LIQUIDATING);
+        m_registry.Add("SYS_CLOSED",            (int)SYS_CLOSED);
+        m_registry.Add("SYS_ERROR",             (int)SYS_ERROR);
 
         // Watcher States
         m_registry.Add("SYS_BOOTSTRAP",           999);
@@ -76,7 +77,7 @@ protected:
             "? ORD_TRACKING                                                                "
             "! SYS_ERROR                                                                   "
             "@ 300s, 0x                                                                    "
-            "* 10=POS_MONITORING, 20=SYS_CLOSED" // [v18.39] XE_EXECUTED(10), SESSION_LIQUIDATING(20) 예외 전이 허용
+            "* 10=POS_MONITORING, 20=SESSION_LIQUIDATING" // [v1.2 Fix] 20(Liquidation) mapping corrected
         };
         BuildFromDSL(pendingDsl, m_session_map);
 
@@ -84,14 +85,27 @@ protected:
         string positionedDsl[] = {
             "POS_MONITORING                                                                "
             "> Stage_PositionGovernance                                                    "
-            "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL,"
-            "    TASK_A_P_ALIGN                                                            "
+            "  : TASK_A_INTENT_WATCH, TASK_A_TS_TRIGGER_WATCH, TASK_A_ALPHA_CALC,            "
+            "    TASK_A_ALPHA_APPLY,  TASK_A_V_TERMINAL,      TASK_A_P_ALIGN               "
             "? POS_MONITORING                                                              "
             "! SYS_ERROR                                                                   "
             "@ 3600s, 0x                                                                   "
-            "* 20=SYS_CLOSED" // [v18.39] SESSION_LIQUIDATING(20) 예외 전이 허용
+            "* 15=POS_TRAILING, 20=SESSION_LIQUIDATING" // [v1.3 Fix] 15(Trailing), 20(Liquidation) added
         };
         BuildFromDSL(positionedDsl, m_session_map);
+
+        // B-2. 포지션 트레일링 전용 태스크 (v17.6 Trailing Mode)
+        string trailingDsl[] = {
+            "POS_TRAILING                                                                  "
+            "> Stage_PositionTrailing                                                      "
+            "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL,"
+            "    TASK_A_P_ALIGN                                                            "
+            "? POS_TRAILING                                                                "
+            "! SYS_ERROR                                                                   "
+            "@ 3600s, 0x                                                                   "
+            "* 20=SESSION_LIQUIDATING"
+        };
+        BuildFromDSL(trailingDsl, m_session_map);
 
         // C. 청산 관리 태스크 (Exit/Liquidation)
         string exitDsl[] = {

@@ -70,6 +70,13 @@ public:
         m_posMgr = factory.CreatePositionManager(ctx);
         m_exitMgr = factory.CreateExitManager(ctx);
         m_terminal = CX_GET_OBJ(ctx, "terminal_platform", IXTerminalPlatform);
+
+        // [v1.3 Fix] Register managers in global context so child session contexts can access them
+        if(IS_VALID(m_globalContext)) {
+            m_globalContext.Register("order_mgr", m_orderMgr);
+            m_globalContext.Register("pos_mgr", m_posMgr);
+            m_globalContext.Register("exit_mgr", m_exitMgr);
+        }
     }
 
     // --- [Commands] ---
@@ -88,6 +95,11 @@ public:
             sig.SetPriceTP(priceMgr.CalculateTP(xp, sym, dir, basePrice, sig.GetTP()));
             SAFE_DELETE(priceMgr);
         }
+
+        // [v1.2 Atomic Lock Mandate] 브로커 호출 전 '요청 중' 상태로 DB 즉시 고정 (중복 진입 방어)
+        sig.SetStatus(XE_PENDING_REQ);
+        sig.SetStatusMsg("Sending Request to Broker...");
+        if(IS_VALID(m_globalRepo)) m_globalRepo.UpdateStatus(sig);
 
         if(m_orderMgr.ExecuteEntry(xp)) {
             ulong ticket = sig.GetTicket();

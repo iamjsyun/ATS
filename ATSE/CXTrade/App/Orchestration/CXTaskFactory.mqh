@@ -37,10 +37,10 @@
 #include "..\..\Session\Workflow\Active\CXTaskActive_V_Terminal.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_P_Align.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_L_Status.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskAlphaCalc.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskAlphaApply.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskActive_TS_TriggerWatch.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskActive_Closed.mqh"
+#include "..\..\Session\Workflow\Active\CXTaskActive_L_AlphaCalc.mqh"
+#include "..\..\Session\Workflow\Active\CXTaskActive_R_AlphaApply.mqh"
+#include "..\..\Session\Workflow\Active\CXTaskActive_L_TS_TriggerWatch.mqh"
+#include "..\..\Session\Workflow\Active\CXTaskActive_P_Closed.mqh"
 
 // Exit Tasks
 #include "..\..\Session\Workflow\Exit\CXTaskExit_L_Prepare.mqh"
@@ -93,11 +93,11 @@ public:
         if(name == "TASK_A_V_TERMINAL")        return new CXTaskActive_V_Terminal();
         if(name == "TASK_A_P_ALIGN")           return new CXTaskActive_P_Align();
         if(name == "TASK_A_L_STATUS")          return new CXTaskActive_L_Status();
-        if(name == "TASK_A_ALPHA_CALC")        return new CXTaskAlphaCalc();
-        if(name == "TASK_A_ALPHA_APPLY")       return new CXTaskAlphaApply();
-        if(name == "TASK_A_TS_TRIGGER_WATCH")  return new CXTaskActive_TS_TriggerWatch();
+        if(name == "TASK_A_ALPHA_CALC")        return new CXTaskActive_L_AlphaCalc();
+        if(name == "TASK_A_ALPHA_APPLY")       return new CXTaskActive_R_AlphaApply();
+        if(name == "TASK_A_TS_TRIGGER_WATCH")  return new CXTaskActive_L_TS_TriggerWatch();
         if(name == "TASK_E_P_FINALIZE")        return new CXTaskEntry_P_Finalize(); // Reuse for Stage_Closed
-        if(name == "TASK_ACTIVE_CLOSED")       return new CXTaskActive_Closed(); // Specific cleanup
+        if(name == "TASK_ACTIVE_CLOSED")       return new CXTaskActive_P_Closed(); // Specific cleanup
         
         // Exit
         if(name == "TASK_X_L_PREPARE")     return new CXTaskExit_L_Prepare();

@@ -1,4 +1,4 @@
-﻿#ifndef CXDATABASE_MQH
+#ifndef CXDATABASE_MQH
 #define CXDATABASE_MQH
 
 #include "..\..\Core\Interfaces\IDatabase.mqh"
@@ -48,6 +48,15 @@ public:
 
         DatabaseExecute(m_db, "PRAGMA journal_mode=WAL;");
         DatabaseExecute(m_db, "PRAGMA synchronous=NORMAL;");
+        
+        // [v1.1] Create atse_log table if not exists
+        DatabaseExecute(m_db, "CREATE TABLE IF NOT EXISTS atse_log ("
+                              "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                              "sid TEXT NOT NULL, "
+                              "created DATETIME DEFAULT (datetime('now', 'localtime')), "
+                              "level TEXT NOT NULL, "
+                              "msg TEXT NOT NULL"
+                              ");");
 
         PrintFormat("[DB-OK] Connected to %s (%s)", dbName, pathType);
         return true;

@@ -3,7 +3,9 @@
 
 #include "..\..\Core\Interfaces\ICXLogger.mqh"
 #include "..\..\Core\Interfaces\ICXConfig.mqh"
+#include "..\..\Core\Interfaces\IDatabase.mqh"
 #include "..\..\Core\Macros\CXMacros.mqh"
+#include "CXDbLogger.mqh"
 #include <Arrays\ArrayObj.mqh>
 
 /**
@@ -16,11 +18,12 @@ private:
     ICXLogger* m_tab;
     ICXLogger* m_ui;
     ICXLogger* m_remote;
+    ICXLogger* m_db; // [v1.1] SQLite DB logger
     ICXConfig* m_config;
     bool       m_enabled;
 
 public:
-    CXLogDispatcher() : m_file(NULL), m_tab(NULL), m_ui(NULL), m_remote(NULL), m_config(NULL), m_enabled(true) {
+    CXLogDispatcher() : m_file(NULL), m_tab(NULL), m_ui(NULL), m_remote(NULL), m_db(NULL), m_config(NULL), m_enabled(true) {
     }
     
     virtual ~CXLogDispatcher() override {
@@ -28,6 +31,7 @@ public:
         SAFE_DELETE(m_tab);
         SAFE_DELETE(m_ui);
         SAFE_DELETE(m_remote);
+        SAFE_DELETE(m_db);
     }
 
     void SetConfig(ICXConfig* config) { m_config = config; }
@@ -58,6 +62,21 @@ public:
 
     virtual void SetEnabled(bool enabled) override { m_enabled = enabled; }
     virtual bool IsEnabled() const override { return m_enabled; }
+
+    virtual void Dispatch(ENUM_LOG_LEVEL level, ICXParam* xp, string msg, ENUM_LOG_POLICY policy = LOG_POLICY_ON_CHANGE) override {
+        if(!m_enabled) return;
+        if(IS_VALID(m_db) && m_db.IsEnabled()) {
+            m_db.Dispatch(level, xp, msg, policy);
+        }
+        ICXLogger::Dispatch(level, xp, msg, policy);
+    }
+
+    void SetDatabase(IDatabase* db) {
+        SAFE_DELETE(m_db);
+        if(IS_VALID(db)) {
+            m_db = new CXDbLogger(db);
+        }
+    }
 
     void SetFileLogger(ICXLogger* logger)   { SAFE_DELETE(m_file);   m_file = logger; }
     void SetTabLogger(ICXLogger* logger)    { SAFE_DELETE(m_tab);    m_tab = logger; }

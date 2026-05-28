@@ -59,8 +59,8 @@
 - **SID (Signal ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)-DIR(1)-TYPE(1)` (총 23자)
 - **GID (Group ID)**: `CNO(4)-YYMMDDHH(8)-SNO(2)-GNO(2)` (총 19자)
 
-### 2.4 AppOrchestrator Sequence-Class Mapping (v18.8)
-하이퍼-원자적 8-Phase 시퀀스의 각 단계별 DSL 명칭과 실제 실행되는 MQL5 구체 클래스의 전체 매칭 정보이다.
+### 2.4 AppOrchestrator Sequence-Class Mapping (v18.9)
+하이퍼-원자적 시퀀스의 각 단계별 DSL 명칭과 실제 실행되는 MQL5 구체 클래스의 전체 매칭 정보이다.
 
 | 시퀀스 상태 (State) | DSL 스테이지 명칭 | 실행 태스크 (DSL Task Name) | 구체 클래스 (MQL5 Class) |
 | :--- | :--- | :--- | :--- |
@@ -82,13 +82,17 @@
 | | | `TASK_P_L_IMPROVE` | `CXTaskPending_L_Improve` |
 | | | `TASK_P_R_APPLY` | `CXTaskPending_R_Apply` |
 | | | `TASK_P_V_SYNC` | `CXTaskPending_V_Sync` |
-| **POS_ACTIVE** | `Stage_PositionWatch` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| **POS_ACTIVE** | `Stage_PositionGovernance` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_A_TS_TRIGGER_WATCH` | `CXTaskActive_L_TS_TriggerWatch` |
+| | | `TASK_A_ALPHA_CALC` | `CXTaskActive_L_AlphaCalc` |
+| | | `TASK_A_ALPHA_APPLY` | `CXTaskActive_R_AlphaApply` |
 | | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
-| | | `TASK_A_TS_TRIGGER_WATCH`| `CXTaskActive_TS_TriggerWatch` |
-| **POS_TRAILING** | `Stage_PositionGovernance` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
-| | | `TASK_A_ALPHA_CALC` | `CXTaskAlphaCalc` |
-| | | `TASK_A_ALPHA_APPLY` | `CXTaskAlphaApply` |
+| | | `TASK_A_P_ALIGN` | `CXTaskActive_P_Align` |
+| **POS_TRAILING** | `Stage_PositionTrailing` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
+| | | `TASK_A_ALPHA_CALC` | `CXTaskActive_L_AlphaCalc` |
+| | | `TASK_A_ALPHA_APPLY` | `CXTaskActive_R_AlphaApply` |
 | | | `TASK_A_V_TERMINAL` | `CXTaskActive_V_Terminal` |
+| | | `TASK_A_P_ALIGN` | `CXTaskActive_P_Align` |
 | **POS_LIQUIDATING** | `Stage_PositionLiquidation` | `TASK_A_INTENT_WATCH` | `CXTaskIntentWatch` |
 | | | `TASK_X_L_PREPARE` | `CXTaskExit_L_Prepare` |
 | | | `TASK_X_P_LOCK` | `CXTaskExit_P_Lock` |
@@ -197,4 +201,19 @@ Every trading action must verify physical state in MT5 immediately after the req
 - **Reverse Injection (Exception)**: 터미널 스캔 중 DB에 없는 매직넘버 일치 자산 발견 시, EA는 예외적으로 `xa_entry=1`을 직접 마킹하여 좀비 자산을 복구한다.
 
 ---
-**Last Updated**: 2026-05-27
+
+## 4. Event-Driven Pulse Performance Optimization Strategy
+
+To maximize execution efficiency and reduce CPU latency, engine tasks are segregated across MetaTrader 5 event channels.
+
+### A. Non-Blocking Database Polling (`OnTimer`)
+- **Design**: Restrict `StageDiscovery` database polling to a fixed `OnTimer` pulse (e.g., 400ms). Use memory-cached session parameters for tasks running on `OnTick` to bypass physical DB disk access. Handles System Health Checks and Timeout Guards.
+
+### B. High-Frequency Trailing Engine (`OnTick`)
+- **Design**: `StageEntryExecute` (Limit tracking) and `StageActiveExecute` (Trailing Stop / Alpha calculations) are isolated and bound directly to `OnTick`. This ensures real-time price tracking. Skips execution if prices remain unchanged (Deduplication filter).
+
+### C. State Fast-Tracking (`OnTradeTransaction`)
+- **Design**: Intercept transaction confirmations in `OnTradeTransaction` and immediately invoke `Pulse(transParam)`. Instantly transitions the state machine (`XE_PENDING_PLACED` -> `XE_EXECUTED` or `XE_CLOSED`), bypassing timer delays entirely.
+
+---
+**Last Updated**: 2026-05-28

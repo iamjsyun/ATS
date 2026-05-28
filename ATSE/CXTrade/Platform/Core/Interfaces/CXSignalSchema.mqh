@@ -12,7 +12,6 @@
 #define SIGNAL_SCHEMA_FIELDS \
     X(int,      id,           Integer, Id)          \
     X(string,   sid,          Text,    Sid)         \
-    X(string,   gid,          Text,    Gid)         \
     X(int,      cno,          Integer, Cno)         \
     X(int,      sno,          Integer, Sno)         \
     X(int,      msg_id,       Integer, MsgId)       \
@@ -34,11 +33,7 @@
     X(double,   ikte_step,    Double,  IkTeStep)    \
     X(double,   tp,           Double,  TP)          \
     X(double,   sl,           Double,  SL)          \
-    X(int,      ts_start,     Integer, TSStart)     \
-    X(int,      ts_step,      Integer, TSStep)      \
     X(int,      close_type,   Integer, CloseType)   \
-    X(double,   trail_price,  Double,  TrailPrice)  \
-    X(double,   price_limit,  Double,  PriceLimit)  \
     X(double,   price,        Double,  Price)       \
     X(double,   price_open,   Double,  PriceOpen)   \
     X(double,   price_close,  Double,  PriceClose)  \

@@ -13,8 +13,7 @@ namespace XTA.XData.Models
 
         [Size(50), Indexed(Unique = true)]
         public string sid { get => GetPropertyValue<string>(nameof(sid))!; set => SetPropertyValue(nameof(sid), value); }
-        [Size(20)]
-        public string gid { get => GetPropertyValue<string>(nameof(gid))!; set => SetPropertyValue(nameof(gid), value); }
+        // gid removed - legacy grouping handled by XIdManager and domain models
         public int cno { get => GetPropertyValue<int>(nameof(cno)); set => SetPropertyValue(nameof(cno), value); }
         public int sno { get => GetPropertyValue<int>(nameof(sno)); set => SetPropertyValue(nameof(sno), value); }
         public int msg_id { get => GetPropertyValue<int>(nameof(msg_id)); set => SetPropertyValue(nameof(msg_id), value); }
@@ -40,11 +39,9 @@ namespace XTA.XData.Models
         public double ikte_step { get => GetPropertyValue<double>(nameof(ikte_step)); set => SetPropertyValue(nameof(ikte_step), value); }
         public double tp { get => GetPropertyValue<double>(nameof(tp)); set => SetPropertyValue(nameof(tp), value); }
         public double sl { get => GetPropertyValue<double>(nameof(sl)); set => SetPropertyValue(nameof(sl), value); }
-        public int ts_start { get => GetPropertyValue<int>(nameof(ts_start)); set => SetPropertyValue(nameof(ts_start), value); }
-        public int ts_step { get => GetPropertyValue<int>(nameof(ts_step)); set => SetPropertyValue(nameof(ts_step), value); }
+        // ts_start/ts_step deprecated - use ikte_start/ikte_step
         public int close_type { get => GetPropertyValue<int>(nameof(close_type)); set => SetPropertyValue(nameof(close_type), value); }
-        public double trail_price { get => GetPropertyValue<double>(nameof(trail_price)); set => SetPropertyValue(nameof(trail_price), value); }
-        public double price_limit { get => GetPropertyValue<double>(nameof(price_limit)); set => SetPropertyValue(nameof(price_limit), value); }
+        // trail_price and price_limit removed - not persisted anymore
         public double price { get => GetPropertyValue<double>(nameof(price)); set => SetPropertyValue(nameof(price), value); }
         public double price_open { get => GetPropertyValue<double>(nameof(price_open)); set => SetPropertyValue(nameof(price_open), value); }
         public double price_close { get => GetPropertyValue<double>(nameof(price_close)); set => SetPropertyValue(nameof(price_close), value); }
@@ -115,7 +112,7 @@ namespace XTA.XData.Models
         public XpoSignalHistory(Session session) : base(session) { }
         [Key(true)] public long id { get => GetPropertyValue<long>(nameof(id)); set => SetPropertyValue(nameof(id), value); }
         [Size(50), Indexed(Unique = false)] public string sid { get => GetPropertyValue<string>(nameof(sid))!; set => SetPropertyValue(nameof(sid), value); }
-        [Size(20)] public string gid { get => GetPropertyValue<string>(nameof(gid))!; set => SetPropertyValue(nameof(gid), value); }
+        // gid removed from history model
         public int cno { get => GetPropertyValue<int>(nameof(cno)); set => SetPropertyValue(nameof(cno), value); }
         public int sno { get => GetPropertyValue<int>(nameof(sno)); set => SetPropertyValue(nameof(sno), value); }
         public int msg_id { get => GetPropertyValue<int>(nameof(msg_id)); set => SetPropertyValue(nameof(msg_id), value); }
@@ -138,8 +135,7 @@ namespace XTA.XData.Models
         public double ikte_step { get => GetPropertyValue<double>(nameof(ikte_step)); set => SetPropertyValue(nameof(ikte_step), value); }
         public double tp { get => GetPropertyValue<double>(nameof(tp)); set => SetPropertyValue(nameof(tp), value); }
         public double sl { get => GetPropertyValue<double>(nameof(sl)); set => SetPropertyValue(nameof(sl), value); }
-        public int ts_start { get => GetPropertyValue<int>(nameof(ts_start)); set => SetPropertyValue(nameof(ts_start), value); }
-        public int ts_step { get => GetPropertyValue<int>(nameof(ts_step)); set => SetPropertyValue(nameof(ts_step), value); }
+        // grid profile: ts_start/ts_step deprecated; use ikte_start/ikte_step where applicable
         public int close_type { get => GetPropertyValue<int>(nameof(close_type)); set => SetPropertyValue(nameof(close_type), value); }
         public double trail_price { get => GetPropertyValue<double>(nameof(trail_price)); set => SetPropertyValue(nameof(trail_price), value); }
         public double price_limit { get => GetPropertyValue<double>(nameof(price_limit)); set => SetPropertyValue(nameof(price_limit), value); }
@@ -211,8 +207,7 @@ namespace XTA.XData.Models
         public double tp { get => GetPropertyValue<double>(nameof(tp)); set => SetPropertyValue(nameof(tp), value); }
         public double sl { get => GetPropertyValue<double>(nameof(sl)); set => SetPropertyValue(nameof(sl), value); }
 
-        public int ts_start { get => GetPropertyValue<int>(nameof(ts_start)); set => SetPropertyValue(nameof(ts_start), value); }
-        public int ts_step { get => GetPropertyValue<int>(nameof(ts_step)); set => SetPropertyValue(nameof(ts_step), value); }
+        // ts_start/ts_step deprecated in history model
         
         public double te_start { get => GetPropertyValue<double>(nameof(te_start)); set => SetPropertyValue(nameof(te_start), value); }
         public double te_step { get => GetPropertyValue<double>(nameof(te_step)); set => SetPropertyValue(nameof(te_step), value); }

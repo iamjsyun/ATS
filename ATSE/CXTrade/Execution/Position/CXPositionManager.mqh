@@ -94,8 +94,14 @@ public:
         int status = invMgr.CheckHistoryClosure(ticket, reason);
 
         if(status != XE_UNKNOWN) {
+            // [v1.2 Manual Sync Mandate] 터미널 수동 종료 감지 시, 앱에 청산 정보를 제공하기 위해 xa_exit=1 설정
+            sig.SetXAExit(1); 
             CXMessageProvider::UpdateStatus(sig, status, reason);
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "Asset closed by broker: " + reason));
+            
+            IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+            if(IS_VALID(repo)) repo.UpdateStatus(sig);
+
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("POS-MANAGER", xp, "Asset closed by broker: " + reason + " (Manual Sync: xa_exit=1)"));
             return;
         }
         
@@ -212,6 +218,21 @@ public:
                     SAFE_DELETE(sig);
                 }
                 xp.SetSignal(NULL);
+            } else {
+                // If session exists, ensure the signal ticket is up to date (mapping pending order ticket to active position ticket)
+                ICXSignal* sig = existing.GetSignal();
+                if(IS_VALID(sig) && sig.GetTicket() != ticket) {
+                    if(sig.GetStatus() < XE_EXECUTED) {
+                        sig.SetTag("LIMIT_FILL"); // [v1.0] 진입 경로 태깅 (지정가 체결)
+                        sig.SetStatus(XE_EXECUTED);
+                        sig.SetStatusMsg(StringFormat("Limit Fill Detected. Ticket:%I64u", ticket));
+                        
+                        IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+                        if(IS_VALID(repo)) repo.UpdateStatus(sig);
+                        XP_LOG_OK(xp, StringFormat("[POS-MANAGER-SCAN] Limit Order Filled. Tag:LIMIT_FILL, Ticket:%I64u, SID:%s", ticket, sid));
+                    }
+                    sig.SetTicket(ticket);
+                }
             }
         }
     }

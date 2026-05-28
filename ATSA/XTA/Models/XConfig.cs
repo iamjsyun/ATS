@@ -70,8 +70,8 @@ namespace XTA.Models
                             Interpreter = "GlobalGold",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Live",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
@@ -79,8 +79,8 @@ namespace XTA.Models
                             Interpreter = "GMK",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Live",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
@@ -88,8 +88,8 @@ namespace XTA.Models
                             Interpreter = "GlobalGold",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
@@ -97,8 +97,8 @@ namespace XTA.Models
                             Interpreter = "GMK",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
@@ -107,8 +107,8 @@ namespace XTA.Models
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/-ps7V40GrA4", ROI = "100,100,400,200", IntervalMs = 3000 },
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
@@ -117,8 +117,8 @@ namespace XTA.Models
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/P4V456LsOYk", ROI = "0,0,800,400", IntervalMs = 3000 },
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 1500, 700" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         }
                     }
@@ -137,6 +137,12 @@ namespace XTA.Models
         public string LoggingLevel { get; set; } = "Info";
         public int RefreshIntervalMs { get; set; } = 1000;
         public int TtsVolume { get; set; } = 100; // [v14.43] TTS Volume control (0-100)
+
+        /// <summary>
+        /// Interval (in seconds) between automatic archive runs executed by the DB service.
+        /// Default is 1 second.
+        /// </summary>
+        public int ArchiveIntervalSeconds { get; set; } = 1;
 
         /// <summary>
         /// [v10.0] Global Signal Source Type (Telegram, YouTube, Simulator)
@@ -185,7 +191,7 @@ namespace XTA.Models
         public bool? Enabled { get; set; }
         public string? LotStrategy { get; set; } = "Fixed, 0.01, 0"; // "Type, Value, Rate"
         public string? Entry { get; set; } = "500, 100, 1000";       // "TeStart, TeStep, TeLimit"
-        public string? Exit { get; set; } = "500, 100, 1500, 700";  // "TsStart, TsStep, TP, SL"
+        public string? Exit { get; set; } = "500, 100, 700, 1500";  // "TsStart, TsStep, SL, TP"
 
         [JsonIgnore]
         public XLotStrategy LotStrategyObj => ParseLotStrategy(LotStrategy);
@@ -223,8 +229,8 @@ namespace XTA.Models
             return new XExitOption { 
                 TsStart = p.Length > 0 ? int.Parse(p[0]) : 500, 
                 TsStep = p.Length > 1 ? int.Parse(p[1]) : 100, 
-                TP = p.Length > 2 ? double.Parse(p[2]) : 1500, 
-                SL = p.Length > 3 ? double.Parse(p[3]) : 700 
+                SL = p.Length > 2 ? double.Parse(p[2]) : 700, 
+                TP = p.Length > 3 ? double.Parse(p[3]) : 1500 
             };
         }
     }
@@ -247,8 +253,8 @@ namespace XTA.Models
     {
         public int TsStart { get; set; }
         public int TsStep { get; set; }
-        public double TP { get; set; }
         public double SL { get; set; }
+        public double TP { get; set; }
     }
 
     public class XOcrSettings

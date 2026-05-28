@@ -9,7 +9,7 @@ namespace XTA.XData.Models
             return new XSignal
             {
                 sid = xpo.sid,
-                gid = xpo.gid,
+                // gid removed from domain model mapping
                 cno = xpo.cno,
                 sno = xpo.sno,
                 gno = XIdManager.Instance.ExtractGnoFromSid(xpo.sid),
@@ -32,11 +32,8 @@ namespace XTA.XData.Models
                 ikte_step = xpo.ikte_step,
                 tp = xpo.tp,
                 sl = xpo.sl,
-                ts_start = xpo.ts_start,
-                ts_step = xpo.ts_step,
+                // ts_start/ts_step, trail_price, price_limit removed from domain mapping
                 close_type = xpo.close_type,
-                trail_price = xpo.trail_price,
-                price_limit = xpo.price_limit,
                 price = xpo.price,
                 price_open = xpo.price_open,
                 price_close = xpo.price_close,
@@ -55,7 +52,7 @@ namespace XTA.XData.Models
         public static void ToXpoModel(this XSignal domain, XpoSignal xpo)
         {
             xpo.sid = domain.sid;
-            xpo.gid = domain.gid;
+            // gid removed - domain gid ignored by XPO
             xpo.cno = domain.cno;
             xpo.sno = domain.sno;
             xpo.msg_id = domain.msg_id;
@@ -77,11 +74,8 @@ namespace XTA.XData.Models
             xpo.ikte_step = domain.ikte_step;
             xpo.tp = domain.tp;
             xpo.sl = domain.sl;
-            xpo.ts_start = domain.ts_start;
-            xpo.ts_step = domain.ts_step;
+            // ts_start/ts_step, trail_price, price_limit removed from XPO mapping
             xpo.close_type = domain.close_type;
-            xpo.trail_price = domain.trail_price;
-            xpo.price_limit = domain.price_limit;
             xpo.price = domain.price;
             xpo.price_open = domain.price_open;
             xpo.price_close = domain.price_close;
@@ -161,8 +155,9 @@ namespace XTA.XData.Models
                 sl = xpo.sl,
                 te_start = xpo.te_start,
                 te_step = xpo.te_step,
-                ts_start = xpo.ts_start,
-                ts_step = xpo.ts_step,
+                // ts_start/ts_step deprecated in grid profile mapping
+                ts_start = 0,
+                ts_step = 0,
                 gap_min = xpo.gap_min
             };
         }
@@ -188,7 +183,6 @@ namespace XTA.XData.Models
         public static void ToHistoryModel(this XpoSignal source, XpoSignalHistory target)
         {
             target.sid = source.sid;
-            target.gid = source.gid;
             target.cno = source.cno;
             target.sno = source.sno;
             target.msg_id = source.msg_id;
@@ -208,11 +202,8 @@ namespace XTA.XData.Models
             target.te_interval = source.te_interval;
             target.tp = source.tp;
             target.sl = source.sl;
-            target.ts_start = source.ts_start;
-            target.ts_step = source.ts_step;
+            // ts_start/ts_step deprecated; trail_price/price_limit removed
             target.close_type = source.close_type;
-            target.trail_price = source.trail_price;
-            target.price_limit = source.price_limit;
             target.price = source.price;
             target.price_open = source.price_open;
             target.price_close = source.price_close;
@@ -245,7 +236,6 @@ namespace XTA.XData.Models
             return new XSignal
             {
                 sid = xpo.sid,
-                gid = xpo.gid,
                 cno = xpo.cno,
                 sno = xpo.sno,
                 gno = XIdManager.Instance.ExtractGnoFromSid(xpo.sid),
@@ -268,11 +258,8 @@ namespace XTA.XData.Models
                 ikte_step = xpo.ikte_step,
                 tp = xpo.tp,
                 sl = xpo.sl,
-                ts_start = xpo.ts_start,
-                ts_step = xpo.ts_step,
+                // ts_start/ts_step deprecated in history mapping
                 close_type = xpo.close_type,
-                trail_price = xpo.trail_price,
-                price_limit = xpo.price_limit,
                 price = xpo.price,
                 price_open = xpo.price_open,
                 price_close = xpo.price_close,

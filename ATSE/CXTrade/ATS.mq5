@@ -1,4 +1,4 @@
-﻿//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
 //|                                                          ATS.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
 //| [v13.5] Main ATS Engine - UAF & Resilience Standard              |
@@ -15,7 +15,7 @@
 
 //--- [Group: Basic Configuration]
 input string         InpTargetMagics    = "1001,1002,3001,3002"; // Target Magic Numbers (CSV)
-input double         InpTimerInterval   = 0.5;                 // Timer Interval (Seconds)
+input double         InpTimerInterval   = 0.2;                 // Timer Interval (Seconds)
 input string         InpRemoteAddr      = "127.0.0.1:878";     // Remote Log Address (IP:Port)
 input string         InpDatabaseName    = "ATS.db";            // DB: Database Filename
 input bool           InpUseCommonPath   = true;                // DB: Use Terminal Common Path
@@ -54,8 +54,8 @@ int OnInit() {
     ChartSetInteger(0, CHART_SHOW_GRID, false);
     ChartSetInteger(0, CHART_SHOW_OBJECT_DESCR, false);
     
-    //--- [v10.4] Testing Mode: Timer-only execution (0.5s)
-    EventSetMillisecondTimer(500);
+    //--- [v10.4] Testing Mode: Timer-only execution (100ms / 0.1s)
+    EventSetMillisecondTimer(100);
     
  
     // 1. Configuration 객체 생성 (v10.27)
@@ -94,8 +94,7 @@ void OnDeinit(const int reason) {
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-    //-- [v10.4] Disabled for Testing (Use Timer Only)
-    // if(IS_VALID(g_app)) g_app.Pulse(EVENT_TICK);
+    if(IS_VALID(g_app)) g_app.Pulse(EVENT_TICK);
 }
 
 //+------------------------------------------------------------------+

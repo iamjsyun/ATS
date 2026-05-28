@@ -17,6 +17,8 @@ public:
 
     //--- 런타임 전용 필드 (비영속)
     int       last_status; 
+    int       ts_start;
+    int       ts_step;
 
     CXSignal() {
         Reset();
@@ -29,7 +31,6 @@ public:
     void Reset() {
         id = 0;
         sid = "";
-        gid = "";
         cno = 0;
         sno = 0;
         msg_id = 0;
@@ -54,8 +55,6 @@ public:
         ts_start = 0;
         ts_step = 0;
         close_type = 0;
-        trail_price = 0.0;
-        price_limit = 0.0;
         price = 0.0;
         price_open = 0.0;
         price_close = 0.0;
@@ -83,7 +82,6 @@ public:
     // Setters (수동 구현)
     virtual void SetId(int v) override { id = v; }
     virtual void SetSid(string v) override { sid = v; StringTrimLeft(sid); StringTrimRight(sid); }
-    virtual void SetGid(string v) override { gid = v; StringTrimLeft(gid); StringTrimRight(gid); }
     virtual void SetCno(int v) override { cno = v; }
     virtual void SetSno(int v) override { sno = v; }
     virtual void SetMsgId(int v) override { msg_id = v; }
@@ -107,9 +105,9 @@ public:
     virtual void SetSL(double v) override { sl = v; }
     virtual void SetTSStart(int v) override { ts_start = v; }
     virtual void SetTSStep(int v) override { ts_step = v; }
+    virtual int  GetTSStart() const override { return ts_start; }
+    virtual int  GetTSStep() const override { return ts_step; }
     virtual void SetCloseType(int v) override { close_type = v; }
-    virtual void SetTrailPrice(double v) override { trail_price = v; }
-    virtual void SetPriceLimit(double v) override { price_limit = v; }
     virtual void SetPrice(double v) override { price = v; }
     virtual void SetPriceOpen(double v) override { price_open = v; }
     virtual void SetPriceClose(double v) override { price_close = v; }

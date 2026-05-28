@@ -44,8 +44,32 @@ public:
             ICXPriceManager* priceMgr = CX_GET_OBJ(m_ctx, "price_mgr", ICXPriceManager);
             double point = IS_VALID(symMgr) ? symMgr.GetPoint(symbol) : SymbolInfoDouble(symbol, SYMBOL_POINT);
             double mkt   = IS_VALID(priceMgr) ? priceMgr.GetMarketPrice(symbol, sig.GetDir()) : SymbolInfoDouble(symbol, (sig.GetDir() == CX_DIR_BUY) ? SYMBOL_ASK : SYMBOL_BID);
-            double tesp = (sig.GetTEStart() >= 1) ? mkt + (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
-            double telp = (sig.GetTELimit() >= 1) ? mkt + (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?-1:1)) : 0.0;
+            
+            // [v1.1 Fix] 실시간 시장가(mkt) 대신 '고정 참조 가격' 기반으로 논리적 트리거 가격 산출 (Jitter 제거)
+            double refPrice = sig.GetPriceSignal();
+            if(refPrice <= 0) refPrice = sig.GetPriceOpen();
+
+            string activeKey = "TE_Active_" + sig.GetSid();
+            ICXParam* pActive = m_ctx.GetParam(activeKey);
+            bool isActive = (IS_VALID(pActive) && pActive.GetInt() == 1);
+
+            double tesp = 0;
+            double telp = 0;
+
+            if(!isActive) {
+                // 1. 활성화 전: 신호 가격 대비 TEStart 포인트 (고정된 진입 장벽 표시)
+                tesp = refPrice + (sig.GetTEStart() * point * (sig.GetDir()==CX_DIR_BUY?-1:1));
+                telp = refPrice + (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?-1:1));
+            } else {
+                // 2. 활성화 후: 극점(Extremity) 대비 TEStep 포인트 (움직이는 반등 트리거선 표시)
+                string extKey = "LastEntryExtremity_" + sig.GetSid();
+                ICXParam* pExt = m_ctx.GetParam(extKey);
+                if(IS_VALID(pExt) && pExt.GetDouble() > 0) refPrice = pExt.GetDouble();
+                
+                tesp = refPrice - (sig.GetTEStep() * point * (sig.GetDir()==CX_DIR_BUY?-1:1));
+                telp = refPrice + (sig.GetTELimit() * point * (sig.GetDir()==CX_DIR_BUY?-1:1));
+            }
+            
             spec = StringFormat("ESTART:%d, ESTART_PRICE:%.2f, ELIMIT_PRICE:%.2f", (int)sig.GetTEStart(), tesp, telp);
         }
 
@@ -76,10 +100,12 @@ public:
         // ... (History retry logic follows as in original)
 
         if(status != XE_UNKNOWN) {
+            // [v1.2 Manual Sync Mandate] 터미널 수동 취소 감지 시, 앱에 정보를 제공하기 위해 xa_exit=1 설정
+            sig.SetXAExit(1);
             IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
             CXMessageProvider::UpdateStatus(sig, status, reason);
             if(IS_VALID(repo)) repo.UpdateStatus(sig);
-            XP_LOG_INFO(xp, CXAuditFormatter::Build("ORDER-MANAGER", xp, "Asset Closure Detected: " + reason));
+            XP_LOG_INFO(xp, CXAuditFormatter::Build("ORDER-MANAGER", xp, "Asset Closure Detected: " + reason + " (Manual Sync: xa_exit=1)"));
             return;
         }
 
@@ -174,6 +200,9 @@ public:
         Print(auditMsg);
 
         IRepository* repo = CX_GET_OBJ(m_ctx, "repo", IRepository);
+        if(sig.GetType() == ORDER_MARKET) {
+            sig.SetTag("ENTRY_MARKET");
+        }
         CXMessageProvider::UpdateStatus(sig, sig.GetStatus(), "Calling " + funcName + "...");
         if(IS_VALID(repo)) repo.UpdateStatus(sig);
 
@@ -212,8 +241,8 @@ public:
             return false;
         }
 
-        ulong ticket = (sig.GetType() == ORDER_MARKET) ? m_terminal.GetLastResultDeal() : m_terminal.GetLastResultOrder();
-        if(ticket == 0) ticket = m_terminal.GetLastResultOrder();
+        ulong ticket = m_terminal.GetLastResultOrder();
+        if(ticket == 0) ticket = m_terminal.GetLastResultDeal();
         sig.SetTicket(ticket);
         CXMessageProvider::UpdateStatus(sig, XE_IN_TRANSIT, "Order Placed: " + (string)ticket);
         if(IS_VALID(repo)) repo.UpdateStatus(sig);

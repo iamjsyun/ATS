@@ -1,4 +1,4 @@
-﻿#ifndef CX_TASK_ENTRY_L_PRICE_MQH
+#ifndef CX_TASK_ENTRY_L_PRICE_MQH
 #define CX_TASK_ENTRY_L_PRICE_MQH
 
 #include "..\..\..\Platform\Core\Interfaces\IXTask.mqh"
@@ -32,9 +32,14 @@ public:
         double marketPrice = priceMgr.GetMarketPrice(symbol, dir);
 
         // 1. 실행 가격 계산 (Pending Order용 또는 Market용)
-        // [v14.31 Spec Sync] 최초 진입 시에는 ELIMIT을 사용하여 안전 거리를 확보한다.
-        double offset = (sig.GetType() == ORDER_MARKET) ? 0 : sig.GetTELimit();
-        double execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), offset);
+        double execPrice = 0;
+        if(sig.GetType() == ORDER_LIMIT || sig.GetType() == ORDER_STOP) {
+            execPrice = sig.GetPriceSignal();
+        } else {
+            // [v14.31 Spec Sync] 최초 진입 시에는 ELIMIT을 사용하여 안전 거리를 확보한다.
+            double offset = (sig.GetType() == ORDER_MARKET) ? 0 : sig.GetTELimit();
+            execPrice = priceMgr.CalculateExecPrice(xp, symbol, dir, sig.GetType(), offset);
+        }
         
         // 2. SL/TP 가격 계산 (BasePrice 기반)
         double basePrice = (sig.GetType() == ORDER_MARKET) ? marketPrice : execPrice;

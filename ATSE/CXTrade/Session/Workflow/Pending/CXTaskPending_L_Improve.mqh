@@ -46,45 +46,49 @@ public:
         if(IS_VALID(pActive) && pActive.GetInt() == 1) isActive = true;
 
         string extKey = "LastEntryExtremity_" + sig.GetSid();
-        double lastExt = 0;
+        double extVal = 0;
         ICXParam* pExt = ctx.GetParam(extKey);
-        if(IS_VALID(pExt)) lastExt = pExt.GetDouble();
-
-        bool is_improved = false;
-        if(lastExt <= 0) {
-            is_improved = true;
-        } else {
-            is_improved = (sig.GetDir() == CX_DIR_BUY) ? (lastExt - currentPrice >= sig.GetTEStep() * point)
-                                                       : (currentPrice - lastExt >= sig.GetTEStep() * point);
-        }
-
-        double extVal = lastExt;
-        if(is_improved) {
-            // [v16.26 Mandate] 극점(lastExt) 갱신
-            extVal = currentPrice;
-            
-            if(IS_INVALID(pExt)) {
-                pExt = new CXParam();
-                ctx.Set(extKey, pExt);
-            }
-            pExt.SetDouble(extVal);
-        }
+        if(IS_VALID(pExt)) extVal = pExt.GetDouble();
 
         // [v16.32 Visual Correction] 활성화 여부에 따른 트리거 라인 위치 정밀화
         double triggerPrice = 0;
+        bool shouldDraw = false;
+
         if(!isActive) {
             // 1. 활성화 전: 진트 활성화 임계선 표시 (price_signal 기준 고정)
             double priceSignal = sig.GetPriceSignal();
             if(priceSignal <= 0) priceSignal = orderPrice - (sig.GetTELimit() * point * dir_sign);
             triggerPrice = priceSignal + (sig.GetTEStart() * point * dir_sign);
-        } else {
+
+            // [v18.36] 활성화 전 라인은 최초 1회 또는 상태 전이 시에만 출력
+            string drawKey = "TE_InitialDraw_" + sig.GetSid();
+            if(IS_INVALID(ctx.GetParam(drawKey))) {
+                ICXParam* pDraw = new CXParam();
+                pDraw.SetInt(1);
+                ctx.Set(drawKey, pDraw);
+                shouldDraw = true;
+            }
+            } else {
             // 2. 활성화 후: 실제 시장가 진입 반등 트리거선 표시 (extreme 기준 유동)
             // BUY: extreme + TE_STEP, SELL: extreme - TE_STEP
-            triggerPrice = extVal - (sig.GetTEStep() * point * dir_sign);
-        }
+            if(extVal > 0) {
+                triggerPrice = extVal - (sig.GetTEStep() * point * dir_sign);
+
+                // 극점이 갱신되었거나, 방금 활성화 상태로 전환되었다면 갱신
+                string lastDrawExtKey = "TE_LastDrawExt_" + sig.GetSid();
+                ICXParam* pLastDraw = ctx.GetParam(lastDrawExtKey);
+                if(IS_INVALID(pLastDraw) || pLastDraw.GetDouble() != extVal) {
+                    if(IS_INVALID(pLastDraw)) {
+                        pLastDraw = new CXParam();
+                        ctx.Set(lastDrawExtKey, pLastDraw);
+                    }
+                    pLastDraw.SetDouble(extVal);
+                    shouldDraw = true;
+                }
+            }
+            }
         
-        // [v18.35 Optimization] 트리거 가격이 변했거나 활성화 상태가 변했을 때만 갱신
-        if(is_improved || !isActive) {
+        if(shouldDraw && triggerPrice > 0) {
             CXChartVisualizer::DrawTEStart(ctx, sig, triggerPrice, "CXTaskPending_L_Improve");
         }
 

@@ -5,11 +5,11 @@
 
 #line 46 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
 int SessionStateNameToEnum(string name);
-#line 57 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
+#line 58 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
 string SessionStateEnumToName(int state);
-#line 68 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
+#line 69 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
 string XeStatusEnumToName(int status);
-#line 133 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
+#line 136 "d:/Projects/ATS/ATSE/CXTradeTest/CXScenarioRunner.mq5"
 void ExecuteTick(int tick);
 
 #endif

@@ -19,6 +19,7 @@
 #include "Orchestration\CXTaskFactory.mqh"
 #include "..\Platform\Shared\Logging\CXAuditFormatter.mqh"
 #include "..\Platform\Shared\Logging\CXMessageProvider.mqh"
+#include "..\Platform\Shared\Logging\CXLogDispatcher.mqh"
 #include "Infra\CXServiceFactory.mqh"
 #include "..\Platform\Core\Models\CXConfig.mqh"
 
@@ -48,11 +49,17 @@ private:
     IXExitManager*        m_exitManager;
     CXUI*                 m_ui;
 
+    // Scheduler tick counters (v1.0 Multi-Interval Scheduler)
+    uint                  m_lastWatcherScanTime;
+    uint                  m_lastAssetPulseTime;
+    uint                  m_lastUiRefreshTime;
+
 public:
     CXAppService() : m_config(NULL), m_db(NULL), m_repo(NULL), m_assetManager(NULL), 
                     m_factory(NULL), m_watcher(NULL), m_logger(NULL), m_globalContext(NULL),
                     m_orchestrator(NULL), m_guard(NULL), m_terminalPlatform(NULL),
-                    m_priceManager(NULL), m_exitManager(NULL), m_ui(NULL) {}
+                    m_priceManager(NULL), m_exitManager(NULL), m_ui(NULL),
+                    m_lastWatcherScanTime(0), m_lastAssetPulseTime(0), m_lastUiRefreshTime(0) {}
 
     virtual ~CXAppService() override {
         SAFE_DELETE(m_ui);
@@ -109,6 +116,12 @@ public:
         m_db = m_factory.CreateDatabase();
         if(IS_INVALID(m_db) || !m_db.Open(m_config.GetDatabaseName(), m_config.IsDatabaseCommon())) return false;
         
+        // [v1.1] Link the database to the logger dispatcher
+        CXLogDispatcher* dispatcher = dynamic_cast<CXLogDispatcher*>(m_logger);
+        if(IS_VALID(dispatcher)) {
+            dispatcher.SetDatabase(m_db);
+        }
+        
         m_repo = m_factory.CreateRepository(m_db);
         if(IS_INVALID(m_repo)) return false;
         m_globalContext.Register("db", m_db);
@@ -126,16 +139,43 @@ public:
         return true;
     }
 
-    virtual void Pulse() override {
+    virtual void Pulse(ENUM_CX_EVENT event = EVENT_TIMER) override {
         if(IS_INVALID(m_pulseParam)) return;
-        m_pulseParam.Reset();
         
-        if(IS_VALID(m_watcher)) m_watcher.Pulse(m_pulseParam);
+        uint currentTick = GetTickCount();
         
-        // [v18.43 Fix] 워처에 의해 오염된 컨텍스트를 글로벌로 원상복구하여 세션이 System 로거를 상속받게 함
-        m_pulseParam.SetContext(m_globalContext); 
-        if(IS_VALID(m_assetManager)) m_assetManager.Pulse(m_pulseParam);
-        if(IS_VALID(m_ui)) m_ui.Refresh();
+        // 1. OnTick High-Performance Path
+        if(event == EVENT_TICK) {
+            m_pulseParam.Reset();
+            m_pulseParam.SetEvent(EVENT_TICK);
+            m_pulseParam.SetContext(m_globalContext);
+            if(IS_VALID(m_assetManager)) m_assetManager.Pulse(m_pulseParam);
+            return;
+        }
+        
+        // 2. OnTimer Heartbeat Path
+        // A. Watcher Scan (400ms)
+        if(currentTick - m_lastWatcherScanTime >= 400) {
+            m_pulseParam.Reset();
+            m_pulseParam.SetEvent(EVENT_TIMER);
+            if(IS_VALID(m_watcher)) m_watcher.Pulse(m_pulseParam);
+            m_lastWatcherScanTime = currentTick;
+        }
+        
+        // B. Core Pulse (300ms)
+        if(currentTick - m_lastAssetPulseTime >= 300) {
+            m_pulseParam.Reset();
+            m_pulseParam.SetEvent(EVENT_TIMER);
+            m_pulseParam.SetContext(m_globalContext);
+            if(IS_VALID(m_assetManager)) m_assetManager.Pulse(m_pulseParam);
+            m_lastAssetPulseTime = currentTick;
+        }
+
+        // C. UI Refresh (1000ms)
+        if(currentTick - m_lastUiRefreshTime >= 500) {
+            if(IS_VALID(m_ui)) m_ui.Refresh();
+            m_lastUiRefreshTime = currentTick;
+        }
     }
 
     virtual ICXContext* GetContext() override { return m_globalContext; }

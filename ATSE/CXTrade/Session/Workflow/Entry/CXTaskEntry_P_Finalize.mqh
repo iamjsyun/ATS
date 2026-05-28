@@ -41,6 +41,12 @@ public:
                 if(priceSignal > 0) {
                     double triggerLine = priceSignal + (sig.GetTEStart() * point * dir_sign);
                     CXChartVisualizer::DrawTEStart(ctx, sig, triggerLine, "CXTaskEntry_P_Finalize");
+                    
+                    // [v18.36] Mark as initially drawn to prevent redundant redraw in Improve task
+                    string drawKey = "TE_InitialDraw_" + sig.GetSid();
+                    ICXParam* pDraw = new CXParam();
+                    pDraw.SetInt(1);
+                    ctx.Set(drawKey, pDraw);
                 }
             }
 
