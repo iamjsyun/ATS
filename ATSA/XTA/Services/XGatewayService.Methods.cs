@@ -45,7 +45,8 @@ namespace XTA.Services
             }
             else // Default: Telegram
             {
-                if (xdo.Sender != "XTelegram")
+                // Allow XTelegram and its UI wrapper (XTelegramUI) or any derived names that start with "XTelegram"
+                if (string.IsNullOrEmpty(xdo.Sender) || !xdo.Sender.StartsWith("XTelegram", StringComparison.Ordinal))
                 {
                     nlog.Trace($"[Gateway:SKIP] Global source is Telegram. Dropping {xdo.Sender} message (MsgId:{xdo.MsgId})");
                     return;

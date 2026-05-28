@@ -99,3 +99,8 @@ CREATE TABLE IF NOT EXISTS atse_log (
 ### B. Standardized Audit Payload
 Audit logs contain a standardized suffix payload tracking the state and converted price metrics:
 `[Description] | SID:{sid}, Stage:{stage}, Task:{task}, SeqState:{state}, XA:({xa_entry},{xa_exit}), XE:{xe_status}, Lot:{lot:F2}, SL:{sl:F2}, TP:{tp:F2}, Parameters:[TE_Start:{te_start:F0}(P:{te_start_price:F2}), TE_Step:{te_step:F0}, TE_Limit:{te_limit:F0}(P:{te_limit_price:F2}), IK_Start:{ikte_start:F0}(P:{ikte_start_price:F2}), IK_Step:{ikte_step:F0}], Msg:\"{status_msg}\"`
+
+[[REPORT_Full_Lifecycle_Orchestration_v1.2]]
+[[REPORT_Logger_Improvement_Strategy_v1.1]]
+
+[[REPORT_Pulse_Performance_Optimization_v1.0]]

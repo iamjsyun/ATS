@@ -34,6 +34,32 @@ namespace XTA.Services.TelegramService
         protected override Task HandleUpdate(UpdatesBase updates)
         {
             if (updates == null) return Task.CompletedTask;
+            // Temporary detailed diagnostics: dump registered channels and matching decisions
+            try
+            {
+                if (param?.Channels != null)
+                {
+                    nlog.Trace($"[TG:DIAG] Registered channel groups: {param.Channels.Count}");
+                    int shown = 0;
+                    foreach (var grp in param.Channels)
+                    {
+                        foreach (var ch in grp.Value)
+                        {
+                            nlog.Trace($"[TG:DIAG] RegisteredChannel[{shown}] CID:{ch.CID} CNO:{ch.CNO} Name:{ch.Name} Type:{ch.Type} RunMode:{ch.RunMode} IsSound:{ch.IsSoundEnabled}");
+                            if (++shown >= 50) break;
+                        }
+                        if (shown >= 50) break;
+                    }
+                }
+                else
+                {
+                    nlog.Trace("[TG:DIAG] No registered channels found in XParameter.Channels");
+                }
+            }
+            catch (Exception ex)
+            {
+                nlog.Warn(ex, "[TG:DIAG] Failed to dump registered channels");
+            }
 
             foreach (var update in updates.UpdateList)
             {
@@ -54,6 +80,8 @@ namespace XTA.Services.TelegramService
                 
                 if (matchedChannels.Count == 0)
                 {
+                    nlog.Trace($"[TG:DIAG] No direct match for rawId:{rawId}. Attempting fuzzy matching across registered channels.");
+
                     var matchedInfo = param.Channels.Values.SelectMany(l => l).FirstOrDefault(c =>
                         c.CID == rawId ||
                         c.CID == -rawId ||
@@ -64,10 +92,13 @@ namespace XTA.Services.TelegramService
 
                     if (matchedInfo != null)
                     {
+                        nlog.Trace($"[TG:DIAG] Fuzzy match succeeded. rawId:{rawId} -> matched CID:{matchedInfo.CID} (CNO:{matchedInfo.CNO}, Name:{matchedInfo.Name})");
                         peerId = matchedInfo.CID;
                         matchedChannels = param.GetChannels(peerId);
-                        // [v9.8.12] fuzzy-matched log is only for registered channels
-                        nlog.Trace($"[SIGNAL:STEP-0:MATCH] PeerID {rawId} fuzzy-matched to Registered CID {peerId} ({matchedInfo.Name})");
+                    }
+                    else
+                    {
+                        nlog.Trace($"[TG:DIAG] Fuzzy match failed for rawId:{rawId}. No registered channel matched.");
                     }
                 }
 
