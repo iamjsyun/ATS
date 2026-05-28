@@ -185,6 +185,7 @@
   },
   "active": "80ec25eb0e760a92",
   "lastOpenFiles": [
+<<<<<<< Updated upstream
     "_log/build_atse_20260529_002100.log",
     "ATSE/CXTrade/ATS.ex5",
     "_log/build_atse_20260529_002018.log",
@@ -199,6 +200,19 @@
     "_doc/REPORT_Full_Lifecycle_Orchestration_v1.3.md",
     "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.3.1.md",
     "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.0.md",
+=======
+    "ATSA/XTA.Test/obj/Debug/net10.0-windows/ved2jlmc.is5~",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/UCtrls/TGMsg/UCXTGMsgView.baml",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/UCtrls/TGMsg/UCXTGMsgView.g.cs",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/Settings/SettingsView.g.cs",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/DataManager/DataManagerView.g.cs",
+    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/Dashboard/DashboardView.g.cs",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.sourcelink.json",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.GlobalUsings.g.cs",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.AssemblyInfo.cs",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.AssemblyInfoInputs.cache",
+    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.GeneratedMSBuildEditorConfig.editorconfig",
+>>>>>>> Stashed changes
     "_doc/CX_Timer_Optimization_Report_v1.0.md",
     "ATSE/_doc/REPORT_LIFECYCLE_TREEVIEW_v1.0.md",
     "_doc/gemini/extensions/caveman/INSTALL.md",
