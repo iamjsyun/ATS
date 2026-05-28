@@ -25,9 +25,6 @@
 #include "..\..\Session\Workflow\Pending\CXTaskPending_V_Sync.mqh"
 #include "..\..\Session\Workflow\Pending\CXTaskPending_V_Terminal.mqh"
 #include "..\..\Session\Workflow\Pending\CXTaskPending_P_Align.mqh"
-#include "..\..\Session\Workflow\Pending\CXTaskPending_L_Rebound.mqh"
-#include "..\..\Session\Workflow\Pending\CXTaskPending_L_Improve.mqh"
-#include "..\..\Session\Workflow\Pending\CXTaskPending_L_Extreme.mqh"
 #include "..\..\Session\Workflow\Pending\CXTaskPending_R_Apply.mqh"
 
 // Active Tasks
@@ -37,9 +34,7 @@
 #include "..\..\Session\Workflow\Active\CXTaskActive_V_Terminal.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_P_Align.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_L_Status.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskActive_L_AlphaCalc.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_R_AlphaApply.mqh"
-#include "..\..\Session\Workflow\Active\CXTaskActive_L_TS_TriggerWatch.mqh"
 #include "..\..\Session\Workflow\Active\CXTaskActive_P_Closed.mqh"
 
 // Exit Tasks
@@ -49,6 +44,12 @@
 #include "..\..\Session\Workflow\Exit\CXTaskExit_V_Error.mqh"
 #include "..\..\Session\Workflow\Exit\CXTaskExit_V_Terminal.mqh"
 #include "..\..\Session\Workflow\Exit\CXTaskExit_P_Finalize.mqh"
+
+// Next-Gen Trailing Tasks
+#include "..\..\Session\Workflow\Trailing\CXTaskTrail_V_Activate.mqh"
+#include "..\..\Session\Workflow\Trailing\CXTaskTrail_V_Extremum.mqh"
+#include "..\..\Session\Workflow\Trailing\CXTaskTrail_L_Evaluate.mqh"
+#include "..\..\Session\Workflow\Trailing\CXTaskTrail_R_Execute.mqh"
 
 /**
  * @class CXTaskFactory
@@ -77,14 +78,17 @@ public:
         if(name == "TASK_E_V_DOUBLECHECK") return new CXTaskFinalize_V_DoubleCheck();
         if(name == "TASK_E_P_FINALIZE")    return new CXTaskEntry_P_Finalize();
         
-        // Pending & Trailing Entry
+        // Pending & Trailing Entry (Next-Gen)
         if(name == "TASK_P_V_SYNC")        return new CXTaskPending_V_Sync();
         if(name == "TASK_P_V_TERMINAL")    return new CXTaskPending_V_Terminal();
         if(name == "TASK_P_P_ALIGN")       return new CXTaskPending_P_Align();
-        if(name == "TASK_P_L_REBOUND")     return new CXTaskPending_L_Rebound();
-        if(name == "TASK_P_L_IMPROVE")     return new CXTaskPending_L_Improve();
-        if(name == "TASK_P_L_EXTREME")     return new CXTaskPending_L_Extreme();
         if(name == "TASK_P_R_APPLY")       return new CXTaskPending_R_Apply();
+
+        // Next-Gen Trailing Entry (TE)
+        if(name == "TASK_T_V_ACTIVATE_TE") return new CXTaskTrail_V_Activate(TRAIL_MODE_ENTRY);
+        if(name == "TASK_T_V_EXTREMUM_TE") return new CXTaskTrail_V_Extremum(TRAIL_MODE_ENTRY);
+        if(name == "TASK_T_L_EVALUATE_TE") return new CXTaskTrail_L_Evaluate(TRAIL_MODE_ENTRY);
+        if(name == "TASK_T_R_EXECUTE_TE")  return new CXTaskTrail_R_Execute(TRAIL_MODE_ENTRY);
         
         // Active & Trailing Stop
         if(name == "TASK_A_INTENT_WATCH")      return new CXTaskIntentWatch();
@@ -92,12 +96,14 @@ public:
         if(name == "TASK_A_V_STALE")           return new CXTaskSync_V_Stale();
         if(name == "TASK_A_V_TERMINAL")        return new CXTaskActive_V_Terminal();
         if(name == "TASK_A_P_ALIGN")           return new CXTaskActive_P_Align();
-        if(name == "TASK_A_L_STATUS")          return new CXTaskActive_L_Status();
-        if(name == "TASK_A_ALPHA_CALC")        return new CXTaskActive_L_AlphaCalc();
-        if(name == "TASK_A_ALPHA_APPLY")       return new CXTaskActive_R_AlphaApply();
-        if(name == "TASK_A_TS_TRIGGER_WATCH")  return new CXTaskActive_L_TS_TriggerWatch();
-        if(name == "TASK_E_P_FINALIZE")        return new CXTaskEntry_P_Finalize(); // Reuse for Stage_Closed
+        if(name == "TASK_A_L_Status")          return new CXTaskActive_L_Status();
         if(name == "TASK_ACTIVE_CLOSED")       return new CXTaskActive_P_Closed(); // Specific cleanup
+
+        // Next-Gen Trailing Stop (TS)
+        if(name == "TASK_T_V_ACTIVATE_TS") return new CXTaskTrail_V_Activate(TRAIL_MODE_EXIT);
+        if(name == "TASK_T_V_EXTREMUM_TS") return new CXTaskTrail_V_Extremum(TRAIL_MODE_EXIT);
+        if(name == "TASK_T_L_EVALUATE_TS") return new CXTaskTrail_L_Evaluate(TRAIL_MODE_EXIT);
+        if(name == "TASK_T_R_EXECUTE_TS")  return new CXTaskTrail_R_Execute(TRAIL_MODE_EXIT);
         
         // Exit
         if(name == "TASK_X_L_PREPARE")     return new CXTaskExit_L_Prepare();

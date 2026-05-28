@@ -38,6 +38,23 @@ public:
         }
 
         int total = activeList.Total();
+        
+        // [v1.0 Scenario G] Massive Zombie Re-sweep
+        // If 5 or more exit signals are pending, trigger a bulk SweepByMagic for high-efficiency liquidation.
+        if(total >= 5) {
+            IXExitManager* exitMgr = CX_GET_OBJ(ctx, "exit_mgr", IXExitManager);
+            if(IS_VALID(exitMgr)) {
+                XP_LOG_WARN(xp, StringFormat("[WATCHER-EXIT] Massive Liquidation Detected (%d signals). Triggering Bulk Sweep...", total));
+                // We'll collect unique magics to sweep. For simplicity, we sweep magics from all signals in the list.
+                for(int i = 0; i < total; i++) {
+                    ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
+                    if(IS_VALID(sig)) {
+                        exitMgr.SweepByMagic(xp, sig.GetMagic());
+                    }
+                }
+            }
+        }
+
         for(int i = 0; i < total; i++) {
             ICXSignal* sig = CX_CAST(ICXSignal, activeList.At(i));
             if(IS_INVALID(sig)) continue;

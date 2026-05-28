@@ -13,6 +13,11 @@
  */
 class CXTaskExit_R_Order : public IXTask {
 public:
+    CXTaskExit_R_Order() {
+        // [v1.0 Scenario F] 30s Retry Timeout for Broker Disconnect Recovery
+        SetTimeout(30); 
+    }
+
     virtual string Name() override { return "Exit_R_Order"; }
     virtual int Execute(ICXParam* xp, ICXContext* ctx) override {
         IXExitManager* exitMgr = CX_GET_OBJ(ctx, "exit_mgr", IXExitManager);
@@ -32,7 +37,8 @@ public:
             return TASK_CONTINUE;
         }
 
-        // [v18.19 Pre-Close Shadowing Sync] 청산 전 최신 터미널 실물 데이터 동기화
+        // [v1.0 Scenario H] Pre-Close Shadowing Sync
+        // Double check terminal reality before sending liquidation request
         if(IS_VALID(invMgr)) {
             invMgr.SyncToSignal(sig);
         }
@@ -46,21 +52,19 @@ public:
 
         XP_LOG_TRACE(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("Sending Liquidation Order for Ticket:%I64u...", ticket)));
         
-        // [v14.37 Massive Sweep] 
-        // Always attempt SweepBySid to handle multiple tickets for the same SID.
-        // This ensures orphans like Ticket 3-8 in the user report are cleared along with Ticket 2.
+        // [v1.0 Scenario E & F] Massive SID Sweep with Retry Loop
         if(exitMgr.SweepBySid(xp, sig.GetSid())) {
             XP_LOG_OK(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, "SUCCESS: Massive SID Sweep executed."));
             xp.SetInt(3); // Mark as requested
             return TASK_CONTINUE;
         }
 
+        // [v1.0 Scenario F] Broker Offline / Reconnect Retry (TASK_YIELD)
         string lastErr = xp.GetString();
         if(lastErr == "") lastErr = "Broker Liquidation Request Rejected";
-        string finalErr = "FAILED: " + lastErr;
-        XP_LOG_ERROR(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, finalErr));
-        xp.SetString("[EXIT-R-ORDER] " + finalErr);
-        return SESSION_ERROR;
+        
+        XP_LOG_WARN(xp, CXAuditFormatter::Build("EXIT-R-ORDER", xp, StringFormat("RETRY: %s. Retrying via TASK_YIELD...", lastErr)));
+        return TASK_YIELD; 
     }
 };
 

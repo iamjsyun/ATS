@@ -31,8 +31,10 @@ public:
         ICXSignal* sig = xp.GetSignal();
         if(IS_INVALID(sig)) return false;
         
-        // [v18.15 Unified Liquidation] Handle both Positions and Pending Orders
-        return CloseByTicket(xp, sig);
+        // [v1.0 Scenario E] SID-based Sweep for Partial Fill protection
+        // Ensure magic is set for the sweep operation
+        SetMagic(sig.GetMagic());
+        return SweepBySid(xp, sig.GetSid());
     }
 
     /**
@@ -120,6 +122,10 @@ public:
 
     virtual bool SweepBySid(ICXParam* xp, string sid) override {
         return m_terminal.SweepBySid(xp, m_magic, sid);
+    }
+
+    virtual bool SweepByMagic(ICXParam* xp, ulong magic) override {
+        return m_terminal.SweepByMagic(xp, magic);
     }
 
     virtual bool VerifyPhysicalAbsence(string sid) override {

@@ -60,11 +60,12 @@ private:
     ulong      m_lastResultDeal;
     ulong      m_lastResultOrder;
     uint       m_lastRetCode;
+    bool       m_failNextTrade;
     CArrayObj* m_assets;
     CArrayObj* m_history;
 
 public:
-    MockTerminalPlatform() : m_nextTicket(50001), m_lastResultDeal(0), m_lastResultOrder(0), m_lastRetCode(10009) {
+    MockTerminalPlatform() : m_nextTicket(50001), m_lastResultDeal(0), m_lastResultOrder(0), m_lastRetCode(10009), m_failNextTrade(false) {
         m_assets = new CArrayObj();
         m_history = new CArrayObj();
     }
@@ -77,6 +78,7 @@ public:
     //--- Helper to access mock assets directly for verification
     CArrayObj* GetAssets() { return m_assets; }
     CArrayObj* GetHistory() { return m_history; }
+    void SetFailNextTrade(bool fail) { m_failNextTrade = fail; }
 
     /**
      * @brief 강제로 특정 자산 상태를 터미널 환경에 수동 주입 (TCL INJECT: terminal 대응)
@@ -271,6 +273,12 @@ public:
     }
 
     virtual bool PositionClose(ICXParam* xp, ulong ticket) override {
+        if(m_failNextTrade) {
+            m_lastRetCode = 10013; // Invalid request or broker error
+            XP_LOG_ERROR(xp, StringFormat("[ORDER-DELETE-FAIL] Broker Code:%u(Mock Error). Raw: [Ticket:%I64u] (PositionClose)", m_lastRetCode, ticket));
+            m_failNextTrade = false; // Reset after one failure
+            return false;
+        }
         for(int i = 0; i < m_assets.Total(); i++) {
             MockAsset* asset = (MockAsset*)m_assets.At(i);
             if(asset.ticket == ticket && asset.is_position) {
@@ -290,6 +298,12 @@ public:
     }
 
     virtual bool OrderDelete(ICXParam* xp, ulong ticket) override {
+        if(m_failNextTrade) {
+            m_lastRetCode = 10013;
+            XP_LOG_ERROR(xp, StringFormat("[ORDER-DELETE-FAIL] Broker Code:%u(Mock Error). Raw: [Ticket:%I64u]", m_lastRetCode, ticket));
+            m_failNextTrade = false;
+            return false;
+        }
         for(int i = 0; i < m_assets.Total(); i++) {
             MockAsset* asset = (MockAsset*)m_assets.At(i);
             if(asset.ticket == ticket && !asset.is_position) {
@@ -472,6 +486,23 @@ public:
                 MockHistory* hist = new MockHistory();
                 hist.ticket = asset.ticket;
                 hist.reason = "Sweep (MOCK)";
+                hist.closeStatus = XE_CLOSED_SIGNAL;
+                m_history.Add(hist);
+
+                m_assets.Delete(i);
+            }
+        }
+        return all_cleared;
+    }
+
+    virtual bool SweepByMagic(ICXParam* xp, ulong magic) override {
+        bool all_cleared = true;
+        for(int i = m_assets.Total() - 1; i >= 0; i--) {
+            MockAsset* asset = (MockAsset*)m_assets.At(i);
+            if(asset.magic == (int)magic) {
+                MockHistory* hist = new MockHistory();
+                hist.ticket = asset.ticket;
+                hist.reason = "Magic Sweep (MOCK)";
                 hist.closeStatus = XE_CLOSED_SIGNAL;
                 m_history.Add(hist);
 

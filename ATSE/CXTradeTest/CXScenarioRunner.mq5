@@ -1,11 +1,11 @@
 //+------------------------------------------------------------------+
 //|                                           CXScenarioRunner.mq5 |
 //|                                  Copyright 2026, Gemini CLI      |
-//| [v1.1] TSDL-based Deterministic E2E Test Runner for ATSE          |
+//| [v2.0] TSDL-based Deterministic E2E Test Runner for ATSE          |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2026, Gemini CLI"
 #property link      "https://github.com/google-gemini/gemini-cli"
-#property version   "2.10"
+#property version   "2.20"
 #property strict
 
 //--- Include test engine & mocks
@@ -23,9 +23,10 @@
 #include "..\CXTrade\Platform\Core\Interfaces\ICXAssetManager.mqh"
 
 //--- [Inputs]
-input string InpScenarioFile  = "ATSE\\test_golden_path.tsdl"; // TSDL Filename (MQL5/Files)
+input string InpScenarioFile  = "ATSE\\test_advanced_exit.tsdl"; // TSDL Filename (MQL5/Files)
 input string InpDatabaseName  = "ATS_TEST.db";                 // Target Database (Isolated)
 input bool   InpUseCommonPath = true;                          // DB Path
+input int    InpMaxTicks      = 100;                           // Safety Break
 
 //--- Global Instances
 CXTsdlScenario*        g_scenario = NULL;
@@ -41,16 +42,17 @@ CXSignalRepository*   g_repo = NULL;
 CArrayObj*            g_traces = NULL;       
 int                   g_currentTick = 0;
 int                   g_maxTick = 0;
+int                   g_passed = 0;
+int                   g_failed = 0;
 
 //--- Helper functions for state names mapping
 int SessionStateNameToEnum(string name) {
-    StringTrimLeft(name);
-    StringTrimRight(name);
+    StringTrimLeft(name); StringTrimRight(name);
     if(name == "SESSION_READY" || name == "ORD_READY") return 0;
     if(name == "SESSION_EXECUTING" || name == "ORD_EXECUTING") return 2;
-    if(name == "SESSION_TRAILING_ENTRY" || name == "ORD_TRACKING") return 5;
-    if(name == "SESSION_ACTIVE" || name == "POS_MONITORING") return 10;
-    if(name == "SESSION_CLOSED" || name == "SYS_CLOSED") return 30;
+    if(name == "SESSION_TRAILING_ENTRY" || name == "ORD_TRACKING" || name == "ORD_TRAILING") return 5;
+    if(name == "SESSION_ACTIVE" || name == "POS_MONITORING" || name == "POS_ACTIVE") return 10;
+    if(name == "SESSION_CLOSED" || name == "SYS_CLOSED" || name == "SYS_DONE") return 30;
     if(name == "SESSION_ERROR" || name == "SYS_ERROR") return 99;
     return -1;
 }
@@ -93,12 +95,16 @@ public:
 
 int OnInit() {
     g_scenario = CXTsdlParser::Parse(InpScenarioFile);
-    if(IS_INVALID(g_scenario)) return INIT_FAILED;
+    if(IS_INVALID(g_scenario)) {
+        PrintFormat("[RUNNER] ERROR: Scenario file '%s' not found.", InpScenarioFile);
+        return INIT_FAILED;
+    }
 
     g_traces = new CArrayObj();
     CXDatabase* db = new CXDatabase();
     if(db.Open(InpDatabaseName, InpUseCommonPath)) {
         g_repo = new CXSignalRepository(db);
+        // Clean up from previous run if any
         g_repo.DeleteSignalByCnoSno((int)StringToInteger(g_scenario.GetDefine("CNO")), (int)StringToInteger(g_scenario.GetDefine("SNO")), g_scenario.GetDefine("SYMBOL"));
     }
 
@@ -116,14 +122,23 @@ int OnInit() {
 
     g_ctx = g_app.GetContext();
     g_maxTick = g_scenario.GetMaxTick();
-    if(g_maxTick <= 0) g_maxTick = 100;
+    if(g_maxTick <= 0) g_maxTick = InpMaxTicks;
     
+    Print("==================================================");
+    PrintFormat("TSDL Runner Started: %s", g_scenario.m_desc);
+    Print("==================================================");
+
     EventSetMillisecondTimer(100);
     return INIT_SUCCEEDED;
 }
 
 void OnDeinit(const int reason) {
     EventKillTimer();
+    
+    Print("==================================================");
+    PrintFormat("TSDL Runner Finished. Total Ticks: %d, Passed: %d, Failed: %d", g_currentTick, g_passed, g_failed);
+    Print("==================================================");
+
     SAFE_DELETE(g_repo);
     SAFE_DELETE(g_app);
     SAFE_DELETE(g_config);
@@ -133,11 +148,156 @@ void OnDeinit(const int reason) {
     SAFE_DELETE(g_traces);
 }
 
+void HandleAction(CXTsdlAction* action) {
+    if(IS_INVALID(action)) return;
+
+    if(action.m_type == "MARKET") {
+        if(action.m_target == "price") {
+            g_pricer.OverridePrice(action.GetParamDouble("price"));
+        }
+    }
+    else if(action.m_type == "INJECT") {
+        if(action.m_target == "terminal") {
+            string sym = action.GetParam("symbol"); if(sym == "") sym = "GOLDF#";
+            g_mockTerminal.InjectMockAsset(action.GetParamBool("order_fill"),
+                                           (ulong)action.GetParamInt("ticket"),
+                                           action.GetParam("sid"),
+                                           sym,
+                                           action.GetParamInt("magic", 1001),
+                                           action.GetParamInt("dir", 1),
+                                           action.GetParamDouble("lot", 0.1),
+                                           action.GetParamDouble("price"),
+                                           action.GetParamDouble("sl"),
+                                           action.GetParamDouble("tp"));
+        }
+        else if(action.m_target == "signals") {
+            CXSignal* sig = new CXSignal();
+            sig.SetSid(action.GetParam("sid"));
+            sig.SetCno(action.GetParamInt("cno"));
+            sig.SetSno(action.GetParamInt("sno"));
+            string sym = action.GetParam("symbol"); if(sym == "") sym = "GOLDF#";
+            sig.SetSymbol(sym);
+            sig.SetDir(action.GetParamInt("dir", 1));
+            sig.SetType(action.GetParamInt("type", 0));
+            sig.SetLot(action.GetParamDouble("lot", 0.1));
+            sig.SetXAEntry(action.GetParamInt("xa_entry", 1));
+            sig.SetXAExit(action.GetParamInt("xa_exit", 0));
+            sig.SetStatus(action.GetParamInt("xe_status", 0));
+            sig.SetMagic(action.GetParamInt("magic", 1001));
+            if(IS_VALID(g_repo)) g_repo.SaveSignal(sig);
+            SAFE_DELETE(sig);
+        }
+    }
+    else if(action.m_type == "FAIL") {
+        if(action.m_target == "broker") {
+            g_mockTerminal.SetFailNextTrade(action.GetParamBool("next"));
+        }
+    }
+}
+
+void VerifyExpectation(CXTsdlExpect* expect, int tick) {
+    if(IS_INVALID(expect)) return;
+
+    bool passed = true;
+    string failDetails = "";
+
+    if(expect.m_type == "session") {
+        string sid = g_scenario.GetDefine("SID");
+        if(sid == "") sid = expect.GetParam("sid");
+        
+        ICXSignal* sig = (IS_VALID(g_repo)) ? g_repo.GetSignalBySid(sid) : NULL;
+        
+        if(IS_INVALID(sig)) {
+            passed = false;
+            failDetails = "Signal SID:" + sid + " not found in DB.";
+        } else {
+            // Check xe_status
+            string expXe = expect.GetParam("xe_status");
+            if(expXe != "") {
+                int actXe = sig.GetStatus();
+                // Map names like XE_EXECUTED (10) to values
+                int expXeVal = -1;
+                if(expXe == "XE_READY") expXeVal = 0;
+                else if(expXe == "XE_EXECUTED") expXeVal = 10;
+                else if(expXe == "XE_CLOSED_SIGNAL") expXeVal = 20;
+                else if(expXe == "XE_ERROR") expXeVal = 99;
+                else if(expXe == "XE_PENDING_PLACED") expXeVal = 5;
+                else expXeVal = (int)StringToInteger(expXe);
+
+                if(actXe != expXeVal) {
+                    passed = false;
+                    failDetails += StringFormat("xe_status Mismatch: Exp:%s(%d), Act:%d. ", expXe, expXeVal, actXe);
+                }
+            }
+            
+            // Check xa_exit
+            string expXaEx = expect.GetParam("xa_exit");
+            if(expXaEx != "") {
+                int actXaEx = sig.GetXAExit();
+                if(actXaEx != (int)StringToInteger(expXaEx)) {
+                    passed = false;
+                    failDetails += StringFormat("xa_exit Mismatch: Exp:%s, Act:%d. ", expXaEx, actXaEx);
+                }
+            }
+        }
+        SAFE_DELETE(sig);
+    }
+    else if(expect.m_type == "terminal") {
+        ulong ticket = (ulong)expect.GetParamInt("ticket");
+        bool exists = expect.GetParamBool("exists");
+        // Default to true if not specified
+        if(expect.GetParam("exists") == "") exists = true;
+        
+        bool actExists = g_mockTerminal.IsPositionExists(ticket) || g_mockTerminal.IsOrderExists(ticket);
+        
+        if(actExists != exists) {
+            passed = false;
+            failDetails = StringFormat("Terminal Asset Ticket:%I64u Exists: Exp:%s, Act:%s", ticket, exists?"True":"False", actExists?"True":"False");
+        }
+        
+        string expSLStr = expect.GetParam("sl");
+        if(expSLStr != "") {
+            double expSL = StringToDouble(expSLStr);
+            double actSL = (g_mockTerminal.IsPositionExists(ticket)) ? g_mockTerminal.GetPositionSL(ticket) : g_mockTerminal.GetOrderSL(ticket);
+            if(MathAbs(actSL - expSL) > 0.00001) {
+                passed = false;
+                failDetails += StringFormat("SL Mismatch: Exp:%.5f, Act:%.5f", expSL, actSL);
+            }
+        }
+    }
+
+    if(passed) {
+        g_passed++;
+        PrintFormat("[TICK:%d] PASS: %s", tick, expect.m_type);
+    } else {
+        g_failed++;
+        PrintFormat("[TICK:%d] FAIL: %s -> %s %s", tick, expect.m_type, expect.m_failMsg, failDetails);
+    }
+}
+
 void ExecuteTick(int tick) {
-    g_app.Pulse();
+    CXTsdlStep* step = g_scenario.GetStep(tick);
     
-    ICXAssetManager* assetMgr = CX_GET_OBJ(g_ctx, "asset_mgr", ICXAssetManager);
-    if(IS_VALID(assetMgr)) assetMgr.Pulse(NULL);
+    // 1. Apply Actions
+    if(IS_VALID(step)) {
+        for(int i = 0; i < step.m_actions.Total(); i++) {
+            HandleAction(CX_CAST(CXTsdlAction, step.m_actions.At(i)));
+        }
+    }
+
+    // 2. Update Virtual World
+    g_pricer.GenerateNextPrice();
+    g_mockTerminal.UpdateBrokerTriggeredExits("GOLDF#", g_pricer.GetBid(), g_pricer.GetAsk());
+
+    // 3. App Heartbeat
+    g_app.Pulse(EVENT_TIMER);
+    
+    // 4. Verify Expectations
+    if(IS_VALID(step)) {
+        for(int i = 0; i < step.m_expectations.Total(); i++) {
+            VerifyExpectation(CX_CAST(CXTsdlExpect, step.m_expectations.At(i)), tick);
+        }
+    }
 }
 
 void OnTimer() {

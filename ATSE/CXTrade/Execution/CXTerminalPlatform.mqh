@@ -392,6 +392,37 @@ public:
         return all_cleared;
     }
 
+    virtual bool SweepByMagic(ICXParam* xp, ulong magic) override {
+        bool all_cleared = true;
+        XP_LOG_WARN(xp, StringFormat("[EXIT-SWEEP-MAGIC] Starting Massive Sweep for Magic:%I64u", magic));
+        
+        //-- 포지션 스윕 (Magic 기준 전수 조사)
+        for(int i = PositionsTotal() - 1; i >= 0; i--) {
+            ulong t = PositionGetTicket(i);
+            if(PositionSelectByTicket(t)) {
+                if(PositionGetInteger(POSITION_MAGIC) == (long)magic) {
+                    XP_LOG_INFO(xp, StringFormat("[POS-CLOSE-SWEEP] Sending Bulk Request [Ticket:%I64u, M:%I64u]", t, magic));
+                    if(!PositionClose(xp, t)) {
+                        all_cleared = false;
+                    }
+                }
+            }
+        }
+        //-- 주문 스윕 (Magic 기준 전수 조사)
+        for(int i = OrdersTotal() - 1; i >= 0; i--) {
+            ulong t = OrderGetTicket(i);
+            if(OrderSelect(t)) {
+                if(OrderGetInteger(ORDER_MAGIC) == (long)magic) {
+                    XP_LOG_INFO(xp, StringFormat("[ORDER-DELETE-SWEEP] Sending Bulk Request [Ticket:%I64u, M:%I64u]", t, magic));
+                    if(!OrderDelete(xp, t)) {
+                        all_cleared = false;
+                    }
+                }
+            }
+        }
+        return all_cleared;
+    }
+
     //--- 4. 호환성 및 부가 유틸리티
     
     virtual ulong GetLastResultDeal() override { return m_trade.ResultDeal(); }

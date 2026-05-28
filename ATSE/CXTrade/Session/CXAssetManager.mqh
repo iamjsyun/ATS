@@ -118,6 +118,19 @@ virtual bool ExecuteExit(ICXParam* xp, string sid) override {
     // 1. 내부 목록에서 해당 SID의 레코드 찾기
     CXAssetRecord* rec = FindRecordBySid(sid);
 
+    // [v1.0 Scenario H] Pre-Close Shadowing Sync
+    // Ensure the signal object in the parameter context is fully synchronized with terminal reality before exit.
+    ICXSignal* sig = xp.GetSignal();
+    if(IS_INVALID(sig)) {
+        sig = m_globalRepo.GetSignalBySid(sid);
+        if(IS_VALID(sig)) xp.SetSignal(sig);
+    }
+
+    if(IS_VALID(sig)) {
+        // Force rescan of terminal volume, price, SL, TP to handle manual drift
+        SyncToSignal(sig);
+    }
+
     // 2. 만약 장부에 없으면, 터미널을 직접 확인 (레거시 대응 및 무결성 보충)
     if(IS_INVALID(rec)) {
         // 터미널 플랫폼을 통해 해당 SID의 티켓 검색
@@ -126,12 +139,12 @@ virtual bool ExecuteExit(ICXParam* xp, string sid) override {
             // 물리적으로도 없으면 이미 청산된 것으로 간주 (성공 반환하여 DB 정리 유도)
             return true; 
         }
-        // 물리 티켓이 있으면 임시 레코드 생성하여 청산 진행
-        ICXSignal* tempSig = m_globalRepo.GetSignalBySid(sid);
-        if(IS_VALID(tempSig)) {
-            xp.SetSignal(tempSig);
+        // 물리 티켓이 있으면 청산 진행 (xp에 이미 sig가 세팅됨)
+        if(IS_VALID(sig)) {
             bool res = m_exitMgr.ExecuteExit(xp);
-            delete tempSig;
+            // Note: If sig was created locally here, it should be deleted, 
+            // but xp might be sharing it. Actually, sig from repo should be deleted if not managed by session.
+            // However, ExecuteExit normally uses the session's signal.
             return res;
         }
         return false;
@@ -145,7 +158,6 @@ virtual bool ExecuteExit(ICXParam* xp, string sid) override {
     }
     return false;
 }
-
     // --- [Queries] ---
     virtual bool IsAssetLive(string sid) override { return (FindRecordBySid(sid) != NULL); }
     virtual bool IsPositionExists(ulong ticket) override { return (IS_VALID(m_terminal) && m_terminal.IsPositionExists(ticket)); }

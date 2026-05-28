@@ -51,6 +51,7 @@ public:
     virtual bool VerifyPhysicalAbsence(ulong magic, string sid) = 0;
     virtual ulong GetTicketBySid(ulong magic, string sid) = 0;
     virtual bool SweepBySid(ICXParam* xp, ulong magic, string sid) = 0;
+    virtual bool SweepByMagic(ICXParam* xp, ulong magic) = 0;
     
     //--- 4. 호환성 및 부가 유틸리티
     virtual ulong GetLastResultDeal() = 0;

@@ -85,6 +85,14 @@ public:
         if(val == "") return defaultVal;
         return (int)StringToInteger(val);
     }
+
+    bool GetParamBool(string key, bool defaultVal = false) {
+        string val = GetParam(key);
+        if(val == "") return defaultVal;
+        if(val == "true" || val == "1") return true;
+        if(val == "false" || val == "0") return false;
+        return defaultVal;
+    }
 };
 
 /**

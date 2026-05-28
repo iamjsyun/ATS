@@ -72,12 +72,12 @@ protected:
         string pendingDsl[] = {
             "ORD_TRACKING                                                                  "
             "> Stage_OrderOptimization                                                     "
-            "  : TASK_A_INTENT_WATCH, TASK_P_L_EXTREME, TASK_P_L_REBOUND, TASK_P_L_IMPROVE,  "
-            "    TASK_P_R_APPLY, TASK_P_V_SYNC                                             "
+            "  : TASK_A_INTENT_WATCH, TASK_T_V_ACTIVATE_TE, TASK_T_V_EXTREMUM_TE,          "
+            "    TASK_T_L_EVALUATE_TE, TASK_T_R_EXECUTE_TE, TASK_P_V_SYNC                  "
             "? ORD_TRACKING                                                                "
             "! SYS_ERROR                                                                   "
             "@ 300s, 0x                                                                    "
-            "* 10=POS_MONITORING, 20=SESSION_LIQUIDATING" // [v1.2 Fix] 20(Liquidation) mapping corrected
+            "* 10=POS_MONITORING, 20=SESSION_LIQUIDATING" 
         };
         BuildFromDSL(pendingDsl, m_session_map);
 
@@ -85,12 +85,11 @@ protected:
         string positionedDsl[] = {
             "POS_MONITORING                                                                "
             "> Stage_PositionGovernance                                                    "
-            "  : TASK_A_INTENT_WATCH, TASK_A_TS_TRIGGER_WATCH, TASK_A_ALPHA_CALC,            "
-            "    TASK_A_ALPHA_APPLY,  TASK_A_V_TERMINAL,      TASK_A_P_ALIGN               "
+            "  : TASK_A_INTENT_WATCH, TASK_T_V_ACTIVATE_TS, TASK_A_V_TERMINAL, TASK_A_P_ALIGN"
             "? POS_MONITORING                                                              "
             "! SYS_ERROR                                                                   "
             "@ 3600s, 0x                                                                   "
-            "* 15=POS_TRAILING, 20=SESSION_LIQUIDATING" // [v1.3 Fix] 15(Trailing), 20(Liquidation) added
+            "* 15=POS_TRAILING, 20=SESSION_LIQUIDATING" 
         };
         BuildFromDSL(positionedDsl, m_session_map);
 
@@ -98,8 +97,8 @@ protected:
         string trailingDsl[] = {
             "POS_TRAILING                                                                  "
             "> Stage_PositionTrailing                                                      "
-            "  : TASK_A_INTENT_WATCH, TASK_A_ALPHA_CALC, TASK_A_ALPHA_APPLY, TASK_A_V_TERMINAL,"
-            "    TASK_A_P_ALIGN                                                            "
+            "  : TASK_A_INTENT_WATCH, TASK_T_V_EXTREMUM_TS, TASK_T_L_EVALUATE_TS,          "
+            "    TASK_T_R_EXECUTE_TS, TASK_A_V_TERMINAL, TASK_A_P_ALIGN                    "
             "? POS_TRAILING                                                                "
             "! SYS_ERROR                                                                   "
             "@ 3600s, 0x                                                                   "
