@@ -52,7 +52,8 @@ namespace XTA.Models
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     @"MetaQuotes\Terminal\Common\Files");
                 
-                string dbFullPath = Path.Combine(commonPath, "ATS.db");
+                // Default DB path under MetaQuotes Common Files 'db' subfolder
+                string dbFullPath = Path.Combine(commonPath, "db", "AGS.db");
 
                 var defaultConfig = new XConfig
                 {
@@ -133,7 +134,7 @@ namespace XTA.Models
     public class XEngineSystemSettings
     {
         public string Version { get; set; } = "1.0.0";
-        public string DatabaseFullPath { get; set; } = "ATS.db";
+        public string DatabaseFullPath { get; set; } = "AGS.db";
         public string LoggingLevel { get; set; } = "Info";
         public int RefreshIntervalMs { get; set; } = 1000;
         public int TtsVolume { get; set; } = 100; // [v14.43] TTS Volume control (0-100)

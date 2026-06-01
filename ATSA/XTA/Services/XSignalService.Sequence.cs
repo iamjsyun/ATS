@@ -68,7 +68,7 @@ namespace XTA.Services
                         .OnEntry(async () => {
                             nlog.Debug(ctx.CurrentSignal.ToAuditString("SIGNAL-CHECK", "Enrichment in progress..."));
 
-                            if (ctx.Xdo.CMD != "DM_INJECTION" && globalCtx.SignalRepo != null)
+                            if (ctx.Xdo.CMD != "DM_INJECTION" && ctx.Xdo.CMD != "CLOSE" && globalCtx.SignalRepo != null)
                             {
                                 var existing = await globalCtx.SignalRepo.GetSignalBySidAsync(ctx.CurrentSignal.sid);
                                 if (existing != null)

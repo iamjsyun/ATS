@@ -1,4 +1,4 @@
-﻿namespace FluentSeq.Core;
+namespace FluentSeq.Core;
 
 using IegTools.Extensions;
 using NLog;
@@ -106,6 +106,8 @@ public class Sequence<TState> : ISequence<TState> where TState : notnull
                 _repeatCount = 0;
             }
 
+            // [v1.0 Log Diet] 폴링 시 대량 생성되는 상태 전이 로그 출력 제거
+            /*
             if (_repeatCount < 5)
             {
                 if (PreviousState == null || PreviousState.ToString() == "NULL")
@@ -117,6 +119,7 @@ public class Sequence<TState> : ISequence<TState> where TState : notnull
             {
                 Logger?.Info("... 상태 변경 로그 반복 생략 (반복 횟수 초과) ...");
             }
+            */
 
             GetSeqState(CurrentState!)?.SetAsCurrentState();
         }

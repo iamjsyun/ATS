@@ -26,7 +26,7 @@ namespace XTA.Services
                         if (_currentInfo != null) {
                             _currentXdo.CNO = _currentInfo.CNO;
                             _ = XContext.Instance.Data?.SaveMessageAsync(_currentXdo);
-                            this.Log($"[TG] {_currentInfo.Name} 채널 메시지 수신 (MsgId:{_currentXdo.MsgId})");
+                            // [v1.0 Log Diet] 메시지 무조건 수신 로깅 제거 (신호 판정 시에만 기록하도록 이관)
                         }
                     })
                 .ConfigureState(XHubState.Interpreted)
@@ -63,6 +63,7 @@ namespace XTA.Services
             if (xdo == null) return;
 
             using (NLog.ScopeContext.PushProperty("TraceId", xdo.MsgId))
+            using (NLog.ScopeContext.PushProperty("CNO", xdo.CNO))
             {
                 List<Models.XSignal>? preparedSignals = null;
                 var ctx = XContext.Instance;
@@ -74,9 +75,14 @@ namespace XTA.Services
                         .OnEntry(async () => {
                             preparedSignals = (ctx.Signal != null) ? await ctx.Signal.PrepareSignalsAsync(xdo) : null;
                             if (preparedSignals == null || preparedSignals.Count == 0) {
-                                nlog.Warn($"[Gateway:DROP] No valid signals for MsgId:{xdo.MsgId}");
+                                nlog.Warn($"[Gateway:DROP] No valid signals for MsgId:{xdo.MsgId} | Text: \"{xdo.Text}\"");
                                 seq.SetState("Idle");
                             } else {
+                                nlog.Info($"[Gateway:INTERPRETED] MsgId:{xdo.MsgId} | Text: \"{xdo.Text}\" -> Generated {preparedSignals.Count} signals.");
+                                foreach (var s in preparedSignals)
+                                {
+                                    nlog.Info(s.ToAuditString("INTERPRETED-SIGNAL"));
+                                }
                                 seq.SetState("Persistence");
                             }
                         })

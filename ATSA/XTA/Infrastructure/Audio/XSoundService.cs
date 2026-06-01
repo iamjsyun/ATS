@@ -45,13 +45,12 @@ namespace XTA.Infrastructure.Audio
 
                 // 3. 억제 상태 (필터링 우선 순위: Spam/Channel/Status 체크)
                 .ConfigureState(XSoundState.Suppressed)
-                    .TriggeredBy(() => _currentXdo?.Signal != null && IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD))
-                        .WhenInState(XSoundState.RequestReceived)
-                    .TriggeredBy(() => IsAlreadyPlayed(_currentXdo?.Signal?.sid, _currentXdo?.CMD))
-                        .WhenInState(XSoundState.RequestReceived)
-                    .TriggeredBy(() => _currentXdo?.Signal != null && !IsTargetChannel(_currentXdo.Signal.cno))
-                        .WhenInState(XSoundState.RequestReceived)
-                    .TriggeredBy(() => _currentXdo?.Signal?.xe_status == (int)XCode.EaStatus.InTransit)
+                    .TriggeredBy(() => _currentXdo?.Signal != null && (
+                        IsSpam(_currentXdo.Signal.sid, _currentXdo.CMD) ||
+                        IsAlreadyPlayed(_currentXdo.Signal.sid, _currentXdo.CMD) ||
+                        !IsTargetChannel(_currentXdo.Signal.cno) ||
+                        _currentXdo.Signal.xe_status == (int)XCode.EaStatus.InTransit
+                    ))
                         .WhenInState(XSoundState.RequestReceived)
                     .OnEntry(() => {
                         if (_currentXdo?.Signal != null) {
@@ -76,7 +75,12 @@ namespace XTA.Infrastructure.Audio
                         string msgToSpeak = string.IsNullOrEmpty(_currentTtsMsg) ? (_currentXdo?.Text ?? "") : _currentTtsMsg;
                         if (!string.IsNullOrEmpty(msgToSpeak))
                         {
-                            nlog.Debug($"[Sound:EXECUTE] TTS Output: {msgToSpeak}");
+                            // [v1.0 Log Diet] CNO별로 TTS 출력 로그가 분리 적재되도록 Property 주입
+                            int cno = _currentXdo?.Signal?.cno ?? _currentXdo?.CNO ?? 0;
+                            var ttsLog = new LogEventInfo(LogLevel.Info, nlog.Name, $"[Sound:EXECUTE] TTS Output: {msgToSpeak} (Event: {_currentXdo?.CMD})");
+                            if (cno > 0) ttsLog.Properties["CNO"] = cno;
+                            nlog.Log(ttsLog);
+
                             XContext.Instance.GetService<ITtsService>()?.Speak(msgToSpeak);
                             
                             // [v14.41] 성공적으로 출력 대기열에 추가된 경우 캐시에 기록
@@ -158,7 +162,10 @@ namespace XTA.Infrastructure.Audio
                 "SID_CLOSE" => $"{cnoStr} 채널 {sig.sno}회차 개별 청산 명령 발생",
                 "SID_COMPLETED" => $"{cnoStr} 채널 {sig.sno}회차 청산 완료 확인",
                 "SID_ARCHIVED" => $"{cnoStr} 채널 {sig.sno}회차 데이터 이관 대기",
-                "TE_TRIGGERED" => $"{cnoStr} 채널 {dirName} 진입 추적 가동",
+                "TE_TRIGGERED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 진입 추적 가동",
+                "ENTRY_TRAILING" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 진입 추적 가동",
+                "STOP_TRAILING" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 익절 추적 가동",
+                "QUARANTINED_ALERT" => $"{cnoStr} 채널 {sig.sno}회차 경고 격리 자산이 발생했습니다. 수동 확인이 필요합니다.",
                 "CLOSE_STRATEGY_STARTED" => $"{cnoStr} 채널 {sig.sno}회차 청산 전략이 가동되었습니다.",
                 _ => string.Empty
             };

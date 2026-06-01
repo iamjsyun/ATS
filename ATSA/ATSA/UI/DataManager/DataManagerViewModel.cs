@@ -51,8 +51,22 @@ namespace ATSA.UI.DataManager
         public List<string> XAExitList { get; } = new() { "0:READY", "1:ACTIVE", "2:COMPLETED", "3:ARCHIVE_READY" };
         public List<string> XEStatusList { get; } = new() 
         { 
-            "0:READY", "1:PENDING", "10:EXECUTED", "20:CLOSED_SIG", 
-            "21:CLOSED_TP", "23:CLOSED_SL", "24:CLOSED_MANUAL", "99:ERROR" 
+            "-1:UNKNOWN",
+            "0:READY", 
+            "1:LOCK", 
+            "2:SENDING", 
+            "5:PENDING", 
+            "6:PENDING*TR", 
+            "10:ACTIVE", 
+            "11:ACTIVE*TR", 
+            "15:QUARANTINE", 
+            "20:CLOSED", 
+            "21:CLOSED(SL)", 
+            "22:CLOSED(TP)", 
+            "23:CLOSED_IKTE", 
+            "24:CLOSED(MAN)", 
+            "25:VERIFYING", 
+            "99:ERROR" 
         };
         
         private BindableXSignal? _selectedSignal;

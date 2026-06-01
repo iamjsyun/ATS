@@ -94,10 +94,11 @@
 - **Auto-Generation**: The system automatically generates `ATSA.json` with the current user's MT5 common path if missing.
 - **Reference Standard**: All modules MUST use `XConfig.GetConfigPath()` to access the unified settings.
 
-## Build Environment (MQL5)
+## Build Environment (MQL5 & C#)
 - **Compiler Path**: `D:\Program Files\XM Global MT5\MetaEditor64.exe` (Primary).
 - **Automated Build**: `ATSE\build.ps1` 스크립트를 사용하여 MQL5 코드를 빌드한다.
 - **Build Logs**: 빌드 결과는 `_log/` 디렉토리에 타임스탬프와 함께 저장되며, UTF-16 인코딩을 준수한다.
+- **dotnet Build Rule**: dotnet 빌드(`dotnet build` 등)는 시스템 검증 시 자동으로 수행하는 것을 **절대 금지**하며, 오직 사용자가 명시적으로 빌드/컴파일을 요청할 때만 수동으로 수행한다.
 
 ## UCXSignalView UI Standard (v9.6)
 - **Layout Architecture**: Strictly follow a **Two-Line Card-Hybrid** design.

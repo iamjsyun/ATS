@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "b9d26fa6ef95c517",
+    "id": "800bc0c80991657a",
     "type": "split",
     "children": [
       {
-        "id": "78e8b67484c56382",
+        "id": "09e88fb2fcd155eb",
         "type": "tabs",
         "children": [
           {
-            "id": "80ec25eb0e760a92",
+            "id": "abc538df2633c725",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_doc/REPORT_Trailing_Entry_Process_Analysis_v1.0.md",
+                "file": "ATSE/_doc/REPORT_SEQUENCE_TASK_RESTRUCTURE_v1.0.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "REPORT_Trailing_Entry_Process_Analysis_v1.0"
+              "title": "REPORT_SEQUENCE_TASK_RESTRUCTURE_v1.0"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "6bc886de291efe4b",
+    "id": "04424f50f4301e24",
     "type": "split",
     "children": [
       {
-        "id": "fc9ce2449750d216",
+        "id": "dab7450775047046",
         "type": "tabs",
         "children": [
           {
-            "id": "ae1674b799e93e7b",
+            "id": "53d17c6eed565222",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +48,7 @@
             }
           },
           {
-            "id": "2d13b20a21fd1d25",
+            "id": "e97eafe315f28156",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +65,7 @@
             }
           },
           {
-            "id": "28a95f3e383c32bd",
+            "id": "edd8ff27895c87c0",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -78,23 +78,22 @@
       }
     ],
     "direction": "horizontal",
-    "width": 391.5
+    "width": 556.5
   },
   "right": {
-    "id": "b30538696ef9ac62",
+    "id": "593f6be5dcaf1d61",
     "type": "split",
     "children": [
       {
-        "id": "96d1929a01356481",
+        "id": "cbd87dd26ba6e4d8",
         "type": "tabs",
         "children": [
           {
-            "id": "bba25e134bf36bdf",
+            "id": "8ef52787c8d837ad",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,25 +103,24 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "DESIGN_SEQUENCE_ORCHESTRATOR_v1.0 의 백링크"
+              "title": "백링크"
             }
           },
           {
-            "id": "b226667cebcbb532",
+            "id": "6d5619fe9bd28d96",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "DESIGN_SEQUENCE_ORCHESTRATOR_v1.0 의 나가는 링크"
+              "title": "나가는 링크"
             }
           },
           {
-            "id": "1f9235d95e9a1baf",
+            "id": "69da309d5774a185",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +135,7 @@
             }
           },
           {
-            "id": "f140920faf064703",
+            "id": "9f13398332b70dcd",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,18 +149,17 @@
             }
           },
           {
-            "id": "09227245d00523ed",
+            "id": "ae0999e60dd11551",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "ATSE/_doc/DESIGN_SEQUENCE_ORCHESTRATOR_v1.0.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "DESIGN_SEQUENCE_ORCHESTRATOR_v1.0 의 개요"
+              "title": "개요"
             }
           }
         ]
@@ -183,57 +180,10 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "80ec25eb0e760a92",
+  "active": "abc538df2633c725",
   "lastOpenFiles": [
-<<<<<<< Updated upstream
-    "_log/build_atse_20260529_002100.log",
-    "ATSE/CXTrade/ATS.ex5",
-    "_log/build_atse_20260529_002018.log",
-    "_log/build_atse_20260529_002003.log",
-    "_log/build_atse_20260528_222208.log",
-    "ATSE/CXTrade/Session/Workflow/test_compilation.ex5",
-    "_log/test_comp_trailing_v2.log",
-    "_log/test_comp_trailing.log",
-    "ATSE/CXTrade/Session/Workflow/test_compilation.mq5",
-    "_log/build_atse_20260528_221556.log",
-    "ATSE/CXTrade/Session/Workflow/Trailing/CXTaskTrail_R_Execute.mqh",
-    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.3.md",
-    "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.3.1.md",
-    "_doc/WALKTHROUGH_CX_Trailing_Entry_Fix_v1.0.md",
-=======
-    "ATSA/XTA.Test/obj/Debug/net10.0-windows/ved2jlmc.is5~",
-    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/UCtrls/TGMsg/UCXTGMsgView.baml",
-    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/UCtrls/TGMsg/UCXTGMsgView.g.cs",
-    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/Settings/SettingsView.g.cs",
-    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/DataManager/DataManagerView.g.cs",
-    "ATSA/ATSA/obj/Debug/net10.0-windows/UI/Dashboard/DashboardView.g.cs",
-    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.sourcelink.json",
-    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.GlobalUsings.g.cs",
-    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.AssemblyInfo.cs",
-    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.AssemblyInfoInputs.cache",
-    "ATSA/ATSA.YouTube/obj/Debug/net10.0-windows10.0.19041.0/ATSA.YouTube_woxjwesb_wpftmp.GeneratedMSBuildEditorConfig.editorconfig",
->>>>>>> Stashed changes
-    "_doc/CX_Timer_Optimization_Report_v1.0.md",
-    "ATSE/_doc/REPORT_LIFECYCLE_TREEVIEW_v1.0.md",
-    "_doc/gemini/extensions/caveman/INSTALL.md",
-    "_doc/gemini/extensions/caveman/README.md",
-    "_doc/REPORT_Trailing_Entry_Process_Analysis_v1.0.md",
-    "_doc/REPORT_Pulse_Performance_Optimization_v1.0.md",
-    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.2.md",
-    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.1.md",
-    "_doc/REPORT_Full_Lifecycle_Orchestration_v1.0.md",
-    "_doc/REPORT_Logger_Improvement_Strategy_v1.1.md",
-    "_doc/REPORT_Trailing_Engine_Orchestration_Registration_v1.0.md",
-    "_doc/REPORT_Logger_Improvement_Strategy_v1.0.md",
-    "_doc/Log_Optimization_Strategy_v1.0.md",
-    "ATSE/_doc/REPORT_SEQUENCE_DESIGN_ANALYSIS_v1.0.md",
-    "_doc/REPORT_Naming_Convention_Consistency_v1.0.md",
-    "2026-05-28.md",
-    "_doc/REPORT_TE_TS_Orchestration_Improvements_v1.0.md",
-    "ATSE/_doc/진트.md",
-    "ATSE/_doc/REPORT_WATCHER_SEQUENCE_FLOW_v1.0.md",
     "ATSE/_doc/REPORT_TSDL_INTEGRITY_ANALYSIS_v1.0.md",
-    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.2.md",
-    "_doc/WALKTHROUGH_CX_Trailing_Entry_Correctness_v1.0.md"
+    "ATSE/_doc/REPORT_WATCHER_SEQUENCE_FLOW_v1.0.md",
+    "ATSE/_doc/PLAN_TEST_REFACTORING_v1.2.md"
   ]
 }

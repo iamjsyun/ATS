@@ -46,25 +46,27 @@ namespace XTA.XData.Models
         /// </summary>
         public enum EaStatus
         {
-            Ready = 0,            // 초기 상태 (XE_READY)
-            PendingReq = 1,       // [v11.3] 브로커 요청 전 DB 잠금 (XE_PENDING_REQ)
-            InTransit = 2,        // [v11.3] 명령 송신 완료, 동기화 대기 (XE_IN_TRANSIT)
-            PendingPlaced = 5,    // [v11.3] 대기 오더 접수 중 (XE_PENDING_PLACED)
-            Executed = 10,        // 체결 완료 / 포지션 진입 (XE_EXECUTED)
+            Unknown = -1,         // 상태 불명 (초기화 오류 등) (XE_UNKNOWN)
+            Ready = 0,            // 신호 주입 완료, 엔진 감지 대기 (XE_READY)
+            PendingReq = 1,       // 브로커 주문 송신 중 (DB 잠금) (XE_PENDING_REQ)
+            InTransit = 2,        // 브로커 응답 완료, 실물 동기화 대기 (XE_IN_TRANSIT)
+            PendingPlaced = 5,    // 대기오더 안착 (단순 대기 상태) (XE_PENDING_PLACED)
+            EntryTrailing = 6,    // 진입 트레일링 활성 (ESTART 도달) (XE_ENTRY_TRAILING)
+            Executed = 10,        // 포지션 체결 및 유지 중 (XE_EXECUTED)
+            StopTrailing = 11,    // 수익보존 트레일링 활성 (SSTART 도달) (XE_STOP_TRAILING)
 
-            // [v1.5] 익절 트레일링(IkTe) 전용 상태 코드
-            IkTeStarted = 15,     // 익절 트레일링 시작 (XE_IKTE_STARTED)
-            IkTePriceMoved = 16,  // 익절 트레일링 가격 이동 (XE_IKTE_PRICE_MOVED)
+            // [v16.4 Scenario C] Zombie Asset Quarantine (EA 규격 v4.0 동기화)
+            Quarantined = 15,     // 좀비 자산 격리 (수동 확인 필요) (XE_QUARANTINED)
 
             // [v1.3 Patch] 청산 상세 상태 코드 (XE_CLOSED_XXX)
-            Closed_Signal = 20,   // 신호 청산 (XE_CLOSED_SIGNAL)
-            Closed_SL = 21,       // [v11.3] 손절 청산 (XE_CLOSED_SL)
-            Closed_TP = 22,       // [v11.3] 익절 청산 (XE_CLOSED_TP)
+            Closed_Signal = 20,   // 정상 신호 청산 완료 (XE_CLOSED_SIGNAL)
+            Closed_SL = 21,       // 물리적 손절(Stop Loss) 종료 (XE_CLOSED_SL)
+            Closed_TP = 22,       // 물리적 익절(Take Profit) 종료 (XE_CLOSED_TP)
             Closed_IKTE = 23,     // 익트 청산 (XE_CLOSED_IKTE)
-            Closed_Manual = 24,   // 수동 청산 (XE_CLOSED_MANUAL)
-            VerifyAbs = 25,       // 청산 후 소멸 검증 (XE_VERIFY_ABS)
+            Closed_Manual = 24,   // 외부 요인 또는 수동 종료 감지 (XE_CLOSED_MANUAL)
+            VerifyAbs = 25,       // 최종 청산 확인 절차 진행 중 (XE_VERIFY_ABS)
 
-            Error = 99            // 에러 발생 (XE_ERROR)
+            Error = 99            // 실행 오류 (메시지 확인 필수) (XE_ERROR)
         }
     }
 }

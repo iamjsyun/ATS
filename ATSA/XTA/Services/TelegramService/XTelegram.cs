@@ -115,32 +115,35 @@ namespace XTA.Services.TelegramService
 
                 foreach (var info in matchedChannels)
                 {
-                    nlog.Info($"[SIGNAL:STEP-0:ACCEPT] CID:{peerId} | CNO:{info.CNO} | Name:{info.Name} | MsgId:{msg.id}");
-
-                    XDataObject xdo = new XDataObject()
+                    using (NLog.ScopeContext.PushProperty("CNO", info.CNO))
                     {
-                        Sender = this.GetType().Name,
-                        CID = peerId,
-                        Text = msg.message,
-                        CName = channelTitle,
-                        CNO = info.CNO,
-                        Timestamp = msg.date,
-                        MsgId = msg.id
-                    };
+                        nlog.Info($"[SIGNAL:STEP-0:ACCEPT] CID:{peerId} | CNO:{info.CNO} | Name:{info.Name} | MsgId:{msg.id}");
 
-                    try
-                    {
-                        // 1. 게이트웨이 서비스로 직접 전송
-                        XContext.Instance.Gateway?.EnqueueRawMessage(xdo);
-                        nlog.Info($"[SIGNAL:STEP-0:DISPATCH] Dispatched MsgId:{msg.id} to Gateway Service for CNO:{info.CNO}");
+                        XDataObject xdo = new XDataObject()
+                        {
+                            Sender = this.GetType().Name,
+                            CID = peerId,
+                            Text = msg.message,
+                            CName = channelTitle,
+                            CNO = info.CNO,
+                            Timestamp = msg.date,
+                            MsgId = msg.id
+                        };
 
-                        // 2. 외부(UI 등) 구독자에게 알림 (구 DashboardChannel 대체)
-                        MessageReceived?.Invoke(xdo);
-                        nlog.Info($"[SIGNAL:STEP-0:DASHBOARD] Broadcasted TG message event for CNO:{info.CNO}");
-                    }
-                    catch (Exception ex)
-                    {
-                        nlog.Error(ex, $"[TG:DISPATCH] Dispatch Error. MsgId:{msg.id} for CNO:{info.CNO}");
+                        try
+                        {
+                            // 1. 게이트웨이 서비스로 직접 전송
+                            XContext.Instance.Gateway?.EnqueueRawMessage(xdo);
+                            nlog.Info($"[SIGNAL:STEP-0:DISPATCH] Dispatched MsgId:{msg.id} to Gateway Service for CNO:{info.CNO}");
+
+                            // 2. 외부(UI 등) 구독자에게 알림 (구 DashboardChannel 대체)
+                            MessageReceived?.Invoke(xdo);
+                            nlog.Info($"[SIGNAL:STEP-0:DASHBOARD] Broadcasted TG message event for CNO:{info.CNO}");
+                        }
+                        catch (Exception ex)
+                        {
+                            nlog.Error(ex, $"[TG:DISPATCH] Dispatch Error. MsgId:{msg.id} for CNO:{info.CNO}");
+                        }
                     }
                 }
             }

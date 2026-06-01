@@ -54,13 +54,14 @@ namespace XTA.Infrastructure.Data
                         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                         @"MetaQuotes\Terminal\Common\Files");
 
+                    // If no explicit path in config, fall back to Common\Files\db\ags.db
                     if (string.IsNullOrEmpty(path))
                     {
-                        path = System.IO.Path.Combine(commonPath, "ATS.db");
+                        path = System.IO.Path.Combine(commonPath, "db", "ags.db");
                     }
                     else if (!System.IO.Path.IsPathRooted(path))
                     {
-                        // 상대 경로이거나 파일명만 있는 경우 공용 폴더 기준으로 해석
+                        // If relative or filename-only, resolve against MetaQuotes Common Files
                         path = System.IO.Path.Combine(commonPath, path);
                     }
 

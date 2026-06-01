@@ -112,15 +112,21 @@ namespace ATSA.UI.Models
         public string SelectedXEStatus
         {
             get => (XCode.EaStatus)base.xe_status switch { 
+                XCode.EaStatus.Unknown => "-1:UNKNOWN",
                 XCode.EaStatus.Ready => "0:READY", 
-                XCode.EaStatus.PendingReq => "1:PENDING_REQ", 
-                XCode.EaStatus.InTransit => "2:IN_TRANSIT", 
-                XCode.EaStatus.PendingPlaced => "5:PENDING_PLACED", 
-                XCode.EaStatus.Executed => "10:EXECUTED", 
-                XCode.EaStatus.Closed_Signal => "20:CLOSED_SIG", 
-                XCode.EaStatus.Closed_SL => "21:CLOSED_SL", 
-                XCode.EaStatus.Closed_TP => "22:CLOSED_TP", 
-                XCode.EaStatus.Closed_Manual => "24:CLOSED_MANUAL", 
+                XCode.EaStatus.PendingReq => "1:LOCK", 
+                XCode.EaStatus.InTransit => "2:SENDING", 
+                XCode.EaStatus.PendingPlaced => "5:PENDING", 
+                XCode.EaStatus.EntryTrailing => "6:PENDING*TR",
+                XCode.EaStatus.Executed => "10:ACTIVE", 
+                XCode.EaStatus.StopTrailing => "11:ACTIVE*TR",
+                XCode.EaStatus.Quarantined => "15:QUARANTINE", 
+                XCode.EaStatus.Closed_Signal => "20:CLOSED", 
+                XCode.EaStatus.Closed_SL => "21:CLOSED(SL)", 
+                XCode.EaStatus.Closed_TP => "22:CLOSED(TP)", 
+                XCode.EaStatus.Closed_IKTE => "23:CLOSED_IKTE", 
+                XCode.EaStatus.Closed_Manual => "24:CLOSED(MAN)", 
+                XCode.EaStatus.VerifyAbs => "25:VERIFYING", 
                 XCode.EaStatus.Error => "99:ERROR", 
                 _ => $"{base.xe_status}:UNK" 
             };

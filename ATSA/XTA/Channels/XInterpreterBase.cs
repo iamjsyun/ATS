@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using System;
 using System.Collections.Generic;
 using XTA.Models;
@@ -54,20 +54,27 @@ namespace XTA.Channels
         /// </summary>
         public void EnqueueMessage(XDataObject xdo)
         {
-            // ?먯떊??CNO? ?쇱튂?섎뒗 硫붿떆吏留?泥섎━
+            // 자신과 CNO가 일치하는 메시지만 처리
             if (xdo == null || xdo.CNO != this.Info.CNO) return;
             if (string.IsNullOrWhiteSpace(xdo.Text)) return;
 
             try
             {
-                nlog.Info($"[SIGNAL:STEP-2:PARSE] Interpreter {GetType().Name} started. MsgId:{xdo.MsgId} | CNO:{Info.CNO} | TextLen:{xdo.Text.Length}");
+                // [v1.0 Log Diet] 시작 로그 제거하여 노이즈 감소
 
-                // 援ъ껜?곸씤 ?댁꽍 濡쒖쭅 ?ㅽ뻾 (?섏쐞 ?대옒?ㅼ뿉??援ы쁽)
+                // 구체적인 해석 로직 실행 (하위 클래스에서 구현)
                 var signals = Interpret(xdo);
 
                 if (signals != null && signals.Count > 0)
                 {
-                    nlog.Info($"[SIGNAL:STEP-2:PARSE] Success. Extracted {signals.Count} base signals from MsgId:{xdo.MsgId}");
+                    // 1. 통합로그에 신호 판정된 raw msg 수신 기록
+                    nlog.Info($"[TG] {Info.Name} 채널 트레이딩 신호 메세지 수신 (MsgId:{xdo.MsgId}) | Raw: {xdo.Text}");
+
+                    // 2. CNO별 파일에 해석 성공 정보 기록
+                    var parseSuccessLog = new LogEventInfo(LogLevel.Info, nlog.Name, $"[SIGNAL:PARSE_SUCCESS] Extracted {signals.Count} base signals from MsgId:{xdo.MsgId}");
+                    parseSuccessLog.Properties["CNO"] = Info.CNO;
+                    nlog.Log(parseSuccessLog);
+
                     foreach (var signal in signals)
                     {
                         if (signal.Validate())
@@ -84,33 +91,41 @@ namespace XTA.Channels
                                 CMD = signal.cmd == XCode.CLOSE ? "CLOSE" : "NEW"
                             };
 
-                            nlog.Info($"[SIGNAL:STEP-2:RESULT] Dispatching SID:{signal.sid} | CMD:{resultXdo.CMD} | Price:{signal.price_signal}");
+                            // 3. CNO별 파일에 추출 결과 기록 (CNO 속성 포함)
+                            var resultLog = new LogEventInfo(LogLevel.Info, nlog.Name, $"[SIGNAL:RESULT] Dispatching SID:{signal.sid} | CMD:{resultXdo.CMD} | Price:{signal.price_signal} | Lot:{signal.lot}");
+                            resultLog.Properties["CNO"] = Info.CNO;
+                            nlog.Log(resultLog);
 
-                            // [v9.0] 泥?궛 ?좏샇 議곌린 ?먮퀎 諛?利됯컖?곸씤 TTS 異쒕젰 (媛??鍮좊Ⅸ ?묐떟???뺣낫)
+                            // [v9.0] 청산 신호 조기 판별 및 즉각적인 TTS 출력 (가장 빠른 응답성 확보)
                             if (signal.cmd == XCode.CLOSE)
                             {
                                 string soundCmd = (signal.sno == 0) ? "GROUP_CLOSE" : "SID_CLOSE";
                                 XContext.Instance.Sound?.PlaySound(signal, soundCmd);
-                                nlog.Debug($"[INTERPRETER:TTS] Triggered {soundCmd} for EXIT signal (SID:{signal.sid}) immediately after parsing.");
+                                
+                                var ttsTriggerLog = new LogEventInfo(LogLevel.Debug, nlog.Name, $"[INTERPRETER:TTS] Triggered {soundCmd} for EXIT signal (SID:{signal.sid}) immediately after parsing.");
+                                ttsTriggerLog.Properties["CNO"] = Info.CNO;
+                                nlog.Log(ttsTriggerLog);
                             }
 
-                            // 1. 寃뚯씠?몄썾???뚯씠?꾨씪?몄쑝濡??꾩넚
+                            // 1. 게이트웨이 파이프라인으로 전송
                             _ = XContext.Instance.Gateway?.ProcessInterpretedSignalAsync(resultXdo);
                         }
                         else
                         {
-                            nlog.Warn($"[SIGNAL:STEP-2:FAIL] Validation failed for SID:{signal.sid} | Reason:{signal.comment}");
+                            var failLog = new LogEventInfo(LogLevel.Warn, nlog.Name, $"[SIGNAL:FAIL] Validation failed for SID:{signal.sid} | Reason:{signal.comment}");
+                            failLog.Properties["CNO"] = Info.CNO;
+                            nlog.Log(failLog);
                         }
                     }
                 }
                 else
                 {
-                    nlog.Warn($"[SIGNAL:STEP-2:FAIL] No valid signals extracted from MsgId:{xdo.MsgId}. Check interpreter logic.");
+                    // 해석 실패(신호가 아님) 시에는 더 이상 파일 로그를 강제 생성하지 않고 무시
                 }
             }
             catch (Exception ex)
             {
-                nlog.Error(ex, $"[SIGNAL:STEP-2:ERROR] Exception in {GetType().Name} for MsgId:{xdo.MsgId}");
+                nlog.Error(ex, $"[SIGNAL:ERROR] Exception in {GetType().Name} for MsgId:{xdo.MsgId}");
             }
         }
 
