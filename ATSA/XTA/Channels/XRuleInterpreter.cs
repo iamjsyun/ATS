@@ -197,13 +197,15 @@ namespace XTA.Channels
                 return;
             }
 
-            // [v9.8.7] Exit 키워드 다중 검증: 반드시 2개 이상 감지되어야 CLOSE 판정 (False Positive 방지)
+            // [v9.8.7] Exit 키워드 다중 검증: 반드시 등록된 키워드 중 일정 수 이상 감지되어야 CLOSE 판정 (False Positive 방지)
+            int exitThreshold = Math.Min(2, Keywords.ExitKeywords.Count);
             int exitKeywordCount = Keywords.ExitKeywords.Count(k => Regex.IsMatch(_ctx.CleanText, Regex.Escape(k), RegexOptions.IgnoreCase));
-            bool isExit = (exitKeywordCount >= 2);
+            bool isExit = (exitThreshold > 0 && exitKeywordCount >= exitThreshold);
             
-            // [v9.8.7] Entry 키워드 다중 검증: 반드시 3개 이상 감지되어야 OPEN 판정 (False Positive 방지)
+            // [v9.8.7] Entry 키워드 다중 검증: 반드시 등록된 키워드 중 일정 수 이상 감지되어야 OPEN 판정 (False Positive 방지)
+            int entryThreshold = Math.Min(3, Keywords.EntryKeywords.Count);
             int entryKeywordCount = Keywords.EntryKeywords.Count(k => Regex.IsMatch(_ctx.CleanText, Regex.Escape(k), RegexOptions.IgnoreCase));
-            bool isEntry = (entryKeywordCount >= 3);
+            bool isEntry = (entryThreshold > 0 && entryKeywordCount >= entryThreshold);
             
             bool hasBuy = Regex.IsMatch(_ctx.CleanText, BuyPattern, RegexOptions.IgnoreCase);
             bool hasSell = Regex.IsMatch(_ctx.CleanText, SellPattern, RegexOptions.IgnoreCase);
@@ -275,16 +277,17 @@ namespace XTA.Channels
             }
 
             // 2. 콤마나 공백으로 구분된 복수 회차 (예: "1, 2, 3회차")
-            if (_ctx.Snos.Count == 0)
+            // 개별 추출 결과가 있더라도 콤보 매치가 더 많은 회차를 포함할 수 있으므로 항상 시도 및 중복 방지
+            var comboMatch = Regex.Match(_ctx.CleanText, @"([\d,\s]+)(?:회차|차|횟차)");
+            if (comboMatch.Success)
             {
-                var comboMatch = Regex.Match(_ctx.CleanText, @"([\d,\s]+)(?:회차|차|횟차)");
-                if (comboMatch.Success)
+                var snoPart = comboMatch.Groups[1].Value;
+                var snoStrings = snoPart.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var sStr in snoStrings)
                 {
-                    var snoPart = comboMatch.Groups[1].Value;
-                    var snoStrings = snoPart.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var sStr in snoStrings)
+                    if (int.TryParse(sStr.Trim(), out int s))
                     {
-                        if (int.TryParse(sStr.Trim(), out int s)) _ctx.Snos.Add(s);
+                        if (!_ctx.Snos.Contains(s)) _ctx.Snos.Add(s);
                     }
                 }
             }
