@@ -5,4 +5,4 @@ Buy	BUY
 Sell	SELL
 Price	(?:Price|가격)[:\s]*([\d.]+)
 Lot	(?:Lot|수량)[:\s]*([\d.]+)
-Sno	(\d+)차
+Sno	(?<!\.)\b(\d+)차
