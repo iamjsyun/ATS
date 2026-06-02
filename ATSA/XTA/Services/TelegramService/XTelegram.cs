@@ -77,7 +77,7 @@ namespace XTA.Services.TelegramService
                 string channelTitle = "Unknown";
                 if (updates.Chats.TryGetValue(rawId, out var chat)) channelTitle = chat.Title ?? "Unknown";
 
-                var matchedChannels = param.GetChannels(peerId);
+                var matchedChannels = param!.GetChannels(peerId);
                 
                 if (matchedChannels.Count == 0)
                 {

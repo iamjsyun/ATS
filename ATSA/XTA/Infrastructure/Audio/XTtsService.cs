@@ -10,14 +10,23 @@ namespace XTA.Infrastructure.Audio
 {
     public class XTtsService : XChannelObject, ITtsService
     {
-        private readonly SpeechSynthesizer _synth = new();
+        private SpeechSynthesizer _synth = null!;
         private readonly BlockingCollection<string> _speechQueue = new();
         private readonly CancellationTokenSource _cts = new();
 
         public XTtsService(XParameter param) : base(param, new XChannelInfo(0, 0, "TTS_SERVICE", "SYSTEM"))
         {
+            InitializeSynthesizer();
+            Task.Run(() => ProcessQueue(_cts.Token));
+        }
+
+        private void InitializeSynthesizer()
+        {
             try
             {
+                var oldSynth = _synth;
+                _synth = new SpeechSynthesizer();
+                
                 var voices = _synth.GetInstalledVoices();
                 foreach (var voice in voices)
                 {
@@ -25,10 +34,18 @@ namespace XTA.Infrastructure.Audio
                 }
                 _synth.Rate = 1;
                 _synth.Volume = Math.Clamp(param.Config.System.TtsVolume, 0, 100);
-            }
-            catch { }
 
-            Task.Run(() => ProcessQueue(_cts.Token));
+                if (oldSynth != null)
+                {
+                    try { oldSynth.SpeakAsyncCancelAll(); oldSynth.Dispose(); } catch { }
+                }
+                
+                nlog.Trace("[TTS] SpeechSynthesizer Initialized.");
+            }
+            catch (Exception ex)
+            {
+                nlog.Error(ex, "[TTS] Failed to initialize SpeechSynthesizer.");
+            }
         }
 
         public override void Start() => nlog.Trace("[TTS] XTtsService Started (Interface Enabled).");
@@ -58,9 +75,22 @@ namespace XTA.Infrastructure.Audio
             {
                 foreach (var text in _speechQueue.GetConsumingEnumerable(token))
                 {
-                    try { _synth.Speak(text); }
+                    try 
+                    { 
+                        _synth.Speak(text); 
+                    }
                     catch (OperationCanceledException) { break; }
-                    catch (Exception ex) { nlog.Error(ex, $"[TTS:Worker] Speech Error: {text}"); }
+                    catch (InvalidOperationException ex)
+                    {
+                        nlog.Warn(ex, $"[TTS:Worker] Audio Device Error. Attempting re-initialization: {text}");
+                        InitializeSynthesizer();
+                        // Optional: Retry once after re-init
+                        try { _synth.Speak(text); } catch { }
+                    }
+                    catch (Exception ex) 
+                    { 
+                        nlog.Error(ex, $"[TTS:Worker] Speech Error: {text}"); 
+                    }
                 }
             }
             catch (OperationCanceledException) { }
