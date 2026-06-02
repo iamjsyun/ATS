@@ -271,7 +271,7 @@ namespace XTA.Channels
             // [v9.6] 복수 회차 및 변종 키워드(횟차, 차 정리 등) 인식 강화
             // [v10.1] 소수점 가격 뒤에 키워드가 오는 경우(예: 4482.61\n차) 오인식 방지 위해 Lookbehind 및 공백 제한 추가
             // 1. "N차 정리" 또는 "N회차" 형태 우선 추출 (이모지 제거된 상태: "횟차 : 15차 정리")
-            var snoMatches = Regex.Matches(_ctx!.CleanText, @"(?<!\.)\b(\d+)[ \t]*(?:회차|차|횟차)");
+            var snoMatches = Regex.Matches(_ctx!.CleanText, @"(?<!\.)\b(\d+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
             foreach (Match m in snoMatches)
             {
                 if (int.TryParse(m.Groups[1].Value, out int s)) _ctx.Snos.Add(s);
@@ -279,7 +279,7 @@ namespace XTA.Channels
 
             // 2. 콤마나 공백으로 구분된 복수 회차 (예: "1, 2, 3회차")
             // 개별 추출 결과가 있더라도 콤보 매치가 더 많은 회차를 포함할 수 있으므로 항상 시도 및 중복 방지
-            var comboMatch = Regex.Match(_ctx.CleanText, @"(?<!\.)\b([\d,\s]+)[ \t]*(?:회차|차|횟차)");
+            var comboMatch = Regex.Match(_ctx.CleanText, @"(?<!\.)\b([\d,\s]+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
             if (comboMatch.Success)
             {
                 var snoPart = comboMatch.Groups[1].Value;
