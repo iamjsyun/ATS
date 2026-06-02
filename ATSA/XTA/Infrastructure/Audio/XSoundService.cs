@@ -156,7 +156,7 @@ namespace XTA.Infrastructure.Audio
             {
                 "SIGNAL_RECEIVED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 신호 발생",
                 "ORDER_PLACED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 주문 접수 완료",
-                "POSITION_ENTERED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 진입 완료",
+                "POSITION_ENTERED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 포지션 진입 완료",
                 "POSITION_CLOSED" => $"{cnoStr} 채널 {sig.sno}회차 {dirName} 청산 완료",
                 "GROUP_CLOSE" => $"{cnoStr} 채널 그룹 청산 명령 발생",
                 "SID_CLOSE" => $"{cnoStr} 채널 {sig.sno}회차 개별 청산 명령 발생",

@@ -70,7 +70,8 @@ namespace XTA.Services.TelegramService
 
                 if (msg == null) continue;
 
-                long rawId = msg.peer_id.ID;
+                long rawId = msg.peer_id?.ID ?? 0;
+                if (rawId == 0) continue;
                 long peerId = rawId;
 
                 string channelTitle = "Unknown";

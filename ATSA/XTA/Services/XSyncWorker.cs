@@ -16,7 +16,7 @@ namespace XTA.Services
     public partial class XSyncWorker : XObject
     {
         private Timer? _syncTimer;
-        private readonly int _intervalSeconds = 10;
+        private readonly int _intervalSeconds = 1;
         private readonly int _lookbackMinutes = 60;
         private readonly int _maxRetryCount = 5;
         private int _isBusyInt = 0;
@@ -31,8 +31,8 @@ namespace XTA.Services
 
         public override void Start()
         {
-            _syncTimer = new Timer(OnSyncTimerCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(_intervalSeconds));
-            nlog.Trace($"[SyncWorker] Sequential worker started.");
+            _syncTimer = new Timer(OnSyncTimerCallback, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(_intervalSeconds));
+            nlog.Trace($"[SyncWorker] Sequential worker started with 1s interval.");
         }
 
         public override void Stop() 
