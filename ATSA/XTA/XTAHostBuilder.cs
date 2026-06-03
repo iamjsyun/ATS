@@ -69,19 +69,26 @@ namespace XTA
                         {
                         foreach (var ch in xConfig.Channels.Where(c => c.Enabled))
                         {
-                            // Support new combined Name format: "CNO, ChannelId , DisplayName"
-                            string displayName = ch.Name ?? string.Empty;
-                            if (!string.IsNullOrWhiteSpace(ch.Name))
+                            // Support new combined CInfo format: "CNO, ChannelId, DisplayName"
+                            string displayName = string.Empty;
+                            int cno = 0;
+                            long cid = 0;
+                            if (!string.IsNullOrWhiteSpace(ch.CInfo))
                             {
-                                var parts = ch.Name.Split(',');
-                                if (parts.Length >= 3)
-                                {
-                                    // Use everything after the first two commas as the display name (handles commas in names)
-                                    displayName = string.Join(",", parts.Skip(2)).Trim();
-                                }
+                                var parts = ch.CInfo.Split(',');
+                                if (parts.Length >= 1) int.TryParse(parts[0].Trim(), out cno);
+                                if (parts.Length >= 2) long.TryParse(parts[1].Trim(), out cid);
+                                if (parts.Length >= 3) displayName = string.Join(",", parts.Skip(2)).Trim();
+                            }
+                            else
+                            {
+                                // Fallback for legacy fields if present on JSON
+                                cno = ch.CNO;
+                                cid = ch.ChannelId;
+                                displayName = ch.Name ?? string.Empty;
                             }
 
-                            var info = new XChannelInfo(ch.ChannelId, ch.CNO, displayName, "TRADE")
+                            var info = new XChannelInfo(cid, cno, displayName, "TRADE")
                             {
                                 IsSoundEnabled = ch.SoundEnabled
                             };

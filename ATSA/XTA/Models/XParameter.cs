@@ -194,24 +194,37 @@ namespace XTA.Models
             return Channels.TryGetValue(channelId, out var list) ? list.FirstOrDefault() : null;
         }
 
+
+
+        public XChannelInfo? GetChannelByCno(int cno)
+        {
+            return Channels.Values.SelectMany(l => l).FirstOrDefault(c => c.CNO == cno);
+        }
+
         public XChannelConfig GetMergedConfig(int cno)
         {
             var channel = Channels.Values.SelectMany(l => l).FirstOrDefault(c => c.CNO == cno);
-            var cfg = Config.Channels.FirstOrDefault(c => c.CNO == cno);
-            
+            var cfg = Config.Channels.FirstOrDefault(c =>
+            {
+                // Match by CNO parsed from CInfo or legacy CNO property
+                if (!string.IsNullOrWhiteSpace(c.CInfo))
+                {
+                    var parts = c.CInfo.Split(',');
+                    if (parts.Length > 0 && int.TryParse(parts[0].Trim(), out var parsedCno)) return parsedCno == cno;
+                }
+                return c.CNO == cno;
+            });
+
             if (cfg != null) return cfg;
 
             // Fallback for dynamically registered channels not in JSON
             return new XChannelConfig 
             { 
-                CNO = cno, 
-                Name = channel?.Name ?? $"CH_{cno}"
+                CInfo = $"{cno}, {channel?.CID ?? 0}",
+                // set Name from channel info when available
+                // Name is exposed via the runtime accessor on XChannelConfig
+                Symbol = channel?.Name ?? $"CH_{cno}"
             };
-        }
-
-        public XChannelInfo? GetChannelByCno(int cno)
-        {
-            return Channels.Values.SelectMany(l => l).FirstOrDefault(c => c.CNO == cno);
         }
     }
 }

@@ -19,6 +19,10 @@ namespace XTA.Models
             public const long XDUNA = -1003697953708;
         }
 
+
+
+
+
         /// <summary>
         /// 커스텀 설정 파일 경로 (지정되지 않으면 기본값 사용)
         /// </summary>
@@ -67,57 +71,57 @@ namespace XTA.Models
                     },
                     Channels = new List<XChannelConfig>
                     {
-                        new XChannelConfig { 
-                            CNO = 1001, Name = " 1001, -1002204600811 , GlobalGold", Symbol = "GOLD#", ChannelId = XChannelIds.GlobalGold, SourceType = "Telegram",
+                        new XChannelConfig {
+                            CInfo = "1001, -1002204600811, GlobalGold", Symbol = "GOLD#", SourceType = "Telegram",
                             Interpreter = "GlobalGold",
-                            TradingOption = new XTradingOption { 
+                            TradingOption = new XTradingOption {
                                 ActiveMode = "Live",
                                 Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
                                 Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
-                        new XChannelConfig { 
-                            CNO = 1002, Name = " 1002, -1002218781954 , GMK", Symbol = "GOLD#", ChannelId = XChannelIds.GMK, SourceType = "Telegram",
+                        new XChannelConfig {
+                            CInfo = "1002, -1002218781954, GMK", Symbol = "GOLD#", SourceType = "Telegram",
                             Interpreter = "GMK",
-                            TradingOption = new XTradingOption { 
+                            TradingOption = new XTradingOption {
                                 ActiveMode = "Live",
                                 Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
                                 Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
-                        new XChannelConfig { 
-                            CNO = 3001, Name = " 3001, -1003778889507 , XHANA", Symbol = "GOLD#", ChannelId = XChannelIds.XHANA, SourceType = "Telegram",
+                        new XChannelConfig {
+                            CInfo = "3001, -1003778889507, XHANA", Symbol = "GOLD#", SourceType = "Telegram",
                             Interpreter = "GlobalGold",
-                            TradingOption = new XTradingOption { 
-                                ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
-                            }
-                        },
-                        new XChannelConfig { 
-                            CNO = 3002, Name = " 3002, -1003697953708 , XDUNA", Symbol = "GOLD#", ChannelId = XChannelIds.XDUNA, SourceType = "Telegram",
-                            Interpreter = "GMK",
-                            TradingOption = new XTradingOption { 
+                            TradingOption = new XTradingOption {
                                 ActiveMode = "Simulation",
                                 Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
                                 Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
-                            CNO = 2001, Name = " 2001, 0 , YouTube_CH1", SourceType = "YouTube",
+                            CInfo = "3002, -1003697953708, XDUNA", Symbol = "GOLD#", SourceType = "Telegram",
+                            Interpreter = "GMK",
+                            TradingOption = new XTradingOption {
+                                ActiveMode = "Simulation",
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                            }
+                        },
+                        new XChannelConfig {
+                            CInfo = "2001, 0, YouTube_CH1", SourceType = "YouTube",
                             Interpreter = "YouTubeVision",
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/-ps7V40GrA4", ROI = "100,100,400,200", IntervalMs = 3000 },
-                            TradingOption = new XTradingOption { 
+                            TradingOption = new XTradingOption {
                                 ActiveMode = "Simulation",
                                 Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
                                 Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
-                            CNO = 2002, Name = " 2002, 0 , YouTube_CH2", SourceType = "YouTube",
+                            CInfo = "2002, 0, YouTube_CH2", SourceType = "YouTube",
                             Interpreter = "YouTubeVision",
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/P4V456LsOYk", ROI = "0,0,800,400", IntervalMs = 3000 },
-                            TradingOption = new XTradingOption { 
+                            TradingOption = new XTradingOption {
                                 ActiveMode = "Simulation",
                                 Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
                                 Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
@@ -155,16 +159,98 @@ namespace XTA.Models
 
     public class XChannelConfig
     {
+        // New single serialized field containing the channel identity info in the form:
+        // "{CNO}, {ChannelId}, {DisplayName with possible commas}"
+        public string CInfo { get; set; } = string.Empty;
+
         public bool Enabled { get; set; } = true;
         public bool SoundEnabled { get; set; } = true;
-        public int CNO { get; set; }
-        public long ChannelId { get; set; }
-        public string Name { get; set; } = "";
+
+        // Backwards-compatible runtime accessors (not serialized) so existing code can still use CNO/ChannelId/Name
+        [JsonIgnore]
+        public int CNO
+        {
+            get
+            {
+                var (cno, _, _) = ParseCInfo();
+                return cno;
+            }
+            set
+            {
+                var (_, cid, name) = ParseCInfo();
+                CInfo = BuildCInfo(value, cid, name);
+            }
+        }
+
+        [JsonIgnore]
+        public long ChannelId
+        {
+            get
+            {
+                var (_, cid, _) = ParseCInfo();
+                return cid;
+            }
+            set
+            {
+                var (cno, _, name) = ParseCInfo();
+                CInfo = BuildCInfo(cno, value, name);
+            }
+        }
+
+        [JsonIgnore]
+        public string Name
+        {
+            get
+            {
+                var (_, _, name) = ParseCInfo();
+                return name ?? string.Empty;
+            }
+            set
+            {
+                var (cno, cid, _) = ParseCInfo();
+                CInfo = BuildCInfo(cno, cid, value);
+            }
+        }
+
         public string Symbol { get; set; } = "GOLD#";
         public string SourceType { get; set; } = "Telegram";
-        public string Interpreter { get; set; } = ""; 
+        public string Interpreter { get; set; } = "";
         public XYouTubeConfig? YouTube { get; set; }
         public XTradingOption TradingOption { get; set; } = new();
+
+        private (int cno, long cid, string name) ParseCInfo()
+        {
+            if (string.IsNullOrWhiteSpace(CInfo)) return (0, 0L, string.Empty);
+            var parts = CInfo.Split(',');
+            if (parts.Length == 0) return (0, 0L, string.Empty);
+
+            int cno = 0;
+            long cid = 0;
+            string name = string.Empty;
+
+            if (parts.Length >= 1)
+            {
+                int.TryParse(parts[0].Trim(), out cno);
+            }
+            if (parts.Length >= 2)
+            {
+                long.TryParse(parts[1].Trim(), out cid);
+            }
+            if (parts.Length >= 3)
+            {
+                name = string.Join(",", parts.Skip(2)).Trim();
+            }
+
+            return (cno, cid, name);
+        }
+
+        private string BuildCInfo(int cno, long cid, string? name)
+        {
+            name ??= string.Empty;
+            return string.IsNullOrEmpty(name)
+                ? $"{cno}, {cid}"
+                : $"{cno}, {cid}, {name}";
+        }
     }
 
     public class XYouTubeConfig
