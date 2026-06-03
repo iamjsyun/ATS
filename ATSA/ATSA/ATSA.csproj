@@ -14,7 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="_temp\DashboardLayout.xaml" />
+    <Compile Remove="_temp\**" />
+    <EmbeddedResource Remove="_temp\**" />
+    <None Remove="_temp\**" />
+    <Page Remove="_temp\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,10 +38,6 @@
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="_temp\" />
   </ItemGroup>
 
 </Project>
