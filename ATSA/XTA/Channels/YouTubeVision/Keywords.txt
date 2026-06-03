@@ -14,4 +14,4 @@ Sell	SHORT
 Price	(?:PRICE|ENTRY|AT|@)[:\s]*([\d.]+)
 Lot	(?:LOT|VOL|QTY|WEIGHT)[:\s]*([\d.]+)
 Sno	(?:SNO|ID|REV)[: \t]*(\d+)
-Sno	(?<!\.)\b([\d, \t\.]+)[ \t]*(?:차|회차|회)
+Sno	(?<!\.)\b(\d+)[ \t]*(?:차|회차|회)

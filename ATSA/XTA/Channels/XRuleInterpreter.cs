@@ -270,8 +270,15 @@ namespace XTA.Channels
         {
             // [v9.6] 복수 회차 및 변종 키워드(횟차, 차 정리 등) 인식 강화
             // [v10.1] 소수점 가격 뒤에 키워드가 오는 경우(예: 4482.61\n차) 오인식 방지 위해 Lookbehind 및 공백 제한 추가
+            // [v10.3] 점(.) 구분 다중 회차(6.8회차)는 청산(CLOSE)시에만 허용. 진입(OPEN)시는 소수점 오인식 방지를 위해 제외.
+            
+            bool isClose = _ctx?.Cmd == XCode.CLOSE;
+            string pattern1 = isClose ? @"(?<!\.)\b(\d+)[ \t]*(?:회차|차|횟차)" : @"(?<!\.)\b(\d+)[ \t]*(?:회차|차|횟차)"; // 1번은 동일
+            string pattern2 = isClose ? @"(?<!\.)\b([\d, \t\.]+)[ \t]*(?:회차|차|횟차)" : @"(?<!\.)\b([\d, \t]+)[ \t]*(?:회차|차|횟차)";
+            char[] splitDelims = isClose ? new[] { ',', ' ', '.' } : new[] { ',', ' ' };
+
             // 1. "N차 정리" 또는 "N회차" 형태 우선 추출 (이모지 제거된 상태: "횟차 : 15차 정리")
-            var snoMatches = Regex.Matches(_ctx!.CleanText, @"(?<!\.)\b(\d+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
+            var snoMatches = Regex.Matches(_ctx!.CleanText, pattern1, RegexOptions.IgnoreCase);
             foreach (Match m in snoMatches)
             {
                 if (int.TryParse(m.Groups[1].Value, out int s)) _ctx.Snos.Add(s);
@@ -279,11 +286,11 @@ namespace XTA.Channels
 
             // 2. 콤마나 공백, 점으로 구분된 복수 회차 (예: "1, 2, 3회차" 또는 "6.8회차")
             // 개별 추출 결과가 있더라도 콤보 매치가 더 많은 회차를 포함할 수 있으므로 항상 시도 및 중복 방지
-            var comboMatch = Regex.Match(_ctx.CleanText, @"(?<!\.)\b([\d, \t\.]+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
+            var comboMatch = Regex.Match(_ctx.CleanText, pattern2, RegexOptions.IgnoreCase);
             if (comboMatch.Success)
             {
                 var snoPart = comboMatch.Groups[1].Value;
-                var snoStrings = snoPart.Split(new[] { ',', ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
+                var snoStrings = snoPart.Split(splitDelims, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var sStr in snoStrings)
                 {
                     if (int.TryParse(sStr.Trim(), out int s))
