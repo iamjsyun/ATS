@@ -277,13 +277,13 @@ namespace XTA.Channels
                 if (int.TryParse(m.Groups[1].Value, out int s)) _ctx.Snos.Add(s);
             }
 
-            // 2. 콤마나 공백으로 구분된 복수 회차 (예: "1, 2, 3회차")
+            // 2. 콤마나 공백, 점으로 구분된 복수 회차 (예: "1, 2, 3회차" 또는 "6.8회차")
             // 개별 추출 결과가 있더라도 콤보 매치가 더 많은 회차를 포함할 수 있으므로 항상 시도 및 중복 방지
-            var comboMatch = Regex.Match(_ctx.CleanText, @"(?<!\.)\b([\d,\s]+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
+            var comboMatch = Regex.Match(_ctx.CleanText, @"(?<!\.)\b([\d, \t\.]+)[ \t]*(?:회차|차|횟차)", RegexOptions.IgnoreCase);
             if (comboMatch.Success)
             {
                 var snoPart = comboMatch.Groups[1].Value;
-                var snoStrings = snoPart.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var snoStrings = snoPart.Split(new[] { ',', ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var sStr in snoStrings)
                 {
                     if (int.TryParse(sStr.Trim(), out int s))
