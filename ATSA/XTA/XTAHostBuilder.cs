@@ -67,33 +67,14 @@ namespace XTA
                         // Dynamic Channel Registration from Config (Enabled only)
                         if (xConfig.Channels != null)
                         {
-                        foreach (var ch in xConfig.Channels.Where(c => c.Enabled))
-                        {
-                            // Support new combined CInfo format: "CNO, ChannelId, DisplayName"
-                            string displayName = string.Empty;
-                            int cno = 0;
-                            long cid = 0;
-                            if (!string.IsNullOrWhiteSpace(ch.CInfo))
+                            foreach (var ch in xConfig.Channels.Where(c => c.Enabled))
                             {
-                                var parts = ch.CInfo.Split(',');
-                                if (parts.Length >= 1) int.TryParse(parts[0].Trim(), out cno);
-                                if (parts.Length >= 2) long.TryParse(parts[1].Trim(), out cid);
-                                if (parts.Length >= 3) displayName = string.Join(",", parts.Skip(2)).Trim();
+                                var info = new XChannelInfo(ch.ChannelId, ch.CNO, ch.Name, "TRADE")
+                                {
+                                    IsSoundEnabled = ch.SoundEnabled
+                                };
+                                parameter.RegisterChannel(info);
                             }
-                            else
-                            {
-                                // Fallback for legacy fields if present on JSON
-                                cno = ch.CNO;
-                                cid = ch.ChannelId;
-                                displayName = ch.Name ?? string.Empty;
-                            }
-
-                            var info = new XChannelInfo(cid, cno, displayName, "TRADE")
-                            {
-                                IsSoundEnabled = ch.SoundEnabled
-                            };
-                            parameter.RegisterChannel(info);
-                        }
                         }
                     }
 
@@ -144,28 +125,28 @@ namespace XTA
                     extraServices?.Invoke(services);
                     
                     // 7. Interpreters (Source of Truth for Channels - Enabled only)
-                        foreach (var ch in parameter.Config.Channels.Where(c => c.Enabled))
+                    foreach (var ch in parameter.Config.Channels.Where(c => c.Enabled))
                     {
                         if (string.IsNullOrEmpty(ch.Interpreter)) continue;
 
-                        var channelInfo = parameter.GetChannels(ch.ChannelId).FirstOrDefault(c => c.CNO == ch.CNO);
-                        if (channelInfo == null) continue;
+                        var info = parameter.GetChannels(ch.ChannelId).FirstOrDefault(c => c.CNO == ch.CNO);
+                        if (info == null) continue;
 
                         XInterpreterBase? interpreter = null;
-
+                        
                         // 명시적 해석기 매핑 (v9.6)
                         if (ch.Interpreter.Equals("GlobalGold", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.GlobalGold.GlobalGold(parameter, channelInfo);
+                            interpreter = new XTA.Channels.GlobalGold.GlobalGold(parameter, info);
                         else if (ch.Interpreter.Equals("GMK", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.GMK.GMK(parameter, channelInfo);
+                            interpreter = new XTA.Channels.GMK.GMK(parameter, info);
                         else if (ch.Interpreter.Equals("YouTubeVision", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.YouTubeVision.YouTubeVision(parameter, channelInfo);
+                            interpreter = new XTA.Channels.YouTubeVision.YouTubeVision(parameter, info);
 
                         if (interpreter != null)
                         {
                             parameter.Add(interpreter);
                             services.AddSingleton<XInterpreterBase>(interpreter);
-                            nlog.Trace($"[XTA:BOOT] Interpreter for {channelInfo?.Name ?? ch.Name} ({ch.Interpreter}) registered.");
+                            nlog.Trace($"[XTA:BOOT] Interpreter for {ch.Name} ({ch.Interpreter}) registered.");
                         }
                     }
                 })

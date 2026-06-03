@@ -294,86 +294,10 @@ namespace XTA.Infrastructure.Data
                 await Task.Delay(1000); 
             } 
         }
-        private async Task ProcessMessageQueue()
-        {
-            while (_dbLoopCancelSource != null && !_dbLoopCancelSource.IsCancellationRequested)
-            {
-                try
-                {
-                    if (!_messageQueue.IsEmpty)
-                    {
-                        using var uow = new UnitOfWork(GetLayer());
-                        while (_messageQueue.TryDequeue(out var xdo))
-                        {
-                            var msg = new XpoTgMessage(uow)
-                            {
-                                CID = xdo.CID,
-                                Time = DateTime.Now,
-                                CNO = xdo.CNO,
-                                Text = xdo.Text ?? string.Empty,
-                                Status = 0
-                            };
-                        }
-                        await uow.CommitChangesAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    nlog.Error(ex, "[DB] Message Queue Error");
-                }
-                await Task.Delay(1000);
-            }
-        }
-
-        private async Task ProcessArchivingQueue()
-        {
-            while (_dbLoopCancelSource != null && !_dbLoopCancelSource.IsCancellationRequested)
-            {
-                try
-                {
-                    await ArchiveSignalsInternal();
-                }
-                catch (Exception ex)
-                {
-                    nlog.Error(ex, "[DB] Archiving Loop Error");
-                }
-
-                int delayMs = 1000;
-                try
-                {
-                    var param = this.param as XTA.Models.XParameter;
-                    if (param?.Config?.System != null) delayMs = Math.Max(1, param.Config.System.ArchiveIntervalSeconds);
-                }
-                catch { }
-
-                await Task.Delay(TimeSpan.FromMilliseconds(delayMs));
-            }
-        }
-
-        public async Task ArchiveSignalsInternal()
-        {
-            try
-            {
-                using var uow = new UnitOfWork(GetLayer());
-                var targets = new XPCollection<XpoSignal>(uow, CriteriaOperator.Parse("xa_exit = ? AND xe_status >= ?", XCode.XA_ARCHIVE_READY, (int)XCode.EaStatus.Closed_Signal)).ToList();
-                var sids = targets.Select(t => t.sid).ToList();
-                foreach (var s in targets)
-                {
-                    var h = new XpoSignalHistory(uow);
-                    s.ToHistoryModel(h);
-                    s.Delete();
-                }
-                if (targets.Count > 0)
-                {
-                    await uow.CommitChangesAsync();
-                    // Clear TTS played cache for archived SIDs so reinjection can trigger audio again
+        private async Task ProcessMessageQueue() { while (_dbLoopCancelSource != null && !_dbLoopCancelSource.IsCancellationRequested) { try { if (!_messageQueue.IsEmpty) { using var uow = new UnitOfWork(GetLayer()); while (_messageQueue.TryDequeue(out var xdo)) { var msg = new XpoTgMessage(uow) { CID = xdo.CID, Time = DateTime.Now, CNO = xdo.CNO, Text = xdo.Text ?? string.Empty, Status = 0 }; } await uow.CommitChangesAsync(); } } catch (Exception ex) { nlog.Error(ex, "[DB] Message Queue Error"); } await Task.Delay(1000); } }
+                int delayMs = 1000; try { var param = this.param as XTA.Models.XParameter; if (param?.Config?.System != null) delayMs = Math.Max(1, param.Config.System.ArchiveIntervalSeconds); } catch { } await Task.Delay(TimeSpan.FromMilliseconds(delayMs)); } }
+        public async Task ArchiveSignalsInternal() { try { using var uow = new UnitOfWork(GetLayer()); var targets = new XPCollection<XpoSignal>(uow, CriteriaOperator.Parse("xa_exit = ? AND xe_status >= ?", XCode.XA_ARCHIVE_READY, (int)XCode.EaStatus.Closed_Signal)).ToList(); var sids = targets.Select(t => t.sid).ToList(); foreach (var s in targets) { var h = new XpoSignalHistory(uow); s.ToHistoryModel(h); s.Delete(); } if (targets.Count > 0) { await uow.CommitChangesAsync(); // Clear TTS played cache for archived SIDs so reinjection can trigger audio again
                     try { XContext.Instance.Sound?.ClearPlayedForSid(sids.FirstOrDefault() ?? string.Empty); } catch { }
-                }
-            }
-            catch (Exception ex)
-            {
-                nlog.Error(ex, "[DB:ARCHIVE] Archiving Protocol Failure.");
-            }
-        }
+                } } catch (Exception ex) { nlog.Error(ex, "[DB:ARCHIVE] Archiving Protocol Failure."); } }
     }
 }
