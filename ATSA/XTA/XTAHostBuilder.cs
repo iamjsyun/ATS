@@ -67,14 +67,26 @@ namespace XTA
                         // Dynamic Channel Registration from Config (Enabled only)
                         if (xConfig.Channels != null)
                         {
-                            foreach (var ch in xConfig.Channels.Where(c => c.Enabled))
+                        foreach (var ch in xConfig.Channels.Where(c => c.Enabled))
+                        {
+                            // Support new combined Name format: "CNO, ChannelId , DisplayName"
+                            string displayName = ch.Name ?? string.Empty;
+                            if (!string.IsNullOrWhiteSpace(ch.Name))
                             {
-                                var info = new XChannelInfo(ch.ChannelId, ch.CNO, ch.Name, "TRADE")
+                                var parts = ch.Name.Split(',');
+                                if (parts.Length >= 3)
                                 {
-                                    IsSoundEnabled = ch.SoundEnabled
-                                };
-                                parameter.RegisterChannel(info);
+                                    // Use everything after the first two commas as the display name (handles commas in names)
+                                    displayName = string.Join(",", parts.Skip(2)).Trim();
+                                }
                             }
+
+                            var info = new XChannelInfo(ch.ChannelId, ch.CNO, displayName, "TRADE")
+                            {
+                                IsSoundEnabled = ch.SoundEnabled
+                            };
+                            parameter.RegisterChannel(info);
+                        }
                         }
                     }
 
@@ -125,28 +137,28 @@ namespace XTA
                     extraServices?.Invoke(services);
                     
                     // 7. Interpreters (Source of Truth for Channels - Enabled only)
-                    foreach (var ch in parameter.Config.Channels.Where(c => c.Enabled))
+                        foreach (var ch in parameter.Config.Channels.Where(c => c.Enabled))
                     {
                         if (string.IsNullOrEmpty(ch.Interpreter)) continue;
 
-                        var info = parameter.GetChannels(ch.ChannelId).FirstOrDefault(c => c.CNO == ch.CNO);
-                        if (info == null) continue;
+                        var channelInfo = parameter.GetChannels(ch.ChannelId).FirstOrDefault(c => c.CNO == ch.CNO);
+                        if (channelInfo == null) continue;
 
                         XInterpreterBase? interpreter = null;
-                        
+
                         // 명시적 해석기 매핑 (v9.6)
                         if (ch.Interpreter.Equals("GlobalGold", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.GlobalGold.GlobalGold(parameter, info);
+                            interpreter = new XTA.Channels.GlobalGold.GlobalGold(parameter, channelInfo);
                         else if (ch.Interpreter.Equals("GMK", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.GMK.GMK(parameter, info);
+                            interpreter = new XTA.Channels.GMK.GMK(parameter, channelInfo);
                         else if (ch.Interpreter.Equals("YouTubeVision", StringComparison.OrdinalIgnoreCase))
-                            interpreter = new XTA.Channels.YouTubeVision.YouTubeVision(parameter, info);
+                            interpreter = new XTA.Channels.YouTubeVision.YouTubeVision(parameter, channelInfo);
 
                         if (interpreter != null)
                         {
                             parameter.Add(interpreter);
                             services.AddSingleton<XInterpreterBase>(interpreter);
-                            nlog.Trace($"[XTA:BOOT] Interpreter for {ch.Name} ({ch.Interpreter}) registered.");
+                            nlog.Trace($"[XTA:BOOT] Interpreter for {channelInfo?.Name ?? ch.Name} ({ch.Interpreter}) registered.");
                         }
                     }
                 })

@@ -413,7 +413,20 @@ namespace ATSA.UI.DataManager
                 _param.nlog.Debug($"[DM:UPDATE] Signal {SelectedSignal.sid} transitioned to xa_exit={newXaExit}, xe_status={newXeStatus}");
 
                 // [Verification] DB 리로드하여 결과 확인
-                await LoadSignals();
+                // Perform 3 refreshes at 1-second intervals to ensure gridview and DB are synchronized
+                for (int i = 0; i < 2; i++)
+                {
+                    try
+                    {
+                        await LoadSignals();
+                    }
+                    catch (Exception ex)
+                    {
+                        _param.nlog.Warn(ex, "[DM:UPDATE] LoadSignals during post-update refresh failed.");
+                    }
+                    if (i < 2)
+                        await Task.Delay(1000);
+                }
             }
             catch (Exception ex)
             {

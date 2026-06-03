@@ -62,58 +62,59 @@ namespace XTA.Models
                         Version = "v9.0.0", 
                         DatabaseFullPath = dbFullPath, // 공용 폴더 FullPath 명시
                         LoggingLevel = "Info",
-                        RefreshIntervalMs = 1000
+                        RefreshIntervalMs = 1000,
+                        ArchiveIntervalSeconds = 1000
                     },
                     Channels = new List<XChannelConfig>
                     {
                         new XChannelConfig { 
-                            CNO = 1001, Name = "GlobalGold", Symbol = "GOLD#", ChannelId = XChannelIds.GlobalGold, SourceType = "Telegram",
+                            CNO = 1001, Name = " 1001, -1002204600811 , GlobalGold", Symbol = "GOLD#", ChannelId = XChannelIds.GlobalGold, SourceType = "Telegram",
                             Interpreter = "GlobalGold",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Live",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
-                            CNO = 1002, Name = "GMK", Symbol = "GOLD#", ChannelId = XChannelIds.GMK, SourceType = "Telegram",
+                            CNO = 1002, Name = " 1002, -1002218781954 , GMK", Symbol = "GOLD#", ChannelId = XChannelIds.GMK, SourceType = "Telegram",
                             Interpreter = "GMK",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Live",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
-                            CNO = 3001, Name = "XHANA", Symbol = "GOLD#", ChannelId = XChannelIds.XHANA, SourceType = "Telegram",
+                            CNO = 3001, Name = " 3001, -1003778889507 , XHANA", Symbol = "GOLD#", ChannelId = XChannelIds.XHANA, SourceType = "Telegram",
                             Interpreter = "GlobalGold",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig { 
-                            CNO = 3002, Name = "XDUNA", Symbol = "GOLD#", ChannelId = XChannelIds.XDUNA, SourceType = "Telegram",
+                            CNO = 3002, Name = " 3002, -1003697953708 , XDUNA", Symbol = "GOLD#", ChannelId = XChannelIds.XDUNA, SourceType = "Telegram",
                             Interpreter = "GMK",
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
-                            CNO = 2001, Name = "YouTube_CH1", SourceType = "YouTube",
+                            CNO = 2001, Name = " 2001, 0 , YouTube_CH1", SourceType = "YouTube",
                             Interpreter = "YouTubeVision",
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/-ps7V40GrA4", ROI = "100,100,400,200", IntervalMs = 3000 },
                             TradingOption = new XTradingOption { 
                                 ActiveMode = "Simulation",
-                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
-                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "Fixed, 0.01, 0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
+                                Buy = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" },
+                                Sell = new XDirectionOption { Enabled = true, LotStrategy = "F,0.01,1.0", Entry = "500, 100, 1000", Exit = "500, 100, 700, 1500" }
                             }
                         },
                         new XChannelConfig {
-                            CNO = 2002, Name = "YouTube_CH2", SourceType = "YouTube",
+                            CNO = 2002, Name = " 2002, 0 , YouTube_CH2", SourceType = "YouTube",
                             Interpreter = "YouTubeVision",
                             YouTube = new XYouTubeConfig { Url = "https://youtu.be/P4V456LsOYk", ROI = "0,0,800,400", IntervalMs = 3000 },
                             TradingOption = new XTradingOption { 
@@ -190,7 +191,7 @@ namespace XTA.Models
     public class XDirectionOption
     {
         public bool? Enabled { get; set; }
-        public string? LotStrategy { get; set; } = "Fixed, 0.01, 0"; // "Type, Value, Rate"
+        public string? LotStrategy { get; set; } = "F,0.01,1.0"; // "Type, Value, Rate" (F/R supported)
         public string? Entry { get; set; } = "500, 100, 1000";       // "TeStart, TeStep, TeLimit"
         public string? Exit { get; set; } = "500, 100, 700, 1500";  // "TsStart, TsStep, SL, TP"
 
@@ -205,10 +206,31 @@ namespace XTA.Models
         {
             if (string.IsNullOrEmpty(s)) return new XLotStrategy();
             var p = s.Split(',').Select(x => x.Trim()).ToArray();
-            return new XLotStrategy { 
-                Type = p.Length > 0 ? p[0] : "Fixed", 
-                Value = p.Length > 1 ? double.Parse(p[1]) : 0.01, 
-                Rate = p.Length > 2 ? double.Parse(p[2]) : 0 
+            string rawType = p.Length > 0 ? p[0] : "Fixed";
+            // Normalize short forms: F -> Fixed, R -> Rate
+            string typeNorm = rawType switch
+            {
+                var t when string.Equals(t, "F", StringComparison.OrdinalIgnoreCase) => "Fixed",
+                var t when string.Equals(t, "R", StringComparison.OrdinalIgnoreCase) => "Rate",
+                _ => rawType
+            };
+
+            double value = 0.01;
+            double rate = 1.0;
+            if (p.Length > 1)
+            {
+                double.TryParse(p[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value);
+            }
+            if (p.Length > 2)
+            {
+                double.TryParse(p[2], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out rate);
+            }
+
+            return new XLotStrategy
+            {
+                Type = typeNorm,
+                Value = value,
+                Rate = rate
             };
         }
 
