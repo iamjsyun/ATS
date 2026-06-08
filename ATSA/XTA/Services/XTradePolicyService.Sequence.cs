@@ -47,6 +47,16 @@ namespace XTA.Services
                 .ConfigureState("CheckEnablement")
                     .OnEntry(() => {
                         bool isManual = ctx.Xdo.CMD == "DM_INJECTION" || ctx.Xdo.CMD == "TEST_INJECTION";
+
+                        // [v10.5] Channel-level Enablement Check (Master Switch)
+                        if (!isManual && ctx.MergedConfig?.Enabled == false)
+                        {
+                            nlog.Warn($"[Policy] Channel CNO:{ctx.MasterSignal.cno} is disabled in configuration. Signal Ignored.");
+                            seq.SetState("End");
+                            return;
+                        }
+
+                        // [v10.5] Direction-level Enablement Check
                         if (!isManual && (ctx.Policy == null || ctx.Policy.Enabled == false))
                         {
                             nlog.Warn($"[Policy] Direction {(ctx.MasterSignal.dir == XCode.BUY ? "BUY" : "SELL")} is disabled for CNO:{ctx.MasterSignal.cno}. Signal Ignored.");
